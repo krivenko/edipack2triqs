@@ -1,0 +1,30 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "edipack2triqs"
+version = "0.1.0"
+description = "Compatibility layer between EDIpack and TRIQS"
+readme = "README.md"
+requires-python = ">=3.8"
+keywords = ["edipack", "edipy", "triqs"]
+authors = [
+    {name = "I. Krivenko", email = "iskrivenko@proton.me" }
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "License :: OSI Approved :: BSD License",
+    "Intended Audience :: Science/Research",
+    "Topic :: Scientific/Engineering :: Physics",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12"
+]
+dependencies = ["edipy", "numpy", "scipy"]
+
+[project.urls]
+"Source" = "https://github.com/krivenko/edipack2triqs/"
