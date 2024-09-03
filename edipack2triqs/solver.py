@@ -1,8 +1,11 @@
+from typing import Union
+
 import triqs.operators as op
 
 from edipy import global_env as ed
 
 from .util import IndicesType, validate_fops_up_dn
+from .hamiltonian import HamiltonianParams, parse_hamiltonian
 
 
 class EDIpackSolver:
@@ -24,7 +27,7 @@ class EDIpackSolver:
         return cls._instance
 
     def __init__(self,
-                 h: op.Operator,
+                 h: Union[HamiltonianParams, op.Operator],
                  fops_imp_up: list[IndicesType],
                  fops_imp_dn: list[IndicesType],
                  fops_bath_up: list[IndicesType],
@@ -36,7 +39,15 @@ class EDIpackSolver:
                             "fops_imp_dn")
 
         self.norb = len(fops_imp_up)
+        if self.norb > 5:
+            raise RuntimeError(
+                f"At most 5 orbitals are allowed, got {self.norb}"
+            )
         ed.Norb = self.norb
+
+        params = h if (h is HamiltonianParams) else parse_hamiltonian(h)
+        # TODO
+        print(params)
 
         # TODO: Extract Uloc and Ust from h
         # TODO: Extract Jh, Jx, Jp

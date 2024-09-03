@@ -2,11 +2,21 @@ import unittest
 
 import triqs.operators as op
 
-from edipack2triqs.util import (validate_fops_up_dn,
+from edipack2triqs.util import (canonical2op,
+                                monomial2op,
+                                validate_fops_up_dn,
                                 spin_conjugate)
 
 
 class TestUtil(unittest.TestCase):
+
+    def test_canonical2op(self):
+        self.assertEqual(canonical2op(True, ["up", 0]), op.c_dag("up", 0))
+        self.assertEqual(canonical2op(False, ["up", 0]), op.c("up", 0))
+
+    def test_monomial2op(self):
+        self.assertEqual(monomial2op([(True, ["up", 0]), (False, ["dn", 1])]),
+                         op.c_dag("up", 0) * op.c("dn", 1))
 
     def test_validate_fops_up_dn(self):
         fops_up = [("up", 0), ("up", 1)]

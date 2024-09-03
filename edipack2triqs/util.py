@@ -4,7 +4,21 @@ from typing import Union
 
 import triqs.operators as op
 
-IndicesType = tuple[Union[int, str], Union[int, str]]
+IndicesType = list[Union[int, str]]
+CanonicalType = tuple[bool, IndicesType]
+
+
+def canonical2op(dag: bool, ind: IndicesType):
+    """
+    Return a many-body operator made out of one canonical operator
+    c_dag(*ind) or c(*ind).
+    """
+    return op.c_dag(*ind) if dag else op.c(*ind)
+
+
+def monomial2op(mon: list[CanonicalType]):
+    "Return a many-body operator made out of one monomial."
+    return reduce(mul, map(lambda c: canonical2op(*c), mon), op.Operator(1))
 
 
 def validate_fops_up_dn(fops_up: list[IndicesType],
@@ -42,11 +56,8 @@ def spin_conjugate(OP: op.Operator,
     spin_conj_map = {u: d for u, d in zip(fops_up, fops_dn)}
     spin_conj_map.update({d: u for d, u in zip(fops_dn, fops_up)})
 
-    def conj_gen(dagind):
-        new_ind = spin_conj_map[tuple(dagind[1])]
-        return op.c_dag(*new_ind) if dagind[0] else op.c(*new_ind)
-
     res = op.Operator()
     for mon, coeff in OP:
-        res += coeff * reduce(mul, map(conj_gen, mon), op.Operator(1))
+        new_mon = [(dag, spin_conj_map[tuple(ind)]) for dag, ind in mon]
+        res += coeff * monomial2op(new_mon)
     return res
