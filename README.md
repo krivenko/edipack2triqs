@@ -2,5 +2,5 @@
 
 ## Dependencies
 
-* [EDIpack >= 3.0.0](https://github.com/aamaricci/EDIpack)
+* [edipy (EDIpack) >= 4.0.0](https://github.com/lcrippa/EDIpack)
 * [TRIQS 3.2.x](https://triqs.github.io/triqs/latest)
