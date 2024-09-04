@@ -2,10 +2,19 @@ from functools import reduce
 from operator import mul
 from typing import Union
 
+import numpy as np
+
 import triqs.operators as op
 
-IndicesType = list[Union[int, str]]
+IndicesType = tuple[Union[int, str], Union[int, str]]
 CanonicalType = tuple[bool, IndicesType]
+
+
+def is_diagonal(a: np.ndarray):
+    """
+    Check if matrix (rank-2 array) diagonal.
+    """
+    return np.array_equal(a, np.diag(np.diag(a)))
 
 
 def canonical2op(dag: bool, ind: IndicesType):
@@ -38,9 +47,11 @@ def validate_fops_up_dn(fops_up: list[IndicesType],
     assert len(fops_dn) == len(fops_dn_s), \
         f"No repeated entries are allowed in {name_fops_dn}"
     assert len(fops_up) == len(fops_dn), \
-        f"Lists {name_fops_up} and {name_fops_dn} must be of equal size"
+        f"Fundamental sets {name_fops_up} and {name_fops_dn} " \
+        "must be of equal size"
     assert fops_up_s.isdisjoint(fops_dn_s), \
-        f"Lists {name_fops_up} and {name_fops_dn} must be disjoint"
+        f"Fundamental sets {name_fops_up} and {name_fops_dn} " \
+        "must be disjoint"
 
 
 def spin_conjugate(OP: op.Operator,
