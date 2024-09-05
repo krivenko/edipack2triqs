@@ -1,7 +1,7 @@
 import unittest
-import numpy as np
-
 from itertools import product
+
+import numpy as np
 from numpy.testing import assert_allclose
 
 import triqs.operators as op

@@ -17,7 +17,7 @@ class EDIpackSolver:
         if not cls._instance:
             cls._instance = super(
                 EDIpackSolver, cls
-            ).__new__(cls, *args, **kwargs)
+            ).__new__(cls)
         else:
             raise RuntimeError(
                 "Only one instance of EDIpackSolver can be created"
