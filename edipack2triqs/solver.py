@@ -1,3 +1,5 @@
+import numpy as np
+
 import triqs.operators as op
 
 from edipy import global_env as ed
@@ -35,14 +37,27 @@ class EDIpackSolver:
                                         fops_imp_dn,
                                         fops_bath_up,
                                         fops_bath_dn)
+        # Pass general parameters to EDIpack
         ed.Nspin = self.params.Hloc.shape[0]
         ed.Norb = self.params.Hloc.shape[2]
         assert ed.Norb <= 5, f"At most 5 orbitals are allowed, got {ed.Norb}"
 
+        # Pass bath parameters to EDIpack
         ed.Nbath = self.params.Nbath
         ed.bath_type = self.params.bath_type
-        ed.init_solver(self.params.bath)
+
+        # Pass interaction parameters to EDIpack
+        ed.Uloc = self.params.Uloc
+        ed.Ust = self.params.Ust
+        ed.Jh = self.params.Jh
+        ed.Jx = self.params.Jx
+        ed.Jp = self.params.Jp
+
+        # Initialize EDIpack solver
+        Nb = ed.get_bath_dimension()
+        self.bath = np.zeros(Nb, dtype='float', order='F')
+        ed.init_solver(self.bath)
 
     def solve(self):
-        # TODO
-        ed.solve(self.params.bath, self.params.Hloc)
+        # TODO: Feed bath parameters to ed
+        ed.solve(self.bath, self.params.Hloc)

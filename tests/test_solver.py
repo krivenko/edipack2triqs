@@ -72,6 +72,7 @@ class TestEDIpackSolver(unittest.TestCase):
                                self.fops_imp_dn,
                                fops_bath_up,
                                fops_bath_dn)
+        # TODO
         solver.solve()
 
         fops = self.fops_imp_up + self.fops_imp_dn + fops_bath_up + fops_bath_dn

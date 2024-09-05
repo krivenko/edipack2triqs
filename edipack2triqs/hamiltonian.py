@@ -232,3 +232,5 @@ def parse_hamiltonian(hamiltonian: op.Operator,
         )
 
     return params
+
+# TODO: detect correct ed_total_ud()
