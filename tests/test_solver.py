@@ -47,8 +47,8 @@ class TestEDIpackSolver(unittest.TestCase):
 
         nbath = 2
         h_loc = np.array([[0.1, 0.0], [0.0, 0.2]])
-        eps = [[-0.1, -0.2], [0.1, 0.2]]
-        V = [[0.4, 0.6], [0.6, 0.4]]
+        eps = np.array([[-0.1, -0.2], [0.1, 0.2]])
+        V = np.array([[0.4, 0.6], [0.6, 0.4]])
 
         fops_bath_up = [('B_up', nu * self.norb + o)
                         for nu, o in product(range(nbath), orbs)]

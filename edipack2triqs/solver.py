@@ -42,9 +42,22 @@ class EDIpackSolver:
         ed.Norb = self.params.Hloc.shape[2]
         assert ed.Norb <= 5, f"At most 5 orbitals are allowed, got {ed.Norb}"
 
+        bath_params = self.params.bath
+
+        # Initialize EDIpack solver
+        ed.Nbath = bath_params.nbath
+        ed.bath_type = bath_params.name
+        self.bath = np.zeros(ed.get_bath_dimension(), dtype=float)
+        ed.init_solver(self.bath)
+
         # Pass bath parameters to EDIpack
-        ed.Nbath = self.params.Nbath
-        ed.bath_type = self.params.bath_type
+        if bath_params.name in ('normal', 'hybrid'):
+            assert self.bath.size == bath_params.eps.size + bath_params.V.size
+            self.bath[:bath_params.eps.size] = bath_params.eps.flatten()
+            self.bath[bath_params.eps.size:] = bath_params.V.flatten()
+        else:
+            # TODO
+            raise RuntimeError("'replica' bath topology is not supported yet")
 
         # Pass interaction parameters to EDIpack
         ed.Uloc = self.params.Uloc
@@ -53,11 +66,5 @@ class EDIpackSolver:
         ed.Jx = self.params.Jx
         ed.Jp = self.params.Jp
 
-        # Initialize EDIpack solver
-        Nb = ed.get_bath_dimension()
-        self.bath = np.zeros(Nb, dtype='float', order='F')
-        ed.init_solver(self.bath)
-
     def solve(self):
-        # TODO: Feed bath parameters to ed
         ed.solve(self.bath, self.params.Hloc)
