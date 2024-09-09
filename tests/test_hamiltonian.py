@@ -231,3 +231,7 @@ class TestHamiltonian(unittest.TestCase):
     # TODO
     # test_parse_hamiltonian_nspin1_replica()
     # test_parse_hamiltonian_nspin2_replica()
+
+
+if __name__ == '__main__':
+    unittest.main()

@@ -1,6 +1,8 @@
 from functools import reduce
 from operator import mul
 from typing import Union
+from contextlib import contextmanager
+import os
 
 import numpy as np
 
@@ -72,3 +74,30 @@ def spin_conjugate(OP: op.Operator,
         new_mon = [(dag, spin_conj_map[tuple(ind)]) for dag, ind in mon]
         res += coeff * monomial2op(new_mon)
     return res
+
+
+@contextmanager
+def chdircontext(path):
+    """
+    Emulates contextlib.chdir(path) from Python 3.11.
+    """
+    oldpwd = os.getcwd()
+    os.chdir(path)
+    try:
+        yield
+    finally:
+        os.chdir(oldpwd)
+
+
+def write_config(f, config):
+    """
+    Write a name-value configuration file recognized by EDIpack.
+    """
+    for name, value in config.items():
+        if isinstance(value, bool):
+            v = 'T' if value else 'F'
+        elif isinstance(value, np.ndarray):
+            v = ','.join(map(str, value))
+        else:
+            v = value
+        f.write(f"{name}={v}\n")

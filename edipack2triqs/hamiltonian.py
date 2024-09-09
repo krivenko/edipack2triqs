@@ -13,7 +13,6 @@ import triqs.operators as op
 from .util import (is_diagonal,
                    IndicesType,
                    monomial2op,
-                   validate_fops_up_dn,
                    spin_conjugate)
 
 
@@ -36,12 +35,11 @@ class BathNormal:
                  V: np.ndarray):
         norb = Hloc.shape[1]
         nbath_total = h.shape[1]
-        nbath = nbath_total // norb
+        self.nbath = nbath_total // norb
 
         self.name = 'normal'
-        self.nbath = nbath
-        self.eps = np.zeros((nspin, norb, nbath), dtype=float)
-        self.V = np.zeros((nspin, norb, nbath), dtype=float)
+        self.eps = np.zeros((nspin, norb, self.nbath), dtype=float)
+        self.V = np.zeros((nspin, norb, self.nbath), dtype=float)
 
         for spin in range(nspin):
             # Lists of bath states coupled to each impurity orbital
@@ -53,13 +51,19 @@ class BathNormal:
                 (bs[orbs[0]] if (len(orbs) != 0) else dec_bs).append(b)
             for orb in range(norb):
                 # Assign the decoupled bath states to some orbitals
-                n_missing_states = nbath - len(bs[orb])
+                n_missing_states = self.nbath - len(bs[orb])
                 for _ in range(n_missing_states):
                     bs[orb].append(dec_bs.pop(0))
                 # Fill the parameters
                 for nu, b in enumerate(bs[orb]):
                     self.eps[spin, orb, nu] = h[spin, b, b]
                     self.V[spin, orb, nu] = V[spin, orb, b]
+
+    def write_edipack_bath(self, bath: np.ndarray):
+        assert bath.size == self.eps.size + self.V.size
+        bath[:self.eps.size] = self.eps.flatten()
+        bath[self.eps.size:] = self.V.flatten()
+
 
 @dataclass
 class BathHybrid:
@@ -89,6 +93,11 @@ class BathHybrid:
         for spin, nu in product(range(nspin), range(nbath)):
             self.eps[spin, 0, nu] = h[spin, nu, nu]
             self.V[spin, ...] = V[spin, ...]
+
+    def write_edipack_bath(self, bath: np.ndarray):
+        assert bath.size == self.eps.size + self.V.size
+        bath[:self.eps.size] = self.eps.flatten()
+        bath[self.eps.size:] = self.V.flatten()
 
 
 def default_Uloc():
@@ -163,15 +172,6 @@ def parse_hamiltonian(hamiltonian: op.Operator,
     """
     Parse a given Hamiltonian and extract parameters from it.
     """
-
-    validate_fops_up_dn(fops_imp_up,
-                        fops_imp_dn,
-                        "fops_imp_up",
-                        "fops_imp_dn")
-    validate_fops_up_dn(fops_bath_up,
-                        fops_bath_dn,
-                        "fops_bath_up",
-                        "fops_bath_dn")
 
     if not (hamiltonian - op.dagger(hamiltonian)).is_zero():
         raise RuntimeError("Hamiltonian is not Hermitian")
@@ -318,5 +318,3 @@ def parse_hamiltonian(hamiltonian: op.Operator,
         params.Hloc[spin, spin, ...] = Hloc[spin, ...]
 
     return params
-
-# TODO: detect correct ed_total_ud()

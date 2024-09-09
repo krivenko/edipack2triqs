@@ -1,70 +1,280 @@
+from tempfile import TemporaryDirectory
+import re
+
 import numpy as np
 
 import triqs.operators as op
 
 from edipy import global_env as ed
 
-from .util import IndicesType
-from .hamiltonian import parse_hamiltonian
+from .util import IndicesType, validate_fops_up_dn, write_config, chdircontext
+from .hamiltonian import parse_hamiltonian, BathNormal, BathHybrid
 
 
 class EDIpackSolver:
 
-    # edipy stores simulation parameters as attributes of the module itself.
-    # Therefore, state of a simulation must be controlled by at most one object
-    # at any time -> singleton.
-    _instance = None
-
-    def __new__(cls, *args, **kwargs):
-        if not cls._instance:
-            cls._instance = super(
-                EDIpackSolver, cls
-            ).__new__(cls)
-        else:
-            raise RuntimeError(
-                "Only one instance of EDIpackSolver can be created"
-            )
-        return cls._instance
+    # Default configuration
+    default_config = {
+        # DMFT
+        "NLOOP": 0,
+        "DMFT_ERROR": 0.0,
+        "NSUCCESS": 0,
+        # Hartree-Fock
+        "HFMODE": False,
+        "XMU": 0.0,
+        # Phonons
+        "PH_TYPE": 1,
+        "NPH": 0,
+        # Fixed density calculations
+        "NREAD": 0.0,
+        "NERR": 0.0,
+        "NDELTA": 0.0,
+        "NCOEFF": 0.0,
+        # ED
+        "ED_PRINT_SIGMA": False,
+        "ED_PRINT_G": False,
+        "ED_PRINT_G0": False,
+        "ED_PRINT_SIGMA": False,
+        "ED_FINITE_TEMP": True,
+        "ED_TWIN": False,
+        "ED_SECTORS": False,
+        "ED_SECTORS_SHIFT": 0,
+        "ED_SOLVE_OFFDIAG_GF": False,   # TODO
+        "ED_ALL_G": False,              # TODO
+        "ED_OFFSET_BATH": 0.0,
+        # TODO: Susceptibilities
+        "LTAU": 1000,               # TODO: To be set in solve()
+        "CHISPIN_FLAG": False,      # TODO: To be set in __init__()
+        "CHIDENS_FLAG": False,      # TODO: To be set in __init__()
+        "CHIPAIR_FLAG": False,      # TODO: To be set in __init__()
+        "CHIEXCT_FLAG": False       # TODO: To be set in __init__()
+    }
 
     def __init__(self,
-                 h: op.Operator,
+                 hamiltonian: op.Operator,
                  fops_imp_up: list[IndicesType],
                  fops_imp_dn: list[IndicesType],
                  fops_bath_up: list[IndicesType],
-                 fops_bath_dn: list[IndicesType]):
-        self.params = parse_hamiltonian(h,
-                                        fops_imp_up,
-                                        fops_imp_dn,
-                                        fops_bath_up,
-                                        fops_bath_dn)
-        # Pass general parameters to EDIpack
-        ed.Nspin = self.params.Hloc.shape[0]
-        ed.Norb = self.params.Hloc.shape[2]
-        assert ed.Norb <= 5, f"At most 5 orbitals are allowed, got {ed.Norb}"
+                 fops_bath_dn: list[IndicesType],
+                 **kwargs
+                 ):
+        """
+        Initialize internal state of the underlying EDIpack solver.
 
-        bath_params = self.params.bath
+        Parameters
+        ----------
+        hamiltonian: triqs.operators.Operator
+            Many-body Hamiltonian to diagonalize
+        fops_imp_up: list of tuples of strings and ints
+            List of all spin-up impurity annihilation / creation operator
+            flavors (indices)
+        fops_imp_dn: list of tuples of strings and ints
+            List of all spin-down impurity annihilation / creation operator
+            flavors (indices)
+        fops_bath_up: list of tuples of strings and ints
+            List of all spin-up bath annihilation / creation operator
+            flavors (indices)
+        fops_bath_dn: list of tuples of strings and ints
+            List of all spin-down bath annihilation / creation operator
+            flavors (indices)
+        verbose: int, default 3
+            Verbosity level: 0=almost nothing --> 5:all
+        cutoff: float, default 1e-9
+            Spectrum cutoff, used to determine the number states to be retained
+        gs_threshold: float, default 1e-9
+            Energy threshold for ground state degeneracy loop up
+        ed_sparse_H: bool, default True
+            Flag to select storage of sparse matrix H (True), or direct
+            on-the-fly product H*v (False).
+        lanc_method: str, default "arpack"
+            Select the Lanczos method to be used in the determination of the
+            spectrum: "arpack", "dvdson" (no MPI only).
+        lanc_nstates_sector: int, default 10
+            Initial number of states per sector to be determined
+        lanc_nstates_total: int, default 10
+            Initial total number of states to be determined
+        lanc_nstates_step: int, default 2
+            Number of states added to the spectrum at each step
+        lanc_ncv_factor: int, default 10
+            Set the size of the block used in Lanczos-ARPACK by multiplying
+            the required Neigen (NCV = lanc_ncv_factor * Neigen + lanc_ncv_add)
+        lanc_ncv_add: int, default 0
+            Adds up to the size of the block to prevent it from becoming too
+            small (NCV = lanc_ncv_factor * Neigen + lanc_ncv_add)
+        lanc_niter: int, default 512
+            Number of Lanczos iterations in spectrum determination
+        lanc_ngfiter: int, default 200
+            Number of Lanczos iterations in GF determination (number of momenta)
+        lanc_tolerance: float, default 1e-18
+            Tolerance for the Lanczos iterations as used in ARPACK
+        lanc_dim_threshold: int, default 1024
+            Min dimension threshold to use Lanczos determination of the spectrum
+            rather than LAPACK based exact diagonalization
+        """
 
-        # Initialize EDIpack solver
-        ed.Nbath = bath_params.nbath
-        ed.bath_type = bath_params.name
-        self.bath = np.zeros(ed.get_bath_dimension(), dtype=float)
-        ed.init_solver(self.bath)
+        validate_fops_up_dn(fops_imp_up, fops_imp_dn,
+                            "fops_imp_up", "fops_imp_dn")
+        validate_fops_up_dn(fops_bath_up, fops_bath_dn,
+                            "fops_bath_up", "fops_bath_dn")
+
+        self.norb = len(fops_imp_up)
+        assert self.norb <= 5, \
+            f"At most 5 orbitals are allowed, got {self.norb}"
+
+        self.fops_imp_up = fops_imp_up
+        self.fops_imp_dn = fops_imp_dn
+        self.fops_bath_up = fops_bath_up
+        self.fops_bath_dn = fops_bath_dn
+
+        self.h_params = parse_hamiltonian(
+            hamiltonian,
+            self.fops_imp_up, self.fops_imp_dn,
+            self.fops_bath_up, self.fops_bath_dn
+        )
+        self.nspin = self.h_params.Hloc.shape[0]
+
+        self.config = self.default_config.copy()
+        self.config["ED_VERBOSE"] = kwargs.get("verbose", 3)
+        self.config["CUTOFF"] = kwargs.get("cutoff", 1e-9)
+        self.config["GS_THRESHOLD"] = kwargs.get("gs_threshold", 1e-9)
+        self.config["ED_SPARSE_H"] = kwargs.get("ed_sparse_H", True)
+        self.config["LANC_METHOD"] = kwargs.get("lanc_method", "arpack")
+        self.config["LANC_NSTATES_SECTOR"] = kwargs.get("lanc_nstates_sector",
+                                                        10)
+        self.config["LANC_NSTATES_TOTAL"] = kwargs.get("lanc_nstates_total", 10)
+        self.config["LANC_NSTATES_STEP"] = kwargs.get("lanc_nstates_step", 2)
+        self.config["LANC_NCV_FACTOR"] = kwargs.get("lanc_ncv_factor", 10)
+        self.config["LANC_NCV_ADD"] = kwargs.get("lanc_ncv_add", 0)
+        self.config["LANC_NITER"] = kwargs.get("lanc_niter", 512)
+        self.config["LANC_NGFITER"] = kwargs.get("lanc_ngfiter", 200)
+        self.config["LANC_TOLERANCE"] = kwargs.get("lanc_tolerance", 1e-18)
+        self.config["LANC_DIM_THRESHOLD"] = kwargs.get("lanc_dim_threshold",
+                                                       1024)
+
+        # Impurity structure
+        self.config["NSPIN"] = self.nspin
+        self.config["NORB"] = self.norb
+
+        # Bath geometry
+        self.config["BATH_TYPE"] = self.h_params.bath.name
+        self.config["NBATH"] = self.h_params.bath.nbath
+
+        # Interaction parameters
+        self.config["ULOC"] = self.h_params.Uloc
+        self.config["UST"] = self.h_params.Ust
+        self.config["JH"] = self.h_params.Jh
+        self.config["JX"] = self.h_params.Jx
+        self.config["JP"] = self.h_params.Jp
+
+        # ed_total_ud
+        if isinstance(self.h_params.bath, BathNormal):
+            self.config["ED_TOTAL_UD"] = not (self.h_params.Jx == 0
+                                              and self.h_params.Jp == 0)
+        elif isinstance(self.h_params.bath, BathHybrid):
+            self.config["ED_TOTAL_UD"] = True
+        else:
+            raise RuntimeError("Unrecognized bath type")
+
+        self.workdir = TemporaryDirectory()
+
+        with chdircontext(self.workdir.name):
+            with open('input.conf', 'w') as config_file:
+                write_config(config_file, self.config)
+            ed.read_input('input.conf')
+
+            self.scifor_version = re.match(
+                r"^SCIFOR VERSION \(GIT\): (.*)",
+                open("scifor_version.inc", 'r').readline())[1]
+            self.edipack_version = re.match(
+                r"^EDIPACK VERSION: (.*)",
+                open("EDIPACK_version.inc", 'r').readline())[1]
 
         # Pass bath parameters to EDIpack
-        if bath_params.name in ('normal', 'hybrid'):
-            assert self.bath.size == bath_params.eps.size + bath_params.V.size
-            self.bath[:bath_params.eps.size] = bath_params.eps.flatten()
-            self.bath[bath_params.eps.size:] = bath_params.V.flatten()
-        else:
-            # TODO
-            raise RuntimeError("'replica' bath topology is not supported yet")
+        self.bath = np.zeros(ed.get_bath_dimension(), dtype=float)
+        ed.init_solver(self.bath)
+        self.h_params.bath.write_edipack_bath(self.bath)
 
-        # Pass interaction parameters to EDIpack
-        ed.Uloc = self.params.Uloc
-        ed.Ust = self.params.Ust
-        ed.Jh = self.params.Jh
-        ed.Jx = self.params.Jx
-        ed.Jp = self.params.Jp
+    def update_int_params(self, *, Uloc, Ust, Jh, Jx, Jp):
+        """
+        Update interaction parameters.
 
-    def solve(self):
-        ed.solve(self.bath, self.params.Hloc)
+        Parameters
+        ----------
+        Uloc: numpy.ndarray
+            Values of the local interaction per orbital (max 5)
+        Ust: float
+            Value of the inter-orbital interaction term
+        Jh: float
+            Hund's coupling
+        Jx: float
+            Spin-exchange coupling
+        Jp: float
+            Pair-hopping coupling
+        """
+        assert len(Uloc) == self.norb, \
+            "Required exactly {self.norb} values in Uloc"
+        Uloc_ = np.zeros(5, dtype=float)
+        Uloc_[:self.norb] = Uloc
+        ed.Uloc = Uloc_
+        ed.Ust = Ust
+        ed.Jh = Jh
+        ed.Jx = Jx
+        ed.Jp = Jp
+
+    def solve(self,
+              beta: float,
+              *,
+              n_iw: int = 4096,
+              energy_window: tuple[float, float] = (-5.0, 5.0),
+              n_w: int = 5000,
+              broadening: float = 0.01):
+        """
+        Solve the impurity problem.
+
+        Parameters
+        ----------
+        beta: float
+            Inverse temperature for observable and GF calculations
+        n_iw: int, default 4096
+            Number of Matsubara frequencies for impurity GF calculations
+        energy_window: (float, float), default (-5.0, 5.0)
+            Energy window for real-frequency impurity GF calculations
+        n_w: int, default 5000
+            Number of real-frequency points for impurity GF calculations
+        broadening: float, default 0.01
+            Broadening (eps) on the real axis
+        TODO: Ltau
+        """
+
+        # Pass parameters to EDIpack
+        ed.beta = beta
+        ed.Lmats = n_iw
+        ed.wini, ed.wfin = energy_window
+        ed.Lreal = n_w
+        ed.eps = broadening
+
+        # Solve!
+        with chdircontext(self.workdir.name):
+            ed.solve(self.bath, self.h_params.Hloc)
+
+    def energies(self):
+        "Returns the impurity local energies components"
+        return ed.get_eimp()
+
+    def densities(self):
+        "Returns the impurity occupations, one element per orbital"
+        return ed.get_dens()
+
+    def double_occ(self):
+        "Returns the impurity double occupancy, one element per orbital"
+        return ed.get_docc()
+
+    def magnetization(self):
+        "Returns the impurity magnetization, one element per orbital"
+        return ed.get_mag()
+
+    # TODO
+    # G_iw()
+    # G_w()
+    # Sigma_iw()
+    # Sigma_w()
