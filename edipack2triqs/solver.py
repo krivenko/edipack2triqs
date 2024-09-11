@@ -202,6 +202,10 @@ class EDIpackSolver:
         ed.init_solver(self.bath)
         self.h_params.bath.write_edipack_bath(self.bath)
 
+        # Hybrid bath requires special treatment
+        if isinstance(self.h_params.bath, BathHybrid):
+            ed.set_Hreplica(self.h_params.Hloc)
+
         self.instance_count[0] += 1
 
     def __del__(self):

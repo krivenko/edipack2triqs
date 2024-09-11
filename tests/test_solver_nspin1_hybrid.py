@@ -59,7 +59,6 @@ class TestEDIpackSolver(unittest.TestCase):
 
         return densities, double_occ, magnetization
 
-    @unittest.skip("bath_type='hybrid' support is incomplete")
     def test_solve(self):
         h_loc = self.make_H_loc(mul.outer([1, 1], np.diag([0.5, 0.6])))
         h_int = self.make_H_int(Uloc=np.array([1.0, 2.0]),
@@ -79,10 +78,10 @@ class TestEDIpackSolver(unittest.TestCase):
 
         h_bath = sum(eps[nu] * op.c_dag("B_" + s, nu) * op.c("B_" + s, nu)
                      for nu, s in product(range(3), self.spins))
-        h_bath = sum(V[o, nu] * (
-                     op.c_dag(s, o) * op.c("B_" + s, nu)
-                     + op.c_dag("B_" + s, nu) * op.c(s, o))
-                     for nu, s, o in product(range(3), self.spins, self.orbs))
+        h_bath += sum(V[o, nu] * (
+                      op.c_dag(s, o) * op.c("B_" + s, nu)
+                      + op.c_dag("B_" + s, nu) * op.c(s, o))
+                      for nu, s, o in product(range(3), self.spins, self.orbs))
 
         h = h_loc + h_int + h_bath
         solver = EDIpackSolver(h,
