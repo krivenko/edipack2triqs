@@ -13,6 +13,11 @@ from .hamiltonian import parse_hamiltonian, BathNormal, BathHybrid
 
 class EDIpackSolver:
 
+    # EDIpack maintains the state of a simulation as a set of global variables.
+    # Therefore, this state must be controlled by at most one EDIpackSolver
+    # object at any time.
+    instance_count = [0]
+
     # Default configuration
     default_config = {
         # DMFT
@@ -112,6 +117,9 @@ class EDIpackSolver:
             rather than LAPACK based exact diagonalization
         """
 
+        assert self.instance_count[0] < 1, \
+            "Only one instance of EDIpackSolver can exist at any time"
+
         validate_fops_up_dn(fops_imp_up, fops_imp_dn,
                             "fops_imp_up", "fops_imp_dn")
         validate_fops_up_dn(fops_bath_up, fops_bath_dn,
@@ -193,6 +201,11 @@ class EDIpackSolver:
         self.bath = np.zeros(ed.get_bath_dimension(), dtype=float)
         ed.init_solver(self.bath)
         self.h_params.bath.write_edipack_bath(self.bath)
+
+        self.instance_count[0] += 1
+
+    def __del__(self):
+        self.instance_count[0] -= 1
 
     def update_int_params(self, *, Uloc, Ust, Jh, Jx, Jp):
         """
