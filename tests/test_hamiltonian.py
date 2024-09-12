@@ -193,7 +193,7 @@ class TestHamiltonian(unittest.TestCase):
         assert_allclose(params.Hloc, h_loc.reshape((1, 1, 3, 3)))
         self.assertEqual(params.bath.nbath, 4)
         self.assertEqual(params.bath.name, "hybrid")
-        assert_allclose(params.bath.eps, eps.reshape(1, 1, 4))
+        assert_allclose(params.bath.eps, eps.reshape(1, 4))
         assert_allclose(params.bath.V, V.reshape(1, 3, 4))
         self.check_int_params(params)
 
@@ -224,7 +224,7 @@ class TestHamiltonian(unittest.TestCase):
         assert_allclose(params.Hloc, mul.outer(sz, h_loc))
         self.assertEqual(params.bath.nbath, 4)
         self.assertEqual(params.bath.name, "hybrid")
-        assert_allclose(params.bath.eps, mul.outer([1, -1], eps.reshape(1, 4)))
+        assert_allclose(params.bath.eps, mul.outer([1, -1], eps.reshape(4)))
         assert_allclose(params.bath.V, mul.outer([1, -1], V.reshape(3, 4)))
         self.check_int_params(params)
 

@@ -16,7 +16,6 @@ from .util import (is_diagonal,
                    spin_conjugate)
 
 
-@dataclass
 class BathNormal:
     """Parameters of a bath with normal topology"""
 
@@ -24,9 +23,11 @@ class BathNormal:
     name: str
     # Number of bath sites
     nbath: int
-    # Energy levels
+    # EDIpack-compatible bath parameter array
+    data: np.ndarray
+    # Energy levels view
     eps: np.ndarray
-    # Hopping amplitudes
+    # Hopping amplitudes view
     V: np.ndarray
 
     def __init__(self, nspin: int,
@@ -38,8 +39,14 @@ class BathNormal:
         self.nbath = nbath_total // norb
 
         self.name = 'normal'
-        self.eps = np.zeros((nspin, norb, self.nbath), dtype=float)
-        self.V = np.zeros((nspin, norb, self.nbath), dtype=float)
+
+        size = nspin * norb * self.nbath
+        self.data = np.zeros(2 * size, dtype=float)
+        self.eps = self.data[:size].reshape((nspin, norb, self.nbath))
+        self.V = self.data[size:].reshape((nspin, norb, self.nbath))
+
+        assert not self.eps.flags['OWNDATA']
+        assert not self.V.flags['OWNDATA']
 
         for spin in range(nspin):
             # Lists of bath states coupled to each impurity orbital
@@ -59,13 +66,7 @@ class BathNormal:
                     self.eps[spin, orb, nu] = h[spin, b, b]
                     self.V[spin, orb, nu] = V[spin, orb, b]
 
-    def write_edipack_bath(self, bath: np.ndarray):
-        assert bath.size == self.eps.size + self.V.size
-        bath[:self.eps.size] = self.eps.flatten()
-        bath[self.eps.size:] = self.V.flatten()
 
-
-@dataclass
 class BathHybrid:
     """Parameters of a bath with hybrid topology"""
 
@@ -73,9 +74,11 @@ class BathHybrid:
     name: str
     # Number of bath sites
     nbath: int
-    # Energy levels
+    # EDIpack-compatible bath parameter array
+    data: np.ndarray
+    # Energy levels view
     eps: np.ndarray
-    # Hopping amplitudes
+    # Hopping amplitudes view
     V: np.ndarray
 
     def __init__(self, nspin: int,
@@ -83,21 +86,21 @@ class BathHybrid:
                  h: np.ndarray,
                  V: np.ndarray):
         norb = Hloc.shape[1]
-        nbath = h.shape[1]
+        self.nbath = h.shape[1]
 
         self.name = 'hybrid'
-        self.nbath = nbath
-        self.eps = np.zeros((nspin, 1, nbath), dtype=float)
-        self.V = np.zeros((nspin, norb, nbath), dtype=float)
 
-        for spin, nu in product(range(nspin), range(nbath)):
-            self.eps[spin, 0, nu] = h[spin, nu, nu]
+        eps_size = nspin * self.nbath
+        self.data = np.zeros(eps_size + nspin * norb * self.nbath, dtype=float)
+        self.eps = self.data[:eps_size].reshape((nspin, self.nbath))
+        self.V = self.data[eps_size:].reshape((nspin, norb, self.nbath))
+
+        assert not self.eps.flags['OWNDATA']
+        assert not self.V.flags['OWNDATA']
+
+        for spin, nu in product(range(nspin), range(self.nbath)):
+            self.eps[spin, nu] = h[spin, nu, nu]
             self.V[spin, ...] = V[spin, ...]
-
-    def write_edipack_bath(self, bath: np.ndarray):
-        assert bath.size == self.eps.size + self.V.size
-        bath[:self.eps.size] = self.eps.flatten()
-        bath[self.eps.size:] = self.V.flatten()
 
 
 def default_Uloc():

@@ -198,9 +198,8 @@ class EDIpackSolver:
                 open("EDIPACK_version.inc", 'r').readline())[1]
 
         # Pass bath parameters to EDIpack
-        self.bath = np.zeros(ed.get_bath_dimension(), dtype=float)
-        ed.init_solver(self.bath)
-        self.h_params.bath.write_edipack_bath(self.bath)
+        assert self.h_params.bath.data.size == ed.get_bath_dimension()
+        ed.init_solver(np.zeros(self.h_params.bath.data.size, dtype=float))
 
         # Hybrid bath requires special treatment
         if isinstance(self.h_params.bath, BathHybrid):
@@ -238,6 +237,10 @@ class EDIpackSolver:
         ed.Jx = Jx
         ed.Jp = Jp
 
+    def bath(self):
+        "Access the bath object"
+        return self.h_params.bath
+
     def solve(self,
               beta: float,
               *,
@@ -272,7 +275,7 @@ class EDIpackSolver:
 
         # Solve!
         with chdircontext(self.workdir.name):
-            ed.solve(self.bath, self.h_params.Hloc)
+            ed.solve(self.h_params.bath.data, self.h_params.Hloc)
 
     def energies(self):
         "Returns the impurity local energies components"
