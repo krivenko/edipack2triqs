@@ -97,9 +97,9 @@ class EDIpackSolver:
         lanc_method: str, default "arpack"
             Select the Lanczos method to be used in the determination of the
             spectrum: "arpack", "dvdson" (no MPI only).
-        lanc_nstates_sector: int, default 10
+        lanc_nstates_sector: int, default 2
             Initial number of states per sector to be determined
-        lanc_nstates_total: int, default 10
+        lanc_nstates_total: int, default 2
             Initial total number of states to be determined
         lanc_nstates_step: int, default 2
             Number of states added to the spectrum at each step
@@ -160,8 +160,8 @@ class EDIpackSolver:
         self.config["ED_SPARSE_H"] = kwargs.get("ed_sparse_H", True)
         self.config["LANC_METHOD"] = kwargs.get("lanc_method", "arpack")
         self.config["LANC_NSTATES_SECTOR"] = kwargs.get("lanc_nstates_sector",
-                                                        10)
-        self.config["LANC_NSTATES_TOTAL"] = kwargs.get("lanc_nstates_total", 10)
+                                                        2)
+        self.config["LANC_NSTATES_TOTAL"] = kwargs.get("lanc_nstates_total", 2)
         self.config["LANC_NSTATES_STEP"] = kwargs.get("lanc_nstates_step", 2)
         self.config["LANC_NCV_FACTOR"] = kwargs.get("lanc_ncv_factor", 10)
         self.config["LANC_NCV_ADD"] = kwargs.get("lanc_ncv_add", 0)

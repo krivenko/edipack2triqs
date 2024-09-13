@@ -102,6 +102,8 @@ class TestEDIpackSolverBathHybrid(unittest.TestCase):
                                self.fops_imp_dn,
                                fops_bath_up,
                                fops_bath_dn,
+                               lanc_nstates_sector=4,
+                               lanc_nstates_total=4,
                                verbose=0)
 
         self.assertEqual(solver.nspin, 1)
@@ -223,6 +225,8 @@ class TestEDIpackSolverBathHybrid(unittest.TestCase):
                                self.fops_imp_dn,
                                fops_bath_up,
                                fops_bath_dn,
+                               lanc_nstates_sector=4,
+                               lanc_nstates_total=4,
                                verbose=0)
 
         self.assertEqual(solver.nspin, 2)
