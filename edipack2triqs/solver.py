@@ -246,7 +246,7 @@ class EDIpackSolver:
         ed.finalize_solver()
         self.instance_count[0] -= 1
 
-    def update_int_params(self, *, Uloc, Ust, Jh, Jx, Jp):
+    def update_int_params(self, **kwargs):
         """
         Update interaction parameters.
 
@@ -263,15 +263,30 @@ class EDIpackSolver:
         Jp: float
             Pair-hopping coupling
         """
-        assert len(Uloc) == self.norb, \
-            "Required exactly {self.norb} values in Uloc"
-        Uloc_ = np.zeros(5, dtype=float)
-        Uloc_[:self.norb] = Uloc
-        ed.Uloc = Uloc_
-        ed.Ust = Ust
-        ed.Jh = Jh
-        ed.Jx = Jx
-        ed.Jp = Jp
+
+        if 'Uloc' in kwargs:
+            Uloc = kwargs.pop("Uloc")
+            assert len(Uloc) == self.norb, \
+                "Required exactly {self.norb} values in Uloc"
+            Uloc_ = np.zeros(5, dtype=float)
+            Uloc_[:self.norb] = Uloc
+            ed.Uloc = Uloc_
+
+        ed.Ust = kwargs.pop("Ust", ed.Ust)
+        ed.Jh = kwargs.pop("Jh", ed.Jh)
+        ed.Jx = kwargs.pop("Jx", ed.Jx)
+        ed.Jp = kwargs.pop("Jp", ed.Jp)
+
+        if not ed.ed_total_ud:
+            if ed.Jx != 0:
+                raise RuntimeError("Cannot set Jx to a non-zero value")
+            if ed.Jp != 0:
+                raise RuntimeError("Cannot set Jp to a non-zero value")
+
+        if len(kwargs) > 0:
+            raise RuntimeError("Unrecognized interaction parameters: "
+                               + ', '.join(map(str, kwargs.keys()))
+                               )
 
     def hloc(self):
         "Access the local impurity Hamiltonian H_loc"
