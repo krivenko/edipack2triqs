@@ -12,7 +12,7 @@ from triqs.atom_diag import AtomDiag, atomic_density_matrix, trace_rho_op
 from edipack2triqs.solver import EDIpackSolver
 
 
-class TestEDIpackSolver(unittest.TestCase):
+class TestEDIpackSolverBathNormal(unittest.TestCase):
 
     # Interaction parameters for make_H_int()
     spins = ('up', 'dn')
@@ -70,7 +70,94 @@ class TestEDIpackSolver(unittest.TestCase):
 
         return densities, double_occ, magnetization
 
-    def test_solve(self):
+    def test_nspin1(self):
+        h_loc = self.make_h_loc(mul.outer([1, 1], np.diag([0.5, 0.6])))
+        h_int = self.make_h_int(Uloc=np.array([1.0, 2.0]),
+                                Ust=0.8,
+                                Jh=0.2,
+                                Jx=0.1,
+                                Jp=0.15)
+
+        fops_bath_up = [('B_up', nu * 2 + o)
+                        for nu, o in product(range(2), self.orbs)]
+        fops_bath_dn = [('B_dn', nu * 2 + o)
+                        for nu, o in product(range(2), self.orbs)]
+
+        fops = self.fops_imp_up + self.fops_imp_dn + fops_bath_up + fops_bath_dn
+
+        eps = np.array([[-0.5, 0.5],
+                        [-0.7, 0.7]])
+        V = np.array([[0.1, 0.2],
+                      [0.3, 0.4]])
+        h_bath = self.make_h_bath(eps, V)
+
+        h = h_loc + h_int + h_bath
+        solver = EDIpackSolver(h,
+                               self.fops_imp_up,
+                               self.fops_imp_dn,
+                               fops_bath_up,
+                               fops_bath_dn,
+                               verbose=0)
+
+        self.assertEqual(solver.nspin, 1)
+        self.assertEqual(solver.norb, 2)
+        self.assertEqual(solver.bath().name, "normal")
+        self.assertEqual(solver.bath().nbath, 2)
+
+        # Part I: Initial solve()
+        solver.solve(beta=100.0)
+
+        ## Reference solution
+        densities_ref, double_occ_ref, magnetization_ref = \
+            self.make_ref_results(h, fops, 100.0)
+
+        assert_allclose(solver.densities(), densities_ref, atol=1e-8)
+        assert_allclose(solver.double_occ(), double_occ_ref, atol=1e-8)
+        assert_allclose(solver.magnetization(), magnetization_ref, atol=1e-8)
+        # TODO: GF
+
+        # Part II: update_int_params()
+        new_int_params = {'Uloc': np.array([2.0, 3.0]),
+                          'Ust': 0.6,
+                          'Jh': 0.1,
+                          'Jx': 0.2,
+                          'Jp': 0.0}
+        solver.update_int_params(**new_int_params)
+        solver.solve(beta=120.0)
+
+        ## Reference solution
+        h_int = self.make_h_int(**new_int_params)
+        h = h_loc + h_int + h_bath
+        densities_ref, double_occ_ref, magnetization_ref = \
+            self.make_ref_results(h, fops, 120.0)
+
+        assert_allclose(solver.densities(), densities_ref, atol=1e-8)
+        assert_allclose(solver.double_occ(), double_occ_ref, atol=1e-8)
+        assert_allclose(solver.magnetization(), magnetization_ref, atol=1e-8)
+        # TODO: GF
+
+        # Part III: Updated bath parameters
+        eps = np.array([[-0.5, 0.5],
+                        [-0.7, 0.8]])
+        V = np.array([[0.1, 0.2],
+                      [0.5, 0.4]])
+
+        solver.bath().eps[:] = eps
+        solver.bath().V[:] = V
+        solver.solve(beta=100.0)
+
+        ## Reference solution
+        h_bath = self.make_h_bath(eps, V)
+        h = h_loc + h_int + h_bath
+        densities_ref, double_occ_ref, magnetization_ref = \
+            self.make_ref_results(h, fops, 100.0)
+
+        assert_allclose(solver.densities(), densities_ref, atol=1e-8)
+        assert_allclose(solver.double_occ(), double_occ_ref, atol=1e-8)
+        assert_allclose(solver.magnetization(), magnetization_ref, atol=1e-8)
+        # TODO: GF
+
+    def test_nspin2(self):
         h_loc = self.make_h_loc(mul.outer([0.8, 1.2], np.diag([0.5, 0.6])))
         h_int = self.make_h_int(Uloc=np.array([1.0, 2.0]),
                                 Ust=0.8,
@@ -104,7 +191,7 @@ class TestEDIpackSolver(unittest.TestCase):
         self.assertEqual(solver.bath().name, "normal")
         self.assertEqual(solver.bath().nbath, 2)
 
-        # Part I
+        # Part I: Initial solve()
         solver.solve(beta=100.0)
 
         ## Reference solution
@@ -116,7 +203,7 @@ class TestEDIpackSolver(unittest.TestCase):
         assert_allclose(solver.magnetization(), magnetization_ref, atol=1e-8)
         # TODO: GF
 
-        # Part II
+        # Part II: update_int_params()
         new_int_params = {'Uloc': np.array([2.0, 3.0]),
                           'Ust': 0.6,
                           'Jh': 0.1,
@@ -136,7 +223,7 @@ class TestEDIpackSolver(unittest.TestCase):
         assert_allclose(solver.magnetization(), magnetization_ref, atol=1e-8)
         # TODO: GF
 
-        # Part III
+        # Part III: Updated bath parameters
         eps = np.array([[-0.5, 0.5],
                         [-0.7, 0.8]])
         V = np.array([[0.1, 0.2],
