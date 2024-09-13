@@ -5,7 +5,7 @@ import re
 import numpy as np
 
 import triqs.operators as op
-from triqs.gf import BlockGf, Gf, MeshImFreq
+from triqs.gf import BlockGf, Gf, MeshImFreq, MeshReFreq
 
 from edipy import global_env as ed
 
@@ -345,6 +345,23 @@ class EDIpackSolver:
                        block_list=blocks,
                        make_copies=False)
 
+    def _make_block_gf_w(self, mesh):
+        blocks = [Gf(mesh=mesh, target_shape=(self.norb, self.norb))
+                  for _ in range(2)]
+
+        # Block up
+        blocks[0].data[:] = np.rollaxis(self._gf_data[0, 0, :, :, :ed.Lreal], 2)
+        # Block down
+        if self.nspin == 1:
+            blocks[1].data[:] = blocks[0].data
+        else:
+            blocks[1].data[:] = \
+                np.rollaxis(self._gf_data[1, 1, :, :, :ed.Lreal], 2)
+
+        return BlockGf(name_list=self.gf_block_names,
+                       block_list=blocks,
+                       make_copies=False)
+
     def g_iw(self):
         "Matsubara impurity Green's function"
         self._reallocate_gf_data(ed.Lmats)
@@ -353,12 +370,22 @@ class EDIpackSolver:
         return self._make_block_gf_iw(mesh)
 
     def Sigma_iw(self):
-        "Matsubara impurity self-energy"
+        "Matsubara impurity self-energy function"
         self._reallocate_gf_data(ed.Lmats)
         ed.get_sigma_matsubara(self._gf_data[:, :, :, :, :ed.Lmats])
         mesh = MeshImFreq(beta=ed.beta, S="Fermion", n_iw=ed.Lmats)
         return self._make_block_gf_iw(mesh)
 
-    # TODO
-    # g_w()
-    # Sigma_w()
+    def g_w(self):
+        "Real-axis impurity Green's function"
+        self._reallocate_gf_data(ed.Lreal)
+        ed.get_gimp_realaxis(self._gf_data[:, :, :, :, :ed.Lreal])
+        mesh = MeshReFreq(window=(ed.wini, ed.wfin), n_w=ed.Lreal)
+        return self._make_block_gf_w(mesh)
+
+    def Sigma_w(self):
+        "Real-axis impurity self-energy function"
+        self._reallocate_gf_data(ed.Lreal)
+        ed.get_sigma_realaxis(self._gf_data[:, :, :, :, :ed.Lreal])
+        mesh = MeshReFreq(window=(ed.wini, ed.wfin), n_w=ed.Lreal)
+        return self._make_block_gf_w(mesh)
