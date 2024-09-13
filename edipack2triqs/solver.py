@@ -265,6 +265,10 @@ class EDIpackSolver:
         ed.Jx = Jx
         ed.Jp = Jp
 
+    def hloc(self):
+        "Access the local impurity Hamiltonian H_loc"
+        return self.h_params.Hloc
+
     def bath(self):
         "Access the bath object"
         return self.h_params.bath

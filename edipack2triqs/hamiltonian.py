@@ -115,13 +115,13 @@ class HamiltonianParams:
     Hloc: np.ndarray
     # Bath parameters
     bath: Union[BathNormal, BathHybrid]  # TODO: BathReplica
-    # Local intra-orbital interactions U (one value per orbital)"
+    # Local intra-orbital interactions U (one value per orbital)
     Uloc: np.ndarray = field(default_factory=default_Uloc)
-    # Local inter-orbital interaction U'"
+    # Local inter-orbital interaction U'
     Ust: float = 0
-    # Hund's coupling"
+    # Hund's coupling
     Jh: float = 0
-    # Spin-exchange coupling constant"
+    # Spin-exchange coupling constant
     Jx: float = 0
     # Pair-hopping coupling constant
     Jp: float = 0
