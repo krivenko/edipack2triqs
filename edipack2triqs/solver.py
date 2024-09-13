@@ -15,7 +15,7 @@ class EDIpackSolver:
 
     # EDIpack maintains the state of a simulation as a set of global variables.
     # Therefore, this state must be controlled by at most one EDIpackSolver
-    # object at any time.
+    # instance at any time.
     instance_count = [0]
 
     # Default configuration
@@ -208,6 +208,7 @@ class EDIpackSolver:
         self.instance_count[0] += 1
 
     def __del__(self):
+        ed.finalize_solver()
         self.instance_count[0] -= 1
 
     def update_int_params(self, *, Uloc, Ust, Jh, Jx, Jp):

@@ -1,4 +1,5 @@
 import unittest
+import gc
 from itertools import product
 
 import numpy as np
@@ -155,6 +156,10 @@ class TestEDIpackSolver(unittest.TestCase):
         assert_allclose(solver.double_occ(), double_occ_ref, atol=1e-8)
         assert_allclose(solver.magnetization(), magnetization_ref, atol=1e-8)
         # TODO: GF
+
+    def tearDown(self):
+        # Make sure EDIpackSolver.__del__() is called
+        gc.collect()
 
 
 if __name__ == '__main__':
