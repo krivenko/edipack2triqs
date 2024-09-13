@@ -1,9 +1,11 @@
 from tempfile import TemporaryDirectory
+from warnings import warn
 import re
 
 import numpy as np
 
 import triqs.operators as op
+from triqs.gf import BlockGf, Gf, MeshImFreq
 
 from edipy import global_env as ed
 
@@ -134,6 +136,15 @@ class EDIpackSolver:
         self.fops_bath_up = fops_bath_up
         self.fops_bath_dn = fops_bath_dn
 
+        # Detect GF block names
+        block_names_up = [ind[0] for ind in fops_imp_up]
+        block_names_dn = [ind[0] for ind in fops_imp_dn]
+        if any(bn != block_names_up[0] for bn in block_names_up):
+            warn(f"Inconsistent block names in {block_names_up}")
+        if any(bn != block_names_dn[0] for bn in block_names_dn):
+            warn(f"Inconsistent block names in {block_names_dn}")
+        self.gf_block_names = (block_names_up[0], block_names_dn[0])
+
         self.h_params = parse_hamiltonian(
             hamiltonian,
             self.fops_imp_up, self.fops_imp_dn,
@@ -205,7 +216,23 @@ class EDIpackSolver:
         if isinstance(self.h_params.bath, BathHybrid):
             ed.set_Hreplica(self.h_params.Hloc)
 
+        # Pre-allocate GF containers
+        self._gf_data = np.empty(
+            (self.nspin, self.nspin, self.norb, self.norb, 5000),
+            dtype=complex,
+            order='F'
+        )
+
         self.instance_count[0] += 1
+
+    def _reallocate_gf_data(self, new_n_points: int):
+        "Reallocate GF data array"
+        if new_n_points > self._gf_data.shape[4]:
+            self._gf_data.resize((self.nspin,
+                                  self.nspin,
+                                  self.orb,
+                                  self.orb,
+                                  new_n_points))
 
     def __del__(self):
         ed.finalize_solver()
@@ -294,8 +321,44 @@ class EDIpackSolver:
         "Returns the impurity magnetization, one element per orbital"
         return ed.get_mag()
 
+    def _make_block_gf_iw(self, mesh):
+        blocks = [Gf(mesh=mesh, target_shape=(self.norb, self.norb))
+                  for _ in range(2)]
+
+        # Block up
+        d = np.rollaxis(self._gf_data[0, 0, :, :, :ed.Lmats], 2)
+        blocks[0].data[ed.Lmats:, :, :] = d
+        # Set negative Matsubara frequencies from Hermitian symmetry
+        blocks[0].data[:ed.Lmats, :, :] = \
+            np.conj(np.transpose(d[::-1, :, :], (0, 2, 1)))
+        # Block down
+        if self.nspin == 1:
+            blocks[1].data[:] = blocks[0].data
+        else:
+            d = np.rollaxis(self._gf_data[1, 1, :, :, :ed.Lmats], 2)
+            blocks[1].data[ed.Lmats:, :, :] = d
+            # Set negative Matsubara frequencies from Hermitian symmetry
+            blocks[1].data[:ed.Lmats, :, :] = \
+                np.conj(np.transpose(d[::-1, :, :], (0, 2, 1)))
+
+        return BlockGf(name_list=self.gf_block_names,
+                       block_list=blocks,
+                       make_copies=False)
+
+    def g_iw(self):
+        "Matsubara impurity Green's function"
+        self._reallocate_gf_data(ed.Lmats)
+        ed.get_gimp_matsubara(self._gf_data[:, :, :, :, :ed.Lmats])
+        mesh = MeshImFreq(beta=ed.beta, S="Fermion", n_iw=ed.Lmats)
+        return self._make_block_gf_iw(mesh)
+
+    def Sigma_iw(self):
+        "Matsubara impurity self-energy"
+        self._reallocate_gf_data(ed.Lmats)
+        ed.get_sigma_matsubara(self._gf_data[:, :, :, :, :ed.Lmats])
+        mesh = MeshImFreq(beta=ed.beta, S="Fermion", n_iw=ed.Lmats)
+        return self._make_block_gf_iw(mesh)
+
     # TODO
-    # G_iw()
-    # G_w()
-    # Sigma_iw()
+    # g_w()
     # Sigma_w()

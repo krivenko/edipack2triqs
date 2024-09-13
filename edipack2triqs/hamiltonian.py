@@ -155,8 +155,6 @@ def _make_bath(nspin: int, Hloc: np.ndarray, h: np.ndarray, V: np.ndarray):
 
     # Can we use bath_type = 'replica'
     # - The total number of bath states must be a multiple of norb
-    # TODO: isolate_replicas(): Reduce 'h' to a block-diagonal form with
-    # bath_size // norb blocks
     # elif False: #(bath_size % norb == 0):
     #    params.Nbath = bath_size // norb
     #    params.bath_type = "replica"

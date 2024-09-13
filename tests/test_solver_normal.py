@@ -7,7 +7,11 @@ from numpy.testing import assert_allclose
 from numpy import multiply as mul
 
 import triqs.operators as op
-from triqs.atom_diag import AtomDiag, atomic_density_matrix, trace_rho_op
+from triqs.atom_diag import (AtomDiag,
+                             atomic_density_matrix,
+                             atomic_g_iw,
+                             trace_rho_op)
+from triqs.utility.comparison_tests import assert_block_gfs_are_close
 
 from edipack2triqs.solver import EDIpackSolver
 
@@ -54,7 +58,7 @@ class TestEDIpackSolverBathNormal(unittest.TestCase):
                       for s, o, nu in product(self.spins, self.orbs, range(2)))
         return h_bath
 
-    def make_ref_results(self, h, fops, beta):
+    def make_ref_results(self, h, fops, beta, n_iw):
         ad = AtomDiag(h, fops)
         rho = atomic_density_matrix(ad, beta)
 
@@ -68,7 +72,10 @@ class TestEDIpackSolverBathNormal(unittest.TestCase):
             trace_rho_op(rho, op.n('up', o) - op.n('dn', o), ad)
             for o in self.orbs]
 
-        return densities, double_occ, magnetization
+        gf_struct = [('up', len(self.orbs)), ('dn', len(self.orbs))]
+        g_iw = atomic_g_iw(ad, beta, gf_struct, n_iw)
+
+        return densities, double_occ, magnetization, g_iw
 
     def test_nspin1(self):
         h_loc = self.make_h_loc(mul.outer([1, 1], np.diag([0.5, 0.6])))
@@ -105,16 +112,18 @@ class TestEDIpackSolverBathNormal(unittest.TestCase):
         self.assertEqual(solver.bath().nbath, 2)
 
         # Part I: Initial solve()
-        solver.solve(beta=100.0)
+        beta = 100.0
+        n_iw = 100
+        solver.solve(beta=beta, n_iw=n_iw)
 
         ## Reference solution
-        densities_ref, double_occ_ref, magnetization_ref = \
-            self.make_ref_results(h, fops, 100.0)
+        densities_ref, double_occ_ref, magnetization_ref, g_iw_ref = \
+            self.make_ref_results(h, fops, beta, n_iw)
 
         assert_allclose(solver.densities(), densities_ref, atol=1e-8)
         assert_allclose(solver.double_occ(), double_occ_ref, atol=1e-8)
         assert_allclose(solver.magnetization(), magnetization_ref, atol=1e-8)
-        # TODO: GF
+        assert_block_gfs_are_close(solver.g_iw(), g_iw_ref)
 
         # Part II: update_int_params()
         new_int_params = {'Uloc': np.array([2.0, 3.0]),
@@ -123,18 +132,21 @@ class TestEDIpackSolverBathNormal(unittest.TestCase):
                           'Jx': 0.2,
                           'Jp': 0.0}
         solver.update_int_params(**new_int_params)
-        solver.solve(beta=120.0)
+
+        beta = 120.0
+        n_iw = 200
+        solver.solve(beta=beta, n_iw=n_iw)
 
         ## Reference solution
         h_int = self.make_h_int(**new_int_params)
         h = h_loc + h_int + h_bath
-        densities_ref, double_occ_ref, magnetization_ref = \
-            self.make_ref_results(h, fops, 120.0)
+        densities_ref, double_occ_ref, magnetization_ref, g_iw_ref = \
+            self.make_ref_results(h, fops, beta, n_iw)
 
         assert_allclose(solver.densities(), densities_ref, atol=1e-8)
         assert_allclose(solver.double_occ(), double_occ_ref, atol=1e-8)
         assert_allclose(solver.magnetization(), magnetization_ref, atol=1e-8)
-        # TODO: GF
+        assert_block_gfs_are_close(solver.g_iw(), g_iw_ref)
 
         # Part III: Updated bath parameters
         eps = np.array([[-0.5, 0.5],
@@ -144,18 +156,21 @@ class TestEDIpackSolverBathNormal(unittest.TestCase):
 
         solver.bath().eps[:] = eps
         solver.bath().V[:] = V
-        solver.solve(beta=100.0)
+
+        beta = 100.0
+        n_iw = 50
+        solver.solve(beta=beta, n_iw=n_iw)
 
         ## Reference solution
         h_bath = self.make_h_bath(eps, V)
         h = h_loc + h_int + h_bath
-        densities_ref, double_occ_ref, magnetization_ref = \
-            self.make_ref_results(h, fops, 100.0)
+        densities_ref, double_occ_ref, magnetization_ref, g_iw_ref = \
+            self.make_ref_results(h, fops, beta, n_iw)
 
         assert_allclose(solver.densities(), densities_ref, atol=1e-8)
         assert_allclose(solver.double_occ(), double_occ_ref, atol=1e-8)
         assert_allclose(solver.magnetization(), magnetization_ref, atol=1e-8)
-        # TODO: GF
+        assert_block_gfs_are_close(solver.g_iw(), g_iw_ref)
 
     def test_nspin2(self):
         h_loc = self.make_h_loc(mul.outer([0.8, 1.2], np.diag([0.5, 0.6])))
@@ -192,16 +207,18 @@ class TestEDIpackSolverBathNormal(unittest.TestCase):
         self.assertEqual(solver.bath().nbath, 2)
 
         # Part I: Initial solve()
-        solver.solve(beta=100.0)
+        beta = 100.0
+        n_iw = 100
+        solver.solve(beta=beta, n_iw=n_iw)
 
         ## Reference solution
-        densities_ref, double_occ_ref, magnetization_ref = \
-            self.make_ref_results(h, fops, 100.0)
+        densities_ref, double_occ_ref, magnetization_ref, g_iw_ref = \
+            self.make_ref_results(h, fops, beta, n_iw)
 
         assert_allclose(solver.densities(), densities_ref, atol=1e-8)
         assert_allclose(solver.double_occ(), double_occ_ref, atol=1e-8)
         assert_allclose(solver.magnetization(), magnetization_ref, atol=1e-8)
-        # TODO: GF
+        assert_block_gfs_are_close(solver.g_iw(), g_iw_ref)
 
         # Part II: update_int_params()
         new_int_params = {'Uloc': np.array([2.0, 3.0]),
@@ -210,18 +227,21 @@ class TestEDIpackSolverBathNormal(unittest.TestCase):
                           'Jx': 0.2,
                           'Jp': 0.0}
         solver.update_int_params(**new_int_params)
-        solver.solve(beta=120.0)
+
+        beta = 120.0
+        n_iw = 200
+        solver.solve(beta=beta, n_iw=n_iw)
 
         ## Reference solution
         h_int = self.make_h_int(**new_int_params)
         h = h_loc + h_int + h_bath
-        densities_ref, double_occ_ref, magnetization_ref = \
-            self.make_ref_results(h, fops, 120.0)
+        densities_ref, double_occ_ref, magnetization_ref, g_iw_ref = \
+            self.make_ref_results(h, fops, beta, n_iw)
 
         assert_allclose(solver.densities(), densities_ref, atol=1e-8)
         assert_allclose(solver.double_occ(), double_occ_ref, atol=1e-8)
         assert_allclose(solver.magnetization(), magnetization_ref, atol=1e-8)
-        # TODO: GF
+        assert_block_gfs_are_close(solver.g_iw(), g_iw_ref)
 
         # Part III: Updated bath parameters
         eps = np.array([[-0.5, 0.5],
@@ -231,18 +251,21 @@ class TestEDIpackSolverBathNormal(unittest.TestCase):
 
         solver.bath().eps[:] = eps
         solver.bath().V[:] = V
-        solver.solve(beta=100.0)
+
+        beta = 100.0
+        n_iw = 50
+        solver.solve(beta=beta, n_iw=n_iw)
 
         ## Reference solution
         h_bath = self.make_h_bath(eps, V)
         h = h_loc + h_int + h_bath
-        densities_ref, double_occ_ref, magnetization_ref = \
-            self.make_ref_results(h, fops, 100.0)
+        densities_ref, double_occ_ref, magnetization_ref, g_iw_ref = \
+            self.make_ref_results(h, fops, beta, n_iw)
 
         assert_allclose(solver.densities(), densities_ref, atol=1e-8)
         assert_allclose(solver.double_occ(), double_occ_ref, atol=1e-8)
         assert_allclose(solver.magnetization(), magnetization_ref, atol=1e-8)
-        # TODO: GF
+        assert_block_gfs_are_close(solver.g_iw(), g_iw_ref)
 
     def tearDown(self):
         # Make sure EDIpackSolver.__del__() is called
