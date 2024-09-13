@@ -3,6 +3,7 @@ from warnings import warn
 import re
 
 import numpy as np
+from mpi4py import MPI
 
 import triqs.operators as op
 from triqs.gf import BlockGf, Gf, MeshImFreq, MeshReFreq
@@ -201,12 +202,19 @@ class EDIpackSolver:
                 write_config(config_file, self.config)
             ed.read_input('input.conf')
 
-            self.scifor_version = re.match(
-                r"^SCIFOR VERSION \(GIT\): (.*)",
-                open("scifor_version.inc", 'r').readline())[1]
-            self.edipack_version = re.match(
-                r"^EDIPACK VERSION: (.*)",
-                open("EDIPACK_version.inc", 'r').readline())[1]
+            if MPI.COMM_WORLD.Get_rank() == 0:
+                self.scifor_version = re.match(
+                    r"^SCIFOR VERSION \(GIT\): (.*)",
+                    open("scifor_version.inc", 'r').readline())[1]
+                self.edipack_version = re.match(
+                    r"^EDIPACK VERSION: (.*)",
+                    open("EDIPACK_version.inc", 'r').readline())[1]
+            else:
+                self.scifor_version = ""
+                self.edipack_version = ""
+
+            self.scifor_version = MPI.COMM_WORLD.bcast(self.scifor_version)
+            self.edipack_version = MPI.COMM_WORLD.bcast(self.edipack_version)
 
         # Pass bath parameters to EDIpack
         assert self.h_params.bath.data.size == ed.get_bath_dimension()
