@@ -26,7 +26,7 @@ classifiers = [
 ]
 dependencies = ["edipy>=4.0.0",
                 "numpy",
-                "mpi4py",]
+                "mpi4py"]
 
 [project.urls]
 "Source" = "https://github.com/krivenko/edipack2triqs/"

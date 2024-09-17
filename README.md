@@ -5,6 +5,7 @@ Copyright (c) 2024, Igor Krivenko
 ## Dependencies
 
 * NumPy
+* mpi4py
 * [edipy (EDIpack) >= 4.0.0](https://github.com/aamaricci/EDIpack)
 * [TRIQS 3.x.y](https://triqs.github.io/triqs/latest), tested with TRIQS 3.2.1
 
