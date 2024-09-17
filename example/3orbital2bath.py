@@ -157,7 +157,7 @@ solver.hloc()[0, 0, 1, 1] = -0.6  # spin1 = spin2 = up and down, orb1 = orb2 = 1
 solver.update_int_params(Jp=0.15)
 
 # Update some bath parameters
-solver.bath().eps[0, 2, 1] = -0.4  # spin = up and down, orb1 = 2, orb2 = 1
-solver.bath().V[0, 0, 1] = 0.3     # spin = up and down, orb1 = 0, orb2 = 1
+solver.bath().eps[0, 2, 1] = -0.4  # spin = up and down, orb1 = 2, nu = 1
+solver.bath().V[0, 0, 1] = 0.3     # spin = up and down, orb1 = 0, nu = 1
 
 solver.solve(beta=beta)
