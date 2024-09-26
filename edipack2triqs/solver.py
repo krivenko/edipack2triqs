@@ -1,3 +1,4 @@
+from pathlib import Path
 from tempfile import TemporaryDirectory
 from warnings import warn
 import re
@@ -85,6 +86,9 @@ class EDIpackSolver:
         fops_bath_dn: list of tuples of strings and ints
             List of all spin-down bath annihilation / creation operator
             flavors (indices)
+        input_file: str
+            Path to an input file to be used by EDIpack. Mutually exclusive with
+            all other keyword arguments.
         verbose: int, default 3
             Verbosity level: 0=almost nothing --> 5:all
         cutoff: float, default 1e-9
@@ -153,53 +157,69 @@ class EDIpackSolver:
         )
         self.nspin = self.h_params.Hloc.shape[0]
 
-        self.config = self.default_config.copy()
-        self.config["ED_VERBOSE"] = kwargs.get("verbose", 3)
-        self.config["CUTOFF"] = kwargs.get("cutoff", 1e-9)
-        self.config["GS_THRESHOLD"] = kwargs.get("gs_threshold", 1e-9)
-        self.config["ED_SPARSE_H"] = kwargs.get("ed_sparse_H", True)
-        self.config["LANC_METHOD"] = kwargs.get("lanc_method", "arpack")
-        self.config["LANC_NSTATES_SECTOR"] = kwargs.get("lanc_nstates_sector",
-                                                        2)
-        self.config["LANC_NSTATES_TOTAL"] = kwargs.get("lanc_nstates_total", 2)
-        self.config["LANC_NSTATES_STEP"] = kwargs.get("lanc_nstates_step", 2)
-        self.config["LANC_NCV_FACTOR"] = kwargs.get("lanc_ncv_factor", 10)
-        self.config["LANC_NCV_ADD"] = kwargs.get("lanc_ncv_add", 0)
-        self.config["LANC_NITER"] = kwargs.get("lanc_niter", 512)
-        self.config["LANC_NGFITER"] = kwargs.get("lanc_ngfiter", 200)
-        self.config["LANC_TOLERANCE"] = kwargs.get("lanc_tolerance", 1e-18)
-        self.config["LANC_DIM_THRESHOLD"] = kwargs.get("lanc_dim_threshold",
-                                                       1024)
+        if "input_file" in kwargs:
+            self.input_file = Path(kwargs.pop("input_file"))
+            self.input_file = self.input_file.resolve(strict=True)
 
-        # Impurity structure
-        self.config["NSPIN"] = self.nspin
-        self.config["NORB"] = self.norb
-
-        # Bath geometry
-        self.config["BATH_TYPE"] = self.h_params.bath.name
-        self.config["NBATH"] = self.h_params.bath.nbath
-
-        # Interaction parameters
-        self.config["ULOC"] = self.h_params.Uloc
-        self.config["UST"] = self.h_params.Ust
-        self.config["JH"] = self.h_params.Jh
-        self.config["JX"] = self.h_params.Jx
-        self.config["JP"] = self.h_params.Jp
-
-        # ed_total_ud
-        if isinstance(self.h_params.bath, BathNormal):
-            self.config["ED_TOTAL_UD"] = not (self.h_params.Jx == 0
-                                              and self.h_params.Jp == 0)
-        elif isinstance(self.h_params.bath, BathHybrid):
-            self.config["ED_TOTAL_UD"] = True
+            if kwargs:
+                raise ValueError(
+                    "'input_file' is mutually exclusive with other parameters"
+                )
         else:
-            raise RuntimeError("Unrecognized bath type")
+            self.input_file = None
+
+            c = self.default_config.copy()
+            c["ED_VERBOSE"] = kwargs.get("verbose", 3)
+            c["CUTOFF"] = kwargs.get("cutoff", 1e-9)
+            c["GS_THRESHOLD"] = kwargs.get("gs_threshold", 1e-9)
+            c["ED_SPARSE_H"] = kwargs.get("ed_sparse_H", True)
+            c["LANC_METHOD"] = kwargs.get("lanc_method", "arpack")
+            c["LANC_NSTATES_SECTOR"] = kwargs.get("lanc_nstates_sector", 2)
+            c["LANC_NSTATES_TOTAL"] = kwargs.get("lanc_nstates_total", 2)
+            c["LANC_NSTATES_STEP"] = kwargs.get("lanc_nstates_step", 2)
+            c["LANC_NCV_FACTOR"] = kwargs.get("lanc_ncv_factor", 10)
+            c["LANC_NCV_ADD"] = kwargs.get("lanc_ncv_add", 0)
+            c["LANC_NITER"] = kwargs.get("lanc_niter", 512)
+            c["LANC_NGFITER"] = kwargs.get("lanc_ngfiter", 200)
+            c["LANC_TOLERANCE"] = kwargs.get("lanc_tolerance", 1e-18)
+            c["LANC_DIM_THRESHOLD"] = kwargs.get("lanc_dim_threshold", 1024)
+
+            # Impurity structure
+            c["NSPIN"] = self.nspin
+            c["NORB"] = self.norb
+
+            # Bath geometry
+            c["BATH_TYPE"] = self.h_params.bath.name
+            c["NBATH"] = self.h_params.bath.nbath
+
+            # Interaction parameters
+            c["ULOC"] = self.h_params.Uloc
+            c["UST"] = self.h_params.Ust
+            c["JH"] = self.h_params.Jh
+            c["JX"] = self.h_params.Jx
+            c["JP"] = self.h_params.Jp
+
+            # ed_total_ud
+            if isinstance(self.h_params.bath, BathNormal):
+                c["ED_TOTAL_UD"] = not (self.h_params.Jx == 0
+                                        and self.h_params.Jp == 0)
+            elif isinstance(self.h_params.bath, BathHybrid):
+                c["ED_TOTAL_UD"] = True
+            else:
+                raise RuntimeError("Unrecognized bath type")
+
+            self.config = c
 
         self.workdir = TemporaryDirectory()
 
         with chdircontext(self.workdir.name):
-            with open('input.conf', 'w') as config_file:
-                write_config(config_file, self.config)
+            if self.input_file is None:
+                self.input_file = Path('input.conf').resolve()
+                with open(self.input_file, 'w') as config_file:
+                    write_config(config_file, self.config)
+            else:
+                Path('input.conf').symlink_to(self.input_file)
+
             ed.read_input('input.conf')
 
             if MPI.COMM_WORLD.Get_rank() == 0:
