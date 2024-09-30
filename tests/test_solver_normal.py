@@ -69,7 +69,15 @@ class TestEDIpackSolverBathNormal(unittest.TestCase):
         double_occ = [
             trace_rho_op(rho, op.n('up', o) * op.n('dn', o), ad)
             for o in self.orbs]
-        magnetization = [
+        magnetization_x = [
+            trace_rho_op(rho, op.c_dag('up', o) * op.c('dn', o)
+                         + op.c_dag('dn', o) * op.c('up', o), ad)
+            for o in self.orbs]
+        magnetization_y = [
+            1j * trace_rho_op(rho, op.c_dag('dn', o) * op.c('up', o)
+                              - op.c_dag('up', o) * op.c('dn', o), ad)
+            for o in self.orbs]
+        magnetization_z = [
             trace_rho_op(rho, op.n('up', o) - op.n('dn', o), ad)
             for o in self.orbs]
 
@@ -78,6 +86,7 @@ class TestEDIpackSolverBathNormal(unittest.TestCase):
         g_iw = atomic_g_iw(ad, beta, gf_struct, n_iw)
         g_w = atomic_g_w(ad, beta, gf_struct, energy_window, n_w, eta)
 
+        magnetization = (magnetization_x, magnetization_y, magnetization_z)
         return densities, double_occ, magnetization, g_iw, g_w
 
     def test_nspin1(self):
@@ -134,7 +143,12 @@ class TestEDIpackSolverBathNormal(unittest.TestCase):
 
         assert_allclose(solver.densities(), densities_ref, atol=1e-8)
         assert_allclose(solver.double_occ(), double_occ_ref, atol=1e-8)
-        assert_allclose(solver.magnetization(), magnetization_ref, atol=1e-8)
+        assert_allclose(solver.magnetization(comp='x'), magnetization_ref[0],
+                        atol=1e-8)
+        assert_allclose(solver.magnetization(comp='y'), magnetization_ref[1],
+                        atol=1e-8)
+        assert_allclose(solver.magnetization(comp='z'), magnetization_ref[2],
+                        atol=1e-8)
         assert_block_gfs_are_close(solver.g_iw(), g_iw_ref)
         assert_block_gfs_are_close(solver.g_w(), g_w_ref)
 
@@ -160,14 +174,16 @@ class TestEDIpackSolverBathNormal(unittest.TestCase):
         ## Reference solution
         h_int = self.make_h_int(**new_int_params)
         h = h_loc + h_int + h_bath
-        densities_ref, double_occ_ref, magnetization_ref, g_iw_ref, g_w_ref = \
+        densities_ref, double_occ_ref, mag_ref, g_iw_ref, g_w_ref = \
             self.make_ref_results(h, fops, beta,
                                   n_iw,
                                   energy_window, n_w, broadening)
 
         assert_allclose(solver.densities(), densities_ref, atol=1e-8)
         assert_allclose(solver.double_occ(), double_occ_ref, atol=1e-8)
-        assert_allclose(solver.magnetization(), magnetization_ref, atol=1e-8)
+        assert_allclose(solver.magnetization(comp='x'), mag_ref[0], atol=1e-8)
+        assert_allclose(solver.magnetization(comp='y'), mag_ref[1], atol=1e-8)
+        assert_allclose(solver.magnetization(comp='z'), mag_ref[2], atol=1e-8)
         assert_block_gfs_are_close(solver.g_iw(), g_iw_ref)
         assert_block_gfs_are_close(solver.g_w(), g_w_ref)
 
@@ -201,7 +217,12 @@ class TestEDIpackSolverBathNormal(unittest.TestCase):
 
         assert_allclose(solver.densities(), densities_ref, atol=1e-8)
         assert_allclose(solver.double_occ(), double_occ_ref, atol=1e-8)
-        assert_allclose(solver.magnetization(), magnetization_ref, atol=1e-8)
+        assert_allclose(solver.magnetization(comp='x'), magnetization_ref[0],
+                        atol=1e-8)
+        assert_allclose(solver.magnetization(comp='y'), magnetization_ref[1],
+                        atol=1e-8)
+        assert_allclose(solver.magnetization(comp='z'), magnetization_ref[2],
+                        atol=1e-8)
         assert_block_gfs_are_close(solver.g_iw(), g_iw_ref)
         assert_block_gfs_are_close(solver.g_w(), g_w_ref)
 
@@ -259,7 +280,12 @@ class TestEDIpackSolverBathNormal(unittest.TestCase):
 
         assert_allclose(solver.densities(), densities_ref, atol=1e-8)
         assert_allclose(solver.double_occ(), double_occ_ref, atol=1e-8)
-        assert_allclose(solver.magnetization(), magnetization_ref, atol=1e-8)
+        assert_allclose(solver.magnetization(comp='x'), magnetization_ref[0],
+                        atol=1e-8)
+        assert_allclose(solver.magnetization(comp='y'), magnetization_ref[1],
+                        atol=1e-8)
+        assert_allclose(solver.magnetization(comp='z'), magnetization_ref[2],
+                        atol=1e-8)
         assert_block_gfs_are_close(solver.g_iw(), g_iw_ref)
         assert_block_gfs_are_close(solver.g_w(), g_w_ref)
 
@@ -292,7 +318,12 @@ class TestEDIpackSolverBathNormal(unittest.TestCase):
 
         assert_allclose(solver.densities(), densities_ref, atol=1e-8)
         assert_allclose(solver.double_occ(), double_occ_ref, atol=1e-8)
-        assert_allclose(solver.magnetization(), magnetization_ref, atol=1e-8)
+        assert_allclose(solver.magnetization(comp='x'), magnetization_ref[0],
+                        atol=1e-8)
+        assert_allclose(solver.magnetization(comp='y'), magnetization_ref[1],
+                        atol=1e-8)
+        assert_allclose(solver.magnetization(comp='z'), magnetization_ref[2],
+                        atol=1e-8)
         assert_block_gfs_are_close(solver.g_iw(), g_iw_ref)
         assert_block_gfs_are_close(solver.g_w(), g_w_ref)
 
@@ -326,7 +357,12 @@ class TestEDIpackSolverBathNormal(unittest.TestCase):
 
         assert_allclose(solver.densities(), densities_ref, atol=1e-8)
         assert_allclose(solver.double_occ(), double_occ_ref, atol=1e-8)
-        assert_allclose(solver.magnetization(), magnetization_ref, atol=1e-8)
+        assert_allclose(solver.magnetization(comp='x'), magnetization_ref[0],
+                        atol=1e-8)
+        assert_allclose(solver.magnetization(comp='y'), magnetization_ref[1],
+                        atol=1e-8)
+        assert_allclose(solver.magnetization(comp='z'), magnetization_ref[2],
+                        atol=1e-8)
         assert_block_gfs_are_close(solver.g_iw(), g_iw_ref)
         assert_block_gfs_are_close(solver.g_w(), g_w_ref)
 

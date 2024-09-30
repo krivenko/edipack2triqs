@@ -9,7 +9,7 @@ from mpi4py import MPI
 import triqs.operators as op
 from triqs.gf import BlockGf, Gf, MeshImFreq, MeshReFreq
 
-from edipy import global_env as ed
+from edipy2 import global_env as ed
 
 from .util import IndicesType, validate_fops_up_dn, write_config, chdircontext
 from .hamiltonian import parse_hamiltonian, BathNormal, BathHybrid
@@ -226,9 +226,10 @@ class EDIpackSolver:
                 self.scifor_version = re.match(
                     r"^SCIFOR VERSION \(GIT\): (.*)",
                     open("scifor_version.inc", 'r').readline())[1]
+
                 self.edipack_version = re.match(
-                    r"^EDIPACK VERSION: (.*)",
-                    open("EDIPACK_version.inc", 'r').readline())[1]
+                    r"^code VERSION: (.*)",
+                    open("code_version.inc", 'r').readline())[1]
             else:
                 self.scifor_version = ""
                 self.edipack_version = ""
@@ -240,31 +241,16 @@ class EDIpackSolver:
         assert self.h_params.bath.data.size == ed.get_bath_dimension()
         ed.init_solver(np.zeros(self.h_params.bath.data.size, dtype=float))
 
-        # Hybrid bath requires special treatment
-        if isinstance(self.h_params.bath, BathHybrid):
-            ed.set_Hreplica(self.h_params.Hloc)
-
-        # Pre-allocate GF containers
-        self._gf_data = np.empty(
-            (self.nspin, self.nspin, self.norb, self.norb, 5000),
-            dtype=complex,
-            order='F'
-        )
-
         self.instance_count[0] += 1
 
-    def _reallocate_gf_data(self, new_n_points: int):
-        "Reallocate GF data array"
-        if new_n_points > self._gf_data.shape[4]:
-            self._gf_data.resize((self.nspin,
-                                  self.nspin,
-                                  self.orb,
-                                  self.orb,
-                                  new_n_points))
-
     def __del__(self):
-        ed.finalize_solver()
-        self.instance_count[0] -= 1
+        try:
+            ed.finalize_solver()
+            self.instance_count[0] -= 1
+        # ed.finalize_solver() can fail if this __del__() method is called as
+        # part of interpreter destruction procedure.
+        except TypeError:
+            pass
 
     def update_int_params(self, **kwargs):
         """
@@ -350,7 +336,8 @@ class EDIpackSolver:
 
         # Solve!
         with chdircontext(self.workdir.name):
-            ed.solve(self.h_params.bath.data, self.h_params.Hloc)
+            ed.set_hloc(hloc=self.h_params.Hloc)
+            ed.solve(self.h_params.bath.data)
 
     def energies(self):
         "Returns the impurity local energies components"
@@ -364,16 +351,20 @@ class EDIpackSolver:
         "Returns the impurity double occupancy, one element per orbital"
         return ed.get_docc()
 
-    def magnetization(self):
-        "Returns the impurity magnetization, one element per orbital"
-        return ed.get_mag()
+    def magnetization(self, comp: str = 'z'):
+        """
+        Returns a component of the impurity magnetization vector, one element
+        per orbital. The component selector 'comp' can be one of 'x', 'y'
+        and 'z'.
+        """
+        return ed.get_mag(icomp=comp)
 
-    def _make_block_gf_iw(self, mesh):
+    def _make_block_gf_iw(self, mesh, data):
         blocks = [Gf(mesh=mesh, target_shape=(self.norb, self.norb))
                   for _ in range(2)]
 
         # Block up
-        d = np.rollaxis(self._gf_data[0, 0, :, :, :ed.Lmats], 2)
+        d = np.rollaxis(data[0, 0, :, :, :ed.Lmats], 2)
         blocks[0].data[ed.Lmats:, :, :] = d
         # Set negative Matsubara frequencies from Hermitian symmetry
         blocks[0].data[:ed.Lmats, :, :] = \
@@ -382,7 +373,7 @@ class EDIpackSolver:
         if self.nspin == 1:
             blocks[1].data[:] = blocks[0].data
         else:
-            d = np.rollaxis(self._gf_data[1, 1, :, :, :ed.Lmats], 2)
+            d = np.rollaxis(data[1, 1, :, :, :ed.Lmats], 2)
             blocks[1].data[ed.Lmats:, :, :] = d
             # Set negative Matsubara frequencies from Hermitian symmetry
             blocks[1].data[:ed.Lmats, :, :] = \
@@ -392,18 +383,17 @@ class EDIpackSolver:
                        block_list=blocks,
                        make_copies=False)
 
-    def _make_block_gf_w(self, mesh):
+    def _make_block_gf_w(self, mesh, data):
         blocks = [Gf(mesh=mesh, target_shape=(self.norb, self.norb))
                   for _ in range(2)]
 
         # Block up
-        blocks[0].data[:] = np.rollaxis(self._gf_data[0, 0, :, :, :ed.Lreal], 2)
+        blocks[0].data[:] = np.rollaxis(data[0, 0, :, :, :ed.Lreal], 2)
         # Block down
         if self.nspin == 1:
             blocks[1].data[:] = blocks[0].data
         else:
-            blocks[1].data[:] = \
-                np.rollaxis(self._gf_data[1, 1, :, :, :ed.Lreal], 2)
+            blocks[1].data[:] = np.rollaxis(data[1, 1, :, :, :ed.Lreal], 2)
 
         return BlockGf(name_list=self.gf_block_names,
                        block_list=blocks,
@@ -411,28 +401,20 @@ class EDIpackSolver:
 
     def g_iw(self):
         "Matsubara impurity Green's function"
-        self._reallocate_gf_data(ed.Lmats)
-        ed.get_gimp_matsubara(self._gf_data[:, :, :, :, :ed.Lmats])
         mesh = MeshImFreq(beta=ed.beta, S="Fermion", n_iw=ed.Lmats)
-        return self._make_block_gf_iw(mesh)
+        return self._make_block_gf_iw(mesh, ed.get_gimp(axis="m"))
 
     def Sigma_iw(self):
         "Matsubara impurity self-energy function"
-        self._reallocate_gf_data(ed.Lmats)
-        ed.get_sigma_matsubara(self._gf_data[:, :, :, :, :ed.Lmats])
         mesh = MeshImFreq(beta=ed.beta, S="Fermion", n_iw=ed.Lmats)
-        return self._make_block_gf_iw(mesh)
+        return self._make_block_gf_iw(mesh, ed.get_sigma(axis="m"))
 
     def g_w(self):
         "Real-axis impurity Green's function"
-        self._reallocate_gf_data(ed.Lreal)
-        ed.get_gimp_realaxis(self._gf_data[:, :, :, :, :ed.Lreal])
         mesh = MeshReFreq(window=(ed.wini, ed.wfin), n_w=ed.Lreal)
-        return self._make_block_gf_w(mesh)
+        return self._make_block_gf_w(mesh, ed.get_gimp(axis="r"))
 
     def Sigma_w(self):
         "Real-axis impurity self-energy function"
-        self._reallocate_gf_data(ed.Lreal)
-        ed.get_sigma_realaxis(self._gf_data[:, :, :, :, :ed.Lreal])
         mesh = MeshReFreq(window=(ed.wini, ed.wfin), n_w=ed.Lreal)
-        return self._make_block_gf_w(mesh)
+        return self._make_block_gf_w(mesh, ed.get_sigma(axis="r"))

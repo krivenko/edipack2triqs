@@ -191,7 +191,7 @@ def parse_hamiltonian(hamiltonian: op.Operator,
                                       fops_imp_dn + fops_bath_dn)
     nspin = 1 if (hamiltonian_conj - hamiltonian).is_zero() else 2
 
-    Hloc = np.zeros((2, norb, norb))
+    Hloc = np.zeros((2, norb, norb), dtype=complex)
     h = np.zeros((2, nbath_total, nbath_total))
     V = np.zeros((2, norb, nbath_total))
 
@@ -306,7 +306,7 @@ def parse_hamiltonian(hamiltonian: op.Operator,
         assert np.allclose(V[0, ...], V[1, ...], atol=1e-10)
 
     params = HamiltonianParams(
-        Hloc=np.zeros((nspin, nspin, norb, norb), dtype=float, order='F'),
+        Hloc=np.zeros((nspin, nspin, norb, norb), dtype=complex, order='F'),
         bath=_make_bath(nspin, Hloc, h, V),
         Uloc=Uloc,
         Ust=Ust[0] if len(Ust) > 0 else .0,

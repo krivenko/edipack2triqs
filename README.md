@@ -6,7 +6,7 @@ Copyright (c) 2024, Igor Krivenko
 
 * NumPy
 * mpi4py
-* [edipy (EDIpack) >= 4.0.0](https://github.com/aamaricci/EDIpack)
+* [edipy2 >= 0.1.0 (EDIpack2.0)](https://github.com/aamaricci/EDIpack2.0)
 * [TRIQS 3.x.y](https://triqs.github.io/triqs/latest), tested with TRIQS 3.2.1
 
 ## Installation
