@@ -49,7 +49,7 @@ class EDIpackSolver:
         "ED_SECTORS": False,
         "ED_SECTORS_SHIFT": 0,
         "ED_SOLVE_OFFDIAG_GF": False,   # TODO
-        "ED_ALL_G": False,              # TODO
+        "ED_ALL_G": True,
         "ED_OFFSET_BATH": 0.0,
         # TODO: Susceptibilities
         "LTAU": 1000,               # TODO: To be set in solve()
@@ -148,7 +148,6 @@ class EDIpackSolver:
             warn(f"Inconsistent block names in {block_names_up}")
         if any(bn != block_names_dn[0] for bn in block_names_dn):
             warn(f"Inconsistent block names in {block_names_dn}")
-        self.gf_block_names = (block_names_up[0], block_names_dn[0])
 
         self.h_params = parse_hamiltonian(
             hamiltonian,
@@ -185,6 +184,7 @@ class EDIpackSolver:
             c["LANC_DIM_THRESHOLD"] = kwargs.get("lanc_dim_threshold", 1024)
 
             # Impurity structure
+            c["ED_MODE"] = self.h_params.ed_mode
             c["NSPIN"] = self.nspin
             c["NORB"] = self.norb
 
@@ -240,6 +240,12 @@ class EDIpackSolver:
         # Pass bath parameters to EDIpack
         assert self.h_params.bath.data.size == ed.get_bath_dimension()
         ed.init_solver(np.zeros(self.h_params.bath.data.size, dtype=float))
+
+        # GF block names
+        if ed.get_ed_mode() == 1:
+            self.gf_block_names = (block_names_up[0], block_names_dn[0])
+        else:
+            self.gf_block_names = (block_names_up[0],)
 
         self.instance_count[0] += 1
 
@@ -360,23 +366,35 @@ class EDIpackSolver:
         return ed.get_mag(icomp=comp)
 
     def _make_block_gf_iw(self, mesh, data):
-        blocks = [Gf(mesh=mesh, target_shape=(self.norb, self.norb))
-                  for _ in range(2)]
-
-        # Block up
-        d = np.rollaxis(data[0, 0, :, :, :ed.Lmats], 2)
-        blocks[0].data[ed.Lmats:, :, :] = d
-        # Set negative Matsubara frequencies from Hermitian symmetry
-        blocks[0].data[:ed.Lmats, :, :] = \
-            np.conj(np.transpose(d[::-1, :, :], (0, 2, 1)))
-        # Block down
-        if self.nspin == 1:
-            blocks[1].data[:] = blocks[0].data
-        else:
-            d = np.rollaxis(data[1, 1, :, :, :ed.Lmats], 2)
-            blocks[1].data[ed.Lmats:, :, :] = d
+        if ed.get_ed_mode() == 1:  # 2 spin blocks
+            blocks = [
+                Gf(mesh=mesh, target_shape=(self.norb, self.norb))
+                for _ in range(2)
+            ]
+            # Block up
+            d = np.rollaxis(data[0, 0, :, :, :ed.Lmats], 2)
+            blocks[0].data[ed.Lmats:, :, :] = d
             # Set negative Matsubara frequencies from Hermitian symmetry
-            blocks[1].data[:ed.Lmats, :, :] = \
+            blocks[0].data[:ed.Lmats, :, :] = \
+                np.conj(np.transpose(d[::-1, :, :], (0, 2, 1)))
+            # Block down
+            if self.nspin == 1:
+                blocks[1].data[:] = blocks[0].data
+            else:
+                d = np.rollaxis(data[1, 1, :, :, :ed.Lmats], 2)
+                blocks[1].data[ed.Lmats:, :, :] = d
+                # Set negative Matsubara frequencies from Hermitian symmetry
+                blocks[1].data[:ed.Lmats, :, :] = \
+                    np.conj(np.transpose(d[::-1, :, :], (0, 2, 1)))
+        else:  # One block
+            blocks = [
+                Gf(mesh=mesh, target_shape=(2 * self.norb, 2 * self.norb))
+            ]
+            d = np.transpose(data, (4, 0, 2, 1, 3)).reshape(
+                ed.Lmats, 2 * self.norb, 2 * self.norb
+            )
+            blocks[0].data[ed.Lmats:, :, :] = d
+            blocks[0].data[:ed.Lmats, :, :] = \
                 np.conj(np.transpose(d[::-1, :, :], (0, 2, 1)))
 
         return BlockGf(name_list=self.gf_block_names,
@@ -384,16 +402,25 @@ class EDIpackSolver:
                        make_copies=False)
 
     def _make_block_gf_w(self, mesh, data):
-        blocks = [Gf(mesh=mesh, target_shape=(self.norb, self.norb))
-                  for _ in range(2)]
-
-        # Block up
-        blocks[0].data[:] = np.rollaxis(data[0, 0, :, :, :ed.Lreal], 2)
-        # Block down
-        if self.nspin == 1:
-            blocks[1].data[:] = blocks[0].data
-        else:
-            blocks[1].data[:] = np.rollaxis(data[1, 1, :, :, :ed.Lreal], 2)
+        if ed.get_ed_mode() == 1:  # 2 spin blocks
+            blocks = [
+                Gf(mesh=mesh, target_shape=(self.norb, self.norb))
+                for _ in range(2)
+            ]
+            # Block up
+            blocks[0].data[:] = np.rollaxis(data[0, 0, :, :, :ed.Lreal], 2)
+            # Block down
+            if self.nspin == 1:
+                blocks[1].data[:] = blocks[0].data
+            else:
+                blocks[1].data[:] = np.rollaxis(data[1, 1, :, :, :ed.Lreal], 2)
+        else:  # One block
+            blocks = [
+                Gf(mesh=mesh, target_shape=(2 * self.norb, 2 * self.norb))
+            ]
+            blocks[0].data[:] = np.transpose(data, (4, 0, 2, 1, 3)).reshape(
+                ed.Lreal, 2 * self.norb, 2 * self.norb
+            )
 
         return BlockGf(name_list=self.gf_block_names,
                        block_list=blocks,
