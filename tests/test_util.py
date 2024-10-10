@@ -5,6 +5,7 @@ import triqs.operators as op
 from edipack2triqs.util import (canonical2op,
                                 monomial2op,
                                 validate_fops_up_dn,
+                                normal_part,
                                 spin_conjugate)
 
 
@@ -29,6 +30,11 @@ class TestUtil(unittest.TestCase):
             validate_fops_up_dn([("up", 0)], fops_dn, 'u', 'd')
         with self.assertRaises(AssertionError):
             validate_fops_up_dn(fops_up, [("dn", 0), ("up", 1)], 'u', 'd')
+
+    def test_normal_part(self):
+        OP_n = 2 * op.n("up", 0) * op.n("dn", 1)
+        OP = OP_n + op.c_dag("up", 2) * op.c_dag("dn", 2)
+        self.assertEqual(normal_part(OP), OP_n)
 
     def test_spin_conjugate(self):
         OP = 2 * op.n("up", 0) * op.n("dn", 1)

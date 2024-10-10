@@ -217,6 +217,7 @@ class EDIpackSolver:
                 self.input_file = Path('input.conf').resolve()
                 with open(self.input_file, 'w') as config_file:
                     write_config(config_file, self.config)
+
             else:
                 Path('input.conf').symlink_to(self.input_file)
 
@@ -242,7 +243,7 @@ class EDIpackSolver:
         ed.init_solver(bath=np.zeros(self.h_params.bath.data.size, dtype=float))
 
         # GF block names
-        if ed.get_ed_mode() == 1:
+        if ed.get_ed_mode() in (1, 2):  # normal or superc
             self.gf_block_names = (block_names_up[0], block_names_dn[0])
         else:
             self.gf_block_names = (block_names_up[0],)
@@ -366,7 +367,7 @@ class EDIpackSolver:
         return ed.get_mag(icomp=comp)
 
     def _make_block_gf_iw(self, mesh, data):
-        if ed.get_ed_mode() == 1:  # 2 spin blocks
+        if ed.get_ed_mode() in (1, 2):  # 2 spin blocks
             blocks = [
                 Gf(mesh=mesh, target_shape=(self.norb, self.norb))
                 for _ in range(2)
@@ -402,7 +403,7 @@ class EDIpackSolver:
                        make_copies=False)
 
     def _make_block_gf_w(self, mesh, data):
-        if ed.get_ed_mode() == 1:  # 2 spin blocks
+        if ed.get_ed_mode() in (1, 2):  # 2 spin blocks
             blocks = [
                 Gf(mesh=mesh, target_shape=(self.norb, self.norb))
                 for _ in range(2)

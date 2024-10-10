@@ -93,6 +93,14 @@ class TestEDIpackSolverBathHybrid(unittest.TestCase):
         return h_bath
 
     @classmethod
+    def make_h_sc(cls, Delta):
+        return sum(Delta[nu] * (
+            op.c_dag('B_dn', nu) * op.c_dag('B_up', nu)
+            + op.c('B_up', nu) * op.c('B_dn', nu))
+            for nu in range(3)
+        )
+
+    @classmethod
     def make_ref_results(
         cls, h, fops, beta, n_iw, energy_window, n_w, eta, spin_blocks
     ):
@@ -590,6 +598,123 @@ class TestEDIpackSolverBathHybrid(unittest.TestCase):
                                      n_iw,
                                      energy_window, n_w, broadening,
                                      False)
+        self.assert_all(solver, **refs)
+
+    def test_superc(self):
+        h_loc = self.make_h_loc(mul.outer(s0, np.diag([0.5, 0.6])), True)
+        h_int = self.make_h_int(True,
+                                Uloc=np.array([1.0, 2.0]),
+                                Ust=0.8,
+                                Jh=0.2,
+                                Jx=0.1,
+                                Jp=0.15)
+
+        fops_imp_up, fops_imp_dn = self.make_fops_imp(True)
+        fops = fops_imp_up + fops_imp_dn + self.fops_bath_up + self.fops_bath_dn
+
+        eps = np.array([-0.1, -0.2, -0.3])
+        V = np.array([[0.4, 0.7, 0.1],
+                      [0.3, 0.5, 0.2]])
+        h_bath = self.make_h_bath(mul.outer([1, 1], eps),
+                                  mul.outer(s0, V),
+                                  True)
+
+        Delta = np.array([0.6, 0.7, 0.8])
+        h_sc = self.make_h_sc(Delta)
+
+        h = h_loc + h_int + h_bath + h_sc
+        solver = EDIpackSolver(h,
+                               fops_imp_up,
+                               fops_imp_dn,
+                               self.fops_bath_up,
+                               self.fops_bath_dn,
+                               lanc_nstates_sector=4,
+                               lanc_nstates_total=4,
+                               verbose=0)
+
+        self.assertEqual(solver.nspin, 1)
+        self.assertEqual(solver.norb, 2)
+        self.assertEqual(solver.bath().name, "hybrid")
+        self.assertEqual(solver.bath().nbath, 3)
+
+        # Part I: Initial solve()
+        beta = 100.0
+        n_iw = 100
+        energy_window = (-2.0, 2.0)
+        n_w = 600
+        broadening = 0.005
+        solver.solve(beta=beta,
+                     n_iw=n_iw,
+                     energy_window=energy_window,
+                     n_w=n_w,
+                     broadening=broadening)
+
+        ## Reference solution
+        refs = self.make_ref_results(h, fops, beta,
+                                     n_iw,
+                                     energy_window, n_w, broadening,
+                                     True)
+        self.assert_all(solver, **refs)
+
+        # Part II: update_int_params()
+        new_int_params = {'Uloc': np.array([2.0, 3.0]),
+                          'Ust': 0.6,
+                          'Jh': 0.1,
+                          'Jx': 0.2,
+                          'Jp': 0.0}
+        solver.update_int_params(**new_int_params)
+
+        beta = 120.0
+        n_iw = 200
+        energy_window = (-1.5, 1.5)
+        n_w = 400
+        broadening = 0.003
+        solver.solve(beta=beta,
+                     n_iw=n_iw,
+                     energy_window=energy_window,
+                     n_w=n_w,
+                     broadening=broadening)
+
+        ## Reference solution
+        h_int = self.make_h_int(True, **new_int_params)
+        h = h_loc + h_int + h_bath + h_sc
+        refs = self.make_ref_results(h, fops, beta,
+                                     n_iw,
+                                     energy_window, n_w, broadening,
+                                     True)
+        self.assert_all(solver, **refs)
+
+        # Part III: Updated bath parameters
+        eps = np.array([-0.1, -0.2, -0.4])
+        V = np.array([[0.4, 0.7, 0.1],
+                      [0.3, 0.8, 0.2]])
+        Delta = np.array([0.5, 0.7, 0.6])
+
+        solver.bath().eps[0, ...] = eps
+        solver.bath().V[0, ...] = V
+        solver.bath().Delta[0, ...] = Delta
+
+        beta = 100.0
+        n_iw = 50
+        energy_window = (-2.5, 2.5)
+        n_w = 800
+        broadening = 0.002
+        solver.solve(beta=beta,
+                     n_iw=n_iw,
+                     energy_window=energy_window,
+                     n_w=n_w,
+                     broadening=broadening)
+
+        ## Reference solution
+        h_bath = self.make_h_bath(mul.outer([1, 1], eps),
+                                  mul.outer(s0, V),
+                                  True)
+        h_sc = self.make_h_sc(Delta)
+        h = h_loc + h_int + h_bath + h_sc
+        refs = self.make_ref_results(h, fops, beta,
+                                     n_iw,
+                                     energy_window, n_w, broadening,
+                                     True)
         self.assert_all(solver, **refs)
 
     def tearDown(self):

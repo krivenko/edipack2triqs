@@ -13,6 +13,7 @@ import triqs.operators as op
 from .util import (is_diagonal,
                    IndicesType,
                    monomial2op,
+                   normal_part,
                    spin_conjugate)
 
 
@@ -27,7 +28,8 @@ class BathNormal:
                  nspin: int,
                  Hloc: np.ndarray,
                  h: np.ndarray,
-                 V: np.ndarray):
+                 V: np.ndarray,
+                 Delta: np.ndarray):
         norb = Hloc.shape[2]
         nbath_total = h.shape[1]
         # Number of bath sites
@@ -39,19 +41,30 @@ class BathNormal:
         self.data = np.zeros(size * (2 if ed_mode == "normal" else 3),
                              dtype=float)
 
-        # Energy levels view
-        self.eps = self.data[:size].reshape((nspin, norb, self.nbath))
+        params_shape = (nspin, norb, self.nbath)
+
+        # View: Energy levels
+        self.eps = self.data[:size].reshape(params_shape)
         assert not self.eps.flags['OWNDATA']
-        # Same-spin hopping amplitudes view
-        self.V = self.data[size:2 * size].reshape((nspin, norb, self.nbath))
-        assert not self.V.flags['OWNDATA']
 
         if ed_mode == "nonsu2":
-            # Spin-flip hopping amplitudes view
-            self.U = self.data[2 * size:].reshape((nspin, norb, self.nbath))
+            # View: Same-spin hopping amplitudes
+            self.V = self.data[size:2 * size].reshape(params_shape)
+            assert not self.V.flags['OWNDATA']
+            # View: Spin-flip hopping amplitudes
+            self.U = self.data[2 * size:].reshape(params_shape)
             assert not self.U.flags['OWNDATA']
-        else:
-            pass  # TODO: superc
+        elif ed_mode == "superc":
+            # View: Local SC order parameters of the bath
+            self.Delta = self.data[size:2 * size].reshape(params_shape)
+            assert not self.Delta.flags['OWNDATA']
+            # View: Same-spin hopping amplitudes
+            self.V = self.data[2 * size:].reshape(params_shape)
+            assert not self.V.flags['OWNDATA']
+        else:  # ed_mode == "normal"
+            # View: Same-spin hopping amplitudes
+            self.V = self.data[size:2 * size].reshape(params_shape)
+            assert not self.V.flags['OWNDATA']
 
         for spin1, spin2 in product(range(nspin), range(nspin)):
             # Lists of bath states coupled to each impurity orbital
@@ -70,6 +83,8 @@ class BathNormal:
                 for nu, b in enumerate(bs[orb]):
                     if spin1 == spin2:
                         self.eps[spin1, orb, nu] = h[spin1, b, b]
+                        if ed_mode == "superc":
+                            self.Delta[spin1, orb, nu] = Delta[spin1, b]
                         self.V[spin1, orb, nu] = V[spin1, spin2, orb, b]
                     elif ed_mode == "nonsu2":
                         self.U[spin1, orb, nu] = V[spin1, spin2, orb, b]
@@ -86,7 +101,8 @@ class BathHybrid:
                  nspin: int,
                  Hloc: np.ndarray,
                  h: np.ndarray,
-                 V: np.ndarray):
+                 V: np.ndarray,
+                 Delta: np.ndarray):
         norb = Hloc.shape[2]
         self.nbath = h.shape[1]
 
@@ -95,32 +111,44 @@ class BathHybrid:
 
         # EDIpack-compatible bath parameter array
         self.data = np.zeros(
-            eps_size + size * (1 if ed_mode == "normal" else 2),
+            {"normal": eps_size + size,
+             "superc": 2 * eps_size + size,
+             "nonsu2": eps_size + 2 * size}[ed_mode],
             dtype=float)
 
-        # Energy levels view
-        self.eps = self.data[:eps_size].reshape(nspin, self.nbath)
+        eps_shape = (nspin, self.nbath)
+        shape = (nspin, norb, self.nbath)
+
+        # View: Energy levels
+        self.eps = self.data[:eps_size].reshape(eps_shape)
         assert not self.eps.flags['OWNDATA']
-        # Same-spin hopping amplitudes view
-        self.V = self.data[eps_size:eps_size + size].reshape(
-            (nspin, norb, self.nbath)
-        )
-        assert not self.V.flags['OWNDATA']
 
         if ed_mode == "nonsu2":
-            # Spin-flip hopping amplitudes view
-            self.U = self.data[eps_size + size:].reshape(
-                (nspin, norb, self.nbath)
-            )
+            # View: Same-spin hopping amplitudes
+            self.V = self.data[eps_size:eps_size + size].reshape(shape)
+            assert not self.V.flags['OWNDATA']
+            # View: Spin-flip hopping amplitudes
+            self.U = self.data[eps_size + size:].reshape(shape)
             assert not self.U.flags['OWNDATA']
-        else:
-            pass  # TODO: superc
+        elif ed_mode == "superc":
+            # View: Local SC order parameters of the bath
+            self.Delta = self.data[eps_size:2 * eps_size].reshape(eps_shape)
+            assert not self.Delta.flags['OWNDATA']
+            # View: Same-spin hopping amplitudes
+            self.V = self.data[2 * eps_size:].reshape(shape)
+            assert not self.V.flags['OWNDATA']
+        else:  # ed_mode == "normal"
+            # View: Same-spin hopping amplitudes
+            self.V = self.data[eps_size:].reshape(shape)
+            assert not self.V.flags['OWNDATA']
 
         for spin1, spin2, nu in product(range(nspin),
                                         range(nspin),
                                         range(self.nbath)):
             if spin1 == spin2:
                 self.eps[spin1, nu] = h[spin1, nu, nu]
+                if ed_mode == "superc":
+                    self.Delta[spin1, nu] = Delta[spin1, nu]
                 self.V[spin1, :, nu] = V[spin1, spin2, :, nu]
             elif ed_mode == "nonsu2":
                 self.U[spin1, :, nu] = V[spin1, spin2, :, nu]
@@ -156,7 +184,8 @@ def _make_bath(ed_mode: str,
                nspin: int,
                Hloc: np.ndarray,
                h: np.ndarray,
-               V: np.ndarray):
+               V: np.ndarray,
+               Delta: np.ndarray):
     """
     Make a bath parameters object.
     """
@@ -176,12 +205,12 @@ def _make_bath(ed_mode: str,
        all(is_diagonal(h[spin, ...]) for spin in range(2)) and \
        (np.count_nonzero(V, axis=2) <= 1).all() and \
        (np.count_nonzero(V, axis=3) <= (nbath_total // norb)).all():
-        return BathNormal(ed_mode, nspin, Hloc, h, V)
+        return BathNormal(ed_mode, nspin, Hloc, h, V, Delta)
 
     # Can we use bath_type = 'hybrid'?
     # - All spin components of h must be diagonal
     elif all(is_diagonal(h[spin, ...]) for spin in range(2)):
-        return BathHybrid(ed_mode, nspin, Hloc, h, V)
+        return BathHybrid(ed_mode, nspin, Hloc, h, V, Delta)
 
     # Can we use bath_type = 'replica'
     # - The total number of bath states must be a multiple of norb
@@ -230,14 +259,10 @@ def parse_hamiltonian(hamiltonian: op.Operator,
     norb = len(fops_imp_up)
     nbath_total = len(fops_bath_up)
 
-    hamiltonian_conj = spin_conjugate(hamiltonian,
-                                      fops_imp_up + fops_bath_up,
-                                      fops_imp_dn + fops_bath_dn)
-    nspin = 1 if (hamiltonian_conj - hamiltonian).is_zero() else 2
-
     Hloc = np.zeros((2, 2, norb, norb), dtype=complex)
     h = np.zeros((2, nbath_total, nbath_total))
     V = np.zeros((2, 2, norb, nbath_total))
+    Delta = np.zeros((2, nbath_total))
 
     Uloc = np.zeros(5, dtype=float)
     Ust, UstmJ = [], []
@@ -320,6 +345,37 @@ def parse_hamiltonian(hamiltonian: op.Operator,
                 else:
                     term = coeff * monomial2op(mon)
                     raise RuntimeError(f"Unexpected interaction term {term}")
+
+        # Anomalous term creation-creation
+        elif daggers == [True, True]:
+            if (indices[0] in fops_bath) and (indices[1] in fops_bath):
+                spin1, b1 = divmod(fops_bath.index(indices[0]), nbath_total)
+                spin2, b2 = divmod(fops_bath.index(indices[1]), nbath_total)
+                if b1 == b2:
+                    # \Delta c^+_dn c^+_up
+                    Delta[0, b1] = (1 if spin1 == 1 else -1) * coeff
+                else:
+                    raise RuntimeError(
+                        f"Unexpected off-diagonal anomalous bath term {term}"
+                    )
+            else:
+                raise RuntimeError(f"Unexpected anomalous term {term}")
+
+        # Anomalous term annihilation-annihilation
+        elif daggers == [False, False]:
+            if (indices[0] in fops_bath) and (indices[1] in fops_bath):
+                spin1, b1 = divmod(fops_bath.index(indices[0]), nbath_total)
+                spin2, b2 = divmod(fops_bath.index(indices[1]), nbath_total)
+                if b1 == b2:
+                    # \Delta^* c_up c_dn
+                    Delta[1, b1] = (1 if spin1 == 0 else -1) * coeff
+                else:
+                    raise RuntimeError(
+                        f"Unexpected off-diagonal anomalous bath term {term}"
+                    )
+            else:
+                raise RuntimeError(f"Unexpected anomalous term {term}")
+
         else:
             raise RuntimeError(
                 f"Unsupported Hamiltonian term {coeff * monomial2op(mon)}"
@@ -337,22 +393,36 @@ def parse_hamiltonian(hamiltonian: op.Operator,
     assert all_close(Jp), \
         "Inconsistent values of J_P for different pairs of orbitals"
 
+    hamiltonian_n = normal_part(hamiltonian)
+    hamiltonian_n_conj = spin_conjugate(
+        hamiltonian_n, fops_imp_up + fops_bath_up, fops_imp_dn + fops_bath_dn
+    )
+    nspin = 1 if (hamiltonian_n_conj - hamiltonian_n).is_zero() else 2
+
     if nspin == 1:
         # Internal consistency check: Hloc, h and V must be spin-degenerate
         assert _is_spin_degenerate(Hloc)
         assert np.allclose(h[0, ...], h[1, ...], atol=1e-10)
         assert _is_spin_degenerate(V)
-        ed_mode = "normal"
+        if (Delta == 0).all():
+            ed_mode = "normal"
+        else:
+            ed_mode = "superc"
     else:  # nspin == 2
-        ed_mode = "normal" if \
-            (_is_spin_diagonal(Hloc) and _is_spin_diagonal(V)) \
-            else "nonsu2"
-        # TODO: superc
+        if not (Delta == 0).all():
+            raise RuntimeError(
+                "Magnetism in presence of a superconducting bath "
+                "is not supported"
+            )
+        if _is_spin_diagonal(Hloc) and _is_spin_diagonal(V):
+            ed_mode = "normal"
+        else:
+            ed_mode = "nonsu2"
 
     params = HamiltonianParams(
         ed_mode,
         Hloc=np.zeros((nspin, nspin, norb, norb), dtype=complex, order='F'),
-        bath=_make_bath(ed_mode, nspin, Hloc, h, V),
+        bath=_make_bath(ed_mode, nspin, Hloc, h, V, Delta),
         Uloc=Uloc,
         Ust=Ust[0] if len(Ust) > 0 else .0,
         Jx=Jx[0] if len(Jx) > 0 else .0,

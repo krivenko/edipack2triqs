@@ -79,6 +79,17 @@ def spin_conjugate(OP: op.Operator,
     return res
 
 
+def normal_part(OP: op.Operator):
+    """
+    Return the particle number conversing part of a many-body operator OP.
+    """
+    res = op.Operator()
+    for mon, coeff in OP:
+        if sum((1 if dag else -1) for dag, ind in mon) == 0:
+            res += coeff * monomial2op(mon)
+    return res
+
+
 @contextmanager
 def chdircontext(path):
     """
