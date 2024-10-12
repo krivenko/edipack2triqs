@@ -103,4 +103,4 @@ def write_config(f, config):
             v = ','.join(map(str, value))
         else:
             v = value
-        f.write(f"{name}={v}\n")
+        f.write(f"{name}={v}    !\n")
