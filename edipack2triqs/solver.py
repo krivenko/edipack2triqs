@@ -239,7 +239,7 @@ class EDIpackSolver:
 
         # Pass bath parameters to EDIpack
         assert self.h_params.bath.data.size == ed.get_bath_dimension()
-        ed.init_solver(np.zeros(self.h_params.bath.data.size, dtype=float))
+        ed.init_solver(bath=np.zeros(self.h_params.bath.data.size, dtype=float))
 
         # GF block names
         if ed.get_ed_mode() == 1:
