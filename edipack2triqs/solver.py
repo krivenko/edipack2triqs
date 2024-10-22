@@ -12,7 +12,7 @@ from triqs.gf import BlockGf, Gf, MeshImFreq, MeshReFreq
 from edipy2 import global_env as ed
 
 from .util import IndicesType, validate_fops_up_dn, write_config, chdircontext
-from .hamiltonian import parse_hamiltonian, BathNormal, BathHybrid
+from .hamiltonian import parse_hamiltonian, BathNormal, BathHybrid, BathGeneral
 
 
 class EDIpackSolver:
@@ -241,6 +241,9 @@ class EDIpackSolver:
         # Pass bath parameters to EDIpack
         assert self.h_params.bath.data.size == ed.get_bath_dimension()
         ed.init_solver(bath=np.zeros(self.h_params.bath.data.size, dtype=float))
+
+        if self.h_params.bath is BathGeneral:
+            ed.set_hgeneral(self.h_params.bath.hvec)
 
         # GF block names
         if ed.get_ed_mode() in (1, 2):  # normal or superc

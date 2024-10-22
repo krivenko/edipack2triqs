@@ -4,6 +4,7 @@ from itertools import product
 import numpy as np
 from numpy.testing import assert_equal, assert_allclose
 from numpy import multiply as mul
+from numpy.linalg import eigh
 
 import triqs.operators as op
 from triqs.operators.util.hamiltonians import h_int_kanamori
@@ -454,13 +455,205 @@ class TestHamiltonianBathHybrid(TestHamiltonian):
         self.assertFalse(hasattr(params.bath, 'U'))
         self.check_int_params(params)
 
+
+class TestHamiltonianBathGeneral(TestHamiltonian):
+
+    fops_bath_up = [('B_up', nu * 3 + o)
+                    for o, nu in product(TestHamiltonian.orbs, range(4))]
+    fops_bath_dn = [('B_dn', nu * 3 + o)
+                    for o, nu in product(TestHamiltonian.orbs, range(4))]
+
+    h_loc = np.array([[1.5, 1.0, 0.5],
+                      [1.0, 2.0, 1.0],
+                      [0.5, 1.0, 2.5]])
+    h = np.moveaxis(np.array([[[0.5, -0.2, 0.0],
+                               [-0.2, 0.6, -0.2],
+                               [0.0, -0.2, 0.7]],
+                              [[0.6, -0.2, 0.0],
+                               [-0.2, 0.7, 0.0],
+                               [0.0, 0.0, 0.85]],
+                              [[0.65, 0.0, 0.0],
+                               [0.0, 0.7, -0.2j],
+                               [0.0, 0.2j, 0.8]],
+                              [[0.6, 0.1, 0.0],
+                               [0.1, 0.7, 0.0],
+                               [0.0, 0.0, 0.8]]]), 0, 2)
+    V = np.array([[0.4, 0.75, 0.2, 0.0],
+                  [0.0, 0.5, 0.45, 0.3],
+                  [0.7, 0.0, 0.0, 0.1]])
+
+    @classmethod
+    def make_H_bath(cls, h, V):
+        h_bath = sum(
+            h[s1, s2, o1, o2, nu]
+            * op.c_dag("B_" + spin1, nu * 3 + o1)
+            * op.c("B_" + spin2, nu * 3 + o2)
+            for (s1, spin1), (s2, spin2), o1, o2, nu
+            in product(enumerate(cls.spins), enumerate(cls.spins),
+                       TestHamiltonian.orbs, TestHamiltonian.orbs,
+                       range(4))
+        )
+        h_bath += sum(V[s, o, nu] * (
+            op.c_dag(spin, o) * op.c("B_" + spin, nu * 3 + o)
+            + op.c_dag("B_" + spin, nu * 3 + o) * op.c(spin, o))
+            for (s, spin), o, nu
+            in product(enumerate(cls.spins), TestHamiltonian.orbs, range(4))
+        )
+        return h_bath
+
+    @classmethod
+    def check_bath(cls, hvec, lambdavec, V, h_ref, V_ref):
+        # Checking the bath Hamiltonian and the hopping amplitude matrix derived
+        # by BathGeneral is not trivial because the way bath states are
+        # distributed over replicas is not necessarily unique.
+        # Here, we perform two indirect tests to check consistency of the bath
+        # parameters with the reference data.
+        #
+        # - Eigenvalues of h and h_ref must agree.
+        # - Matrix products V @ h @ V^T and V_ref @ h_ref @ V_ref^T must
+        #   coincide. This effectively checks that the tested and reference
+        #   baths have the same effect on the impurity.
+
+        nspin, norb = h_ref.shape[0], h_ref.shape[2]
+
+        # Build and diagonalize Hamiltonian
+        h_mat = np.zeros((4, nspin, norb, 4, nspin, norb), dtype=complex)
+        for nu in range(4):
+            for spin1, spin2, orb1, orb2, isym in np.ndindex(hvec.shape):
+                h_mat[nu, spin1, orb1, nu, spin2, orb2] += \
+                    lambdavec[nu][isym] * hvec[spin1, spin2, orb1, orb2, isym]
+        h_mat = h_mat.reshape((4 * nspin * norb, 4 * nspin * norb))
+        eps = eigh(h_mat)[0]
+
+        # Build and diagonalize reference Hamiltonian
+        h_ref_mat = np.zeros((4, nspin, norb, 4, nspin, norb), dtype=complex)
+        for spin1, spin2, orb1, orb2, nu in np.ndindex(h_ref.shape):
+            h_ref_mat[nu, spin1, orb1, nu, spin2, orb2] = \
+                h_ref[spin1, spin2, orb1, orb2, nu]
+        h_ref_mat = h_ref_mat.reshape((4 * nspin * norb, 4 * nspin * norb))
+        eps_ref = eigh(h_ref_mat)[0]
+
+        # Compare the eigenvalues
+        assert_allclose(eps, eps_ref, atol=1e-10)
+
+        # Compare V @ h @ V^T and V_ref @ h_ref @ V_ref^T
+
+        V_mat = np.zeros((nspin, norb, 4, nspin, norb))
+        for nu in range(4):
+            for spin, orb in np.ndindex(V[nu].shape):
+                V_mat[spin, orb, nu, spin, orb] = V[nu][spin, orb]
+        V_mat = V_mat.reshape((nspin * norb, 4 * nspin * norb))
+
+        V_ref_mat = np.zeros((nspin, norb, 4, nspin, norb))
+        for spin, orb, nu in np.ndindex(V_ref.shape):
+            V_ref_mat[spin, orb, nu, spin, orb] = V_ref[spin, orb, nu]
+        V_ref_mat = V_ref_mat.reshape((nspin * norb, 4 * nspin * norb))
+
+        assert_allclose(V_mat @ h_mat @ V_mat.T,
+                        V_ref_mat @ h_ref_mat @ V_ref_mat.T,
+                        atol=1e-10)
+
+    def test_parse_hamiltonian_nspin1(self):
+        h = self.make_H_loc(mul.outer(s0, self.h_loc)) + self.make_H_int()
+        h += self.make_H_bath(mul.outer(s0, self.h), mul.outer([1, 1], self.V))
+
+        params = parse_hamiltonian(
+            h,
+            self.fops_imp_up, self.fops_imp_dn,
+            self.fops_bath_up, self.fops_bath_dn
+        )
+
+        self.assertEqual(params.ed_mode, "normal")
+        assert_allclose(params.Hloc, self.h_loc.reshape((1, 1, 3, 3)))
+        self.assertEqual(params.bath.nbath, 4)
+        self.assertEqual(params.bath.name, "general")
+        self.assertFalse(hasattr(params.bath, 'Delta'))
+        self.assertEqual(params.bath.nsym, 6)
+        self.assertEqual(params.bath.hvec.shape, (1, 1, 3, 3, 6))
+        self.assertEqual(len(params.bath.lambdavec), 4)
+        self.assertEqual(len(params.bath.V), 4)
+        self.check_bath(params.bath.hvec, params.bath.lambdavec, params.bath.V,
+                        self.h.reshape(1, 1, 3, 3, 4), self.V.reshape(1, 3, 4))
+        self.assertFalse(hasattr(params.bath, 'U'))
+        self.check_int_params(params)
+
+    def test_parse_hamiltonian_nspin2(self):
+        h = self.make_H_loc(mul.outer(sz, self.h_loc)) + self.make_H_int()
+        h += self.make_H_bath(mul.outer(sz, self.h), mul.outer([1, -1], self.V))
+
+        params = parse_hamiltonian(
+            h,
+            self.fops_imp_up, self.fops_imp_dn,
+            self.fops_bath_up, self.fops_bath_dn
+        )
+
+        self.assertEqual(params.ed_mode, "normal")
+        assert_allclose(params.Hloc, mul.outer(sz, self.h_loc))
+        self.assertEqual(params.bath.nbath, 4)
+        self.assertEqual(params.bath.name, "general")
+        self.assertFalse(hasattr(params.bath, 'Delta'))
+        self.assertEqual(params.bath.nsym, 12)
+        self.assertEqual(params.bath.hvec.shape, (2, 2, 3, 3, 12))
+        self.assertEqual(len(params.bath.lambdavec), 4)
+        self.assertEqual(len(params.bath.V), 4)
+        self.check_bath(params.bath.hvec, params.bath.lambdavec, params.bath.V,
+                        mul.outer(sz, self.h), mul.outer([1, -1], self.V))
+        self.assertFalse(hasattr(params.bath, 'U'))
+        self.check_int_params(params)
+
+    def test_parse_hamiltonian_nonsu2_hloc(self):
+        h = self.make_H_loc(mul.outer(sz + 0.2 * sx, self.h_loc)) \
+            + self.make_H_int()
+        h += self.make_H_bath(mul.outer(s0, self.h), mul.outer([1, 1], self.V))
+
+        params = parse_hamiltonian(
+            h,
+            self.fops_imp_up, self.fops_imp_dn,
+            self.fops_bath_up, self.fops_bath_dn
+        )
+
+        self.assertEqual(params.ed_mode, "nonsu2")
+        assert_allclose(params.Hloc, mul.outer(sz + 0.2 * sx, self.h_loc))
+        self.assertEqual(params.bath.nbath, 4)
+        self.assertEqual(params.bath.name, "general")
+        self.assertFalse(hasattr(params.bath, 'Delta'))
+        self.assertEqual(params.bath.nsym, 12)
+        self.assertEqual(params.bath.hvec.shape, (2, 2, 3, 3, 12))
+        self.assertEqual(len(params.bath.lambdavec), 4)
+        self.assertEqual(len(params.bath.V), 4)
+        self.check_bath(params.bath.hvec, params.bath.lambdavec, params.bath.V,
+                        mul.outer(s0, self.h), mul.outer([1, 1], self.V))
+        self.assertFalse(hasattr(params.bath, 'U'))
+        self.check_int_params(params)
+
+    def test_parse_hamiltonian_nonsu2_bath(self):
+        h = self.make_H_loc(mul.outer(s0, self.h_loc)) + self.make_H_int()
+        h += self.make_H_bath(mul.outer(sz + 0.2 * sx, self.h),
+                              mul.outer([1, -1], self.V))
+
+        params = parse_hamiltonian(
+            h,
+            self.fops_imp_up, self.fops_imp_dn,
+            self.fops_bath_up, self.fops_bath_dn
+        )
+
+        self.assertEqual(params.ed_mode, "nonsu2")
+        assert_allclose(params.Hloc, mul.outer(s0, self.h_loc))
+        self.assertEqual(params.bath.nbath, 4)
+        self.assertEqual(params.bath.name, "general")
+        self.assertFalse(hasattr(params.bath, 'Delta'))
+        self.assertEqual(params.bath.nsym, 21)
+        self.assertEqual(params.bath.hvec.shape, (2, 2, 3, 3, 21))
+        self.assertEqual(len(params.bath.lambdavec), 4)
+        self.assertEqual(len(params.bath.V), 4)
+        self.check_bath(params.bath.hvec, params.bath.lambdavec, params.bath.V,
+                        mul.outer(sz + 0.2 * sx, self.h),
+                        mul.outer([1, -1], self.V))
+        self.assertFalse(hasattr(params.bath, 'U'))
+        self.check_int_params(params)
+
 # TODO
-# class TestHamiltonianBathGeneral():
-#     test_parse_hamiltonian_nspin1()
-#     test_parse_hamiltonian_nspin2()
-#     test_parse_hamiltonian_nonsu2_hloc()
-#     test_parse_hamiltonian_nonsu2_bath()
-#     test_parse_hamiltonian_superc()
+#   def test_parse_hamiltonian_superc()
 
 
 if __name__ == '__main__':
