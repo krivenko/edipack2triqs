@@ -203,7 +203,7 @@ class EDIpackSolver:
             if isinstance(self.h_params.bath, BathNormal):
                 c["ED_TOTAL_UD"] = not (self.h_params.Jx == 0
                                         and self.h_params.Jp == 0)
-            elif isinstance(self.h_params.bath, BathHybrid):
+            elif isinstance(self.h_params.bath, (BathHybrid, BathGeneral)):
                 c["ED_TOTAL_UD"] = True
             else:
                 raise RuntimeError("Unrecognized bath type")
@@ -238,12 +238,14 @@ class EDIpackSolver:
             self.scifor_version = MPI.COMM_WORLD.bcast(self.scifor_version)
             self.edipack_version = MPI.COMM_WORLD.bcast(self.edipack_version)
 
-        # Pass bath parameters to EDIpack
-        assert self.h_params.bath.data.size == ed.get_bath_dimension()
-        ed.init_solver(bath=np.zeros(self.h_params.bath.data.size, dtype=float))
+        if isinstance(self.h_params.bath, BathGeneral):
+            ed.set_hgeneral(self.h_params.bath.hvec,
+                            self.h_params.bath.lambdavec)
+        else:
+            assert self.h_params.bath.data.size == ed.get_bath_dimension()
 
-        if self.h_params.bath is BathGeneral:
-            ed.set_hgeneral(self.h_params.bath.hvec)
+        # Initialize EDIpack
+        ed.init_solver(bath=np.zeros(self.h_params.bath.data.size, dtype=float))
 
         # GF block names
         if ed.get_ed_mode() in (1, 2):  # normal or superc

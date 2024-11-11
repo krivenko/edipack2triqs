@@ -444,7 +444,8 @@ class BathGeneral:
 
         replicas = self.build_replica_bases(norb, h, V)
 
-        self.hvec, lambdavec = self.build_linear_combination(replicas, nspin, h)
+        self.hvec, self.lambdavec = \
+            self.build_linear_combination(replicas, nspin, h)
         self.nsym = self.hvec.shape[-1]
 
         V_size = nspin * norb
@@ -463,10 +464,10 @@ class BathGeneral:
         assert all(not V_nu.flags['OWNDATA'] for V_nu in self.V)
 
         # View: Linear coefficients of the replica matrix linear combination
-        self.lambdavec = [self.data[replica_offset(nu) + V_size:
-                                    replica_offset(nu) + V_size + self.nsym].
-                          reshape(self.nsym)
-                          for nu in range(self.nbath)]
+        self.l = [self.data[replica_offset(nu) + V_size:  # noqa: E741
+                            replica_offset(nu) + V_size + self.nsym].
+                  reshape(self.nsym)
+                  for nu in range(self.nbath)]
         assert all(not l_nu.flags['OWNDATA'] for l_nu in self.lambdavec)
 
         # Fill V and lambda
@@ -476,7 +477,7 @@ class BathGeneral:
                 for orb, b in enumerate(replica):
                     self.V[nu][spin, orb] = V[spin, spin, orb, b]
             for isym in range(self.nsym):
-                self.lambdavec[nu][isym] = lambdavec[nu, isym]
+                self.l[nu][isym] = self.lambdavec[nu, isym]
 
 
 def default_Uloc():
@@ -545,7 +546,7 @@ def _is_spin_degenerate(h: np.ndarray):
         np.allclose(h[0, 0, ...], h[1, 1, ...], atol=1e-10)
 
 
-def parse_hamiltonian(hamiltonian: op.Operator,
+def parse_hamiltonian(hamiltonian: op.Operator,  # noqa: C901
                       fops_imp_up: list[IndicesType],
                       fops_imp_dn: list[IndicesType],
                       fops_bath_up: list[IndicesType],

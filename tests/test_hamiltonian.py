@@ -570,9 +570,9 @@ class TestHamiltonianBathGeneral(TestHamiltonian):
         self.assertFalse(hasattr(params.bath, 'Delta'))
         self.assertEqual(params.bath.nsym, 6)
         self.assertEqual(params.bath.hvec.shape, (1, 1, 3, 3, 6))
-        self.assertEqual(len(params.bath.lambdavec), 4)
+        self.assertEqual(len(params.bath.l), 4)
         self.assertEqual(len(params.bath.V), 4)
-        self.check_bath(params.bath.hvec, params.bath.lambdavec, params.bath.V,
+        self.check_bath(params.bath.hvec, params.bath.l, params.bath.V,
                         self.h.reshape(1, 1, 3, 3, 4), self.V.reshape(1, 3, 4))
         self.assertFalse(hasattr(params.bath, 'U'))
         self.check_int_params(params)
@@ -594,9 +594,9 @@ class TestHamiltonianBathGeneral(TestHamiltonian):
         self.assertFalse(hasattr(params.bath, 'Delta'))
         self.assertEqual(params.bath.nsym, 12)
         self.assertEqual(params.bath.hvec.shape, (2, 2, 3, 3, 12))
-        self.assertEqual(len(params.bath.lambdavec), 4)
+        self.assertEqual(len(params.bath.l), 4)
         self.assertEqual(len(params.bath.V), 4)
-        self.check_bath(params.bath.hvec, params.bath.lambdavec, params.bath.V,
+        self.check_bath(params.bath.hvec, params.bath.l, params.bath.V,
                         mul.outer(sz, self.h), mul.outer([1, -1], self.V))
         self.assertFalse(hasattr(params.bath, 'U'))
         self.check_int_params(params)
@@ -619,9 +619,9 @@ class TestHamiltonianBathGeneral(TestHamiltonian):
         self.assertFalse(hasattr(params.bath, 'Delta'))
         self.assertEqual(params.bath.nsym, 12)
         self.assertEqual(params.bath.hvec.shape, (2, 2, 3, 3, 12))
-        self.assertEqual(len(params.bath.lambdavec), 4)
+        self.assertEqual(len(params.bath.l), 4)
         self.assertEqual(len(params.bath.V), 4)
-        self.check_bath(params.bath.hvec, params.bath.lambdavec, params.bath.V,
+        self.check_bath(params.bath.hvec, params.bath.l, params.bath.V,
                         mul.outer(s0, self.h), mul.outer([1, 1], self.V))
         self.assertFalse(hasattr(params.bath, 'U'))
         self.check_int_params(params)
@@ -644,9 +644,9 @@ class TestHamiltonianBathGeneral(TestHamiltonian):
         self.assertFalse(hasattr(params.bath, 'Delta'))
         self.assertEqual(params.bath.nsym, 21)
         self.assertEqual(params.bath.hvec.shape, (2, 2, 3, 3, 21))
-        self.assertEqual(len(params.bath.lambdavec), 4)
+        self.assertEqual(len(params.bath.l), 4)
         self.assertEqual(len(params.bath.V), 4)
-        self.check_bath(params.bath.hvec, params.bath.lambdavec, params.bath.V,
+        self.check_bath(params.bath.hvec, params.bath.l, params.bath.V,
                         mul.outer(sz + 0.2 * sx, self.h),
                         mul.outer([1, -1], self.V))
         self.assertFalse(hasattr(params.bath, 'U'))
