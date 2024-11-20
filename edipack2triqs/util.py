@@ -19,6 +19,20 @@ def is_diagonal(a: np.ndarray):
     return np.array_equal(a, np.diag(np.diag(a)))
 
 
+def is_spin_diagonal(h: np.ndarray):
+    "Check if array is diagonal in its first two indices"
+    return np.all(h[0, 1, ...] == 0) and np.all(h[1, 0, ...] == 0)
+
+
+def is_spin_degenerate(h: np.ndarray):
+    """
+    Check if array is proportional to an identity matrix in its first two
+    indices
+    """
+    return is_spin_diagonal(h) and \
+        np.allclose(h[0, 0, ...], h[1, 1, ...], atol=1e-10)
+
+
 def canonical2op(dag: bool, ind: IndicesType):
     """
     Return a many-body operator made out of one canonical operator
