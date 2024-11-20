@@ -19,8 +19,7 @@ pip install .
 
 ## Missing features
 
-* `replica` bath type
 * Phonons
 * Imaginary time susceptibilities
-* Bath fitting
 * Sector selection
+* Bath fitting
