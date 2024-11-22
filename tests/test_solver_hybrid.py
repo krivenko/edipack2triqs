@@ -95,8 +95,8 @@ class TestEDIpackSolverBathHybrid(unittest.TestCase):
     @classmethod
     def make_h_sc(cls, Delta):
         return sum(Delta[nu] * (
-            op.c_dag('B_dn', nu) * op.c_dag('B_up', nu)
-            + op.c('B_up', nu) * op.c('B_dn', nu))
+            op.c_dag('B_up', nu) * op.c_dag('B_dn', nu)
+            + op.c('B_dn', nu) * op.c('B_up', nu))
             for nu in range(3)
         )
 

@@ -56,10 +56,10 @@ def _make_bath(ed_mode: str,
     """
 
     # Can we use bath_type = 'normal'?
-    if BathNormal.is_usable(Hloc, h, V):
+    if BathNormal.is_usable(Hloc, h, V, Delta):
         return BathNormal(ed_mode, nspin, Hloc, h, V, Delta)
     # Can we use bath_type = 'hybrid'?
-    elif BathHybrid.is_usable(h):
+    elif BathHybrid.is_usable(h, Delta):
         return BathHybrid(ed_mode, nspin, Hloc, h, V, Delta)
     # Can we use bath_type = 'general'?
     else:
@@ -101,8 +101,8 @@ def parse_hamiltonian(hamiltonian: op.Operator,  # noqa: C901
     # Coefficients V[spin1, spin2, orb, b] in front of
     # d^+(spin1, orb) a(spin2, b)
     V = np.zeros((2, 2, norb, nbath_total))
-    # TODO
-    Delta = np.zeros((2, nbath_total))
+    # Coefficients \Delta[b1, b2] in front of c^+(up, b1) c^+(dn, b2)
+    Delta = np.zeros((nbath_total, nbath_total), dtype=complex)
 
     Uloc = np.zeros(5, dtype=float)
     Ust, UstmJ = [], []
@@ -189,14 +189,17 @@ def parse_hamiltonian(hamiltonian: op.Operator,  # noqa: C901
             if (indices[0] in fops_bath) and (indices[1] in fops_bath):
                 spin1, b1 = divmod(fops_bath.index(indices[0]), nbath_total)
                 spin2, b2 = divmod(fops_bath.index(indices[1]), nbath_total)
-                if b1 == b2:
-                    # \Delta c^+_dn c^+_up
-                    Delta[0, b1] = (1 if spin1 == 1 else -1) * coeff
-                else:
+                if spin1 == spin2:  # Not representable in Nambu notation
+                    term = coeff * monomial2op(mon)
                     raise RuntimeError(
-                        f"Unexpected off-diagonal anomalous bath term {term}"
+                        f"Unexpected same-spin anomalous term {term}"
                     )
+                if spin1 == 0:
+                    Delta[b1, b2] = coeff
+                else:
+                    Delta[b2, b1] = -coeff
             else:
+                term = coeff * monomial2op(mon)
                 raise RuntimeError(f"Unexpected anomalous term {term}")
 
         # Anomalous term annihilation-annihilation
@@ -204,13 +207,11 @@ def parse_hamiltonian(hamiltonian: op.Operator,  # noqa: C901
             if (indices[0] in fops_bath) and (indices[1] in fops_bath):
                 spin1, b1 = divmod(fops_bath.index(indices[0]), nbath_total)
                 spin2, b2 = divmod(fops_bath.index(indices[1]), nbath_total)
-                if b1 == b2:
-                    # \Delta^* c_up c_dn
-                    Delta[1, b1] = (1 if spin1 == 0 else -1) * coeff
-                else:
+                if spin1 == spin2:  # Not representable in Nambu notation
                     raise RuntimeError(
-                        f"Unexpected off-diagonal anomalous bath term {term}"
+                        f"Unexpected same-spin anomalous term {term}"
                     )
+                continue
             else:
                 raise RuntimeError(f"Unexpected anomalous term {term}")
 

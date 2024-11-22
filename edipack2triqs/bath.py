@@ -41,13 +41,18 @@ class BathNormal:
     name: str = 'normal'
 
     @classmethod
-    def is_usable(cls, Hloc: np.ndarray, h: np.ndarray, V: np.ndarray):
+    def is_usable(cls,
+                  Hloc: np.ndarray,
+                  h: np.ndarray,
+                  V: np.ndarray,
+                  Delta: np.ndarray):
         norb = Hloc.shape[2]
         nbath_total = h.shape[2]  # Total number of bath states
 
         # - The total number of bath states must be a multiple of norb
         # - All spin components of Hloc must be diagonal
         # - h must be spin-diagonal
+        # - Delta must be diagonal
         # - All spin components of h must be diagonal
         # - Each bath state is coupled to at most one impurity orbital
         # - Each impurity orbital is coupled to at most nbath_total/norb
@@ -56,6 +61,7 @@ class BathNormal:
             all(is_diagonal(Hloc[spin1, spin2, ...])
                 for spin1, spin2 in product(range(2), repeat=2)) and \
             is_spin_diagonal(h) and \
+            is_diagonal(Delta) and \
             all(is_diagonal(h[spin, spin, ...]) for spin in range(2)) and \
             all(len(orbs) <= 1 for orbs in _bath_states_to_orbs(V)) and \
             all(len(bs) <= (nbath_total // norb)
@@ -124,7 +130,9 @@ class BathNormal:
                             h[spin1, spin2, b, b]
                         )
                         if ed_mode == "superc":
-                            self.Delta[spin1, orb, nu] = Delta[spin1, b]
+                            self.Delta[spin1, orb, nu] = np.real_if_close(
+                                Delta[b, b]
+                            )
                         self.V[spin1, orb, nu] = V[spin1, spin2, orb, b]
                     elif ed_mode == "nonsu2":
                         self.U[spin1, orb, nu] = V[spin1, spin2, orb, b]
@@ -137,11 +145,13 @@ class BathHybrid:
     name: str = 'hybrid'
 
     @classmethod
-    def is_usable(cls, h: np.ndarray):
+    def is_usable(cls, h: np.ndarray, Delta: np.ndarray):
         # - h must be spin-diagonal
         # - All spin components of h must be diagonal
+        # - Delta must be diagonal
         return is_spin_diagonal(h) and \
-            all(is_diagonal(h[spin, spin, ...]) for spin in range(2))
+            all(is_diagonal(h[spin, spin, ...]) for spin in range(2)) and \
+            is_diagonal(Delta)
 
     def __init__(self,
                  ed_mode: str,
@@ -195,7 +205,7 @@ class BathHybrid:
             if spin1 == spin2:
                 self.eps[spin1, nu] = np.real_if_close(h[spin1, spin2, nu, nu])
                 if ed_mode == "superc":
-                    self.Delta[spin1, nu] = Delta[spin1, nu]
+                    self.Delta[spin1, nu] = np.real_if_close(Delta[nu, nu])
                 self.V[spin1, :, nu] = V[spin1, spin2, :, nu]
             elif ed_mode == "nonsu2":
                 self.U[spin1, :, nu] = V[spin1, spin2, :, nu]
@@ -349,10 +359,11 @@ class BathGeneral:
         return ordered_replicas
 
     @classmethod
-    def build_linear_combination(cls,
+    def build_linear_combination(cls,  # noqa: C901
                                  replicas: list[list[int]],
                                  nspin: int,
-                                 h: np.ndarray):
+                                 h: np.ndarray,
+                                 is_nambu: bool):
         """
         Analyse a given bath Hamiltonian h and build its representation as a
         linear combination of basis matrices for a single replica. The basis
@@ -380,6 +391,22 @@ class BathGeneral:
         h_elements_imag_idx = set()
         for h_elements_nu in h_elements:
             for (idx1, idx2), val in h_elements_nu.items():
+                # In the superconducting case, check that all elements from the
+                # inambu1 = inambu2 = 1 block have negated counterparts in the
+                # inambu1 = inambu2 = 0 block. Disregard the former.
+                if is_nambu:
+                    inambu1, orb1 = idx1
+                    inambu2, orb2 = idx2
+                    if inambu1 == 1 and inambu2 == 1:
+                        val00 = h_elements_nu.get(((0, orb1), (0, orb2)), 0)
+                        if abs(val00 + val) > 1e-10:
+                            raise RuntimeError(
+                                "Inconsistent matrix elements in the diagonal "
+                                "Nambu blocks of h"
+                            )
+                        else:
+                            continue
+
                 if idx1 > idx2:
                     continue
                 if val.real != 0:
@@ -401,12 +428,18 @@ class BathGeneral:
             spin2, orb2 = idx2
             hvec[spin1, spin2, orb1, orb2, isym] = 1.0
             hvec[spin2, spin1, orb2, orb1, isym] = 1.0
+            if is_nambu and spin1 == 0 and spin2 == 0:
+                hvec[1, 1, orb1, orb2, isym] = -1.0
+                hvec[1, 1, orb2, orb1, isym] = -1.0
             isym += 1
         for idx1, idx2 in h_elements_imag_idx:
             spin1, orb1 = idx1
             spin2, orb2 = idx2
             hvec[spin1, spin2, orb1, orb2, isym] = -1.0j
             hvec[spin2, spin1, orb2, orb1, isym] = 1.0j
+            if is_nambu and spin1 == 0 and spin2 == 0:
+                hvec[1, 1, orb1, orb2, isym] = 1.0j
+                hvec[1, 1, orb2, orb1, isym] = -1.0j
             isym += 1
 
         # Extract lambda parameters
@@ -429,15 +462,27 @@ class BathGeneral:
                  h: np.ndarray,
                  V: np.ndarray,
                  Delta: np.ndarray):
+
         norb = Hloc.shape[2]
         nbath_total = h.shape[2]
         # Number of replicas
         self.nbath = nbath_total // norb
 
+        # In the superconducting case, reinterpret first two indices of h as
+        # Nambu indices and fill the off-diagonal elements from Delta
+        is_nambu = not (Delta == 0).all()
+        nnambu = 1
+        if is_nambu:
+            nnambu = 2
+            h = h.copy()
+            h[1, 1, :, :] *= -1
+            h[0, 1, :, :] = Delta
+            h[1, 0, :, :] = np.conj(Delta.T)
+
         replicas = self.build_replica_bases(norb, h, V)
 
         self.hvec, self.lambdavec = \
-            self.build_linear_combination(replicas, nspin, h)
+            self.build_linear_combination(replicas, nnambu * nspin, h, is_nambu)
         self.nsym = self.hvec.shape[-1]
 
         V_size = nspin * norb

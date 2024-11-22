@@ -100,8 +100,8 @@ class TestEDIpackSolverBathNormal(unittest.TestCase):
     @classmethod
     def make_h_sc(cls, Delta):
         return sum(Delta[o, nu] * (
-            op.c_dag('B_dn', nu * 2 + o) * op.c_dag('B_up', nu * 2 + o)
-            + op.c('B_up', nu * 2 + o) * op.c('B_dn', nu * 2 + o))
+            op.c_dag('B_up', nu * 2 + o) * op.c_dag('B_dn', nu * 2 + o)
+            + op.c('B_dn', nu * 2 + o) * op.c('B_up', nu * 2 + o))
             for o, nu in product(cls.orbs, range(2))
         )
 
