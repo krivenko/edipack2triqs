@@ -371,61 +371,25 @@ class EDIpackSolver:
         """
         return ed.get_mag(icomp=comp)
 
-    def _make_block_gf_iw(self, mesh, data):
+    def _make_block_gf(self, mesh, data):
         if ed.get_ed_mode() in (1, 2):  # 2 spin blocks
             blocks = [
                 Gf(mesh=mesh, target_shape=(self.norb, self.norb))
                 for _ in range(2)
             ]
             # Block up
-            d = np.rollaxis(data[0, 0, :, :, :ed.Lmats], 2)
-            blocks[0].data[ed.Lmats:, :, :] = d
-            # Set negative Matsubara frequencies from Hermitian symmetry
-            blocks[0].data[:ed.Lmats, :, :] = \
-                np.conj(np.transpose(d[::-1, :, :], (0, 2, 1)))
+            blocks[0].data[:] = np.rollaxis(data[0, 0, :, :, :], 2)
             # Block down
             if self.nspin == 1:
                 blocks[1].data[:] = blocks[0].data
             else:
-                d = np.rollaxis(data[1, 1, :, :, :ed.Lmats], 2)
-                blocks[1].data[ed.Lmats:, :, :] = d
-                # Set negative Matsubara frequencies from Hermitian symmetry
-                blocks[1].data[:ed.Lmats, :, :] = \
-                    np.conj(np.transpose(d[::-1, :, :], (0, 2, 1)))
-        else:  # One block
-            blocks = [
-                Gf(mesh=mesh, target_shape=(2 * self.norb, 2 * self.norb))
-            ]
-            d = np.transpose(data, (4, 0, 2, 1, 3)).reshape(
-                ed.Lmats, 2 * self.norb, 2 * self.norb
-            )
-            blocks[0].data[ed.Lmats:, :, :] = d
-            blocks[0].data[:ed.Lmats, :, :] = \
-                np.conj(np.transpose(d[::-1, :, :], (0, 2, 1)))
-
-        return BlockGf(name_list=self.gf_block_names,
-                       block_list=blocks,
-                       make_copies=False)
-
-    def _make_block_gf_w(self, mesh, data):
-        if ed.get_ed_mode() in (1, 2):  # 2 spin blocks
-            blocks = [
-                Gf(mesh=mesh, target_shape=(self.norb, self.norb))
-                for _ in range(2)
-            ]
-            # Block up
-            blocks[0].data[:] = np.rollaxis(data[0, 0, :, :, :ed.Lreal], 2)
-            # Block down
-            if self.nspin == 1:
-                blocks[1].data[:] = blocks[0].data
-            else:
-                blocks[1].data[:] = np.rollaxis(data[1, 1, :, :, :ed.Lreal], 2)
+                blocks[1].data[:] = np.rollaxis(data[1, 1, :, :, :], 2)
         else:  # One block
             blocks = [
                 Gf(mesh=mesh, target_shape=(2 * self.norb, 2 * self.norb))
             ]
             blocks[0].data[:] = np.transpose(data, (4, 0, 2, 1, 3)).reshape(
-                ed.Lreal, 2 * self.norb, 2 * self.norb
+                len(mesh), 2 * self.norb, 2 * self.norb
             )
 
         return BlockGf(name_list=self.gf_block_names,
@@ -435,19 +399,27 @@ class EDIpackSolver:
     def g_iw(self):
         "Matsubara impurity Green's function"
         mesh = MeshImFreq(beta=ed.beta, S="Fermion", n_iw=ed.Lmats)
-        return self._make_block_gf_iw(mesh, ed.get_gimp(axis="m"))
+        with chdircontext(self.workdir.name):
+            data = ed.build_gimp([complex(z) for z in mesh])
+        return self._make_block_gf(mesh, data)
 
     def Sigma_iw(self):
         "Matsubara impurity self-energy function"
         mesh = MeshImFreq(beta=ed.beta, S="Fermion", n_iw=ed.Lmats)
-        return self._make_block_gf_iw(mesh, ed.get_sigma(axis="m"))
+        with chdircontext(self.workdir.name):
+            data = ed.build_sigma([complex(z) for z in mesh])
+        return self._make_block_gf(mesh, data)
 
     def g_w(self):
         "Real-axis impurity Green's function"
         mesh = MeshReFreq(window=(ed.wini, ed.wfin), n_w=ed.Lreal)
-        return self._make_block_gf_w(mesh, ed.get_gimp(axis="r"))
+        with chdircontext(self.workdir.name):
+            data = ed.build_gimp([complex(z) + ed.eps * 1j for z in mesh])
+        return self._make_block_gf(mesh, data)
 
     def Sigma_w(self):
         "Real-axis impurity self-energy function"
         mesh = MeshReFreq(window=(ed.wini, ed.wfin), n_w=ed.Lreal)
-        return self._make_block_gf_w(mesh, ed.get_sigma(axis="r"))
+        with chdircontext(self.workdir.name):
+            data = ed.build_sigma([complex(z) + ed.eps * 1j for z in mesh])
+        return self._make_block_gf(mesh, data)
