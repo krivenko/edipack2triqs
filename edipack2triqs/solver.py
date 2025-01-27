@@ -253,6 +253,10 @@ class EDIpackSolver:
         else:
             self.gf_block_names = (block_names_up[0],)
 
+        if ed.get_ed_mode() == 2:  # superc
+            self.gf_an_block_names = (block_names_up[0]
+                                      + "_" + block_names_dn[0],)
+
         self.instance_count[0] += 1
 
     def __del__(self):
@@ -371,7 +375,17 @@ class EDIpackSolver:
         """
         return ed.get_mag(icomp=comp)
 
-    def _make_block_gf(self, mesh, data):
+    def _make_block_gf(self, mesh, data, /, anomalous):
+        if anomalous:
+            if ed.get_ed_mode() != 2:  # superc
+                raise RuntimeError("anomalous = True is only supported for "
+                                   "superconducting bath")
+            F = Gf(mesh=mesh, target_shape=(self.norb, self.norb))
+            F.data[:] = np.rollaxis(data[0, 0, :, :, :], 2)
+            return BlockGf(name_list=self.gf_an_block_names,
+                           block_list=[F],
+                           make_copies=False)
+
         if ed.get_ed_mode() in (1, 2):  # 2 spin blocks
             blocks = [
                 Gf(mesh=mesh, target_shape=(self.norb, self.norb))
@@ -396,30 +410,36 @@ class EDIpackSolver:
                        block_list=blocks,
                        make_copies=False)
 
-    def g_iw(self):
+    def g_iw(self, anomalous: bool = False):
         "Matsubara impurity Green's function"
+        typ = 'a' if anomalous else 'n'
         mesh = MeshImFreq(beta=ed.beta, S="Fermion", n_iw=ed.Lmats)
         with chdircontext(self.workdir.name):
-            data = ed.build_gimp([complex(z) for z in mesh])
-        return self._make_block_gf(mesh, data)
+            data = ed.build_gimp([complex(z) for z in mesh], typ=typ)
+        return self._make_block_gf(mesh, data, anomalous=anomalous)
 
-    def Sigma_iw(self):
+    def Sigma_iw(self, anomalous: bool = False):
         "Matsubara impurity self-energy function"
+        typ = 'a' if anomalous else 'n'
         mesh = MeshImFreq(beta=ed.beta, S="Fermion", n_iw=ed.Lmats)
         with chdircontext(self.workdir.name):
-            data = ed.build_sigma([complex(z) for z in mesh])
-        return self._make_block_gf(mesh, data)
+            data = ed.build_sigma([complex(z) for z in mesh], typ=typ)
+        return self._make_block_gf(mesh, data, anomalous=anomalous)
 
-    def g_w(self):
+    def g_w(self, anomalous: bool = False):
         "Real-axis impurity Green's function"
+        typ = 'a' if anomalous else 'n'
         mesh = MeshReFreq(window=(ed.wini, ed.wfin), n_w=ed.Lreal)
         with chdircontext(self.workdir.name):
-            data = ed.build_gimp([complex(z) + ed.eps * 1j for z in mesh])
-        return self._make_block_gf(mesh, data)
+            data = ed.build_gimp([complex(z) + ed.eps * 1j for z in mesh],
+                                 typ=typ)
+        return self._make_block_gf(mesh, data, anomalous=anomalous)
 
-    def Sigma_w(self):
+    def Sigma_w(self, anomalous: bool = False):
         "Real-axis impurity self-energy function"
+        typ = 'a' if anomalous else 'n'
         mesh = MeshReFreq(window=(ed.wini, ed.wfin), n_w=ed.Lreal)
         with chdircontext(self.workdir.name):
-            data = ed.build_sigma([complex(z) + ed.eps * 1j for z in mesh])
-        return self._make_block_gf(mesh, data)
+            data = ed.build_sigma([complex(z) + ed.eps * 1j for z in mesh],
+                                  typ=typ)
+        return self._make_block_gf(mesh, data, anomalous=anomalous)

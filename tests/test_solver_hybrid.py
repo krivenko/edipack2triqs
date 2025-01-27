@@ -717,6 +717,11 @@ class TestEDIpackSolverBathHybrid(unittest.TestCase):
                                      True)
         self.assert_all(solver, **refs)
 
+        solver.g_iw(anomalous=True)
+        solver.Sigma_iw(anomalous=True)
+        solver.g_w(anomalous=True)
+        solver.Sigma_w(anomalous=True)
+
     def tearDown(self):
         # Make sure EDIpackSolver.__del__() is called
         gc.collect()
