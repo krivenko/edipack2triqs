@@ -104,6 +104,17 @@ def normal_part(OP: op.Operator):
     return res
 
 
+def non_int_part(OP: op.Operator):
+    """
+    Return the non-interacting part of a many-body operator OP.
+    """
+    res = op.Operator()
+    for mon, coeff in OP:
+        if len(mon) < 3:
+            res += coeff * monomial2op(mon)
+    return res
+
+
 @contextmanager
 def chdircontext(path):
     """
