@@ -1,6 +1,6 @@
 # edipack2triqs: Compatibility layer between EDIpack and TRIQS
 
-Copyright (c) 2024, Igor Krivenko
+Copyright (c) 2024-2025, Igor Krivenko
 
 ## Dependencies
 

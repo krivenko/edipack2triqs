@@ -1,4 +1,4 @@
-Copyright (c) 2024, Igor Krivenko
+Copyright (c) 2024-2025, Igor Krivenko
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -15,7 +15,7 @@ her materials provided with the distribution.
 y be used to endorse or promote products derived from this software without spec
 ific prior written permission.
 
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
 ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WA
 RRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
  IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT
