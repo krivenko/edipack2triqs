@@ -213,7 +213,7 @@ class TestEDIpackSolverBathHybrid(unittest.TestCase):
         n_iw = 100
         energy_window = (-2.0, 2.0)
         n_w = 600
-        broadening = 0.005
+        broadening = 0.05
         solver.solve(beta=beta,
                      n_iw=n_iw,
                      energy_window=energy_window,
@@ -240,7 +240,7 @@ class TestEDIpackSolverBathHybrid(unittest.TestCase):
         n_iw = 200
         energy_window = (-1.5, 1.5)
         n_w = 400
-        broadening = 0.003
+        broadening = 0.03
         solver.solve(beta=beta,
                      n_iw=n_iw,
                      energy_window=energy_window,
@@ -269,7 +269,7 @@ class TestEDIpackSolverBathHybrid(unittest.TestCase):
         n_iw = 50
         energy_window = (-2.5, 2.5)
         n_w = 800
-        broadening = 0.002
+        broadening = 0.02
         solver.solve(beta=beta,
                      n_iw=n_iw,
                      energy_window=energy_window,
@@ -329,7 +329,7 @@ class TestEDIpackSolverBathHybrid(unittest.TestCase):
         n_iw = 100
         energy_window = (-1.5, 1.5)
         n_w = 600
-        broadening = 0.005
+        broadening = 0.05
         solver.solve(beta=beta,
                      n_iw=n_iw,
                      energy_window=energy_window,
@@ -356,7 +356,7 @@ class TestEDIpackSolverBathHybrid(unittest.TestCase):
         n_iw = 200
         energy_window = (-1.0, 1.0)
         n_w = 400
-        broadening = 0.003
+        broadening = 0.03
         solver.solve(beta=beta,
                      n_iw=n_iw,
                      energy_window=energy_window,
@@ -385,7 +385,7 @@ class TestEDIpackSolverBathHybrid(unittest.TestCase):
         n_iw = 50
         energy_window = (-1.5, 1.5)
         n_w = 800
-        broadening = 0.002
+        broadening = 0.02
         solver.solve(beta=beta,
                      n_iw=n_iw,
                      energy_window=energy_window,
@@ -446,7 +446,7 @@ class TestEDIpackSolverBathHybrid(unittest.TestCase):
         n_iw = 100
         energy_window = (-1.5, 1.5)
         n_w = 600
-        broadening = 0.005
+        broadening = 0.05
         solver.solve(beta=beta,
                      n_iw=n_iw,
                      energy_window=energy_window,
@@ -473,7 +473,7 @@ class TestEDIpackSolverBathHybrid(unittest.TestCase):
         n_iw = 200
         energy_window = (-1.0, 1.0)
         n_w = 400
-        broadening = 0.003
+        broadening = 0.03
         solver.solve(beta=beta,
                      n_iw=n_iw,
                      energy_window=energy_window,
@@ -502,7 +502,7 @@ class TestEDIpackSolverBathHybrid(unittest.TestCase):
         n_iw = 50
         energy_window = (-1.5, 1.5)
         n_w = 800
-        broadening = 0.002
+        broadening = 0.02
         solver.solve(beta=beta,
                      n_iw=n_iw,
                      energy_window=energy_window,
@@ -562,7 +562,7 @@ class TestEDIpackSolverBathHybrid(unittest.TestCase):
         n_iw = 100
         energy_window = (-1.5, 1.5)
         n_w = 600
-        broadening = 0.005
+        broadening = 0.05
         solver.solve(beta=beta,
                      n_iw=n_iw,
                      energy_window=energy_window,
@@ -589,7 +589,7 @@ class TestEDIpackSolverBathHybrid(unittest.TestCase):
         n_iw = 200
         energy_window = (-1.0, 1.0)
         n_w = 400
-        broadening = 0.003
+        broadening = 0.03
         solver.solve(beta=beta,
                      n_iw=n_iw,
                      energy_window=energy_window,
@@ -619,7 +619,7 @@ class TestEDIpackSolverBathHybrid(unittest.TestCase):
         n_iw = 50
         energy_window = (-1.5, 1.5)
         n_w = 800
-        broadening = 0.002
+        broadening = 0.02
         solver.solve(beta=beta,
                      n_iw=n_iw,
                      energy_window=energy_window,
@@ -680,7 +680,7 @@ class TestEDIpackSolverBathHybrid(unittest.TestCase):
         n_iw = 100
         energy_window = (-2.0, 2.0)
         n_w = 600
-        broadening = 0.005
+        broadening = 0.05
         solver.solve(beta=beta,
                      n_iw=n_iw,
                      energy_window=energy_window,
@@ -707,7 +707,7 @@ class TestEDIpackSolverBathHybrid(unittest.TestCase):
         n_iw = 200
         energy_window = (-1.5, 1.5)
         n_w = 400
-        broadening = 0.003
+        broadening = 0.03
         solver.solve(beta=beta,
                      n_iw=n_iw,
                      energy_window=energy_window,
@@ -738,7 +738,7 @@ class TestEDIpackSolverBathHybrid(unittest.TestCase):
         n_iw = 50
         energy_window = (-2.5, 2.5)
         n_w = 800
-        broadening = 0.002
+        broadening = 0.02
         solver.solve(beta=beta,
                      n_iw=n_iw,
                      energy_window=energy_window,
