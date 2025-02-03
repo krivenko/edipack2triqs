@@ -1,15 +1,24 @@
-# edipack2triqs: Compatibility layer between EDIpack and TRIQS
+edipack2triqs: Compatibility layer between EDIpack2 and TRIQS
+=============================================================
+
+**edipack2triqs** is a thin compatibility layer between
+**EDIpack2** (A Massively Parallel Exact Diagonalization solver for generic
+Quantum Impurity problems) and **TRIQS** (Toolbox for Research on Interacting
+Quantum Systems).
 
 Copyright (c) 2024-2025, Igor Krivenko, Lorenzo Crippa
 
-## Dependencies
+Dependencies
+------------
 
 * NumPy
+* NetworkX
 * mpi4py
 * [edipy2 >= 0.1.0 (EDIpack2.0)](https://github.com/edipack/EDIpack2.0)
-* [TRIQS 3.x.y](https://triqs.github.io/triqs/latest), tested with TRIQS 3.2.1
+* [TRIQS 3.x.y](https://github.com/TRIQS/triqs), tested with TRIQS 3.2.1
 
-## Installation
+Installation
+------------
 
 ```bash
 git clone https://github.com/krivenko/edipack2triqs
@@ -17,9 +26,31 @@ cd edipack2triqs
 pip install .
 ```
 
-## Missing features
+Usage examples
+--------------
+
+See https://krivenko.github.io/edipack2triqs/example.
+
+Missing features
+----------------
 
 * Phonons
 * Imaginary time susceptibilities
 * Sector selection
 * Conversion of bath objects into operator expressions
+
+License
+-------
+
+edipack2triqs is free software: you can redistribute it and/or modify it under
+the terms of the GNU General Public License as published by the Free Software
+Foundation, either version 3 of the License, or (at your option) any later
+version.
+
+edipack2triqs is distributed in the hope that it will be useful, but WITHOUT ANY
+WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+PARTICULAR PURPOSE. See the GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License along with
+edipack2triqs (in the file LICENSE.txt in this directory).
+If not, see <http://www.gnu.org/licenses/>.

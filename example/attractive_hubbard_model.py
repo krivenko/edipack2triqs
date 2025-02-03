@@ -1,3 +1,9 @@
+#!/bin/env python
+
+#
+# DMFT study of superconductivity in the attractive Hubbard model
+#
+
 from itertools import product
 import numpy as np
 
