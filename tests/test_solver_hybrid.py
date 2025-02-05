@@ -167,12 +167,12 @@ class TestEDIpackSolverBathHybrid(unittest.TestCase):
         assert_allclose(s.magnetization(comp='x'), refs['magn_x'], atol=1e-8)
         assert_allclose(s.magnetization(comp='y'), refs['magn_y'], atol=1e-8)
         assert_allclose(s.magnetization(comp='z'), refs['magn_z'], atol=1e-8)
-        assert_block_gfs_are_close(s.g_iw(), refs['g_iw'])
-        assert_block_gfs_are_close(s.g_w(), refs['g_w'])
+        assert_block_gfs_are_close(s.g_iw, refs['g_iw'])
+        assert_block_gfs_are_close(s.g_w, refs['g_w'])
         if not refs['Sigma_iw'] is None:
-            assert_block_gfs_are_close(s.Sigma_iw(), refs['Sigma_iw'])
+            assert_block_gfs_are_close(s.Sigma_iw, refs['Sigma_iw'])
         if not refs['Sigma_w'] is None:
-            assert_block_gfs_are_close(s.Sigma_w(), refs['Sigma_w'])
+            assert_block_gfs_are_close(s.Sigma_w, refs['Sigma_w'])
 
     def test_nspin1(self):
         h_loc = self.make_h_loc(mul.outer(s0, np.diag([0.5, 0.6])), True)
@@ -758,10 +758,10 @@ class TestEDIpackSolverBathHybrid(unittest.TestCase):
                                      True)
         self.assert_all(solver, **refs)
 
-        solver.g_iw(anomalous=True)
-        solver.Sigma_iw(anomalous=True)
-        solver.g_w(anomalous=True)
-        solver.Sigma_w(anomalous=True)
+        solver.g_an_iw
+        solver.Sigma_an_iw
+        solver.g_an_w
+        solver.Sigma_an_w
 
     def tearDown(self):
         # Make sure EDIpackSolver.__del__() is called
