@@ -162,8 +162,8 @@ class TestEDIpackSolverBathHybrid(unittest.TestCase):
 
     @classmethod
     def assert_all(cls, s, **refs):
-        assert_allclose(s.densities(), refs['densities'], atol=1e-8)
-        assert_allclose(s.double_occ(), refs['double_occ'], atol=1e-8)
+        assert_allclose(s.densities, refs['densities'], atol=1e-8)
+        assert_allclose(s.double_occ, refs['double_occ'], atol=1e-8)
         assert_allclose(s.magnetization(comp='x'), refs['magn_x'], atol=1e-8)
         assert_allclose(s.magnetization(comp='y'), refs['magn_y'], atol=1e-8)
         assert_allclose(s.magnetization(comp='z'), refs['magn_z'], atol=1e-8)
@@ -205,8 +205,8 @@ class TestEDIpackSolverBathHybrid(unittest.TestCase):
 
         self.assertEqual(solver.nspin, 1)
         self.assertEqual(solver.norb, 2)
-        self.assertEqual(solver.bath().name, "hybrid")
-        self.assertEqual(solver.bath().nbath, 3)
+        self.assertEqual(solver.bath.name, "hybrid")
+        self.assertEqual(solver.bath.nbath, 3)
 
         # Part I: Initial solve()
         beta = 100.0
@@ -262,8 +262,8 @@ class TestEDIpackSolverBathHybrid(unittest.TestCase):
         V = np.array([[0.4, 0.7, 0.1],
                       [0.3, 0.8, 0.2]])
 
-        solver.bath().eps[0, ...] = eps
-        solver.bath().V[0, ...] = V
+        solver.bath.eps[0, ...] = eps
+        solver.bath.V[0, ...] = V
 
         beta = 100.0
         n_iw = 50
@@ -321,8 +321,8 @@ class TestEDIpackSolverBathHybrid(unittest.TestCase):
 
         self.assertEqual(solver.nspin, 2)
         self.assertEqual(solver.norb, 2)
-        self.assertEqual(solver.bath().name, "hybrid")
-        self.assertEqual(solver.bath().nbath, 3)
+        self.assertEqual(solver.bath.name, "hybrid")
+        self.assertEqual(solver.bath.nbath, 3)
 
         # Part I: Initial solve()
         beta = 100.0
@@ -378,8 +378,8 @@ class TestEDIpackSolverBathHybrid(unittest.TestCase):
         V = np.array([[0.4, 0.7, 0.1],
                       [0.3, 0.8, 0.2]])
 
-        solver.bath().eps[:] = mul.outer([1, -1], eps)
-        solver.bath().V[:] = mul.outer([1, 0.9], V)
+        solver.bath.eps[:] = mul.outer([1, -1], eps)
+        solver.bath.V[:] = mul.outer([1, 0.9], V)
 
         beta = 100.0
         n_iw = 50
@@ -438,8 +438,8 @@ class TestEDIpackSolverBathHybrid(unittest.TestCase):
 
         self.assertEqual(solver.nspin, 2)
         self.assertEqual(solver.norb, 2)
-        self.assertEqual(solver.bath().name, "hybrid")
-        self.assertEqual(solver.bath().nbath, 3)
+        self.assertEqual(solver.bath.name, "hybrid")
+        self.assertEqual(solver.bath.nbath, 3)
 
         # Part I: Initial solve()
         beta = 100.0
@@ -495,8 +495,8 @@ class TestEDIpackSolverBathHybrid(unittest.TestCase):
         V = np.array([[0.4, 0.7, 0.1],
                       [0.3, 0.8, 0.2]])
 
-        solver.bath().eps[:] = mul.outer([1, -1], eps)
-        solver.bath().V[:] = mul.outer([1, 0.9], V)
+        solver.bath.eps[:] = mul.outer([1, -1], eps)
+        solver.bath.V[:] = mul.outer([1, 0.9], V)
 
         beta = 100.0
         n_iw = 50
@@ -554,8 +554,8 @@ class TestEDIpackSolverBathHybrid(unittest.TestCase):
 
         self.assertEqual(solver.nspin, 2)
         self.assertEqual(solver.norb, 2)
-        self.assertEqual(solver.bath().name, "hybrid")
-        self.assertEqual(solver.bath().nbath, 3)
+        self.assertEqual(solver.bath.name, "hybrid")
+        self.assertEqual(solver.bath.nbath, 3)
 
         # Part I: Initial solve()
         beta = 100.0
@@ -611,9 +611,9 @@ class TestEDIpackSolverBathHybrid(unittest.TestCase):
         V = np.array([[0.4, 0.7, 0.1],
                       [0.3, 0.8, 0.2]])
 
-        solver.bath().eps[:] = mul.outer([1, -1], eps)
-        solver.bath().V[:] = mul.outer([1, 0.9], V)
-        solver.bath().U[:] = mul.outer([0.2, 0.2], V)
+        solver.bath.eps[:] = mul.outer([1, -1], eps)
+        solver.bath.V[:] = mul.outer([1, 0.9], V)
+        solver.bath.U[:] = mul.outer([0.2, 0.2], V)
 
         beta = 100.0
         n_iw = 50
@@ -672,8 +672,8 @@ class TestEDIpackSolverBathHybrid(unittest.TestCase):
 
         self.assertEqual(solver.nspin, 1)
         self.assertEqual(solver.norb, 2)
-        self.assertEqual(solver.bath().name, "hybrid")
-        self.assertEqual(solver.bath().nbath, 3)
+        self.assertEqual(solver.bath.name, "hybrid")
+        self.assertEqual(solver.bath.nbath, 3)
 
         # Part I: Initial solve()
         beta = 100.0
@@ -730,9 +730,9 @@ class TestEDIpackSolverBathHybrid(unittest.TestCase):
                       [0.3, 0.8, 0.2]])
         Delta = np.array([0.5, 0.7, 0.6])
 
-        solver.bath().eps[0, ...] = eps
-        solver.bath().V[0, ...] = V
-        solver.bath().Delta[0, ...] = Delta
+        solver.bath.eps[0, ...] = eps
+        solver.bath.V[0, ...] = V
+        solver.bath.Delta[0, ...] = Delta
 
         beta = 100.0
         n_iw = 50

@@ -310,10 +310,12 @@ class EDIpackSolver:
                                + ', '.join(map(str, kwargs.keys()))
                                )
 
+    @property
     def hloc(self):
         "Access the local impurity Hamiltonian H_loc"
         return self.h_params.Hloc
 
+    @property
     def bath(self):
         "Access the bath object"
         return self.h_params.bath
@@ -355,14 +357,17 @@ class EDIpackSolver:
             ed.set_hloc(hloc=self.h_params.Hloc)
             ed.solve(self.h_params.bath.data)
 
+    @property
     def energies(self):
         "Returns the impurity local energies components"
         return ed.get_eimp()
 
+    @property
     def densities(self):
         "Returns the impurity occupations, one element per orbital"
         return ed.get_dens()
 
+    @property
     def double_occ(self):
         "Returns the impurity double occupancy, one element per orbital"
         return ed.get_docc()

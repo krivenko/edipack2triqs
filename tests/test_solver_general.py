@@ -160,8 +160,8 @@ class TestEDIpackSolverBathGeneral(unittest.TestCase):
 
     @classmethod
     def assert_all(cls, s, **refs):
-        assert_allclose(s.densities(), refs['densities'], atol=1e-8)
-        assert_allclose(s.double_occ(), refs['double_occ'], atol=1e-8)
+        assert_allclose(s.densities, refs['densities'], atol=1e-8)
+        assert_allclose(s.double_occ, refs['double_occ'], atol=1e-8)
         assert_allclose(s.magnetization(comp='x'), refs['magn_x'], atol=1e-8)
         assert_allclose(s.magnetization(comp='y'), refs['magn_y'], atol=1e-8)
         assert_allclose(s.magnetization(comp='z'), refs['magn_z'], atol=1e-8)
@@ -209,8 +209,8 @@ class TestEDIpackSolverBathGeneral(unittest.TestCase):
 
         self.assertEqual(solver.nspin, 1)
         self.assertEqual(solver.norb, 2)
-        self.assertEqual(solver.bath().name, "general")
-        self.assertEqual(solver.bath().nbath, 2)
+        self.assertEqual(solver.bath.name, "general")
+        self.assertEqual(solver.bath.nbath, 2)
 
         # Part I: Initial solve()
         beta = 100.0
@@ -272,7 +272,7 @@ class TestEDIpackSolverBathGeneral(unittest.TestCase):
         mat = np.zeros((1, 1, 2, 2), dtype=complex)
         mat[0, 0, 0, 1] = mat[0, 0, 1, 0] = 1
 
-        bath = solver.bath()
+        bath = solver.bath
         bath.l[0][self.find_basis_mat(bath.hvec, mat)] = 0.2
         bath.V[0][:] = V[:, 0]
         bath.V[1][:] = V[:, 1]
@@ -332,8 +332,8 @@ class TestEDIpackSolverBathGeneral(unittest.TestCase):
 
         self.assertEqual(solver.nspin, 2)
         self.assertEqual(solver.norb, 2)
-        self.assertEqual(solver.bath().name, "general")
-        self.assertEqual(solver.bath().nbath, 2)
+        self.assertEqual(solver.bath.name, "general")
+        self.assertEqual(solver.bath.nbath, 2)
 
         # Part I: Initial solve()
         beta = 100.0
@@ -397,7 +397,7 @@ class TestEDIpackSolverBathGeneral(unittest.TestCase):
         mat_up[0, 0, 0, 1] = mat_up[0, 0, 1, 0] = 1
         mat_dn[1, 1, 0, 1] = mat_dn[1, 1, 1, 0] = 1
 
-        bath = solver.bath()
+        bath = solver.bath
         bath.l[0][self.find_basis_mat(bath.hvec, mat_up)] = 0.2
         bath.l[0][self.find_basis_mat(bath.hvec, mat_dn)] = -0.2
         bath.V[0][:] = mul.outer([1, 0.9], V[:, 0])
@@ -460,8 +460,8 @@ class TestEDIpackSolverBathGeneral(unittest.TestCase):
 
         self.assertEqual(solver.nspin, 2)
         self.assertEqual(solver.norb, 2)
-        self.assertEqual(solver.bath().name, "general")
-        self.assertEqual(solver.bath().nbath, 2)
+        self.assertEqual(solver.bath.name, "general")
+        self.assertEqual(solver.bath.nbath, 2)
 
         # Part I: Initial solve()
         beta = 100.0
@@ -525,7 +525,7 @@ class TestEDIpackSolverBathGeneral(unittest.TestCase):
         mat_up[0, 0, 0, 1] = mat_up[0, 0, 1, 0] = 1
         mat_dn[1, 1, 0, 1] = mat_dn[1, 1, 1, 0] = 1
 
-        bath = solver.bath()
+        bath = solver.bath
         bath.l[0][self.find_basis_mat(bath.hvec, mat_up)] = 0.2
         bath.l[0][self.find_basis_mat(bath.hvec, mat_dn)] = -0.2
         bath.V[0][:] = mul.outer([1, 0.9], V[:, 0])
@@ -588,8 +588,8 @@ class TestEDIpackSolverBathGeneral(unittest.TestCase):
 
         self.assertEqual(solver.nspin, 2)
         self.assertEqual(solver.norb, 2)
-        self.assertEqual(solver.bath().name, "general")
-        self.assertEqual(solver.bath().nbath, 2)
+        self.assertEqual(solver.bath.name, "general")
+        self.assertEqual(solver.bath.nbath, 2)
 
         # Part I: Initial solve()
         beta = 100.0
@@ -657,7 +657,7 @@ class TestEDIpackSolverBathGeneral(unittest.TestCase):
         mat_updn1[0, 1, 0, 1] = mat_updn1[1, 0, 1, 0] = 1
         mat_updn2[0, 1, 1, 0] = mat_updn2[1, 0, 0, 1] = 1
 
-        bath = solver.bath()
+        bath = solver.bath
         bath.l[0][self.find_basis_mat(bath.hvec, mat_up)] = 0.2
         bath.l[0][self.find_basis_mat(bath.hvec, mat_dn)] = -0.2
         bath.l[0][self.find_basis_mat(bath.hvec, mat_updn1)] = 0.2 * 0.2
@@ -724,8 +724,8 @@ class TestEDIpackSolverBathGeneral(unittest.TestCase):
 
         self.assertEqual(solver.nspin, 1)
         self.assertEqual(solver.norb, 2)
-        self.assertEqual(solver.bath().name, "general")
-        self.assertEqual(solver.bath().nbath, 2)
+        self.assertEqual(solver.bath.name, "general")
+        self.assertEqual(solver.bath.nbath, 2)
 
         # Part I: Initial solve()
         beta = 100.0
@@ -799,7 +799,7 @@ class TestEDIpackSolverBathGeneral(unittest.TestCase):
         mat_sc2[0, 1, 1, 0] = -1j
         mat_sc2[1, 0, 0, 1] = 1j
 
-        bath = solver.bath()
+        bath = solver.bath
         bath.l[0][self.find_basis_mat(bath.hvec, mat)] = 0.2
         bath.l[0][self.find_basis_mat(bath.hvec, mat_sc1)] = -0.1
         bath.l[0][self.find_basis_mat(bath.hvec, mat_sc2)] = -0.1
