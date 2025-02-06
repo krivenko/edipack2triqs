@@ -1,6 +1,7 @@
 from pathlib import Path
 from tempfile import TemporaryDirectory
 from warnings import warn
+import os
 import re
 
 import numpy as np
@@ -210,20 +211,33 @@ class EDIpackSolver:
 
             self.config = c
 
-        self.workdir = TemporaryDirectory()
+        self.comm = MPI.COMM_WORLD
 
-        with chdircontext(self.workdir.name):
-            if self.input_file is None:
-                self.input_file = Path('input.conf').resolve()
-                with open(self.input_file, 'w') as config_file:
-                    write_config(config_file, self.config)
+        # A temporary directory for EDIpack is created and managed by the MPI
+        # process with rank 0. The directory is assumed to be accessible to all
+        # other MPI processes under the same name via a common file system.
+        if self.comm.Get_rank() == 0:
+            self.workdir = TemporaryDirectory(prefix=".edipack-",
+                                              dir=os.getcwd())
+            self.wdname = self.workdir.name
+        else:
+            self.wdname = None
+        self.wdname = self.comm.bcast(self.wdname)
 
-            else:
-                Path('input.conf').symlink_to(self.input_file)
+        with chdircontext(self.wdname):
+            if self.comm.Get_rank() == 0:
+                if self.input_file is None:
+                    self.input_file = Path('input.conf').resolve()
+                    with open(self.input_file, 'w') as config_file:
+                        write_config(config_file, self.config)
 
+                else:
+                    Path('input.conf').symlink_to(self.input_file)
+
+            self.comm.barrier()
             ed.read_input('input.conf')
 
-            if MPI.COMM_WORLD.Get_rank() == 0:
+            if self.comm.Get_rank() == 0:
                 self.scifor_version = re.match(
                     r"^SCIFOR VERSION \(GIT\): (.*)",
                     open("scifor_version.inc", 'r').readline())[1]
@@ -235,8 +249,8 @@ class EDIpackSolver:
                 self.scifor_version = ""
                 self.edipack_version = ""
 
-            self.scifor_version = MPI.COMM_WORLD.bcast(self.scifor_version)
-            self.edipack_version = MPI.COMM_WORLD.bcast(self.edipack_version)
+            self.scifor_version = self.comm.bcast(self.scifor_version)
+            self.edipack_version = self.comm.bcast(self.edipack_version)
 
         if isinstance(self.h_params.bath, BathGeneral):
             ed.set_hgeneral(self.h_params.bath.hvec,
@@ -258,8 +272,10 @@ class EDIpackSolver:
                                       + "_" + block_names_dn[0],)
 
         self.instance_count[0] += 1
+        self.comm.barrier()
 
     def __del__(self):
+        self.comm.barrier()
         try:
             ed.finalize_solver()
             self.instance_count[0] -= 1
@@ -309,6 +325,7 @@ class EDIpackSolver:
             raise RuntimeError("Unrecognized interaction parameters: "
                                + ', '.join(map(str, kwargs.keys()))
                                )
+        self.comm.barrier()
 
     @property
     def hloc(self):
@@ -353,9 +370,11 @@ class EDIpackSolver:
         ed.eps = broadening
 
         # Solve!
-        with chdircontext(self.workdir.name):
+        self.comm.barrier()
+        with chdircontext(self.wdname):
             ed.set_hloc(hloc=self.h_params.Hloc)
             ed.solve(self.h_params.bath.data)
+        self.comm.barrier()
 
     @property
     def energies(self):
@@ -393,7 +412,7 @@ class EDIpackSolver:
             mesh = MeshImFreq(beta=ed.beta, S="Fermion", n_iw=ed.Lmats)
             z_vals = [complex(z) for z in mesh]
 
-        with chdircontext(self.workdir.name):
+        with chdircontext(self.wdname):
             data = ed_func(z_vals, typ='a' if anomalous else 'n')
 
         if anomalous:
