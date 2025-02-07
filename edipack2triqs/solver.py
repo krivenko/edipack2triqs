@@ -1,7 +1,8 @@
 from pathlib import Path
 from tempfile import TemporaryDirectory
 from warnings import warn
-import os
+import os,sys
+import copy
 import re
 
 import numpy as np
@@ -183,6 +184,9 @@ class EDIpackSolver:
             c["LANC_NGFITER"] = kwargs.get("lanc_ngfiter", 200)
             c["LANC_TOLERANCE"] = kwargs.get("lanc_tolerance", 1e-18)
             c["LANC_DIM_THRESHOLD"] = kwargs.get("lanc_dim_threshold", 1024)
+            c["CG_METHOD"] = kwargs.get("cg_method", 0)
+            c["CG_GRAD"] = kwargs.get("cg_grad", 0)
+            c["CG_SCHEME"] = kwargs.get("cg_scheme", "weiss")
 
             # Impurity structure
             c["ED_MODE"] = self.h_params.ed_mode
@@ -259,6 +263,7 @@ class EDIpackSolver:
             assert self.h_params.bath.data.size == ed.get_bath_dimension()
 
         # Initialize EDIpack
+        self.bath_old = None
         ed.init_solver(bath=np.zeros(self.h_params.bath.data.size, dtype=float))
 
         # GF block names
@@ -398,6 +403,71 @@ class EDIpackSolver:
         and 'z'.
         """
         return ed.get_mag(icomp=comp)
+        
+    def fit_gf(self, func_in, mixing=0.5):
+        
+        listnames=tuple(func_in.indices) #if it has only one component, it's nonsu2
+        mesh = MeshImFreq(beta=ed.beta, S="Fermion", n_iw=ed.Lmats)
+        z_vals = np.array([complex(z) for z in mesh])
+        
+        with chdircontext(self.wdname):
+            if ed.get_ed_mode() == 1:  #Normal, here nspin is important
+                func_up = np.transpose(func_in[listnames[0]].data[ed.Lmats:,...],(1,2,0))
+                self.h_params.bath.data[:] = ed.chi2_fitgf(func_up,self.h_params.bath.data,ispin=0)
+                if ed.Nspin == 1:
+                    self.h_params.bath.data[:] = ed.spin_symmetrize_bath(self.h_params.bath.data[:])
+                else:
+                    func_dw = np.transpose(func_in[listnames[1]].data[ed.Lmats:,...],(1,2,0))
+                    self.h_params.bath.data[:] = ed.chi2_fitgf(func_dw,self.h_params.bath.data,ispin=1)
+            
+            elif ed.get_ed_mode() == 2:  #superc, here nspin is 1
+                func_up = np.transpose(func_in[listnames[0]].data[ed.Lmats:,...],(1,2,0))
+                func_an = np.transpose(func_in[listnames[1]].data[ed.Lmats:,...],(1,2,0))
+                self.h_params.bath.data[:] = ed.chi2_fitgf(func_up,func_an,self.h_params.bath.data[:])
+                
+            elif ed.get_ed_mode() == 3:  #nonsu2, here nspin is 2
+                func = np.transpose(func_in[listnames[0]].data[ed.Lmats:,...],(1,2,0))
+                self.h_params.bath.data[:] = ed.chi2_fitgf(func,self.h_params.bath.data[:])
+                
+        #Created fitted G0
+        if len(listnames) > 1: #everything but nonsu2
+            if self.config["CG_SCHEME"] == "weiss":
+                fittedfunc = ed.get_g0and(z_vals, self.h_params.bath.data, ishape=5, typ='n')
+                if ed.get_ed_mode() == 2:
+                    fittedfunc_an = ed.get_g0and(z_vals, self.h_params.bath.data, ishape=5, typ='a')
+            else:
+                fittedfunc = ed.get_delta(z_vals, self.h_params.bath.data, ishape=5)
+                if ed.get_ed_mode() == 2:
+                    fittedfunc_an = ed.get_delta(z_vals, self.h_params.bath.data, ishape=5, typ='a')
+                    
+            #Create GF object to return
+            func_out = func_in.copy()
+            if len(listnames) > 1: #everything but nonsu2
+                func_out[listnames[0]].data[:] = np.transpose(fittedfunc[0,0,:,:,:],(2,0,1))
+                if ed.get_ed_mode() == 2:  #superc, second component is anomalous
+                    func_out[listnames[1]].data[:] = np.transpose(fittedfunc_an[0,0,:,:,:],(2,0,1))
+                else:
+                    if ed.Nspin ==2: #normal with two spin blocks
+                        func_out[listnames[1]].data[:] = np.transpose(fittedfunc[1,1,:,:,:],(2,0,1))
+        else: #nonsu2
+            if self.config["CG_SCHEME"] == "weiss":
+                fittedfunc = ed.get_g0and(z_vals, self.h_params.bath.data, ishape=3)
+            else:
+                fittedfunc = ed.get_delta(z_vals, self.h_params.bath.data, ishape=3)
+            
+            #Create GF object to return
+            func_out = func_in.copy()
+            func_out[listnames[0]].data[:] = np.transpose(fittedfunc,(2,0,1))
+
+        # Mix bath
+        
+        if self.bath_old:
+            self.h_params.bath.data[:] = mixing * self.h_params.bath.data[:] + (1.0 - mixing) * self.bath_old.data[:]
+            self.bath_old.data[:] = self.h_params.bath.data[:]
+        else:
+            self.bath_old = copy.deepcopy(self.h_params.bath)            
+        
+        return func_out
 
     def _make_gf(self, ed_func, real_freq, anomalous):
         if anomalous:
