@@ -1,5 +1,6 @@
 import unittest
 from itertools import product
+from copy import deepcopy
 
 import numpy as np
 from numpy.testing import assert_equal, assert_allclose
@@ -16,6 +17,11 @@ from edipack2triqs.bath import BathNormal, BathHybrid, BathGeneral
 s0 = np.eye(2)
 sx = np.array([[0, 1], [1, 0]])
 sz = np.array([[1, 0], [0, -1]])
+
+
+def assert_equal_and_not_id(test, a, b):
+    assert_equal(a, b)
+    test.assertFalse(a is b)
 
 
 class TestHamiltonian(unittest.TestCase):
@@ -154,6 +160,13 @@ class TestHamiltonianBathNormal(TestHamiltonian):
             set(e for e, v in zip(self.eps.flat, self.V.flat) if v == 0)
         )
         self.check_int_params(params)
+        # Check deepcopy of bath
+        b2 = deepcopy(b)
+        assert_equal_and_not_id(self, b2.data, b.data)
+        assert_equal_and_not_id(self, b2.eps, b.eps)
+        assert_equal_and_not_id(self, b2.V, b.V)
+        self.assertTrue(b2.eps.base is b2.data)
+        self.assertTrue(b2.V.base is b2.data)
 
     def test_parse_hamiltonian_nspin2(self):
         h = self.make_H_loc(mul.outer(sz, self.h_loc)) + self.make_H_int()
@@ -191,6 +204,13 @@ class TestHamiltonianBathNormal(TestHamiltonian):
                 set(e for e, v in zip(eps_s.flat, V_s.flat) if v == 0)
             )
         self.check_int_params(params)
+        # Check deepcopy of bath
+        b2 = deepcopy(b)
+        assert_equal_and_not_id(self, b2.data, b.data)
+        assert_equal_and_not_id(self, b2.eps, b.eps)
+        assert_equal_and_not_id(self, b2.V, b.V)
+        self.assertTrue(b2.eps.base is b2.data)
+        self.assertTrue(b2.V.base is b2.data)
 
     def test_parse_hamiltonian_nonsu2_hloc(self):
         h = self.make_H_loc(mul.outer(sz + 0.2 * sx, self.h_loc)) \
@@ -228,6 +248,15 @@ class TestHamiltonianBathNormal(TestHamiltonian):
                 set(e for e, v in zip(self.eps.flat, self.V.flat) if v == 0)
             )
         self.check_int_params(params)
+        # Check deepcopy of bath
+        b2 = deepcopy(b)
+        assert_equal_and_not_id(self, b2.data, b.data)
+        assert_equal_and_not_id(self, b2.eps, b.eps)
+        assert_equal_and_not_id(self, b2.V, b.V)
+        assert_equal_and_not_id(self, b2.U, b.U)
+        self.assertTrue(b2.eps.base is b2.data)
+        self.assertTrue(b2.V.base is b2.data)
+        self.assertTrue(b2.U.base is b2.data)
 
     def test_parse_hamiltonian_nonsu2_bath(self):
         h = self.make_H_loc(mul.outer(s0, self.h_loc)) + self.make_H_int()
@@ -266,6 +295,15 @@ class TestHamiltonianBathNormal(TestHamiltonian):
                 set(e for e, v in zip(eps_s.flat, V_s.flat) if v == 0)
             )
         self.check_int_params(params)
+        # Check deepcopy of bath
+        b2 = deepcopy(b)
+        assert_equal_and_not_id(self, b2.data, b.data)
+        assert_equal_and_not_id(self, b2.eps, b.eps)
+        assert_equal_and_not_id(self, b2.V, b.V)
+        assert_equal_and_not_id(self, b2.U, b.U)
+        self.assertTrue(b2.eps.base is b2.data)
+        self.assertTrue(b2.V.base is b2.data)
+        self.assertTrue(b2.U.base is b2.data)
 
     def test_parse_hamiltonian_superc(self):
         h = self.make_H_loc(mul.outer(s0, self.h_loc)) + self.make_H_int()
@@ -316,6 +354,15 @@ class TestHamiltonianBathNormal(TestHamiltonian):
                 if v == 0)
         )
         self.check_int_params(params)
+        # Check deepcopy of bath
+        b2 = deepcopy(b)
+        assert_equal_and_not_id(self, b2.data, b.data)
+        assert_equal_and_not_id(self, b2.eps, b.eps)
+        assert_equal_and_not_id(self, b2.V, b.V)
+        assert_equal_and_not_id(self, b2.Delta, b.Delta)
+        self.assertTrue(b2.eps.base is b2.data)
+        self.assertTrue(b2.V.base is b2.data)
+        self.assertTrue(b2.Delta.base is b2.data)
 
 
 class TestHamiltonianBathHybrid(TestHamiltonian):
@@ -366,6 +413,14 @@ class TestHamiltonianBathHybrid(TestHamiltonian):
         self.assertFalse(hasattr(params.bath, 'U'))
         self.check_int_params(params)
 
+        # Check deepcopy of bath
+        b2 = deepcopy(params.bath)
+        assert_equal_and_not_id(self, b2.data, params.bath.data)
+        assert_equal_and_not_id(self, b2.eps, params.bath.eps)
+        assert_equal_and_not_id(self, b2.V, params.bath.V)
+        self.assertTrue(b2.eps.base is b2.data)
+        self.assertTrue(b2.V.base is b2.data)
+
     def test_parse_hamiltonian_nspin2(self):
         h = self.make_H_loc(mul.outer(sz, self.h_loc)) + self.make_H_int()
         h += self.make_H_bath(mul.outer([1, -1], self.eps),
@@ -387,6 +442,14 @@ class TestHamiltonianBathHybrid(TestHamiltonian):
         assert_allclose(params.bath.V, mul.outer([1, -1], self.V.reshape(3, 4)))
         self.assertFalse(hasattr(params.bath, 'U'))
         self.check_int_params(params)
+
+        # Check deepcopy of bath
+        b2 = deepcopy(params.bath)
+        assert_equal_and_not_id(self, b2.data, params.bath.data)
+        assert_equal_and_not_id(self, b2.eps, params.bath.eps)
+        assert_equal_and_not_id(self, b2.V, params.bath.V)
+        self.assertTrue(b2.eps.base is b2.data)
+        self.assertTrue(b2.V.base is b2.data)
 
     def test_parse_hamiltonian_nonsu2_hloc(self):
         h = self.make_H_loc(mul.outer(sz + 0.2 * sx, self.h_loc)) \
@@ -410,6 +473,16 @@ class TestHamiltonianBathHybrid(TestHamiltonian):
         assert_allclose(params.bath.U, np.zeros((2, 3, 4)))
         self.check_int_params(params)
 
+        # Check deepcopy of bath
+        b2 = deepcopy(params.bath)
+        assert_equal_and_not_id(self, b2.data, params.bath.data)
+        assert_equal_and_not_id(self, b2.eps, params.bath.eps)
+        assert_equal_and_not_id(self, b2.V, params.bath.V)
+        assert_equal_and_not_id(self, b2.U, params.bath.U)
+        self.assertTrue(b2.eps.base is b2.data)
+        self.assertTrue(b2.V.base is b2.data)
+        self.assertTrue(b2.U.base is b2.data)
+
     def test_parse_hamiltonian_nonsu2_bath(self):
         h = self.make_H_loc(mul.outer(s0, self.h_loc)) + self.make_H_int()
         h += self.make_H_bath(mul.outer([1, -1], self.eps),
@@ -429,6 +502,16 @@ class TestHamiltonianBathHybrid(TestHamiltonian):
         self.assertFalse(hasattr(params.bath, 'Delta'))
         assert_allclose(params.bath.V, mul.outer([1, -1], self.V))
         assert_allclose(params.bath.U, mul.outer([0.2, 0.2], self.V))
+
+        # Check deepcopy of bath
+        b2 = deepcopy(params.bath)
+        assert_equal_and_not_id(self, b2.data, params.bath.data)
+        assert_equal_and_not_id(self, b2.eps, params.bath.eps)
+        assert_equal_and_not_id(self, b2.V, params.bath.V)
+        assert_equal_and_not_id(self, b2.U, params.bath.U)
+        self.assertTrue(b2.eps.base is b2.data)
+        self.assertTrue(b2.V.base is b2.data)
+        self.assertTrue(b2.U.base is b2.data)
 
     def test_parse_hamiltonian_superc(self):
         h = self.make_H_loc(mul.outer(s0, self.h_loc)) + self.make_H_int()
@@ -455,6 +538,16 @@ class TestHamiltonianBathHybrid(TestHamiltonian):
         assert_allclose(params.bath.V, self.V.reshape(1, 3, 4))
         self.assertFalse(hasattr(params.bath, 'U'))
         self.check_int_params(params)
+
+        # Check deepcopy of bath
+        b2 = deepcopy(params.bath)
+        assert_equal_and_not_id(self, b2.data, params.bath.data)
+        assert_equal_and_not_id(self, b2.eps, params.bath.eps)
+        assert_equal_and_not_id(self, b2.V, params.bath.V)
+        assert_equal_and_not_id(self, b2.Delta, params.bath.Delta)
+        self.assertTrue(b2.eps.base is b2.data)
+        self.assertTrue(b2.V.base is b2.data)
+        self.assertTrue(b2.Delta.base is b2.data)
 
 
 class TestHamiltonianBathGeneral(TestHamiltonian):
@@ -587,6 +680,16 @@ class TestHamiltonianBathGeneral(TestHamiltonian):
         self.assertFalse(hasattr(params.bath, 'U'))
         self.check_int_params(params)
 
+        # Check deepcopy of bath
+        b2 = deepcopy(params.bath)
+        assert_equal_and_not_id(self, b2.data, params.bath.data)
+        assert_equal_and_not_id(self, b2.hvec, params.bath.hvec)
+        assert_equal_and_not_id(self, b2.lambdavec, params.bath.lambdavec)
+        assert_equal_and_not_id(self, b2.V, params.bath.V)
+        assert_equal_and_not_id(self, b2.l, params.bath.l)
+        self.assertTrue(all(V_nu.base is b2.data for V_nu in b2.V))
+        self.assertTrue(all(l_nu.base is b2.data for l_nu in b2.l))
+
     def test_parse_hamiltonian_nspin2(self):
         h = self.make_H_loc(mul.outer(sz, self.h_loc)) + self.make_H_int()
         h += self.make_H_bath(mul.outer(sz, self.h), mul.outer([1, -1], self.V))
@@ -610,6 +713,16 @@ class TestHamiltonianBathGeneral(TestHamiltonian):
                         mul.outer(sz, self.h), mul.outer([1, -1], self.V))
         self.assertFalse(hasattr(params.bath, 'U'))
         self.check_int_params(params)
+
+        # Check deepcopy of bath
+        b2 = deepcopy(params.bath)
+        assert_equal_and_not_id(self, b2.data, params.bath.data)
+        assert_equal_and_not_id(self, b2.hvec, params.bath.hvec)
+        assert_equal_and_not_id(self, b2.lambdavec, params.bath.lambdavec)
+        assert_equal_and_not_id(self, b2.V, params.bath.V)
+        assert_equal_and_not_id(self, b2.l, params.bath.l)
+        self.assertTrue(all(V_nu.base is b2.data for V_nu in b2.V))
+        self.assertTrue(all(l_nu.base is b2.data for l_nu in b2.l))
 
     def test_parse_hamiltonian_nonsu2_hloc(self):
         h = self.make_H_loc(mul.outer(sz + 0.2 * sx, self.h_loc)) \
@@ -636,6 +749,16 @@ class TestHamiltonianBathGeneral(TestHamiltonian):
         self.assertFalse(hasattr(params.bath, 'U'))
         self.check_int_params(params)
 
+        # Check deepcopy of bath
+        b2 = deepcopy(params.bath)
+        assert_equal_and_not_id(self, b2.data, params.bath.data)
+        assert_equal_and_not_id(self, b2.hvec, params.bath.hvec)
+        assert_equal_and_not_id(self, b2.lambdavec, params.bath.lambdavec)
+        assert_equal_and_not_id(self, b2.V, params.bath.V)
+        assert_equal_and_not_id(self, b2.l, params.bath.l)
+        self.assertTrue(all(V_nu.base is b2.data for V_nu in b2.V))
+        self.assertTrue(all(l_nu.base is b2.data for l_nu in b2.l))
+
     def test_parse_hamiltonian_nonsu2_bath(self):
         h = self.make_H_loc(mul.outer(s0, self.h_loc)) + self.make_H_int()
         h += self.make_H_bath(mul.outer(sz + 0.2 * sx, self.h),
@@ -661,6 +784,16 @@ class TestHamiltonianBathGeneral(TestHamiltonian):
                         mul.outer([1, -1], self.V))
         self.assertFalse(hasattr(params.bath, 'U'))
         self.check_int_params(params)
+
+        # Check deepcopy of bath
+        b2 = deepcopy(params.bath)
+        assert_equal_and_not_id(self, b2.data, params.bath.data)
+        assert_equal_and_not_id(self, b2.hvec, params.bath.hvec)
+        assert_equal_and_not_id(self, b2.lambdavec, params.bath.lambdavec)
+        assert_equal_and_not_id(self, b2.V, params.bath.V)
+        assert_equal_and_not_id(self, b2.l, params.bath.l)
+        self.assertTrue(all(V_nu.base is b2.data for V_nu in b2.V))
+        self.assertTrue(all(l_nu.base is b2.data for l_nu in b2.l))
 
     def test_parse_hamiltonian_superc(self):
         h = self.make_H_loc(mul.outer(s0, self.h_loc)) + self.make_H_int()
@@ -700,6 +833,16 @@ class TestHamiltonianBathGeneral(TestHamiltonian):
                         h_ref, mul.outer([1, 1], self.V), is_nambu=True)
         self.assertFalse(hasattr(params.bath, 'U'))
         self.check_int_params(params)
+
+        # Check deepcopy of bath
+        b2 = deepcopy(params.bath)
+        assert_equal_and_not_id(self, b2.data, params.bath.data)
+        assert_equal_and_not_id(self, b2.hvec, params.bath.hvec)
+        assert_equal_and_not_id(self, b2.lambdavec, params.bath.lambdavec)
+        assert_equal_and_not_id(self, b2.V, params.bath.V)
+        assert_equal_and_not_id(self, b2.l, params.bath.l)
+        self.assertTrue(all(V_nu.base is b2.data for V_nu in b2.V))
+        self.assertTrue(all(l_nu.base is b2.data for l_nu in b2.l))
 
 
 if __name__ == '__main__':

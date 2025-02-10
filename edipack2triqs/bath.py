@@ -3,6 +3,7 @@ Objects representing various EDIpack bath topologies.
 """
 
 from itertools import product
+from copy import deepcopy
 
 import numpy as np
 import networkx as nx
@@ -75,6 +76,18 @@ class BathNormal:
             assert not self.V.flags['OWNDATA']
         else:
             raise RuntimeError("Unknown ED mode")
+
+    def __deepcopy__(self, memo):
+        nspin, norb, nbath = self.eps.shape
+        if hasattr(self, "U"):
+            ed_mode = "nonsu2"
+        elif hasattr(self, "Delta"):
+            ed_mode = "superc"
+        else:
+            ed_mode = "normal"
+        bath = BathNormal(ed_mode, nspin, norb, nbath)
+        bath.data[:] = self.data
+        return bath
 
     @classmethod
     def is_usable(cls,
@@ -195,6 +208,18 @@ class BathHybrid:
         else:
             raise RuntimeError("Unknown ED mode")
 
+    def __deepcopy__(self, memo):
+        nspin, norb, nbath = self.V.shape
+        if hasattr(self, "U"):
+            ed_mode = "nonsu2"
+        elif hasattr(self, "Delta"):
+            ed_mode = "superc"
+        else:
+            ed_mode = "normal"
+        bath = BathHybrid(ed_mode, nspin, norb, nbath)
+        bath.data[:] = self.data
+        return bath
+
     @classmethod
     def is_usable(cls, h: np.ndarray, Delta: np.ndarray):
         # - h must be spin-diagonal
@@ -274,6 +299,15 @@ class BathGeneral:
         for nu in range(self.nbath):
             for isym in range(self.nsym):
                 self.l[nu][isym] = self.lambdavec[nu, isym]
+
+    def __deepcopy__(self, memo):
+        nbath = len(self.V)
+        nspin, norb = self.V[0].shape
+        bath = BathGeneral(nspin, norb, nbath,
+                           deepcopy(self.hvec, memo),
+                           deepcopy(self.lambdavec, memo))
+        bath.data[:] = self.data
+        return bath
 
     @classmethod
     def is_replica_valid(cls, replica: set[int], bs2orbs: list[list[int]]):
