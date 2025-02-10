@@ -57,14 +57,19 @@ def _make_bath(ed_mode: str,
 
     # Can we use bath_type = 'normal'?
     if BathNormal.is_usable(Hloc, h, V, Delta):
-        return BathNormal(ed_mode, nspin, Hloc, h, V, Delta)
+        return BathNormal.from_hamiltonian(ed_mode, nspin, Hloc, h, V, Delta)
     # Can we use bath_type = 'hybrid'?
     elif BathHybrid.is_usable(h, Delta):
-        return BathHybrid(ed_mode, nspin, Hloc, h, V, Delta)
+        return BathHybrid.from_hamiltonian(ed_mode, nspin, Hloc, h, V, Delta)
     # Can we use bath_type = 'general'?
     else:
         try:
-            return BathGeneral(ed_mode, nspin, Hloc, h, V, Delta)
+            return BathGeneral.from_hamiltonian(ed_mode,
+                                                nspin,
+                                                Hloc,
+                                                h,
+                                                V,
+                                                Delta)
         except RuntimeError:
             raise RuntimeError(
                 "Cannot find a suitable bath mode for the given Hamiltonian"

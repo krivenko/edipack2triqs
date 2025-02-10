@@ -40,6 +40,42 @@ class BathNormal:
     # EDIpack bath type
     name: str = 'normal'
 
+    def __init__(self, ed_mode: str, nspin: int, norb: int, nbath: int):
+        self.nbath = nbath
+
+        size = nspin * norb * nbath
+
+        # EDIpack-compatible bath parameter array
+        self.data = np.zeros(size * (2 if ed_mode == "normal" else 3),
+                             dtype=float)
+
+        params_shape = (nspin, norb, nbath)
+
+        # View: Energy levels
+        self.eps = self.data[:size].reshape(params_shape)
+        assert not self.eps.flags['OWNDATA']
+
+        if ed_mode == "nonsu2":
+            # View: Same-spin hopping amplitudes
+            self.V = self.data[size:2 * size].reshape(params_shape)
+            assert not self.V.flags['OWNDATA']
+            # View: Spin-flip hopping amplitudes
+            self.U = self.data[2 * size:].reshape(params_shape)
+            assert not self.U.flags['OWNDATA']
+        elif ed_mode == "superc":
+            # View: Local SC order parameters of the bath
+            self.Delta = self.data[size:2 * size].reshape(params_shape)
+            assert not self.Delta.flags['OWNDATA']
+            # View: Same-spin hopping amplitudes
+            self.V = self.data[2 * size:].reshape(params_shape)
+            assert not self.V.flags['OWNDATA']
+        elif ed_mode == "normal":
+            # View: Same-spin hopping amplitudes
+            self.V = self.data[size:2 * size].reshape(params_shape)
+            assert not self.V.flags['OWNDATA']
+        else:
+            raise RuntimeError("Unknown ED mode")
+
     @classmethod
     def is_usable(cls,
                   Hloc: np.ndarray,
@@ -67,48 +103,20 @@ class BathNormal:
             all(len(bs) <= (nbath_total // norb)
                 for bs in _orbs_to_bath_states(V))
 
-    def __init__(self,
-                 ed_mode: str,
-                 nspin: int,
-                 Hloc: np.ndarray,
-                 h: np.ndarray,
-                 V: np.ndarray,
-                 Delta: np.ndarray):
+    @classmethod
+    def from_hamiltonian(cls,
+                         ed_mode: str,
+                         nspin: int,
+                         Hloc: np.ndarray,
+                         h: np.ndarray,
+                         V: np.ndarray,
+                         Delta: np.ndarray):
         norb = Hloc.shape[2]
         nbath_total = h.shape[2]
         # Number of bath sites
-        self.nbath = nbath_total // norb
+        nbath = nbath_total // norb
 
-        size = nspin * norb * self.nbath
-
-        # EDIpack-compatible bath parameter array
-        self.data = np.zeros(size * (2 if ed_mode == "normal" else 3),
-                             dtype=float)
-
-        params_shape = (nspin, norb, self.nbath)
-
-        # View: Energy levels
-        self.eps = self.data[:size].reshape(params_shape)
-        assert not self.eps.flags['OWNDATA']
-
-        if ed_mode == "nonsu2":
-            # View: Same-spin hopping amplitudes
-            self.V = self.data[size:2 * size].reshape(params_shape)
-            assert not self.V.flags['OWNDATA']
-            # View: Spin-flip hopping amplitudes
-            self.U = self.data[2 * size:].reshape(params_shape)
-            assert not self.U.flags['OWNDATA']
-        elif ed_mode == "superc":
-            # View: Local SC order parameters of the bath
-            self.Delta = self.data[size:2 * size].reshape(params_shape)
-            assert not self.Delta.flags['OWNDATA']
-            # View: Same-spin hopping amplitudes
-            self.V = self.data[2 * size:].reshape(params_shape)
-            assert not self.V.flags['OWNDATA']
-        else:  # ed_mode == "normal"
-            # View: Same-spin hopping amplitudes
-            self.V = self.data[size:2 * size].reshape(params_shape)
-            assert not self.V.flags['OWNDATA']
+        bath = cls(ed_mode, nspin, norb, nbath)
 
         for spin1, spin2 in product(range(nspin), repeat=2):
             # Lists of bath states coupled to each impurity orbital
@@ -120,22 +128,24 @@ class BathNormal:
                 (bs[orbs[0]] if (len(orbs) != 0) else dec_bs).append(b)
             for orb in range(norb):
                 # Assign the decoupled bath states to some orbitals
-                n_missing_states = self.nbath - len(bs[orb])
+                n_missing_states = nbath - len(bs[orb])
                 for _ in range(n_missing_states):
                     bs[orb].append(dec_bs.pop(0))
                 # Fill the parameters
                 for nu, b in enumerate(bs[orb]):
                     if spin1 == spin2:
-                        self.eps[spin1, orb, nu] = np.real_if_close(
+                        bath.eps[spin1, orb, nu] = np.real_if_close(
                             h[spin1, spin2, b, b]
                         )
                         if ed_mode == "superc":
-                            self.Delta[spin1, orb, nu] = np.real_if_close(
+                            bath.Delta[spin1, orb, nu] = np.real_if_close(
                                 Delta[b, b]
                             )
-                        self.V[spin1, orb, nu] = V[spin1, spin2, orb, b]
+                        bath.V[spin1, orb, nu] = V[spin1, spin2, orb, b]
                     elif ed_mode == "nonsu2":
-                        self.U[spin1, orb, nu] = V[spin1, spin2, orb, b]
+                        bath.U[spin1, orb, nu] = V[spin1, spin2, orb, b]
+
+        return bath
 
 
 class BathHybrid:
@@ -144,26 +154,10 @@ class BathHybrid:
     # EDIpack bath type
     name: str = 'hybrid'
 
-    @classmethod
-    def is_usable(cls, h: np.ndarray, Delta: np.ndarray):
-        # - h must be spin-diagonal
-        # - All spin components of h must be diagonal
-        # - Delta must be diagonal
-        return is_spin_diagonal(h) and \
-            all(is_diagonal(h[spin, spin, ...]) for spin in range(2)) and \
-            is_diagonal(Delta)
+    def __init__(self, ed_mode: str, nspin: int, norb: int, nbath: int):
+        self.nbath = nbath
 
-    def __init__(self,
-                 ed_mode: str,
-                 nspin: int,
-                 Hloc: np.ndarray,
-                 h: np.ndarray,
-                 V: np.ndarray,
-                 Delta: np.ndarray):
-        norb = Hloc.shape[2]
-        self.nbath = h.shape[2]
-
-        eps_size = nspin * self.nbath
+        eps_size = nspin * nbath
         size = eps_size * norb
 
         # EDIpack-compatible bath parameter array
@@ -173,8 +167,8 @@ class BathHybrid:
              "nonsu2": eps_size + 2 * size}[ed_mode],
             dtype=float)
 
-        eps_shape = (nspin, self.nbath)
-        shape = (nspin, norb, self.nbath)
+        eps_shape = (nspin, nbath)
+        shape = (nspin, norb, nbath)
 
         # View: Energy levels
         self.eps = self.data[:eps_size].reshape(eps_shape)
@@ -194,21 +188,47 @@ class BathHybrid:
             # View: Same-spin hopping amplitudes
             self.V = self.data[2 * eps_size:].reshape(shape)
             assert not self.V.flags['OWNDATA']
-        else:  # ed_mode == "normal"
+        elif ed_mode == "normal":
             # View: Same-spin hopping amplitudes
             self.V = self.data[eps_size:].reshape(shape)
             assert not self.V.flags['OWNDATA']
+        else:
+            raise RuntimeError("Unknown ED mode")
+
+    @classmethod
+    def is_usable(cls, h: np.ndarray, Delta: np.ndarray):
+        # - h must be spin-diagonal
+        # - All spin components of h must be diagonal
+        # - Delta must be diagonal
+        return is_spin_diagonal(h) and \
+            all(is_diagonal(h[spin, spin, ...]) for spin in range(2)) and \
+            is_diagonal(Delta)
+
+    @classmethod
+    def from_hamiltonian(cls,
+                         ed_mode: str,
+                         nspin: int,
+                         Hloc: np.ndarray,
+                         h: np.ndarray,
+                         V: np.ndarray,
+                         Delta: np.ndarray):
+        norb = Hloc.shape[2]
+        nbath = h.shape[2]
+
+        bath = cls(ed_mode, nspin, norb, nbath)
 
         for spin1, spin2, nu in product(range(nspin),
                                         range(nspin),
-                                        range(self.nbath)):
+                                        range(nbath)):
             if spin1 == spin2:
-                self.eps[spin1, nu] = np.real_if_close(h[spin1, spin2, nu, nu])
+                bath.eps[spin1, nu] = np.real_if_close(h[spin1, spin2, nu, nu])
                 if ed_mode == "superc":
-                    self.Delta[spin1, nu] = np.real_if_close(Delta[nu, nu])
-                self.V[spin1, :, nu] = V[spin1, spin2, :, nu]
+                    bath.Delta[spin1, nu] = np.real_if_close(Delta[nu, nu])
+                bath.V[spin1, :, nu] = V[spin1, spin2, :, nu]
             elif ed_mode == "nonsu2":
-                self.U[spin1, :, nu] = V[spin1, spin2, :, nu]
+                bath.U[spin1, :, nu] = V[spin1, spin2, :, nu]
+
+        return bath
 
 
 class BathGeneral:
@@ -216,6 +236,44 @@ class BathGeneral:
 
     # EDIpack bath type
     name: str = 'general'
+
+    def __init__(self,
+                 nspin: int,
+                 norb: int,
+                 nbath: int,
+                 hvec: np.ndarray,
+                 lambdavec: np.ndarray):
+        self.nbath = nbath
+        self.hvec = hvec
+        self.lambdavec = lambdavec
+        self.nsym = hvec.shape[-1]
+
+        V_size = nspin * norb
+        replica_params_size = V_size + self.nsym
+
+        def replica_offset(nu):
+            return 1 + nu * replica_params_size
+
+        self.data = np.zeros(1 + nbath * replica_params_size, dtype=float)
+        self.data[0] = self.nsym
+
+        # View: Hopping amplitudes
+        self.V = [self.data[replica_offset(nu):replica_offset(nu) + V_size].
+                  reshape(nspin, norb)
+                  for nu in range(nbath)]
+        assert all(not V_nu.flags['OWNDATA'] for V_nu in self.V)
+
+        # View: Linear coefficients of the replica matrix linear combination
+        self.l = [self.data[replica_offset(nu) + V_size:  # noqa: E741
+                            replica_offset(nu) + V_size + self.nsym].
+                  reshape(self.nsym)
+                  for nu in range(self.nbath)]
+        assert all(not l_nu.flags['OWNDATA'] for l_nu in self.l)
+
+        # Fill self.l
+        for nu in range(self.nbath):
+            for isym in range(self.nsym):
+                self.l[nu][isym] = self.lambdavec[nu, isym]
 
     @classmethod
     def is_replica_valid(cls, replica: set[int], bs2orbs: list[list[int]]):
@@ -455,18 +513,19 @@ class BathGeneral:
 
         return hvec, lambdavec
 
-    def __init__(self,
-                 ed_mode: str,
-                 nspin: int,
-                 Hloc: np.ndarray,
-                 h: np.ndarray,
-                 V: np.ndarray,
-                 Delta: np.ndarray):
+    @classmethod
+    def from_hamiltonian(cls,
+                         ed_mode: str,
+                         nspin: int,
+                         Hloc: np.ndarray,
+                         h: np.ndarray,
+                         V: np.ndarray,
+                         Delta: np.ndarray):
 
         norb = Hloc.shape[2]
         nbath_total = h.shape[2]
         # Number of replicas
-        self.nbath = nbath_total // norb
+        nbath = nbath_total // norb
 
         # In the superconducting case, reinterpret first two indices of h as
         # Nambu indices and fill the off-diagonal elements from Delta
@@ -479,39 +538,18 @@ class BathGeneral:
             h[0, 1, :, :] = Delta
             h[1, 0, :, :] = np.conj(Delta.T)
 
-        replicas = self.build_replica_bases(norb, h, V)
+        replicas = cls.build_replica_bases(norb, h, V)
 
-        self.hvec, self.lambdavec = \
-            self.build_linear_combination(replicas, nnambu * nspin, h, is_nambu)
-        self.nsym = self.hvec.shape[-1]
+        hvec, lambdavec = \
+            cls.build_linear_combination(replicas, nnambu * nspin, h, is_nambu)
 
-        V_size = nspin * norb
-        replica_params_size = V_size + self.nsym
+        bath = cls(nspin, norb, nbath, hvec, lambdavec)
 
-        def replica_offset(nu):
-            return 1 + nu * replica_params_size
-
-        self.data = np.zeros(1 + self.nbath * replica_params_size, dtype=float)
-        self.data[0] = self.nsym
-
-        # View: Hopping amplitudes
-        self.V = [self.data[replica_offset(nu):replica_offset(nu) + V_size].
-                  reshape(nspin, norb)
-                  for nu in range(self.nbath)]
-        assert all(not V_nu.flags['OWNDATA'] for V_nu in self.V)
-
-        # View: Linear coefficients of the replica matrix linear combination
-        self.l = [self.data[replica_offset(nu) + V_size:  # noqa: E741
-                            replica_offset(nu) + V_size + self.nsym].
-                  reshape(self.nsym)
-                  for nu in range(self.nbath)]
-        assert all(not l_nu.flags['OWNDATA'] for l_nu in self.lambdavec)
-
-        # Fill V and lambda
-        for nu in range(self.nbath):
+        # Fill V
+        for nu in range(bath.nbath):
             replica = replicas[nu]
             for spin in range(nspin):
                 for orb, b in enumerate(replica):
-                    self.V[nu][spin, orb] = V[spin, spin, orb, b]
-            for isym in range(self.nsym):
-                self.l[nu][isym] = self.lambdavec[nu, isym]
+                    bath.V[nu][spin, orb] = V[spin, spin, orb, b]
+
+        return bath

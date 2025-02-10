@@ -10,6 +10,7 @@ import triqs.operators as op
 from triqs.operators.util.hamiltonians import h_int_kanamori
 
 from edipack2triqs.hamiltonian import parse_hamiltonian
+from edipack2triqs.bath import BathNormal, BathHybrid, BathGeneral
 
 
 s0 = np.eye(2)
@@ -135,8 +136,8 @@ class TestHamiltonianBathNormal(TestHamiltonian):
         self.assertEqual(params.ed_mode, "normal")
         assert_allclose(params.Hloc, self.h_loc.reshape((1, 1, 3, 3)))
         b = params.bath
+        self.assertTrue(isinstance(b, BathNormal))
         self.assertEqual(b.nbath, 2)
-        self.assertEqual(b.name, "normal")
         self.assertEqual(b.eps.shape, (1, 3, 2))
         self.assertFalse(hasattr(b, 'Delta'))
         self.assertEqual(b.V.shape, (1, 3, 2))
@@ -168,8 +169,8 @@ class TestHamiltonianBathNormal(TestHamiltonian):
         self.assertEqual(params.ed_mode, "normal")
         assert_allclose(params.Hloc, mul.outer(sz, self.h_loc))
         b = params.bath
+        self.assertTrue(isinstance(b, BathNormal))
         self.assertEqual(b.nbath, 2)
-        self.assertEqual(b.name, "normal")
         self.assertEqual(b.eps.shape, (2, 3, 2))
         self.assertFalse(hasattr(b, 'Delta'))
         self.assertEqual(b.V.shape, (2, 3, 2))
@@ -206,8 +207,8 @@ class TestHamiltonianBathNormal(TestHamiltonian):
         self.assertEqual(params.ed_mode, "nonsu2")
         assert_allclose(params.Hloc, mul.outer(sz + 0.2 * sx, self.h_loc))
         b = params.bath
+        self.assertTrue(isinstance(b, BathNormal))
         self.assertEqual(b.nbath, 2)
-        self.assertEqual(b.name, "normal")
         self.assertEqual(b.eps.shape, (2, 3, 2))
         self.assertFalse(hasattr(b, 'Delta'))
         self.assertEqual(b.V.shape, (2, 3, 2))
@@ -242,8 +243,8 @@ class TestHamiltonianBathNormal(TestHamiltonian):
         self.assertEqual(params.ed_mode, "nonsu2")
         assert_allclose(params.Hloc, mul.outer(s0, self.h_loc))
         b = params.bath
+        self.assertTrue(isinstance(b, BathNormal))
         self.assertEqual(b.nbath, 2)
-        self.assertEqual(b.name, "normal")
         self.assertEqual(b.eps.shape, (2, 3, 2))
         self.assertFalse(hasattr(b, 'Delta'))
         self.assertEqual(b.V.shape, (2, 3, 2))
@@ -289,8 +290,8 @@ class TestHamiltonianBathNormal(TestHamiltonian):
         self.assertEqual(params.ed_mode, "superc")
         assert_allclose(params.Hloc, self.h_loc.reshape(1, 1, 3, 3))
         b = params.bath
+        self.assertTrue(isinstance(b, BathNormal))
         self.assertEqual(b.nbath, 2)
-        self.assertEqual(b.name, "normal")
         self.assertEqual(b.eps.shape, (1, 3, 2))
         self.assertEqual(b.Delta.shape, (1, 3, 2))
         self.assertEqual(b.V.shape, (1, 3, 2))
@@ -357,8 +358,8 @@ class TestHamiltonianBathHybrid(TestHamiltonian):
 
         self.assertEqual(params.ed_mode, "normal")
         assert_allclose(params.Hloc, self.h_loc.reshape((1, 1, 3, 3)))
+        self.assertTrue(isinstance(params.bath, BathHybrid))
         self.assertEqual(params.bath.nbath, 4)
-        self.assertEqual(params.bath.name, "hybrid")
         assert_allclose(params.bath.eps, self.eps.reshape(1, 4))
         self.assertFalse(hasattr(params.bath, 'Delta'))
         assert_allclose(params.bath.V, self.V.reshape(1, 3, 4))
@@ -378,8 +379,8 @@ class TestHamiltonianBathHybrid(TestHamiltonian):
 
         self.assertEqual(params.ed_mode, "normal")
         assert_allclose(params.Hloc, mul.outer(sz, self.h_loc))
+        self.assertTrue(isinstance(params.bath, BathHybrid))
         self.assertEqual(params.bath.nbath, 4)
-        self.assertEqual(params.bath.name, "hybrid")
         assert_allclose(params.bath.eps,
                         mul.outer([1, -1], self.eps.reshape(4)))
         self.assertFalse(hasattr(params.bath, 'Delta'))
@@ -401,8 +402,8 @@ class TestHamiltonianBathHybrid(TestHamiltonian):
 
         self.assertEqual(params.ed_mode, "nonsu2")
         assert_allclose(params.Hloc, mul.outer(sz + 0.2 * sx, self.h_loc))
+        self.assertTrue(isinstance(params.bath, BathHybrid))
         self.assertEqual(params.bath.nbath, 4)
-        self.assertEqual(params.bath.name, "hybrid")
         assert_allclose(params.bath.eps, mul.outer([1, 1], self.eps))
         self.assertFalse(hasattr(params.bath, 'Delta'))
         assert_allclose(params.bath.V, mul.outer([1, 1], self.V))
@@ -422,8 +423,8 @@ class TestHamiltonianBathHybrid(TestHamiltonian):
 
         self.assertEqual(params.ed_mode, "nonsu2")
         assert_allclose(params.Hloc, mul.outer(s0, self.h_loc))
+        self.assertTrue(isinstance(params.bath, BathHybrid))
         self.assertEqual(params.bath.nbath, 4)
-        self.assertEqual(params.bath.name, "hybrid")
         assert_allclose(params.bath.eps, mul.outer([1, -1], self.eps))
         self.assertFalse(hasattr(params.bath, 'Delta'))
         assert_allclose(params.bath.V, mul.outer([1, -1], self.V))
@@ -447,8 +448,8 @@ class TestHamiltonianBathHybrid(TestHamiltonian):
 
         self.assertEqual(params.ed_mode, "superc")
         assert_allclose(params.Hloc, self.h_loc.reshape(1, 1, 3, 3))
+        self.assertTrue(isinstance(params.bath, BathHybrid))
         self.assertEqual(params.bath.nbath, 4)
-        self.assertEqual(params.bath.name, "hybrid")
         assert_allclose(params.bath.eps, self.eps.reshape(1, 4))
         assert_allclose(params.bath.Delta, Delta.reshape(1, 4))
         assert_allclose(params.bath.V, self.V.reshape(1, 3, 4))
@@ -574,8 +575,8 @@ class TestHamiltonianBathGeneral(TestHamiltonian):
 
         self.assertEqual(params.ed_mode, "normal")
         assert_allclose(params.Hloc, self.h_loc.reshape((1, 1, 3, 3)))
+        self.assertTrue(isinstance(params.bath, BathGeneral))
         self.assertEqual(params.bath.nbath, 4)
-        self.assertEqual(params.bath.name, "general")
         self.assertFalse(hasattr(params.bath, 'Delta'))
         self.assertEqual(params.bath.nsym, 6)
         self.assertEqual(params.bath.hvec.shape, (1, 1, 3, 3, 6))
@@ -598,8 +599,8 @@ class TestHamiltonianBathGeneral(TestHamiltonian):
 
         self.assertEqual(params.ed_mode, "normal")
         assert_allclose(params.Hloc, mul.outer(sz, self.h_loc))
+        self.assertTrue(isinstance(params.bath, BathGeneral))
         self.assertEqual(params.bath.nbath, 4)
-        self.assertEqual(params.bath.name, "general")
         self.assertFalse(hasattr(params.bath, 'Delta'))
         self.assertEqual(params.bath.nsym, 12)
         self.assertEqual(params.bath.hvec.shape, (2, 2, 3, 3, 12))
@@ -623,8 +624,8 @@ class TestHamiltonianBathGeneral(TestHamiltonian):
 
         self.assertEqual(params.ed_mode, "nonsu2")
         assert_allclose(params.Hloc, mul.outer(sz + 0.2 * sx, self.h_loc))
+        self.assertTrue(isinstance(params.bath, BathGeneral))
         self.assertEqual(params.bath.nbath, 4)
-        self.assertEqual(params.bath.name, "general")
         self.assertFalse(hasattr(params.bath, 'Delta'))
         self.assertEqual(params.bath.nsym, 12)
         self.assertEqual(params.bath.hvec.shape, (2, 2, 3, 3, 12))
@@ -648,8 +649,8 @@ class TestHamiltonianBathGeneral(TestHamiltonian):
 
         self.assertEqual(params.ed_mode, "nonsu2")
         assert_allclose(params.Hloc, mul.outer(s0, self.h_loc))
+        self.assertTrue(isinstance(params.bath, BathGeneral))
         self.assertEqual(params.bath.nbath, 4)
-        self.assertEqual(params.bath.name, "general")
         self.assertFalse(hasattr(params.bath, 'Delta'))
         self.assertEqual(params.bath.nsym, 21)
         self.assertEqual(params.bath.hvec.shape, (2, 2, 3, 3, 21))
@@ -681,8 +682,8 @@ class TestHamiltonianBathGeneral(TestHamiltonian):
 
         self.assertEqual(params.ed_mode, "superc")
         assert_allclose(params.Hloc, self.h_loc.reshape(1, 1, 3, 3))
+        self.assertTrue(isinstance(params.bath, BathGeneral))
         self.assertEqual(params.bath.nbath, 4)
-        self.assertEqual(params.bath.name, "general")
         self.assertEqual(params.bath.nsym, 15)
         self.assertEqual(params.bath.hvec.shape, (2, 2, 3, 3, 15))
         self.assertEqual(len(params.bath.l), 4)
