@@ -35,7 +35,58 @@ def _orbs_to_bath_states(V: np.ndarray):
             for orb in range(norb)]
 
 
-class BathNormal:
+class Bath:
+    """Base class for all bath classes"""
+
+    # Multiply all bath parameters by a constant
+    def __imul__(self, x):
+        self.data *= x
+        return self
+
+    def __mul__(self, x):
+        res = deepcopy(self)
+        res *= x
+        return res
+
+    def __rmul__(self, x):
+        res = deepcopy(self)
+        res *= x
+        return res
+
+    def __neg__(self):
+        res = deepcopy(self)
+        res *= -1
+        return res
+
+    # Addition and subtraction of bath parameters
+    def __iadd__(self, other):
+        assert type(self) is type(other), \
+            "Cannot add bath objects of different types"
+        assert self.data.shape == self.data.shape, \
+            "Cannot add bath objects of different topologies"
+        self.data += other.data
+        return self
+
+    def __isub__(self, other):
+        assert type(self) is type(other), \
+            "Cannot subtract bath objects of different types"
+        assert self.data.shape == self.data.shape, \
+            "Cannot subtract bath objects of different topologies"
+        self.data -= other.data
+        return self
+
+    def __add__(self, other):
+        res = deepcopy(self)
+        res += other
+        return res
+
+    def __sub__(self, other):
+        res = deepcopy(self)
+        res -= other
+        return res
+
+
+class BathNormal(Bath):
     """Parameters of a bath with normal topology"""
 
     # EDIpack bath type
@@ -161,7 +212,7 @@ class BathNormal:
         return bath
 
 
-class BathHybrid:
+class BathHybrid(Bath):
     """Parameters of a bath with hybrid topology"""
 
     # EDIpack bath type
@@ -256,7 +307,7 @@ class BathHybrid:
         return bath
 
 
-class BathGeneral:
+class BathGeneral(Bath):
     """Parameters of a bath with general topology"""
 
     # EDIpack bath type
@@ -308,6 +359,38 @@ class BathGeneral:
                            deepcopy(self.lambdavec, memo))
         bath.data[:] = self.data
         return bath
+
+    # Multiply all bath parameters by a constant
+    def __imul__(self, x):
+        # Skipping the first element that stores nsym
+        self.data[1:] *= x
+        self.lambdavec *= x
+        return self
+
+    # Addition and subtraction of bath parameters
+    def __iadd__(self, other):
+        assert type(self) is type(other), \
+            "Cannot add bath objects of different types"
+        assert self.data.shape == self.data.shape, \
+            "Cannot add bath objects of different topologies"
+        assert (self.hvec == other.hvec).all(), \
+            "Cannot add general bath objects defined by different bases"
+        # Skipping the first element that stores nsym
+        self.data[1:] += other.data[1:]
+        self.lambdavec += other.lambdavec
+        return self
+
+    def __isub__(self, other):
+        assert type(self) is type(other), \
+            "Cannot subtract bath objects of different types"
+        assert self.data.shape == self.data.shape, \
+            "Cannot subtract bath objects of different topologies"
+        assert (self.hvec == other.hvec).all(), \
+            "Cannot subtract general bath objects defined by different bases"
+        # Skipping the first element that stores nsym
+        self.data[1:] -= other.data[1:]
+        self.lambdavec -= other.lambdavec
+        return self
 
     @classmethod
     def is_replica_valid(cls, replica: set[int], bs2orbs: list[list[int]]):

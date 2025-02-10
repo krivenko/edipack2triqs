@@ -167,6 +167,11 @@ class TestHamiltonianBathNormal(TestHamiltonian):
         assert_equal_and_not_id(self, b2.V, b.V)
         self.assertTrue(b2.eps.base is b2.data)
         self.assertTrue(b2.V.base is b2.data)
+        # Check bath parameter arithmetics
+        res1 = -(2 * b + 3 * b2)
+        assert_allclose(res1.data, -5 * b.data, atol=1e-10)
+        res2 = -(3 * b - 5 * b2)
+        assert_allclose(res2.data, 2 * b.data, atol=1e-10)
 
     def test_parse_hamiltonian_nspin2(self):
         h = self.make_H_loc(mul.outer(sz, self.h_loc)) + self.make_H_int()
@@ -211,6 +216,11 @@ class TestHamiltonianBathNormal(TestHamiltonian):
         assert_equal_and_not_id(self, b2.V, b.V)
         self.assertTrue(b2.eps.base is b2.data)
         self.assertTrue(b2.V.base is b2.data)
+        # Check bath parameter arithmetics
+        res1 = -(2 * b + 3 * b2)
+        assert_allclose(res1.data, -5 * b.data, atol=1e-10)
+        res2 = -(3 * b - 5 * b2)
+        assert_allclose(res2.data, 2 * b.data, atol=1e-10)
 
     def test_parse_hamiltonian_nonsu2_hloc(self):
         h = self.make_H_loc(mul.outer(sz + 0.2 * sx, self.h_loc)) \
@@ -257,6 +267,11 @@ class TestHamiltonianBathNormal(TestHamiltonian):
         self.assertTrue(b2.eps.base is b2.data)
         self.assertTrue(b2.V.base is b2.data)
         self.assertTrue(b2.U.base is b2.data)
+        # Check bath parameter arithmetics
+        res1 = -(2 * b + 3 * b2)
+        assert_allclose(res1.data, -5 * b.data, atol=1e-10)
+        res2 = -(3 * b - 5 * b2)
+        assert_allclose(res2.data, 2 * b.data, atol=1e-10)
 
     def test_parse_hamiltonian_nonsu2_bath(self):
         h = self.make_H_loc(mul.outer(s0, self.h_loc)) + self.make_H_int()
@@ -304,6 +319,11 @@ class TestHamiltonianBathNormal(TestHamiltonian):
         self.assertTrue(b2.eps.base is b2.data)
         self.assertTrue(b2.V.base is b2.data)
         self.assertTrue(b2.U.base is b2.data)
+        # Check bath parameter arithmetics
+        res1 = -(2 * b + 3 * b2)
+        assert_allclose(res1.data, -5 * b.data, atol=1e-10)
+        res2 = -(3 * b - 5 * b2)
+        assert_allclose(res2.data, 2 * b.data, atol=1e-10)
 
     def test_parse_hamiltonian_superc(self):
         h = self.make_H_loc(mul.outer(s0, self.h_loc)) + self.make_H_int()
@@ -363,6 +383,11 @@ class TestHamiltonianBathNormal(TestHamiltonian):
         self.assertTrue(b2.eps.base is b2.data)
         self.assertTrue(b2.V.base is b2.data)
         self.assertTrue(b2.Delta.base is b2.data)
+        # Check bath parameter arithmetics
+        res1 = -(2 * b + 3 * b2)
+        assert_allclose(res1.data, -5 * b.data, atol=1e-10)
+        res2 = -(3 * b - 5 * b2)
+        assert_allclose(res2.data, 2 * b.data, atol=1e-10)
 
 
 class TestHamiltonianBathHybrid(TestHamiltonian):
@@ -420,6 +445,11 @@ class TestHamiltonianBathHybrid(TestHamiltonian):
         assert_equal_and_not_id(self, b2.V, params.bath.V)
         self.assertTrue(b2.eps.base is b2.data)
         self.assertTrue(b2.V.base is b2.data)
+        # Check bath parameter arithmetics
+        res1 = -(2 * params.bath + 3 * b2)
+        assert_allclose(res1.data, -5 * params.bath.data, atol=1e-10)
+        res2 = -(3 * params.bath - 5 * b2)
+        assert_allclose(res2.data, 2 * params.bath.data, atol=1e-10)
 
     def test_parse_hamiltonian_nspin2(self):
         h = self.make_H_loc(mul.outer(sz, self.h_loc)) + self.make_H_int()
@@ -450,6 +480,11 @@ class TestHamiltonianBathHybrid(TestHamiltonian):
         assert_equal_and_not_id(self, b2.V, params.bath.V)
         self.assertTrue(b2.eps.base is b2.data)
         self.assertTrue(b2.V.base is b2.data)
+        # Check bath parameter arithmetics
+        res1 = -(2 * params.bath + 3 * b2)
+        assert_allclose(res1.data, -5 * params.bath.data, atol=1e-10)
+        res2 = -(3 * params.bath - 5 * b2)
+        assert_allclose(res2.data, 2 * params.bath.data, atol=1e-10)
 
     def test_parse_hamiltonian_nonsu2_hloc(self):
         h = self.make_H_loc(mul.outer(sz + 0.2 * sx, self.h_loc)) \
@@ -482,6 +517,11 @@ class TestHamiltonianBathHybrid(TestHamiltonian):
         self.assertTrue(b2.eps.base is b2.data)
         self.assertTrue(b2.V.base is b2.data)
         self.assertTrue(b2.U.base is b2.data)
+        # Check bath parameter arithmetics
+        res1 = -(2 * params.bath + 3 * b2)
+        assert_allclose(res1.data, -5 * params.bath.data, atol=1e-10)
+        res2 = -(3 * params.bath - 5 * b2)
+        assert_allclose(res2.data, 2 * params.bath.data, atol=1e-10)
 
     def test_parse_hamiltonian_nonsu2_bath(self):
         h = self.make_H_loc(mul.outer(s0, self.h_loc)) + self.make_H_int()
@@ -512,6 +552,11 @@ class TestHamiltonianBathHybrid(TestHamiltonian):
         self.assertTrue(b2.eps.base is b2.data)
         self.assertTrue(b2.V.base is b2.data)
         self.assertTrue(b2.U.base is b2.data)
+        # Check bath parameter arithmetics
+        res1 = -(2 * params.bath + 3 * b2)
+        assert_allclose(res1.data, -5 * params.bath.data, atol=1e-10)
+        res2 = -(3 * params.bath - 5 * b2)
+        assert_allclose(res2.data, 2 * params.bath.data, atol=1e-10)
 
     def test_parse_hamiltonian_superc(self):
         h = self.make_H_loc(mul.outer(s0, self.h_loc)) + self.make_H_int()
@@ -548,6 +593,11 @@ class TestHamiltonianBathHybrid(TestHamiltonian):
         self.assertTrue(b2.eps.base is b2.data)
         self.assertTrue(b2.V.base is b2.data)
         self.assertTrue(b2.Delta.base is b2.data)
+        # Check bath parameter arithmetics
+        res1 = -(2 * params.bath + 3 * b2)
+        assert_allclose(res1.data, -5 * params.bath.data, atol=1e-10)
+        res2 = -(3 * params.bath - 5 * b2)
+        assert_allclose(res2.data, 2 * params.bath.data, atol=1e-10)
 
 
 class TestHamiltonianBathGeneral(TestHamiltonian):
@@ -689,6 +739,15 @@ class TestHamiltonianBathGeneral(TestHamiltonian):
         assert_equal_and_not_id(self, b2.l, params.bath.l)
         self.assertTrue(all(V_nu.base is b2.data for V_nu in b2.V))
         self.assertTrue(all(l_nu.base is b2.data for l_nu in b2.l))
+        # Check bath parameter arithmetics
+        res1 = -(2 * params.bath + 3 * b2)
+        self.assertEqual(res1.data[0], params.bath.data[0])
+        assert_allclose(res1.data[1:], -5 * params.bath.data[1:], atol=1e-10)
+        assert_allclose(res1.lambdavec, -5 * params.bath.lambdavec, atol=1e-10)
+        res2 = -(3 * params.bath - 5 * b2)
+        self.assertEqual(res2.data[0], params.bath.data[0])
+        assert_allclose(res2.data[1:], 2 * params.bath.data[1:], atol=1e-10)
+        assert_allclose(res2.lambdavec, 2 * params.bath.lambdavec, atol=1e-10)
 
     def test_parse_hamiltonian_nspin2(self):
         h = self.make_H_loc(mul.outer(sz, self.h_loc)) + self.make_H_int()
@@ -723,6 +782,15 @@ class TestHamiltonianBathGeneral(TestHamiltonian):
         assert_equal_and_not_id(self, b2.l, params.bath.l)
         self.assertTrue(all(V_nu.base is b2.data for V_nu in b2.V))
         self.assertTrue(all(l_nu.base is b2.data for l_nu in b2.l))
+        # Check bath parameter arithmetics
+        res1 = -(2 * params.bath + 3 * b2)
+        self.assertEqual(res1.data[0], params.bath.data[0])
+        assert_allclose(res1.data[1:], -5 * params.bath.data[1:], atol=1e-10)
+        assert_allclose(res1.lambdavec, -5 * params.bath.lambdavec, atol=1e-10)
+        res2 = -(3 * params.bath - 5 * b2)
+        self.assertEqual(res2.data[0], params.bath.data[0])
+        assert_allclose(res2.data[1:], 2 * params.bath.data[1:], atol=1e-10)
+        assert_allclose(res2.lambdavec, 2 * params.bath.lambdavec, atol=1e-10)
 
     def test_parse_hamiltonian_nonsu2_hloc(self):
         h = self.make_H_loc(mul.outer(sz + 0.2 * sx, self.h_loc)) \
@@ -758,6 +826,15 @@ class TestHamiltonianBathGeneral(TestHamiltonian):
         assert_equal_and_not_id(self, b2.l, params.bath.l)
         self.assertTrue(all(V_nu.base is b2.data for V_nu in b2.V))
         self.assertTrue(all(l_nu.base is b2.data for l_nu in b2.l))
+        # Check bath parameter arithmetics
+        res1 = -(2 * params.bath + 3 * b2)
+        self.assertEqual(res1.data[0], params.bath.data[0])
+        assert_allclose(res1.data[1:], -5 * params.bath.data[1:], atol=1e-10)
+        assert_allclose(res1.lambdavec, -5 * params.bath.lambdavec, atol=1e-10)
+        res2 = -(3 * params.bath - 5 * b2)
+        self.assertEqual(res2.data[0], params.bath.data[0])
+        assert_allclose(res2.data[1:], 2 * params.bath.data[1:], atol=1e-10)
+        assert_allclose(res2.lambdavec, 2 * params.bath.lambdavec, atol=1e-10)
 
     def test_parse_hamiltonian_nonsu2_bath(self):
         h = self.make_H_loc(mul.outer(s0, self.h_loc)) + self.make_H_int()
@@ -794,6 +871,15 @@ class TestHamiltonianBathGeneral(TestHamiltonian):
         assert_equal_and_not_id(self, b2.l, params.bath.l)
         self.assertTrue(all(V_nu.base is b2.data for V_nu in b2.V))
         self.assertTrue(all(l_nu.base is b2.data for l_nu in b2.l))
+        # Check bath parameter arithmetics
+        res1 = -(2 * params.bath + 3 * b2)
+        self.assertEqual(res1.data[0], params.bath.data[0])
+        assert_allclose(res1.data[1:], -5 * params.bath.data[1:], atol=1e-10)
+        assert_allclose(res1.lambdavec, -5 * params.bath.lambdavec, atol=1e-10)
+        res2 = -(3 * params.bath - 5 * b2)
+        self.assertEqual(res2.data[0], params.bath.data[0])
+        assert_allclose(res2.data[1:], 2 * params.bath.data[1:], atol=1e-10)
+        assert_allclose(res2.lambdavec, 2 * params.bath.lambdavec, atol=1e-10)
 
     def test_parse_hamiltonian_superc(self):
         h = self.make_H_loc(mul.outer(s0, self.h_loc)) + self.make_H_int()
@@ -843,6 +929,15 @@ class TestHamiltonianBathGeneral(TestHamiltonian):
         assert_equal_and_not_id(self, b2.l, params.bath.l)
         self.assertTrue(all(V_nu.base is b2.data for V_nu in b2.V))
         self.assertTrue(all(l_nu.base is b2.data for l_nu in b2.l))
+        # Check bath parameter arithmetics
+        res1 = -(2 * params.bath + 3 * b2)
+        self.assertEqual(res1.data[0], params.bath.data[0])
+        assert_allclose(res1.data[1:], -5 * params.bath.data[1:], atol=1e-10)
+        assert_allclose(res1.lambdavec, -5 * params.bath.lambdavec, atol=1e-10)
+        res2 = -(3 * params.bath - 5 * b2)
+        self.assertEqual(res2.data[0], params.bath.data[0])
+        assert_allclose(res2.data[1:], 2 * params.bath.data[1:], atol=1e-10)
+        assert_allclose(res2.lambdavec, 2 * params.bath.lambdavec, atol=1e-10)
 
 
 if __name__ == '__main__':
