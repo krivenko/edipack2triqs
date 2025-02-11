@@ -110,7 +110,7 @@ def _chi2_fit_bath(self, g: BlockGf, f: Optional[BlockGf] = None):
 
         elif ed.get_ed_mode() == 2:  # superc, here nspin is 1
             func_up = extract_triqs_data(g[self.gf_block_names[0]].data)
-            func_an = extract_triqs_data(f[self.gf_an_block_names].data)
+            func_an = extract_triqs_data(f[self.gf_an_block_names[0]].data)
             fitted_bath.data[:] = ed.chi2_fitgf(func_up,
                                                 func_an,
                                                 fitted_bath.data)
@@ -149,10 +149,10 @@ def _chi2_fit_bath(self, g: BlockGf, f: Optional[BlockGf] = None):
         elif ed.get_ed_mode() == 2:  # superc
             out = get_method(z_vals, fitted_bath.data, ishape=5, typ='n')
             for bn in self.gf_block_names:
-                g_out[bn] = pack_triqs_data(out[0, 0, ...])
+                g_out[bn].data[:] = pack_triqs_data(out[0, 0, ...])
             out_an = get_method(z_vals, fitted_bath.data, ishape=5, typ='a')
             f_out = f.copy()
-            f_out[self.gf_an_block_names].data[:] = \
+            f_out[self.gf_an_block_names[0]].data[:] = \
                 pack_triqs_data(out_an[0, 0, ...])
             return fitted_bath, g_out, f_out
 
