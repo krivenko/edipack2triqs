@@ -15,6 +15,7 @@ from edipy2 import global_env as ed
 from .util import IndicesType, validate_fops_up_dn, write_config, chdircontext
 from .bath import Bath, BathNormal, BathHybrid, BathGeneral
 from .hamiltonian import parse_hamiltonian
+from .fit import BathFittingParams, _chi2_fit_bath
 
 
 class EDIpackSolver:
@@ -124,6 +125,8 @@ class EDIpackSolver:
         lanc_dim_threshold: int, default 1024
             Min dimension threshold to use Lanczos determination of the spectrum
             rather than LAPACK based exact diagonalization
+        bath_fitting_params: BathFittingParams
+            Parameters used to perform bath fitting
         """
 
         assert self.instance_count[0] < 1, \
@@ -209,6 +212,10 @@ class EDIpackSolver:
                 c["ED_TOTAL_UD"] = True
             else:
                 raise RuntimeError("Unrecognized bath type")
+
+            # Bath fitting
+            bfp = kwargs.get("bath_fitting_params", BathFittingParams())
+            c.update(bfp.__dict__())
 
             self.config = c
 
@@ -474,3 +481,6 @@ class EDIpackSolver:
                        doc="Real-frequency impurity self-energy")
     Sigma_an_w = property(lambda s: s._make_gf(ed.build_sigma, True, True),
                           doc="Anomalous real-frequency impurity self-energy")
+
+    # Bath fitting
+    chi2_fit_bath = _chi2_fit_bath

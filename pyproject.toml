@@ -10,7 +10,8 @@ readme = "README.md"
 requires-python = ">=3.8"
 keywords = ["edipack", "edipy", "triqs"]
 authors = [
-    {name = "I. Krivenko", email = "iskrivenko@proton.me" }
+    {name = "I. Krivenko", email = "iskrivenko@proton.me" },
+    {name = "L. Crippa", email = "crippa.lorenzo@gmail.com" }
 ]
 classifiers = [
     "Development Status :: 3 - Alpha",
