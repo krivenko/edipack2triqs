@@ -13,7 +13,8 @@ from triqs.gf import BlockGf, Gf, MeshImFreq, MeshReFreq
 from edipy2 import global_env as ed
 
 from .util import IndicesType, validate_fops_up_dn, write_config, chdircontext
-from .hamiltonian import parse_hamiltonian, BathNormal, BathHybrid, BathGeneral
+from .bath import Bath, BathNormal, BathHybrid, BathGeneral
+from .hamiltonian import parse_hamiltonian
 
 
 class EDIpackSolver:
@@ -334,8 +335,14 @@ class EDIpackSolver:
 
     @property
     def bath(self):
-        "Access the bath object"
+        "Get the bath object"
         return self.h_params.bath
+
+    @bath.setter
+    def bath(self, new_bath: Bath):
+        "Set the bath object"
+        self.h_params.bath.assert_compatible(new_bath)
+        self.h_params.bath = new_bath
 
     def solve(self,
               beta: float,

@@ -38,6 +38,11 @@ def _orbs_to_bath_states(V: np.ndarray):
 class Bath:
     """Base class for all bath classes"""
 
+    def assert_compatible(self, other):
+        assert type(self) is type(other), "Incompatible bath object types"
+        assert self.data.shape == other.data.shape, \
+            "Incompatible bath topologies"
+
     # Multiply all bath parameters by a constant
     def __imul__(self, x):
         self.data *= x
@@ -60,18 +65,12 @@ class Bath:
 
     # Addition and subtraction of bath parameters
     def __iadd__(self, other):
-        assert type(self) is type(other), \
-            "Cannot add bath objects of different types"
-        assert self.data.shape == self.data.shape, \
-            "Cannot add bath objects of different topologies"
+        self.assert_compatible(other)
         self.data += other.data
         return self
 
     def __isub__(self, other):
-        assert type(self) is type(other), \
-            "Cannot subtract bath objects of different types"
-        assert self.data.shape == self.data.shape, \
-            "Cannot subtract bath objects of different topologies"
+        self.assert_compatible(other)
         self.data -= other.data
         return self
 
@@ -360,6 +359,13 @@ class BathGeneral(Bath):
         bath.data[:] = self.data
         return bath
 
+    def assert_compatible(self, other):
+        assert type(self) is type(other), "Incompatible bath object types"
+        assert self.data.shape == other.data.shape, \
+            "Incompatible bath topologies"
+        assert (self.hvec == other.hvec).all(), \
+            "Incompatible general bath objects (different basis matrices)"
+
     # Multiply all bath parameters by a constant
     def __imul__(self, x):
         # Skipping the first element that stores nsym
@@ -369,24 +375,14 @@ class BathGeneral(Bath):
 
     # Addition and subtraction of bath parameters
     def __iadd__(self, other):
-        assert type(self) is type(other), \
-            "Cannot add bath objects of different types"
-        assert self.data.shape == self.data.shape, \
-            "Cannot add bath objects of different topologies"
-        assert (self.hvec == other.hvec).all(), \
-            "Cannot add general bath objects defined by different bases"
+        self.assert_compatible(other)
         # Skipping the first element that stores nsym
         self.data[1:] += other.data[1:]
         self.lambdavec += other.lambdavec
         return self
 
     def __isub__(self, other):
-        assert type(self) is type(other), \
-            "Cannot subtract bath objects of different types"
-        assert self.data.shape == self.data.shape, \
-            "Cannot subtract bath objects of different topologies"
-        assert (self.hvec == other.hvec).all(), \
-            "Cannot subtract general bath objects defined by different bases"
+        self.assert_compatible(other)
         # Skipping the first element that stores nsym
         self.data[1:] -= other.data[1:]
         self.lambdavec -= other.lambdavec
