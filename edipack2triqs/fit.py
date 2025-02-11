@@ -20,11 +20,11 @@ class BathFittingParams:
     """Parameters of bath fitting"""
 
     # Fitting scheme: delta, weiss
-    scheme: str = "delta"
+    scheme: str = "weiss"
     # Minimization routine type: CGnr, minimize
-    method: str = "CGnr"
+    method: str = "minimize"
     # Gradient evaluation: analytic, numeric
-    grad: str = "analytic"
+    grad: str = "numeric"
     # Conjugate-gradient tolerance
     tol: float = 0.00001
     # Conjugate-gradient stopping condition:
@@ -63,7 +63,7 @@ class BathFittingParams:
         return {
             "CG_SCHEME": self.scheme,
             "CG_METHOD": {"CGnr": 0, "minimize": 1}[self.method],
-            "CG_GRAD": {"analytic": 0, "minimize": 1}[self.grad],
+            "CG_GRAD": {"analytic": 0, "numeric": 1}[self.grad],
             "CG_FTOL": self.tol,
             "CG_STOP": {"target": 1, "vars": 2, "both": 0}[self.stop],
             "CG_NITER": self.niter,
@@ -130,7 +130,6 @@ def _chi2_fit_bath(self, g: BlockGf, f: Optional[BlockGf] = None):
     z_vals = np.array([complex(z) for z in mesh])
     get_method = ed.get_g0and if (self.config["CG_SCHEME"] == "weiss") \
         else ed.get_delta
-
     g_out = g.copy()
 
     def pack_triqs_data(d):
