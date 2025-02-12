@@ -34,6 +34,8 @@ class BathFittingParams:
     stop: str = "both"
     # Max number of iterations
     niter: int = 500
+    # Number of Matsubara frequencies used in the fit
+    n_iw: int = 1000
     # Conjugate-gradient weight form: 1, 1/n, 1/w_n
     weight: str = "1"
     # Conjugate-gradient norm definition: elemental, frobenius
@@ -55,6 +57,7 @@ class BathFittingParams:
         assert self.stop in ("target", "vars", "both"), \
             "Invalid value of 'stop'"
         assert self.niter > 0, "'niter' must be positive"
+        assert self.n_iw > 0, "'n_iw' must be positive"
         assert self.weight in ("1", "1/n", "1/w_n"), "Invalid value of 'weight'"
         assert self.norm in ("elemental", "frobenius"), \
             "Invalid value of 'norm'"
@@ -71,7 +74,8 @@ class BathFittingParams:
             "CG_NORM": self.norm,
             "CG_POW": self.pow,
             "CG_MINIMIZE_VER": self.minimize_ver,
-            "CG_MINIMIZE_HH": self.minimize_hh
+            "CG_MINIMIZE_HH": self.minimize_hh,
+            "LFIT": self.n_iw
         }
 
 
