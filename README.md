@@ -22,4 +22,3 @@ pip install .
 * Phonons
 * Imaginary time susceptibilities
 * Sector selection
-* Bath fitting
