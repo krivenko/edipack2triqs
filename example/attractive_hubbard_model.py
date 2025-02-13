@@ -6,6 +6,7 @@ from triqs.gf import Gf, BlockGf, MeshProduct, iOmega_n, conjugate, inverse
 from triqs.gf.tools import dyson
 from triqs.operators import c, c_dag, n, dagger
 from triqs.lattice.tight_binding import TBLattice
+from h5 import HDFArchive
 
 # edipack2triqs modules
 from edipack2triqs.solver import EDIpackSolver
@@ -229,5 +230,15 @@ for iloop in range(Nloop):
 
     if conv_bool:
         break
+
+
+# Save calculation results
+with HDFArchive('ahm.h5', 'w') as ar:
+    ar["s_iw"] = s_iw
+    ar["s_an_iw"] = s_an_iw
+    ar["g_iw"] = g_iw
+    ar["g_an_iw"] = g_an_iw
+    ar["g_w"] = solver.g_w
+    ar["g_an_w"] = solver.g_an_w
 
 print("Done...")
