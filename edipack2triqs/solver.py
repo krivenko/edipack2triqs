@@ -225,7 +225,8 @@ class EDIpackSolver:
         # process with rank 0. The directory is assumed to be accessible to all
         # other MPI processes under the same name via a common file system.
         if self.comm.Get_rank() == 0:
-            self.workdir = TemporaryDirectory(prefix=".edipack-",
+            self.workdir = TemporaryDirectory(prefix="edipack-",
+                                              suffix=".tmp",
                                               dir=os.getcwd())
             self.wdname = self.workdir.name
         else:
