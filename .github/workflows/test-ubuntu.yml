@@ -1,0 +1,94 @@
+name: Build and test (Ubuntu)
+
+on:
+  push:
+    branches:
+      - master
+      - ci
+  pull_request:
+    branches:
+      - master
+  schedule:
+    - cron:  '0 0 * * 2'
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-24.04
+    strategy:
+      matrix:
+        python-version:
+          - "3.9"
+          - "3.10"
+          - "3.11"
+          - "3.12"
+          - "3.13"
+
+    steps:
+    - name: Install dependencies
+      run: |
+           sudo apt-get update -q
+           sudo apt-get install -y gfortran libopenmpi-dev libboost-dev \
+               libblas-dev liblapack-dev libfftw3-dev libgmp-dev libhdf5-dev
+
+    - name: Build & install SciFortran
+      env:
+        FC: mpifort
+      run: |
+           git clone https://github.com/SciFortran/SciFortran.git scifor.git
+           mkdir scifor.build && pushd scifor.build
+           cmake ../scifor.git -DCMAKE_BUILD_TYPE=Release
+           make -j2
+           make install
+           popd
+
+    - name: Build & install EDIpack2.0
+      env:
+        FC: mpifort
+      run: |
+           git clone https://github.com/aamaricci/EDIpack2.0 EDIpack2.git
+           mkdir EDIpack2.build && pushd EDIpack2.build
+           source $(readlink -f ${HOME}/opt/scifor/gnu/*/bin/scifor_config_user.sh)
+           cmake ../EDIpack2.git -DCMAKE_BUILD_TYPE=Release
+           make -j2
+           make install
+           popd
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v5
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install Python dependencies
+      run: |
+           pip install --user numpy scipy matplotlib mpi4py mako pytest networkx
+
+    - name: Install EDIpy2
+      env:
+        FC: mpifort
+      run: |
+           source $(readlink -f ${HOME}/opt/edipack2/gnu/*/bin/edipack2_config_user.sh)
+           pushd EDIpack2.git
+           pip install --user .
+           popd
+
+    - name: Build & install TRIQS
+      env:
+        CXX: g++
+      run: |
+        git clone https://github.com/TRIQS/triqs --branch 3.3.x triqs.git
+        mkdir triqs.build && pushd triqs.build
+        cmake ../triqs.git                                                     \
+          -DCMAKE_BUILD_TYPE=Release                                           \
+          -DCMAKE_INSTALL_PREFIX=${HOME}/opt/triqs                             \
+          -DBuild_Tests=OFF
+        make -j2
+        make install
+        popd
+
+    - name: Checkout edipack2triqs
+      uses: actions/checkout@v4
+
+    - name: Test edipack2triqs
+      run: |
+           source ${HOME}/opt/triqs/share/triqs/triqsvars.sh
+           py.test -v tests/
