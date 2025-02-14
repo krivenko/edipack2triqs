@@ -118,7 +118,7 @@ solver = EDIpackSolver(H,
 def get_gloc(s_iw, s_an_iw, axis="m"):
     xmu = (U / 2 + (Norb - 1) * Ust / 2 + (Norb - 1) * (Ust - Jh) / 2)
     z_iw = Gf(mesh=s_iw.mesh, target_shape=nambu_shape)
-    if (axis=="m"):
+    if (axis == "m"):
         z_iw[:Norb, :Norb] << iOmega_n + xmu - s_iw
         z_iw[:Norb, Norb:] << -s_an_iw
         z_iw[Norb:, :Norb] << -s_an_iw
@@ -127,8 +127,10 @@ def get_gloc(s_iw, s_an_iw, axis="m"):
         z_iw[:Norb, Norb:] << -s_an_iw
         z_iw[Norb:, :Norb] << -s_an_iw
         for ifreq in z_iw.mesh:
-            z_iw[ifreq][:Norb, :Norb] =  ifreq +1j*broadening + xmu - s_iw[ifreq]
-            z_iw[ifreq][Norb:, Norb:] =  ifreq +1j*broadening - xmu + conjugate(s_iw(-ifreq))
+            z_iw[ifreq][:Norb, :Norb] = \
+                ifreq + 1j * broadening + xmu - s_iw[ifreq]
+            z_iw[ifreq][Norb:, Norb:] = \
+                ifreq + 1j * broadening - xmu + conjugate(s_iw(-ifreq))
 
     g_k_iw = Gf(mesh=MeshProduct(kmesh, z_iw.mesh), target_shape=nambu_shape)
     for k in kmesh:
@@ -238,7 +240,7 @@ for iloop in range(Nloop):
         break
 
 
-#Calculate local Green's function on the real axis
+# Calculate local Green's function on the real axis
 s_w = solver.Sigma_w["up"]
 s_an_w = solver.Sigma_an_w["up_dn"]
 g_w, g_an_w = get_gloc(s_w, s_an_w, axis="r")
