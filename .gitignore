@@ -20,4 +20,4 @@ venv/
 *.h5
 
 # temporary EDIpack dirs
-.edipack-*
+edipack-*.tmp
