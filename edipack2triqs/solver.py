@@ -388,7 +388,7 @@ class EDIpackSolver:
         self.comm.barrier()
         with chdircontext(self.wdname):
             ed.set_hloc(hloc=self.h_params.Hloc)
-            ed.solve(self.h_params.bath.data)
+            ed.solve(self.h_params.bath.data, flag_rdm=False)
         self.comm.barrier()
 
     @property
