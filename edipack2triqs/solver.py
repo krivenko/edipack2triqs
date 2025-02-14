@@ -46,7 +46,7 @@ class EDIpackSolver:
         "ED_PRINT_SIGMA": False,
         "ED_PRINT_G": False,
         "ED_PRINT_G0": False,
-        "ED_PRINT_SIGMA": False,
+        "RDM_FLAG": False,
         "ED_FINITE_TEMP": True,
         "ED_TWIN": False,
         "ED_SECTORS": False,
@@ -388,7 +388,7 @@ class EDIpackSolver:
         self.comm.barrier()
         with chdircontext(self.wdname):
             ed.set_hloc(hloc=self.h_params.Hloc)
-            ed.solve(self.h_params.bath.data, flag_rdm=False)
+            ed.solve(self.h_params.bath.data)
         self.comm.barrier()
 
     @property
