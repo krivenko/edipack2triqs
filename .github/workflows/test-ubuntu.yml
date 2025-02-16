@@ -44,7 +44,7 @@ jobs:
       env:
         FC: mpifort
       run: |
-           git clone https://github.com/aamaricci/EDIpack2.0 EDIpack2.git
+           git clone https://github.com/edipack/EDIpack2.0 EDIpack2.git
            mkdir EDIpack2.build && pushd EDIpack2.build
            source $(readlink -f ${HOME}/opt/scifor/gnu/*/bin/scifor_config_user.sh)
            cmake ../EDIpack2.git -DCMAKE_BUILD_TYPE=Release
