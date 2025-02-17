@@ -14,10 +14,14 @@ from triqs.atom_diag import (AtomDiag,
                              trace_rho_op)
 from triqs.gf.tools import dyson
 from triqs.utility.comparison_tests import assert_block_gfs_are_close
+from h5 import HDFArchive
 
 from edipack2triqs.solver import EDIpackSolver
 from edipack2triqs.util import non_int_part
 
+
+generate_packaged_ref_results = False
+packaged_ref_results_name = __file__[:-2] + "h5"
 
 s0 = np.eye(2)
 sx = np.array([[0, 1], [1, 0]])
@@ -104,8 +108,14 @@ class TestEDIpackSolverBathHybrid(unittest.TestCase):
 
     @classmethod
     def make_ref_results(
-        cls, h, fops, beta, n_iw, energy_window, n_w, eta, spin_blocks, superc
+        cls, h, fops, beta, n_iw, energy_window, n_w, eta,
+        spin_blocks, superc,
+        h5_name
     ):
+        if not generate_packaged_ref_results:
+            with HDFArchive(packaged_ref_results_name, 'r') as ar:
+                return ar[h5_name]
+
         mki = cls.make_mkind(spin_blocks)
 
         c_up = [op.c(*mki('up', o)) for o in cls.orbs]
@@ -134,31 +144,28 @@ class TestEDIpackSolverBathHybrid(unittest.TestCase):
         def avg(ops):
             return np.array([trace_rho_op(rho, ops[o], ad) for o in cls.orbs])
 
+        results = {'densities': avg(N),
+                   'double_occ': avg(D),
+                   'magn_x': avg(S_x),
+                   'magn_y': 1j * avg(S_y),
+                   'magn_z': avg(S_z),
+                   'g_iw': g_iw,
+                   'g_w': g_w}
+
         if not superc:
             h0 = non_int_part(h)
             ad0 = AtomDiag(h0, fops)
             g0_iw = atomic_g_iw(ad0, beta, gf_struct, n_iw)
             g0_w = atomic_g_w(ad0, beta, gf_struct, energy_window, n_w, eta)
-            Sigma_iw = dyson(G0_iw=g0_iw, G_iw=g_iw)
-            Sigma_w = dyson(G0_iw=g0_w, G_iw=g_w)
-        else:
-            Sigma_iw = None
-            Sigma_w = None
+            results['Sigma_iw'] = dyson(G0_iw=g0_iw, G_iw=g_iw)
+            results['Sigma_w'] = dyson(G0_iw=g0_w, G_iw=g_w)
 
-        h0 = non_int_part(h)
-        ad0 = AtomDiag(h0, fops)
-        g0_iw = atomic_g_iw(ad0, beta, gf_struct, n_iw)
-        g0_w = atomic_g_w(ad0, beta, gf_struct, energy_window, n_w, eta)
+        if generate_packaged_ref_results:
+            with HDFArchive(packaged_ref_results_name, 'a') as ar:
+                ar.create_group(h5_name)
+                ar[h5_name] = results
 
-        return {'densities': avg(N),
-                'double_occ': avg(D),
-                'magn_x': avg(S_x),
-                'magn_y': 1j * avg(S_y),
-                'magn_z': avg(S_z),
-                'g_iw': g_iw,
-                'g_w': g_w,
-                'Sigma_iw': Sigma_iw,
-                'Sigma_w': Sigma_w}
+        return results
 
     @classmethod
     def assert_all(cls, s, **refs):
@@ -169,9 +176,9 @@ class TestEDIpackSolverBathHybrid(unittest.TestCase):
         assert_allclose(s.magnetization(comp='z'), refs['magn_z'], atol=1e-8)
         assert_block_gfs_are_close(s.g_iw, refs['g_iw'])
         assert_block_gfs_are_close(s.g_w, refs['g_w'])
-        if not refs['Sigma_iw'] is None:
+        if 'Sigma_iw' in refs:
             assert_block_gfs_are_close(s.Sigma_iw, refs['Sigma_iw'])
-        if not refs['Sigma_w'] is None:
+        if 'Sigma_w' in refs:
             assert_block_gfs_are_close(s.Sigma_w, refs['Sigma_w'])
 
     def test_nspin1(self):
@@ -225,7 +232,8 @@ class TestEDIpackSolverBathHybrid(unittest.TestCase):
                                      n_iw,
                                      energy_window, n_w, broadening,
                                      True,
-                                     False)
+                                     False,
+                                     "nspin1_1")
         self.assert_all(solver, **refs)
 
         # Part II: update_int_params()
@@ -254,7 +262,8 @@ class TestEDIpackSolverBathHybrid(unittest.TestCase):
                                      n_iw,
                                      energy_window, n_w, broadening,
                                      True,
-                                     False)
+                                     False,
+                                     "nspin1_2")
         self.assert_all(solver, **refs)
 
         # Part III: Updated bath parameters
@@ -285,7 +294,8 @@ class TestEDIpackSolverBathHybrid(unittest.TestCase):
                                      n_iw,
                                      energy_window, n_w, broadening,
                                      True,
-                                     False)
+                                     False,
+                                     "nspin1_3")
         self.assert_all(solver, **refs)
 
     def test_nspin2(self):
@@ -341,7 +351,8 @@ class TestEDIpackSolverBathHybrid(unittest.TestCase):
                                      n_iw,
                                      energy_window, n_w, broadening,
                                      True,
-                                     False)
+                                     False,
+                                     "nspin2_1")
         self.assert_all(solver, **refs)
 
         # Part II: update_int_params()
@@ -370,7 +381,8 @@ class TestEDIpackSolverBathHybrid(unittest.TestCase):
                                      n_iw,
                                      energy_window, n_w, broadening,
                                      True,
-                                     False)
+                                     False,
+                                     "nspin2_2")
         self.assert_all(solver, **refs)
 
         # Part III: Updated bath parameters
@@ -401,7 +413,8 @@ class TestEDIpackSolverBathHybrid(unittest.TestCase):
                                      n_iw,
                                      energy_window, n_w, broadening,
                                      True,
-                                     False)
+                                     False,
+                                     "nspin2_3")
         self.assert_all(solver, **refs)
 
     def test_nonsu2_hloc(self):
@@ -458,7 +471,8 @@ class TestEDIpackSolverBathHybrid(unittest.TestCase):
                                      n_iw,
                                      energy_window, n_w, broadening,
                                      False,
-                                     False)
+                                     False,
+                                     "nonsu2_hloc_1")
         self.assert_all(solver, **refs)
 
         # Part II: update_int_params()
@@ -487,7 +501,8 @@ class TestEDIpackSolverBathHybrid(unittest.TestCase):
                                      n_iw,
                                      energy_window, n_w, broadening,
                                      False,
-                                     False)
+                                     False,
+                                     "nonsu2_hloc_2")
         self.assert_all(solver, **refs)
 
         # Part III: Updated bath parameters
@@ -518,7 +533,8 @@ class TestEDIpackSolverBathHybrid(unittest.TestCase):
                                      n_iw,
                                      energy_window, n_w, broadening,
                                      False,
-                                     False)
+                                     False,
+                                     "nonsu2_hloc_3")
         self.assert_all(solver, **refs)
 
     def test_nonsu2_bath(self):
@@ -574,7 +590,8 @@ class TestEDIpackSolverBathHybrid(unittest.TestCase):
                                      n_iw,
                                      energy_window, n_w, broadening,
                                      False,
-                                     False)
+                                     False,
+                                     "nonsu2_bath_1")
         self.assert_all(solver, **refs)
 
         # Part II: update_int_params()
@@ -603,7 +620,8 @@ class TestEDIpackSolverBathHybrid(unittest.TestCase):
                                      n_iw,
                                      energy_window, n_w, broadening,
                                      False,
-                                     False)
+                                     False,
+                                     "nonsu2_bath_2")
         self.assert_all(solver, **refs)
 
         # Part III: Updated bath parameters
@@ -635,7 +653,8 @@ class TestEDIpackSolverBathHybrid(unittest.TestCase):
                                      n_iw,
                                      energy_window, n_w, broadening,
                                      False,
-                                     False)
+                                     False,
+                                     "nonsu2_bath_3")
         self.assert_all(solver, **refs)
 
     def test_superc(self):
@@ -692,7 +711,8 @@ class TestEDIpackSolverBathHybrid(unittest.TestCase):
                                      n_iw,
                                      energy_window, n_w, broadening,
                                      True,
-                                     True)
+                                     True,
+                                     "superc_1")
         self.assert_all(solver, **refs)
 
         # Part II: update_int_params()
@@ -721,7 +741,8 @@ class TestEDIpackSolverBathHybrid(unittest.TestCase):
                                      n_iw,
                                      energy_window, n_w, broadening,
                                      True,
-                                     True)
+                                     True,
+                                     "superc_2")
         self.assert_all(solver, **refs)
 
         # Part III: Updated bath parameters
@@ -755,7 +776,8 @@ class TestEDIpackSolverBathHybrid(unittest.TestCase):
                                      n_iw,
                                      energy_window, n_w, broadening,
                                      True,
-                                     True)
+                                     True,
+                                     "superc_3")
         self.assert_all(solver, **refs)
 
         solver.g_an_iw
