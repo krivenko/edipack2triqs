@@ -405,6 +405,11 @@ class EDIpackSolver:
     def double_occ(self):
         "Returns the impurity double occupancy, one element per orbital"
         return ed.get_docc()
+        
+    @property
+    def superconductive_phi(self):
+        "Returns the impurity superconductive phi matrix"
+        return ed.get_phi()
 
     def magnetization(self, comp: str = 'z'):
         """
