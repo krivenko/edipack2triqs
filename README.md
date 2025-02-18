@@ -22,3 +22,5 @@ pip install .
 * Phonons
 * Imaginary time susceptibilities
 * Sector selection
+* Conversion of bath objects into operator expressions
+* hdf5 compatibility for bath objects
