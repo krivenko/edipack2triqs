@@ -128,9 +128,10 @@ def get_gloc(s_iw, s_an_iw, axis="m"):
         z_iw[Norb:, :Norb] << -s_an_iw
         for ifreq in z_iw.mesh:
             z_iw[ifreq][:Norb, :Norb] = \
-                ifreq + 1j * broadening + xmu - s_iw[ifreq]
+                (ifreq + 1j * broadening + xmu) * np.eye(Norb) - s_iw[ifreq]
             z_iw[ifreq][Norb:, Norb:] = \
-                ifreq + 1j * broadening - xmu + conjugate(s_iw(-ifreq))
+                (ifreq + 1j * broadening - xmu) * np.eye(Norb) \
+                + conjugate(s_iw(-ifreq))
 
     g_k_iw = Gf(mesh=MeshProduct(kmesh, z_iw.mesh), target_shape=nambu_shape)
     for k in kmesh:
