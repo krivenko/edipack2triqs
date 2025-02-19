@@ -2,7 +2,8 @@ from itertools import product
 import numpy as np
 
 # TRIQS modules
-from triqs.gf import Gf, BlockGf, MeshProduct, iOmega_n, conjugate, inverse
+from triqs.gf import (Gf, BlockGf, MeshImFreq, MeshProduct,
+                      iOmega_n, conjugate, inverse)
 from triqs.gf.tools import dyson
 from triqs.operators import c, c_dag, n, dagger
 from triqs.lattice.tight_binding import TBLattice
@@ -47,9 +48,9 @@ fops_bath_up = [('B_up', i) for i in range(Norb * Nbath)]
 fops_bath_dn = [('B_dn', i) for i in range(Norb * Nbath)]
 
 # Non-interacting part of the impurity Hamiltonian
-xmu = -(U / 2 + (Norb - 1) * Ust / 2 + (Norb - 1) * (Ust - Jh) / 2)
+xmu = U / 2 + (Norb - 1) * Ust / 2 + (Norb - 1) * (Ust - Jh) / 2
 
-h_loc = xmu * np.eye(Norb)
+h_loc = -xmu * np.eye(Norb)
 H = sum(h_loc[o1, o2] * c_dag(spin, o1) * c(spin, o2)
         for spin, o1, o2 in product(spins, orbs, orbs))
 
@@ -115,35 +116,33 @@ solver = EDIpackSolver(H,
 
 
 # Compute local GF from bare lattice Hamiltonian and self-energy
-def get_gloc(s_iw, s_an_iw, axis="m"):
-    xmu = (U / 2 + (Norb - 1) * Ust / 2 + (Norb - 1) * (Ust - Jh) / 2)
-    z_iw = Gf(mesh=s_iw.mesh, target_shape=nambu_shape)
-    if (axis == "m"):
-        z_iw[:Norb, :Norb] << iOmega_n + xmu - s_iw
-        z_iw[:Norb, Norb:] << -s_an_iw
-        z_iw[Norb:, :Norb] << -s_an_iw
-        z_iw[Norb:, Norb:] << iOmega_n - xmu + conjugate(s_iw)
+def get_gloc(s, s_an):
+    z = Gf(mesh=s.mesh, target_shape=nambu_shape)
+    if isinstance(s.mesh, MeshImFreq):
+        z[:Norb, :Norb] << iOmega_n + xmu - s
+        z[:Norb, Norb:] << -s_an
+        z[Norb:, :Norb] << -s_an
+        z[Norb:, Norb:] << iOmega_n - xmu + conjugate(s)
     else:
-        z_iw[:Norb, Norb:] << -s_an_iw
-        z_iw[Norb:, :Norb] << -s_an_iw
-        for ifreq in z_iw.mesh:
-            z_iw[ifreq][:Norb, :Norb] = \
-                (ifreq + 1j * broadening + xmu) * np.eye(Norb) - s_iw[ifreq]
-            z_iw[ifreq][Norb:, Norb:] = \
-                (ifreq + 1j * broadening - xmu) * np.eye(Norb) \
-                + conjugate(s_iw(-ifreq))
+        z[:Norb, Norb:] << -s_an
+        z[Norb:, :Norb] << -s_an
+        for w in z.mesh:
+            z[w][:Norb, :Norb] = \
+                (w + 1j * broadening + xmu) * np.eye(Norb) - s[w]
+            z[w][Norb:, Norb:] = \
+                (w + 1j * broadening - xmu) * np.eye(Norb) + conjugate(s(-w))
 
-    g_k_iw = Gf(mesh=MeshProduct(kmesh, z_iw.mesh), target_shape=nambu_shape)
+    g_k = Gf(mesh=MeshProduct(kmesh, z.mesh), target_shape=nambu_shape)
     for k in kmesh:
-        g_k_iw[k, :] << inverse(z_iw - h0_nambu_k[k])
+        g_k[k, :] << inverse(z - h0_nambu_k[k])
 
-    g_loc_nambu_iw = sum(g_k_iw[k, :] for k in kmesh) / len(kmesh)
+    g_loc_nambu = sum(g_k[k, :] for k in kmesh) / len(kmesh)
 
-    g_loc_iw = s_iw.copy()
-    g_loc_an_iw = s_an_iw.copy()
-    g_loc_iw[:] = g_loc_nambu_iw[:Norb, :Norb]
-    g_loc_an_iw[:] = g_loc_nambu_iw[:Norb, Norb:]
-    return g_loc_iw, g_loc_an_iw
+    g_loc = s.copy()
+    g_loc_an = s_an.copy()
+    g_loc[:] = g_loc_nambu[:Norb, :Norb]
+    g_loc_an[:] = g_loc_nambu[:Norb, Norb:]
+    return g_loc, g_loc_an
 
 
 # Compute Weiss field from local GF and self-energy
@@ -244,7 +243,7 @@ for iloop in range(Nloop):
 # Calculate local Green's function on the real axis
 s_w = solver.Sigma_w["up"]
 s_an_w = solver.Sigma_an_w["up_dn"]
-g_w, g_an_w = get_gloc(s_w, s_an_w, axis="r")
+g_w, g_an_w = get_gloc(s_w, s_an_w)
 
 # Save calculation results
 with HDFArchive('ahm.h5', 'w') as ar:
