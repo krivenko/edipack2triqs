@@ -90,8 +90,8 @@ if MPI.COMM_WORLD.Get_rank() == 0:
     print("Using SciFortran", solver.scifor_version)
     print("Using EDIpack", solver.edipack_version)
 
-    print("Densities (per orbital):", solver.densities())
-    print("Double occupancy (per orbital):", solver.double_occ())
+    print("Densities (per orbital):", solver.densities)
+    print("Double occupancy (per orbital):", solver.double_occ)
     print("Magnetization M_x (per orbital):", solver.magnetization(comp='x'))
     print("Magnetization M_y (per orbital):", solver.magnetization(comp='y'))
     print("Magnetization M_z (per orbital):", solver.magnetization(comp='z'))
@@ -99,7 +99,7 @@ if MPI.COMM_WORLD.Get_rank() == 0:
     from triqs.plot.mpl_interface import plt, oplot
 
     # Extract the Matsubara GF from the solver and plot it
-    g_iw = solver.g_iw()
+    g_iw = solver.g_iw
 
     plt.figure()
     for spin in ('up', 'dn'):
@@ -111,7 +111,7 @@ if MPI.COMM_WORLD.Get_rank() == 0:
     plt.savefig("g_iw.pdf")
 
     # Extract the Matsubara self-energy from the solver and plot it
-    Sigma_iw = solver.Sigma_iw()
+    Sigma_iw = solver.Sigma_iw
 
     plt.figure()
     for spin in ('up', 'dn'):
@@ -123,7 +123,7 @@ if MPI.COMM_WORLD.Get_rank() == 0:
     plt.savefig("Sigma_iw.pdf")
 
     # Extract the real-frequency GF from the solver and plot it
-    g_w = solver.g_w()
+    g_w = solver.g_w
 
     plt.figure()
     for spin in ('up', 'dn'):
@@ -135,7 +135,7 @@ if MPI.COMM_WORLD.Get_rank() == 0:
     plt.savefig("g_w.pdf")
 
     # Extract the real-frequency self-energy from the solver and plot it
-    Sigma_w = solver.Sigma_w()
+    Sigma_w = solver.Sigma_w
 
     plt.figure()
     for spin in ('up', 'dn'):
@@ -153,13 +153,13 @@ if MPI.COMM_WORLD.Get_rank() == 0:
 # Since the non-interacting part of the original Hamiltonian is spin-symmetric,
 # solver.hloc() returns an array of shape (1, 1, 3, 3). In presence of a spin
 # energy splitting the shape would be (2, 2, 3, 3).
-solver.hloc()[0, 0, 1, 1] = -0.6  # spin1 = spin2 = up and down, orb1 = orb2 = 1
+solver.hloc[0, 0, 1, 1] = -0.6  # spin1 = spin2 = up and down, orb1 = orb2 = 1
 
 # Change Jp
 solver.update_int_params(Jp=0.15)
 
 # Update some bath parameters
-solver.bath().eps[0, 2, 1] = -0.4  # spin = up and down, orb1 = 2, nu = 1
-solver.bath().V[0, 0, 1] = 0.3     # spin = up and down, orb1 = 0, nu = 1
+solver.bath.eps[0, 2, 1] = -0.4  # spin = up and down, orb1 = 2, nu = 1
+solver.bath.V[0, 0, 1] = 0.3     # spin = up and down, orb1 = 0, nu = 1
 
 solver.solve(beta=beta)
