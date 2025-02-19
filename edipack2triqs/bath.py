@@ -4,9 +4,12 @@ Objects representing various EDIpack bath topologies.
 
 from itertools import product
 from copy import deepcopy
+from typing import Optional
 
 import numpy as np
 import networkx as nx
+
+from h5.formats import register_class
 
 from .util import is_diagonal, is_spin_diagonal
 
@@ -91,14 +94,24 @@ class BathNormal(Bath):
     # EDIpack bath type
     name: str = 'normal'
 
-    def __init__(self, ed_mode: str, nspin: int, norb: int, nbath: int):
+    def __init__(self,
+                 ed_mode: str,
+                 nspin: int,
+                 norb: int,
+                 nbath: int,
+                 data: Optional[np.ndarray] = None):
         self.nbath = nbath
 
         size = nspin * norb * nbath
 
         # EDIpack-compatible bath parameter array
-        self.data = np.zeros(size * (2 if ed_mode == "normal" else 3),
-                             dtype=float)
+        data_size = size * (2 if ed_mode == "normal" else 3)
+        if data is None:
+            self.data = np.zeros(data_size, dtype=float)
+        else:
+            assert data.dtype == float
+            assert data.shape == (data_size,)
+            self.data = data
 
         params_shape = (nspin, norb, nbath)
 
@@ -127,17 +140,33 @@ class BathNormal(Bath):
         else:
             raise RuntimeError("Unknown ED mode")
 
-    def __deepcopy__(self, memo):
-        nspin, norb, nbath = self.eps.shape
+    def ed_mode(self):
+        "ED mode this bath object is usable with"
         if hasattr(self, "U"):
-            ed_mode = "nonsu2"
+            return "nonsu2"
         elif hasattr(self, "Delta"):
-            ed_mode = "superc"
+            return "superc"
         else:
-            ed_mode = "normal"
-        bath = BathNormal(ed_mode, nspin, norb, nbath)
-        bath.data[:] = self.data
-        return bath
+            return "normal"
+
+    def __deepcopy__(self, memo):
+        nspin, norb, nbath = self.V.shape
+        return BathNormal(self.ed_mode(), nspin, norb, nbath, self.data.copy())
+
+    def __reduce_to_dict__(self):
+        "HDFArchive serialization"
+        return {"ed_mode": self.ed_mode(),
+                "nspin": self.V.shape[0],
+                "norb": self.V.shape[1],
+                "nbath": self.V.shape[2],
+                "data": self.data}
+
+    @classmethod
+    def __factory_from_dict__(cls, name, d):
+        "HDFArchive deserialization"
+        return BathNormal(
+            d["ed_mode"], d["nspin"], d["norb"], d["nbath"], d["data"]
+        )
 
     @classmethod
     def is_usable(cls,
@@ -211,24 +240,36 @@ class BathNormal(Bath):
         return bath
 
 
+register_class(BathNormal)
+
+
 class BathHybrid(Bath):
     """Parameters of a bath with hybrid topology"""
 
     # EDIpack bath type
     name: str = 'hybrid'
 
-    def __init__(self, ed_mode: str, nspin: int, norb: int, nbath: int):
+    def __init__(self,
+                 ed_mode: str,
+                 nspin: int,
+                 norb: int,
+                 nbath: int,
+                 data: Optional[np.ndarray] = None):
         self.nbath = nbath
 
         eps_size = nspin * nbath
         size = eps_size * norb
 
         # EDIpack-compatible bath parameter array
-        self.data = np.zeros(
-            {"normal": eps_size + size,
-             "superc": 2 * eps_size + size,
-             "nonsu2": eps_size + 2 * size}[ed_mode],
-            dtype=float)
+        data_size = {"normal": eps_size + size,
+                     "superc": 2 * eps_size + size,
+                     "nonsu2": eps_size + 2 * size}[ed_mode]
+        if data is None:
+            self.data = np.zeros(data_size, dtype=float)
+        else:
+            assert data.dtype == float
+            assert data.shape == (data_size,)
+            self.data = data
 
         eps_shape = (nspin, nbath)
         shape = (nspin, norb, nbath)
@@ -258,17 +299,33 @@ class BathHybrid(Bath):
         else:
             raise RuntimeError("Unknown ED mode")
 
+    def ed_mode(self):
+        "ED mode this bath object is usable with"
+        if hasattr(self, "U"):
+            return "nonsu2"
+        elif hasattr(self, "Delta"):
+            return "superc"
+        else:
+            return "normal"
+
     def __deepcopy__(self, memo):
         nspin, norb, nbath = self.V.shape
-        if hasattr(self, "U"):
-            ed_mode = "nonsu2"
-        elif hasattr(self, "Delta"):
-            ed_mode = "superc"
-        else:
-            ed_mode = "normal"
-        bath = BathHybrid(ed_mode, nspin, norb, nbath)
-        bath.data[:] = self.data
-        return bath
+        return BathHybrid(self.ed_mode(), nspin, norb, nbath, self.data.copy())
+
+    def __reduce_to_dict__(self):
+        "HDFArchive serialization"
+        return {"ed_mode": self.ed_mode(),
+                "nspin": self.V.shape[0],
+                "norb": self.V.shape[1],
+                "nbath": self.V.shape[2],
+                "data": self.data}
+
+    @classmethod
+    def __factory_from_dict__(cls, name, d):
+        "HDFArchive deserialization"
+        return BathHybrid(
+            d["ed_mode"], d["nspin"], d["norb"], d["nbath"], d["data"]
+        )
 
     @classmethod
     def is_usable(cls, h: np.ndarray, Delta: np.ndarray):
@@ -306,6 +363,9 @@ class BathHybrid(Bath):
         return bath
 
 
+register_class(BathHybrid)
+
+
 class BathGeneral(Bath):
     """Parameters of a bath with general topology"""
 
@@ -317,7 +377,8 @@ class BathGeneral(Bath):
                  norb: int,
                  nbath: int,
                  hvec: np.ndarray,
-                 lambdavec: np.ndarray):
+                 lambdavec: np.ndarray,
+                 data: Optional[np.ndarray] = None):
         self.nbath = nbath
         self.hvec = hvec
         self.lambdavec = lambdavec
@@ -329,8 +390,15 @@ class BathGeneral(Bath):
         def replica_offset(nu):
             return 1 + nu * replica_params_size
 
-        self.data = np.zeros(1 + nbath * replica_params_size, dtype=float)
-        self.data[0] = self.nsym
+        data_size = 1 + nbath * replica_params_size
+        if data is None:
+            self.data = np.zeros(data_size, dtype=float)
+            self.data[0] = self.nsym
+        else:
+            assert data.dtype == float
+            assert data.shape == (data_size,)
+            assert data[0] == self.nsym
+            self.data = data
 
         # View: Hopping amplitudes
         self.V = [self.data[replica_offset(nu):replica_offset(nu) + V_size].
@@ -351,13 +419,28 @@ class BathGeneral(Bath):
                 self.l[nu][isym] = self.lambdavec[nu, isym]
 
     def __deepcopy__(self, memo):
-        nbath = len(self.V)
         nspin, norb = self.V[0].shape
-        bath = BathGeneral(nspin, norb, nbath,
+        return BathGeneral(nspin, norb, self.nbath,
                            deepcopy(self.hvec, memo),
-                           deepcopy(self.lambdavec, memo))
-        bath.data[:] = self.data
-        return bath
+                           deepcopy(self.lambdavec, memo),
+                           self.data.copy())
+
+    def __reduce_to_dict__(self):
+        "HDFArchive serialization"
+        return {"nspin": self.V[0].shape[0],
+                "norb": self.V[0].shape[1],
+                "nbath": self.nbath,
+                "hvec": self.hvec,
+                "lambdavec": self.lambdavec,
+                "data": self.data}
+
+    @classmethod
+    def __factory_from_dict__(cls, name, d):
+        "HDFArchive deserialization"
+        return BathGeneral(
+            d["nspin"], d["norb"], d["nbath"],
+            d["hvec"], d["lambdavec"], d["data"]
+        )
 
     def assert_compatible(self, other):
         assert type(self) is type(other), "Incompatible bath object types"
@@ -666,3 +749,6 @@ class BathGeneral(Bath):
                     bath.V[nu][spin, orb] = V[spin, spin, orb, b]
 
         return bath
+
+
+register_class(BathGeneral)

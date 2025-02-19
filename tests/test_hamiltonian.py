@@ -6,9 +6,11 @@ import numpy as np
 from numpy.testing import assert_equal, assert_allclose
 from numpy import multiply as mul
 from numpy.linalg import eigh
+from mpi4py import MPI
 
 import triqs.operators as op
 from triqs.operators.util.hamiltonians import h_int_kanamori
+from h5 import HDFArchive
 
 from edipack2triqs.hamiltonian import parse_hamiltonian
 from edipack2triqs.bath import BathNormal, BathHybrid, BathGeneral
@@ -134,6 +136,26 @@ class TestHamiltonianBathNormal(TestHamiltonian):
         res2 = -(3 * b1 - 5 * b2)
         assert_allclose(res2.data, 2 * b1.data, atol=1e-10)
 
+    def check_bath_h5(self, b, h5_name):
+        if MPI.COMM_WORLD.Get_rank() != 0:
+            return
+
+        archive_name = __file__[:-2] + "h5"
+
+        with HDFArchive(archive_name, 'a') as ar:
+            ar["normal_" + h5_name] = b
+
+        with HDFArchive(archive_name, 'r') as ar:
+            b2 = ar["normal_" + h5_name]
+            self.assertEqual(b2.ed_mode(), b2.ed_mode())
+            assert_equal(b2.data, b.data)
+            assert_equal(b2.eps.base, b2.data)
+            assert_equal(b2.V.base, b2.data)
+            if hasattr(b2, 'U'):
+                self.assertIs(b2.U.base, b2.data)
+            if hasattr(b2, 'Delta'):
+                self.assertIs(b2.Delta.base, b2.data)
+
     def test_parse_hamiltonian_nspin1(self):
         h = self.make_H_loc(mul.outer(s0, self.h_loc)) + self.make_H_int()
         h += self.make_H_bath(mul.outer([1, 1], self.eps),
@@ -175,6 +197,7 @@ class TestHamiltonianBathNormal(TestHamiltonian):
         self.assertTrue(b2.V.base is b2.data)
 
         self.check_bath_arithmetics(b, b2)
+        self.check_bath_h5(b, "nspin1")
 
     def test_parse_hamiltonian_nspin2(self):
         h = self.make_H_loc(mul.outer(sz, self.h_loc)) + self.make_H_int()
@@ -221,6 +244,7 @@ class TestHamiltonianBathNormal(TestHamiltonian):
         self.assertTrue(b2.V.base is b2.data)
 
         self.check_bath_arithmetics(b, b2)
+        self.check_bath_h5(b, "nspin2")
 
     def test_parse_hamiltonian_nonsu2_hloc(self):
         h = self.make_H_loc(mul.outer(sz + 0.2 * sx, self.h_loc)) \
@@ -269,6 +293,7 @@ class TestHamiltonianBathNormal(TestHamiltonian):
         self.assertTrue(b2.U.base is b2.data)
 
         self.check_bath_arithmetics(b, b2)
+        self.check_bath_h5(b, "nonsu2_hloc")
 
     def test_parse_hamiltonian_nonsu2_bath(self):
         h = self.make_H_loc(mul.outer(s0, self.h_loc)) + self.make_H_int()
@@ -318,6 +343,7 @@ class TestHamiltonianBathNormal(TestHamiltonian):
         self.assertTrue(b2.U.base is b2.data)
 
         self.check_bath_arithmetics(b, b2)
+        self.check_bath_h5(b, "nonsu2_bath")
 
     def test_parse_hamiltonian_superc(self):
         h = self.make_H_loc(mul.outer(s0, self.h_loc)) + self.make_H_int()
@@ -379,6 +405,7 @@ class TestHamiltonianBathNormal(TestHamiltonian):
         self.assertTrue(b2.Delta.base is b2.data)
 
         self.check_bath_arithmetics(b, b2)
+        self.check_bath_h5(b, "superc")
 
 
 class TestHamiltonianBathHybrid(TestHamiltonian):
@@ -414,6 +441,26 @@ class TestHamiltonianBathHybrid(TestHamiltonian):
         res2 = -(3 * b1 - 5 * b2)
         assert_allclose(res2.data, 2 * b1.data, atol=1e-10)
 
+    def check_bath_h5(self, b, h5_name):
+        if MPI.COMM_WORLD.Get_rank() != 0:
+            return
+
+        archive_name = __file__[:-2] + "h5"
+
+        with HDFArchive(archive_name, 'a') as ar:
+            ar["hybrid_" + h5_name] = b
+
+        with HDFArchive(archive_name, 'r') as ar:
+            b2 = ar["hybrid_" + h5_name]
+            self.assertEqual(b2.ed_mode(), b2.ed_mode())
+            assert_equal(b2.data, b.data)
+            assert_equal(b2.eps.base, b2.data)
+            assert_equal(b2.V.base, b2.data)
+            if hasattr(b2, 'U'):
+                self.assertIs(b2.U.base, b2.data)
+            if hasattr(b2, 'Delta'):
+                self.assertIs(b2.Delta.base, b2.data)
+
     def test_parse_hamiltonian_nspin1(self):
         h = self.make_H_loc(mul.outer(s0, self.h_loc)) + self.make_H_int()
         h += self.make_H_bath(mul.outer([1, 1], self.eps),
@@ -444,6 +491,7 @@ class TestHamiltonianBathHybrid(TestHamiltonian):
         self.assertTrue(b2.V.base is b2.data)
 
         self.check_bath_arithmetics(params.bath, b2)
+        self.check_bath_h5(b2, "nspin1")
 
     def test_parse_hamiltonian_nspin2(self):
         h = self.make_H_loc(mul.outer(sz, self.h_loc)) + self.make_H_int()
@@ -476,6 +524,7 @@ class TestHamiltonianBathHybrid(TestHamiltonian):
         self.assertTrue(b2.V.base is b2.data)
 
         self.check_bath_arithmetics(params.bath, b2)
+        self.check_bath_h5(b2, "nspin2")
 
     def test_parse_hamiltonian_nonsu2_hloc(self):
         h = self.make_H_loc(mul.outer(sz + 0.2 * sx, self.h_loc)) \
@@ -510,6 +559,7 @@ class TestHamiltonianBathHybrid(TestHamiltonian):
         self.assertTrue(b2.U.base is b2.data)
 
         self.check_bath_arithmetics(params.bath, b2)
+        self.check_bath_h5(b2, "nonsu2_hloc")
 
     def test_parse_hamiltonian_nonsu2_bath(self):
         h = self.make_H_loc(mul.outer(s0, self.h_loc)) + self.make_H_int()
@@ -542,6 +592,7 @@ class TestHamiltonianBathHybrid(TestHamiltonian):
         self.assertTrue(b2.U.base is b2.data)
 
         self.check_bath_arithmetics(params.bath, b2)
+        self.check_bath_h5(b2, "nonsu2_bath")
 
     def test_parse_hamiltonian_superc(self):
         h = self.make_H_loc(mul.outer(s0, self.h_loc)) + self.make_H_int()
@@ -580,6 +631,7 @@ class TestHamiltonianBathHybrid(TestHamiltonian):
         self.assertTrue(b2.Delta.base is b2.data)
 
         self.check_bath_arithmetics(params.bath, b2)
+        self.check_bath_h5(b2, "superc")
 
 
 class TestHamiltonianBathGeneral(TestHamiltonian):
@@ -698,6 +750,24 @@ class TestHamiltonianBathGeneral(TestHamiltonian):
         assert_allclose(res2.data[1:], 2 * b1.data[1:], atol=1e-10)
         assert_allclose(res2.lambdavec, 2 * b1.lambdavec, atol=1e-10)
 
+    def check_bath_h5(self, b, h5_name):
+        if MPI.COMM_WORLD.Get_rank() != 0:
+            return
+
+        archive_name = __file__[:-2] + "h5"
+
+        with HDFArchive(archive_name, 'a') as ar:
+            ar["general_" + h5_name] = b
+
+        with HDFArchive(archive_name, 'r') as ar:
+            b2 = ar["general_" + h5_name]
+            assert_equal(b2.hvec, b.hvec)
+            assert_equal(b2.lambdavec, b.lambdavec)
+            assert_equal(b2.data, b.data)
+            for l_nu, V_nu in zip(b2.l, b2.V):
+                self.assertIs(l_nu.base, b2.data)
+                self.assertIs(V_nu.base, b2.data)
+
     def test_parse_hamiltonian_nspin1(self):
         h = self.make_H_loc(mul.outer(s0, self.h_loc)) + self.make_H_int()
         h += self.make_H_bath(mul.outer(s0, self.h), mul.outer([1, 1], self.V))
@@ -733,6 +803,7 @@ class TestHamiltonianBathGeneral(TestHamiltonian):
         self.assertTrue(all(l_nu.base is b2.data for l_nu in b2.l))
 
         self.check_bath_arithmetics(params.bath, b2)
+        self.check_bath_h5(params.bath, "nspin1")
 
     def test_parse_hamiltonian_nspin2(self):
         h = self.make_H_loc(mul.outer(sz, self.h_loc)) + self.make_H_int()
@@ -769,6 +840,7 @@ class TestHamiltonianBathGeneral(TestHamiltonian):
         self.assertTrue(all(l_nu.base is b2.data for l_nu in b2.l))
 
         self.check_bath_arithmetics(params.bath, b2)
+        self.check_bath_h5(params.bath, "nspin2")
 
     def test_parse_hamiltonian_nonsu2_hloc(self):
         h = self.make_H_loc(mul.outer(sz + 0.2 * sx, self.h_loc)) \
@@ -806,6 +878,7 @@ class TestHamiltonianBathGeneral(TestHamiltonian):
         self.assertTrue(all(l_nu.base is b2.data for l_nu in b2.l))
 
         self.check_bath_arithmetics(params.bath, b2)
+        self.check_bath_h5(params.bath, "nonsu2_hloc")
 
     def test_parse_hamiltonian_nonsu2_bath(self):
         h = self.make_H_loc(mul.outer(s0, self.h_loc)) + self.make_H_int()
@@ -844,6 +917,7 @@ class TestHamiltonianBathGeneral(TestHamiltonian):
         self.assertTrue(all(l_nu.base is b2.data for l_nu in b2.l))
 
         self.check_bath_arithmetics(params.bath, b2)
+        self.check_bath_h5(params.bath, "nonsu2_bath")
 
     def test_parse_hamiltonian_superc(self):
         h = self.make_H_loc(mul.outer(s0, self.h_loc)) + self.make_H_int()
@@ -895,6 +969,7 @@ class TestHamiltonianBathGeneral(TestHamiltonian):
         self.assertTrue(all(l_nu.base is b2.data for l_nu in b2.l))
 
         self.check_bath_arithmetics(params.bath, b2)
+        self.check_bath_h5(params.bath, "superc")
 
 
 if __name__ == '__main__':
