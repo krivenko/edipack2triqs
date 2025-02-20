@@ -1,3 +1,8 @@
+[![Test (Ubuntu)](https://github.com/krivenko/edipack2triqs/actions/workflows/test-ubuntu.yml/badge.svg)](
+https://github.com/krivenko/edipack2triqs/actions/workflows/test-ubuntu.yml)
+[![Documentation](https://img.shields.io/badge/docs-GitHub%20Pages-red)](
+https://krivenko.github.io/edipack2triqs)
+
 edipack2triqs: Compatibility layer between EDIpack2 and TRIQS
 =============================================================
 
