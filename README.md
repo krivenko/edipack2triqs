@@ -34,7 +34,7 @@ pip install .
 Usage examples
 --------------
 
-See https://krivenko.github.io/edipack2triqs/example.
+See https://krivenko.github.io/edipack2triqs/examples.html.
 
 Missing features
 ----------------
