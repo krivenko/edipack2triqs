@@ -101,6 +101,9 @@ class EDIpackSolver:
         ed_sparse_H: bool, default True
             Flag to select storage of sparse matrix H (True), or direct
             on-the-fly product H*v (False).
+        ed_total_ud: bool, default False
+            Force use of total spin-up and spin-down occupations as quantum
+            numbers
         lanc_method: str, default "arpack"
             Select the Lanczos method to be used in the determination of the
             spectrum: "arpack", "dvdson" (no MPI only).
@@ -205,9 +208,10 @@ class EDIpackSolver:
             c["JP"] = self.h_params.Jp
 
             # ed_total_ud
+            ed_total_ud = kwargs.get("ed_total_ud", False)
             if isinstance(self.h_params.bath, BathNormal):
-                c["ED_TOTAL_UD"] = not (self.h_params.Jx == 0
-                                        and self.h_params.Jp == 0)
+                c["ED_TOTAL_UD"] = ed_total_ud or (not (self.h_params.Jx == 0
+                                                   and self.h_params.Jp == 0))
             elif isinstance(self.h_params.bath, (BathHybrid, BathGeneral)):
                 c["ED_TOTAL_UD"] = True
             else:
