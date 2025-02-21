@@ -374,7 +374,7 @@ class EDIpackSolver:
             Number of real-frequency points for impurity GF calculations
         broadening: float, default 0.01
             Broadening (eps) on the real axis
-        TODO: Ltau
+
         """
 
         # Pass parameters to EDIpack
