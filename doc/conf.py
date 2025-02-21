@@ -2,12 +2,14 @@
 #
 # TRIQS documentation build configuration file
 
+import os
 import sys
 from sphinx.writers.html import HTMLTranslator
 from docutils import nodes
 from docutils.nodes import Element
 
 sys.path.insert(0, "sphinxext")
+sys.path.insert(0, os.path.abspath(".."))
 
 # exclude these folders from scanning by sphinx
 exclude_patterns = ['_templates']
