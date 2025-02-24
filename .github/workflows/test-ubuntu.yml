@@ -101,7 +101,8 @@ jobs:
       if: env.DEPLOY_DOCS == 'true'
       run: >
            pip install
-           sphinx sphinx-rtd-theme myst-parser nbsphinx linkify-it-py
+           sphinx sphinx-rtd-theme sphinxfortran-ng
+           myst-parser nbsphinx linkify-it-py
 
     - name: Build documentation
       if: env.DEPLOY_DOCS == 'true'

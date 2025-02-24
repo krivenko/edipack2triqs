@@ -25,6 +25,7 @@ extensions = ['sphinx.ext.autodoc',
               'nbsphinx',
               'myst_parser',
               'matplotlib.sphinxext.plot_directive',
+              'sphinxfortran_ng.fortran_domain'
              ]
 
 myst_enable_extensions = [
