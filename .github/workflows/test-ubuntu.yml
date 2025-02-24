@@ -17,13 +17,13 @@ jobs:
     strategy:
       matrix:
         python-version:
-          - "3.10"
-          - "3.11"
-          - "3.12"
+          #- "3.10"
+          #- "3.11"
+          #- "3.12"
           - "3.13"
 
     env:
-      DEPLOY_DOCS: ${{ github.ref == 'refs/heads/main' &&
+      DEPLOY_DOCS: ${{ github.ref == 'refs/heads/ci' &&
                        matrix.python-version == '3.13' }}
 
     steps:
@@ -106,12 +106,14 @@ jobs:
 
     - name: Build documentation
       if: env.DEPLOY_DOCS == 'true'
-      run: sphinx-build -M html doc/ build/sphinx
+      run: |
+           source ${HOME}/opt/triqs/share/triqs/triqsvars.sh
+           sphinx-build -M html doc/ build/sphinx
 
-    - name: Deploy documentation
-      if: env.DEPLOY_DOCS == 'true'
-      uses: JamesIves/github-pages-deploy-action@v4
-      with:
-        branch: gh-pages
-        token: ${{ secrets.GITHUB_TOKEN }}
-        folder: build/sphinx/html
+    #- name: Deploy documentation
+    #  if: env.DEPLOY_DOCS == 'true'
+    #  uses: JamesIves/github-pages-deploy-action@v4
+    #  with:
+    #    branch: gh-pages
+    #    token: ${{ secrets.GITHUB_TOKEN }}
+    #    folder: build/sphinx/html

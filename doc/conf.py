@@ -11,7 +11,7 @@ from docutils.nodes import Element
 
 sys.path.insert(0, "sphinxext")
 sys.path.insert(0, str(pathlib.Path(__file__).parents[1]))
-
+print(sys.path)
 
 # exclude these folders from scanning by sphinx
 exclude_patterns = ['_templates']
@@ -28,7 +28,7 @@ extensions = ['sphinx.ext.autodoc',
               'myst_parser',
               'matplotlib.sphinxext.plot_directive',
               'sphinxfortran_ng.fortran_domain'
-             ]
+              ]
 
 myst_enable_extensions = [
     "amsmath",
@@ -64,6 +64,8 @@ rst_epilog = """
 copyright = '2024-2025, Igor Krivenko, Lorenzo Crippa'
 
 templates_path = ['_templates']
+
+autoclass_content = 'both'
 
 # this requires the sphinx_rtd_theme to be installed via pip
 html_theme = 'sphinx_rtd_theme'
