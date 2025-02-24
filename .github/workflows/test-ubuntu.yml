@@ -106,7 +106,9 @@ jobs:
 
     - name: Build documentation
       if: env.DEPLOY_DOCS == 'true'
-      run: sphinx-build -M html doc/ build/sphinx
+      run: |
+           source ${HOME}/opt/triqs/share/triqs/triqsvars.sh
+           sphinx-build -M html doc/ build/sphinx
 
     - name: Deploy documentation
       if: env.DEPLOY_DOCS == 'true'
