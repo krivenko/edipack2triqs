@@ -1,0 +1,673 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>edipack2triqs.solver &mdash; edipack2triqs  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css?v=df4ffeb6" />
+      <link rel="stylesheet" type="text/css" href="../../_static/plot_directive.css" />
+
+  
+    <link rel="shortcut icon" href="../../_static/triqs_favicon.ico"/>
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="author" title="About these documents" href="../../about.html" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #7E588A" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            edipack2triqs
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../documentation.html">Documentation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../documentation.html#module-edipack2triqs.solver">Solver class</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../documentation.html#edipack2triqs.solver.EDIpackSolver"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../documentation.html#edipack2triqs.solver.EDIpackSolver.Sigma_an_iw"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.Sigma_an_iw</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../documentation.html#edipack2triqs.solver.EDIpackSolver.Sigma_an_w"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.Sigma_an_w</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../documentation.html#edipack2triqs.solver.EDIpackSolver.Sigma_iw"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.Sigma_iw</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../documentation.html#edipack2triqs.solver.EDIpackSolver.Sigma_w"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.Sigma_w</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../documentation.html#edipack2triqs.solver.EDIpackSolver.bath"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.bath</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../documentation.html#edipack2triqs.solver.EDIpackSolver.densities"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.densities</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../documentation.html#edipack2triqs.solver.EDIpackSolver.double_occ"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.double_occ</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../documentation.html#edipack2triqs.solver.EDIpackSolver.energies"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.energies</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../documentation.html#edipack2triqs.solver.EDIpackSolver.g_an_iw"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.g_an_iw</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../documentation.html#edipack2triqs.solver.EDIpackSolver.g_an_w"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.g_an_w</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../documentation.html#edipack2triqs.solver.EDIpackSolver.g_iw"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.g_iw</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../documentation.html#edipack2triqs.solver.EDIpackSolver.g_w"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.g_w</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../documentation.html#edipack2triqs.solver.EDIpackSolver.hloc"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.hloc</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../documentation.html#edipack2triqs.solver.EDIpackSolver.magnetization"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.magnetization()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../documentation.html#edipack2triqs.solver.EDIpackSolver.solve"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.solve()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../documentation.html#edipack2triqs.solver.EDIpackSolver.superconductive_phi"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.superconductive_phi</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../documentation.html#edipack2triqs.solver.EDIpackSolver.update_int_params"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.update_int_params()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../documentation.html#module-edipack2triqs.bath">Objects representing bath parameters</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../documentation.html#edipack2triqs.bath.BathNormal"><code class="docutils literal notranslate"><span class="pre">BathNormal</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../documentation.html#edipack2triqs.bath.BathNormal.ed_mode"><code class="docutils literal notranslate"><span class="pre">BathNormal.ed_mode()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../documentation.html#edipack2triqs.bath.BathHybrid"><code class="docutils literal notranslate"><span class="pre">BathHybrid</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../documentation.html#edipack2triqs.bath.BathHybrid.ed_mode"><code class="docutils literal notranslate"><span class="pre">BathHybrid.ed_mode()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../documentation.html#edipack2triqs.bath.BathGeneral"><code class="docutils literal notranslate"><span class="pre">BathGeneral</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../documentation.html#edipack2triqs.bath.BathGeneral.build_linear_combination"><code class="docutils literal notranslate"><span class="pre">BathGeneral.build_linear_combination()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../documentation.html#edipack2triqs.bath.BathGeneral.build_replica_bases"><code class="docutils literal notranslate"><span class="pre">BathGeneral.build_replica_bases()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../documentation.html#edipack2triqs.bath.BathGeneral.is_replica_valid"><code class="docutils literal notranslate"><span class="pre">BathGeneral.is_replica_valid()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../documentation.html#edipack2triqs.bath.BathGeneral.merge_inc_replicas"><code class="docutils literal notranslate"><span class="pre">BathGeneral.merge_inc_replicas()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../documentation.html#module-edipack2triqs.fit">Bath fitting</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../documentation.html#edipack2triqs.fit.BathFittingParams"><code class="docutils literal notranslate"><span class="pre">BathFittingParams</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../documentation.html#edipack2triqs.solver.EDIpackSolver.chi2_fit_bath"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.chi2_fit_bath()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../examples.html">Usage examples</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../examples.html#orbital-impurity-with-hubbard-kanamori-interaction">3 orbital impurity with Hubbard-Kanamori interaction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../examples.html#dmft-study-of-superconductivity-in-the-attractive-hubbard-model">DMFT study of superconductivity in the attractive Hubbard model</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../issues.html">Reporting issues</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ChangeLog.html">Changelog</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../ChangeLog.html#version-0-4-0">Version 0.4.0</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../about.html">About edipack2triqs</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../about.html#license">License</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../about.html#usage-disclaimer">Usage disclaimer</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #7E588A" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">edipack2triqs</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">edipack2triqs.solver</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for edipack2triqs.solver</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">tempfile</span><span class="w"> </span><span class="kn">import</span> <span class="n">TemporaryDirectory</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">warnings</span><span class="w"> </span><span class="kn">import</span> <span class="n">warn</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mpi4py</span><span class="w"> </span><span class="kn">import</span> <span class="n">MPI</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">triqs.operators</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">op</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">triqs.gf</span><span class="w"> </span><span class="kn">import</span> <span class="n">BlockGf</span><span class="p">,</span> <span class="n">Gf</span><span class="p">,</span> <span class="n">MeshImFreq</span><span class="p">,</span> <span class="n">MeshReFreq</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">edipy2</span><span class="w"> </span><span class="kn">import</span> <span class="n">global_env</span> <span class="k">as</span> <span class="n">ed</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">.util</span><span class="w"> </span><span class="kn">import</span> <span class="n">IndicesType</span><span class="p">,</span> <span class="n">validate_fops_up_dn</span><span class="p">,</span> <span class="n">write_config</span><span class="p">,</span> <span class="n">chdircontext</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.bath</span><span class="w"> </span><span class="kn">import</span> <span class="n">Bath</span><span class="p">,</span> <span class="n">BathNormal</span><span class="p">,</span> <span class="n">BathHybrid</span><span class="p">,</span> <span class="n">BathGeneral</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.hamiltonian</span><span class="w"> </span><span class="kn">import</span> <span class="n">parse_hamiltonian</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.fit</span><span class="w"> </span><span class="kn">import</span> <span class="n">BathFittingParams</span><span class="p">,</span> <span class="n">_chi2_fit_bath</span>
+
+
+<div class="viewcode-block" id="EDIpackSolver">
+<a class="viewcode-back" href="../../documentation.html#edipack2triqs.solver.EDIpackSolver">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">EDIpackSolver</span><span class="p">:</span>
+
+    <span class="c1"># EDIpack maintains the state of a simulation as a set of global variables.</span>
+    <span class="c1"># Therefore, this state must be controlled by at most one EDIpackSolver</span>
+    <span class="c1"># instance at any time.</span>
+    <span class="n">instance_count</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="c1"># Default configuration</span>
+    <span class="n">default_config</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="c1"># DMFT</span>
+        <span class="s2">&quot;NLOOP&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+        <span class="s2">&quot;DMFT_ERROR&quot;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>
+        <span class="s2">&quot;NSUCCESS&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+        <span class="c1"># Hartree-Fock</span>
+        <span class="s2">&quot;HFMODE&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="s2">&quot;XMU&quot;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>
+        <span class="c1"># Phonons</span>
+        <span class="s2">&quot;PH_TYPE&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+        <span class="s2">&quot;NPH&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+        <span class="c1"># Fixed density calculations</span>
+        <span class="s2">&quot;NREAD&quot;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>
+        <span class="s2">&quot;NERR&quot;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>
+        <span class="s2">&quot;NDELTA&quot;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>
+        <span class="s2">&quot;NCOEFF&quot;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>
+        <span class="c1"># ED</span>
+        <span class="s2">&quot;ED_PRINT_SIGMA&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="s2">&quot;ED_PRINT_G&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="s2">&quot;ED_PRINT_G0&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="s2">&quot;RDM_FLAG&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="s2">&quot;ED_FINITE_TEMP&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="s2">&quot;ED_TWIN&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="s2">&quot;ED_SECTORS&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="s2">&quot;ED_SECTORS_SHIFT&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+        <span class="s2">&quot;ED_SOLVE_OFFDIAG_GF&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>   <span class="c1"># TODO</span>
+        <span class="s2">&quot;ED_ALL_G&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="s2">&quot;ED_OFFSET_BATH&quot;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>
+        <span class="c1"># TODO: Susceptibilities</span>
+        <span class="s2">&quot;LTAU&quot;</span><span class="p">:</span> <span class="mi">1000</span><span class="p">,</span>               <span class="c1"># TODO: To be set in solve()</span>
+        <span class="s2">&quot;CHISPIN_FLAG&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>      <span class="c1"># TODO: To be set in __init__()</span>
+        <span class="s2">&quot;CHIDENS_FLAG&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>      <span class="c1"># TODO: To be set in __init__()</span>
+        <span class="s2">&quot;CHIPAIR_FLAG&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>      <span class="c1"># TODO: To be set in __init__()</span>
+        <span class="s2">&quot;CHIEXCT_FLAG&quot;</span><span class="p">:</span> <span class="kc">False</span>       <span class="c1"># TODO: To be set in __init__()</span>
+    <span class="p">}</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                 <span class="n">hamiltonian</span><span class="p">:</span> <span class="n">op</span><span class="o">.</span><span class="n">Operator</span><span class="p">,</span>
+                 <span class="n">fops_imp_up</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">IndicesType</span><span class="p">],</span>
+                 <span class="n">fops_imp_dn</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">IndicesType</span><span class="p">],</span>
+                 <span class="n">fops_bath_up</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">IndicesType</span><span class="p">],</span>
+                 <span class="n">fops_bath_dn</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">IndicesType</span><span class="p">],</span>
+                 <span class="o">**</span><span class="n">kwargs</span>
+                 <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initialize internal state of the underlying EDIpack solver.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        hamiltonian: triqs.operators.Operator</span>
+<span class="sd">            Many-body Hamiltonian to diagonalize</span>
+<span class="sd">        fops_imp_up: list of tuples of strings and ints</span>
+<span class="sd">            List of all spin-up impurity annihilation / creation operator</span>
+<span class="sd">            flavors (indices)</span>
+<span class="sd">        fops_imp_dn: list of tuples of strings and ints</span>
+<span class="sd">            List of all spin-down impurity annihilation / creation operator</span>
+<span class="sd">            flavors (indices)</span>
+<span class="sd">        fops_bath_up: list of tuples of strings and ints</span>
+<span class="sd">            List of all spin-up bath annihilation / creation operator</span>
+<span class="sd">            flavors (indices)</span>
+<span class="sd">        fops_bath_dn: list of tuples of strings and ints</span>
+<span class="sd">            List of all spin-down bath annihilation / creation operator</span>
+<span class="sd">            flavors (indices)</span>
+<span class="sd">        input_file: str</span>
+<span class="sd">            Path to an input file to be used by EDIpack. Mutually exclusive with</span>
+<span class="sd">            all other keyword arguments.</span>
+<span class="sd">        verbose: int, default 3</span>
+<span class="sd">            Verbosity level: 0=almost nothing --&gt; 5:all</span>
+<span class="sd">        cutoff: float, default 1e-9</span>
+<span class="sd">            Spectrum cutoff, used to determine the number states to be retained</span>
+<span class="sd">        gs_threshold: float, default 1e-9</span>
+<span class="sd">            Energy threshold for ground state degeneracy loop up</span>
+<span class="sd">        ed_sparse_H: bool, default True</span>
+<span class="sd">            Flag to select storage of sparse matrix H (True), or direct</span>
+<span class="sd">            on-the-fly product H*v (False).</span>
+<span class="sd">        ed_total_ud: bool, default False</span>
+<span class="sd">            Force use of total spin-up and spin-down occupations as quantum</span>
+<span class="sd">            numbers</span>
+<span class="sd">        lanc_method: str, default &quot;arpack&quot;</span>
+<span class="sd">            Select the Lanczos method to be used in the determination of the</span>
+<span class="sd">            spectrum: &quot;arpack&quot;, &quot;dvdson&quot; (no MPI only).</span>
+<span class="sd">        lanc_nstates_sector: int, default 2</span>
+<span class="sd">            Initial number of states per sector to be determined</span>
+<span class="sd">        lanc_nstates_total: int, default 2</span>
+<span class="sd">            Initial total number of states to be determined</span>
+<span class="sd">        lanc_nstates_step: int, default 2</span>
+<span class="sd">            Number of states added to the spectrum at each step</span>
+<span class="sd">        lanc_ncv_factor: int, default 10</span>
+<span class="sd">            Set the size of the block used in Lanczos-ARPACK by multiplying</span>
+<span class="sd">            the required Neigen (NCV = lanc_ncv_factor * Neigen + lanc_ncv_add)</span>
+<span class="sd">        lanc_ncv_add: int, default 0</span>
+<span class="sd">            Adds up to the size of the block to prevent it from becoming too</span>
+<span class="sd">            small (NCV = lanc_ncv_factor * Neigen + lanc_ncv_add)</span>
+<span class="sd">        lanc_niter: int, default 512</span>
+<span class="sd">            Number of Lanczos iterations in spectrum determination</span>
+<span class="sd">        lanc_ngfiter: int, default 200</span>
+<span class="sd">            Number of Lanczos iterations in GF determination (number of momenta)</span>
+<span class="sd">        lanc_tolerance: float, default 1e-18</span>
+<span class="sd">            Tolerance for the Lanczos iterations as used in ARPACK</span>
+<span class="sd">        lanc_dim_threshold: int, default 1024</span>
+<span class="sd">            Min dimension threshold to use Lanczos determination of the spectrum</span>
+<span class="sd">            rather than LAPACK based exact diagonalization</span>
+<span class="sd">        bath_fitting_params: BathFittingParams</span>
+<span class="sd">            Parameters used to perform bath fitting</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance_count</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">,</span> \
+            <span class="s2">&quot;Only one instance of EDIpackSolver can exist at any time&quot;</span>
+
+        <span class="n">validate_fops_up_dn</span><span class="p">(</span><span class="n">fops_imp_up</span><span class="p">,</span> <span class="n">fops_imp_dn</span><span class="p">,</span>
+                            <span class="s2">&quot;fops_imp_up&quot;</span><span class="p">,</span> <span class="s2">&quot;fops_imp_dn&quot;</span><span class="p">)</span>
+        <span class="n">validate_fops_up_dn</span><span class="p">(</span><span class="n">fops_bath_up</span><span class="p">,</span> <span class="n">fops_bath_dn</span><span class="p">,</span>
+                            <span class="s2">&quot;fops_bath_up&quot;</span><span class="p">,</span> <span class="s2">&quot;fops_bath_dn&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">norb</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">fops_imp_up</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">norb</span> <span class="o">&lt;=</span> <span class="mi">5</span><span class="p">,</span> \
+            <span class="sa">f</span><span class="s2">&quot;At most 5 orbitals are allowed, got </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">norb</span><span class="si">}</span><span class="s2">&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">fops_imp_up</span> <span class="o">=</span> <span class="n">fops_imp_up</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fops_imp_dn</span> <span class="o">=</span> <span class="n">fops_imp_dn</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fops_bath_up</span> <span class="o">=</span> <span class="n">fops_bath_up</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fops_bath_dn</span> <span class="o">=</span> <span class="n">fops_bath_dn</span>
+
+        <span class="c1"># Detect GF block names</span>
+        <span class="n">block_names_up</span> <span class="o">=</span> <span class="p">[</span><span class="n">ind</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">ind</span> <span class="ow">in</span> <span class="n">fops_imp_up</span><span class="p">]</span>
+        <span class="n">block_names_dn</span> <span class="o">=</span> <span class="p">[</span><span class="n">ind</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">ind</span> <span class="ow">in</span> <span class="n">fops_imp_dn</span><span class="p">]</span>
+        <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">bn</span> <span class="o">!=</span> <span class="n">block_names_up</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">bn</span> <span class="ow">in</span> <span class="n">block_names_up</span><span class="p">):</span>
+            <span class="n">warn</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Inconsistent block names in </span><span class="si">{</span><span class="n">block_names_up</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">bn</span> <span class="o">!=</span> <span class="n">block_names_dn</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">bn</span> <span class="ow">in</span> <span class="n">block_names_dn</span><span class="p">):</span>
+            <span class="n">warn</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Inconsistent block names in </span><span class="si">{</span><span class="n">block_names_dn</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">h_params</span> <span class="o">=</span> <span class="n">parse_hamiltonian</span><span class="p">(</span>
+            <span class="n">hamiltonian</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">fops_imp_up</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">fops_imp_dn</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">fops_bath_up</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">fops_bath_dn</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nspin</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">h_params</span><span class="o">.</span><span class="n">Hloc</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="s2">&quot;input_file&quot;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">input_file</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;input_file&quot;</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">input_file</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">input_file</span><span class="o">.</span><span class="n">resolve</span><span class="p">(</span><span class="n">strict</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">kwargs</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="s2">&quot;&#39;input_file&#39; is mutually exclusive with other parameters&quot;</span>
+                <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">input_file</span> <span class="o">=</span> <span class="kc">None</span>
+
+            <span class="n">c</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">default_config</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+            <span class="n">c</span><span class="p">[</span><span class="s2">&quot;ED_VERBOSE&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;verbose&quot;</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+            <span class="n">c</span><span class="p">[</span><span class="s2">&quot;CUTOFF&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;cutoff&quot;</span><span class="p">,</span> <span class="mf">1e-9</span><span class="p">)</span>
+            <span class="n">c</span><span class="p">[</span><span class="s2">&quot;GS_THRESHOLD&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;gs_threshold&quot;</span><span class="p">,</span> <span class="mf">1e-9</span><span class="p">)</span>
+            <span class="n">c</span><span class="p">[</span><span class="s2">&quot;ED_SPARSE_H&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;ed_sparse_H&quot;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+            <span class="n">c</span><span class="p">[</span><span class="s2">&quot;LANC_METHOD&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;lanc_method&quot;</span><span class="p">,</span> <span class="s2">&quot;arpack&quot;</span><span class="p">)</span>
+            <span class="n">c</span><span class="p">[</span><span class="s2">&quot;LANC_NSTATES_SECTOR&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;lanc_nstates_sector&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+            <span class="n">c</span><span class="p">[</span><span class="s2">&quot;LANC_NSTATES_TOTAL&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;lanc_nstates_total&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+            <span class="n">c</span><span class="p">[</span><span class="s2">&quot;LANC_NSTATES_STEP&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;lanc_nstates_step&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+            <span class="n">c</span><span class="p">[</span><span class="s2">&quot;LANC_NCV_FACTOR&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;lanc_ncv_factor&quot;</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
+            <span class="n">c</span><span class="p">[</span><span class="s2">&quot;LANC_NCV_ADD&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;lanc_ncv_add&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+            <span class="n">c</span><span class="p">[</span><span class="s2">&quot;LANC_NITER&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;lanc_niter&quot;</span><span class="p">,</span> <span class="mi">512</span><span class="p">)</span>
+            <span class="n">c</span><span class="p">[</span><span class="s2">&quot;LANC_NGFITER&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;lanc_ngfiter&quot;</span><span class="p">,</span> <span class="mi">200</span><span class="p">)</span>
+            <span class="n">c</span><span class="p">[</span><span class="s2">&quot;LANC_TOLERANCE&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;lanc_tolerance&quot;</span><span class="p">,</span> <span class="mf">1e-18</span><span class="p">)</span>
+            <span class="n">c</span><span class="p">[</span><span class="s2">&quot;LANC_DIM_THRESHOLD&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;lanc_dim_threshold&quot;</span><span class="p">,</span> <span class="mi">1024</span><span class="p">)</span>
+
+            <span class="c1"># Impurity structure</span>
+            <span class="n">c</span><span class="p">[</span><span class="s2">&quot;ED_MODE&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">h_params</span><span class="o">.</span><span class="n">ed_mode</span>
+            <span class="n">c</span><span class="p">[</span><span class="s2">&quot;NSPIN&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">nspin</span>
+            <span class="n">c</span><span class="p">[</span><span class="s2">&quot;NORB&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">norb</span>
+
+            <span class="c1"># Bath geometry</span>
+            <span class="n">c</span><span class="p">[</span><span class="s2">&quot;BATH_TYPE&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">h_params</span><span class="o">.</span><span class="n">bath</span><span class="o">.</span><span class="n">name</span>
+            <span class="n">c</span><span class="p">[</span><span class="s2">&quot;NBATH&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">h_params</span><span class="o">.</span><span class="n">bath</span><span class="o">.</span><span class="n">nbath</span>
+
+            <span class="c1"># Interaction parameters</span>
+            <span class="n">c</span><span class="p">[</span><span class="s2">&quot;ULOC&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">h_params</span><span class="o">.</span><span class="n">Uloc</span>
+            <span class="n">c</span><span class="p">[</span><span class="s2">&quot;UST&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">h_params</span><span class="o">.</span><span class="n">Ust</span>
+            <span class="n">c</span><span class="p">[</span><span class="s2">&quot;JH&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">h_params</span><span class="o">.</span><span class="n">Jh</span>
+            <span class="n">c</span><span class="p">[</span><span class="s2">&quot;JX&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">h_params</span><span class="o">.</span><span class="n">Jx</span>
+            <span class="n">c</span><span class="p">[</span><span class="s2">&quot;JP&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">h_params</span><span class="o">.</span><span class="n">Jp</span>
+
+            <span class="c1"># ed_total_ud</span>
+            <span class="n">ed_total_ud</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;ed_total_ud&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">h_params</span><span class="o">.</span><span class="n">bath</span><span class="p">,</span> <span class="n">BathNormal</span><span class="p">):</span>
+                <span class="n">c</span><span class="p">[</span><span class="s2">&quot;ED_TOTAL_UD&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ed_total_ud</span> <span class="ow">or</span> <span class="p">(</span><span class="ow">not</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">h_params</span><span class="o">.</span><span class="n">Jx</span> <span class="o">==</span> <span class="mi">0</span>
+                                                   <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">h_params</span><span class="o">.</span><span class="n">Jp</span> <span class="o">==</span> <span class="mi">0</span><span class="p">))</span>
+            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">h_params</span><span class="o">.</span><span class="n">bath</span><span class="p">,</span> <span class="p">(</span><span class="n">BathHybrid</span><span class="p">,</span> <span class="n">BathGeneral</span><span class="p">)):</span>
+                <span class="n">c</span><span class="p">[</span><span class="s2">&quot;ED_TOTAL_UD&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Unrecognized bath type&quot;</span><span class="p">)</span>
+
+            <span class="c1"># Bath fitting</span>
+            <span class="n">bfp</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;bath_fitting_params&quot;</span><span class="p">,</span> <span class="n">BathFittingParams</span><span class="p">())</span>
+            <span class="n">c</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">bfp</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">())</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">config</span> <span class="o">=</span> <span class="n">c</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">comm</span> <span class="o">=</span> <span class="n">MPI</span><span class="o">.</span><span class="n">COMM_WORLD</span>
+
+        <span class="c1"># A temporary directory for EDIpack is created and managed by the MPI</span>
+        <span class="c1"># process with rank 0. The directory is assumed to be accessible to all</span>
+        <span class="c1"># other MPI processes under the same name via a common file system.</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">comm</span><span class="o">.</span><span class="n">Get_rank</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">workdir</span> <span class="o">=</span> <span class="n">TemporaryDirectory</span><span class="p">(</span><span class="n">prefix</span><span class="o">=</span><span class="s2">&quot;edipack-&quot;</span><span class="p">,</span>
+                                              <span class="n">suffix</span><span class="o">=</span><span class="s2">&quot;.tmp&quot;</span><span class="p">,</span>
+                                              <span class="nb">dir</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">())</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">wdname</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">workdir</span><span class="o">.</span><span class="n">name</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">wdname</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">wdname</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">comm</span><span class="o">.</span><span class="n">bcast</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">wdname</span><span class="p">)</span>
+
+        <span class="k">with</span> <span class="n">chdircontext</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">wdname</span><span class="p">):</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">comm</span><span class="o">.</span><span class="n">Get_rank</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">input_file</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">input_file</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s1">&#39;input.conf&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">resolve</span><span class="p">()</span>
+                    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">input_file</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">config_file</span><span class="p">:</span>
+                        <span class="n">write_config</span><span class="p">(</span><span class="n">config_file</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">)</span>
+
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">Path</span><span class="p">(</span><span class="s1">&#39;input.conf&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">symlink_to</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">input_file</span><span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">comm</span><span class="o">.</span><span class="n">barrier</span><span class="p">()</span>
+            <span class="n">ed</span><span class="o">.</span><span class="n">read_input</span><span class="p">(</span><span class="s1">&#39;input.conf&#39;</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">comm</span><span class="o">.</span><span class="n">Get_rank</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">scifor_version</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span>
+                    <span class="sa">r</span><span class="s2">&quot;^SCIFOR VERSION \(GIT\): (.*)&quot;</span><span class="p">,</span>
+                    <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;scifor_version.inc&quot;</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">readline</span><span class="p">())[</span><span class="mi">1</span><span class="p">]</span>
+
+                <span class="bp">self</span><span class="o">.</span><span class="n">edipack_version</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span>
+                    <span class="sa">r</span><span class="s2">&quot;^code VERSION: (.*)&quot;</span><span class="p">,</span>
+                    <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;code_version.inc&quot;</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">readline</span><span class="p">())[</span><span class="mi">1</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">scifor_version</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">edipack_version</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">scifor_version</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">comm</span><span class="o">.</span><span class="n">bcast</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">scifor_version</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">edipack_version</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">comm</span><span class="o">.</span><span class="n">bcast</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">edipack_version</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">h_params</span><span class="o">.</span><span class="n">bath</span><span class="p">,</span> <span class="n">BathGeneral</span><span class="p">):</span>
+            <span class="n">ed</span><span class="o">.</span><span class="n">set_hgeneral</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">h_params</span><span class="o">.</span><span class="n">bath</span><span class="o">.</span><span class="n">hvec</span><span class="p">,</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">h_params</span><span class="o">.</span><span class="n">bath</span><span class="o">.</span><span class="n">lambdavec</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">h_params</span><span class="o">.</span><span class="n">bath</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">size</span> <span class="o">==</span> <span class="n">ed</span><span class="o">.</span><span class="n">get_bath_dimension</span><span class="p">()</span>
+
+        <span class="c1"># Initialize EDIpack</span>
+        <span class="n">ed</span><span class="o">.</span><span class="n">init_solver</span><span class="p">(</span><span class="n">bath</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">h_params</span><span class="o">.</span><span class="n">bath</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">size</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">))</span>
+
+        <span class="c1"># GF block names</span>
+        <span class="k">if</span> <span class="n">ed</span><span class="o">.</span><span class="n">get_ed_mode</span><span class="p">()</span> <span class="ow">in</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">):</span>  <span class="c1"># normal or superc</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">gf_block_names</span> <span class="o">=</span> <span class="p">(</span><span class="n">block_names_up</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">block_names_dn</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">gf_block_names</span> <span class="o">=</span> <span class="p">(</span><span class="n">block_names_up</span><span class="p">[</span><span class="mi">0</span><span class="p">],)</span>
+
+        <span class="k">if</span> <span class="n">ed</span><span class="o">.</span><span class="n">get_ed_mode</span><span class="p">()</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>  <span class="c1"># superc</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">gf_an_block_names</span> <span class="o">=</span> <span class="p">(</span><span class="n">block_names_up</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                                      <span class="o">+</span> <span class="s2">&quot;_&quot;</span> <span class="o">+</span> <span class="n">block_names_dn</span><span class="p">[</span><span class="mi">0</span><span class="p">],)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">instance_count</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">comm</span><span class="o">.</span><span class="n">barrier</span><span class="p">()</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__del__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">comm</span><span class="o">.</span><span class="n">barrier</span><span class="p">()</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">ed</span><span class="o">.</span><span class="n">finalize_solver</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">instance_count</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-=</span> <span class="mi">1</span>
+        <span class="c1"># ed.finalize_solver() can fail if this __del__() method is called as</span>
+        <span class="c1"># part of interpreter destruction procedure.</span>
+        <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
+            <span class="k">pass</span>
+
+<div class="viewcode-block" id="EDIpackSolver.update_int_params">
+<a class="viewcode-back" href="../../documentation.html#edipack2triqs.solver.EDIpackSolver.update_int_params">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">update_int_params</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Update interaction parameters.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        Uloc: numpy.ndarray</span>
+<span class="sd">            Values of the local interaction per orbital (max 5)</span>
+<span class="sd">        Ust: float</span>
+<span class="sd">            Value of the inter-orbital interaction term</span>
+<span class="sd">        Jh: float</span>
+<span class="sd">            Hund&#39;s coupling</span>
+<span class="sd">        Jx: float</span>
+<span class="sd">            Spin-exchange coupling</span>
+<span class="sd">        Jp: float</span>
+<span class="sd">            Pair-hopping coupling</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="s1">&#39;Uloc&#39;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
+            <span class="n">Uloc</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;Uloc&quot;</span><span class="p">)</span>
+            <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">Uloc</span><span class="p">)</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">norb</span><span class="p">,</span> \
+                <span class="s2">&quot;Required exactly </span><span class="si">{self.norb}</span><span class="s2"> values in Uloc&quot;</span>
+            <span class="n">Uloc_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+            <span class="n">Uloc_</span><span class="p">[:</span><span class="bp">self</span><span class="o">.</span><span class="n">norb</span><span class="p">]</span> <span class="o">=</span> <span class="n">Uloc</span>
+            <span class="n">ed</span><span class="o">.</span><span class="n">Uloc</span> <span class="o">=</span> <span class="n">Uloc_</span>
+
+        <span class="n">ed</span><span class="o">.</span><span class="n">Ust</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;Ust&quot;</span><span class="p">,</span> <span class="n">ed</span><span class="o">.</span><span class="n">Ust</span><span class="p">)</span>
+        <span class="n">ed</span><span class="o">.</span><span class="n">Jh</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;Jh&quot;</span><span class="p">,</span> <span class="n">ed</span><span class="o">.</span><span class="n">Jh</span><span class="p">)</span>
+        <span class="n">ed</span><span class="o">.</span><span class="n">Jx</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;Jx&quot;</span><span class="p">,</span> <span class="n">ed</span><span class="o">.</span><span class="n">Jx</span><span class="p">)</span>
+        <span class="n">ed</span><span class="o">.</span><span class="n">Jp</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;Jp&quot;</span><span class="p">,</span> <span class="n">ed</span><span class="o">.</span><span class="n">Jp</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">ed</span><span class="o">.</span><span class="n">ed_total_ud</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">ed</span><span class="o">.</span><span class="n">Jx</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Cannot set Jx to a non-zero value&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">ed</span><span class="o">.</span><span class="n">Jp</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Cannot set Jp to a non-zero value&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Unrecognized interaction parameters: &quot;</span>
+                               <span class="o">+</span> <span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span>
+                               <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">comm</span><span class="o">.</span><span class="n">barrier</span><span class="p">()</span></div>
+
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">hloc</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="s2">&quot;Access the local impurity Hamiltonian H_loc&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">h_params</span><span class="o">.</span><span class="n">Hloc</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">bath</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="s2">&quot;Get the bath object&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">h_params</span><span class="o">.</span><span class="n">bath</span>
+
+    <span class="nd">@bath</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">bath</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_bath</span><span class="p">:</span> <span class="n">Bath</span><span class="p">):</span>
+        <span class="s2">&quot;Set the bath object&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">h_params</span><span class="o">.</span><span class="n">bath</span><span class="o">.</span><span class="n">assert_compatible</span><span class="p">(</span><span class="n">new_bath</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">h_params</span><span class="o">.</span><span class="n">bath</span> <span class="o">=</span> <span class="n">new_bath</span>
+
+<div class="viewcode-block" id="EDIpackSolver.solve">
+<a class="viewcode-back" href="../../documentation.html#edipack2triqs.solver.EDIpackSolver.solve">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">solve</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+              <span class="n">beta</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+              <span class="o">*</span><span class="p">,</span>
+              <span class="n">n_iw</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">4096</span><span class="p">,</span>
+              <span class="n">energy_window</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="o">-</span><span class="mf">5.0</span><span class="p">,</span> <span class="mf">5.0</span><span class="p">),</span>
+              <span class="n">n_w</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">5000</span><span class="p">,</span>
+              <span class="n">broadening</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.01</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Solve the impurity problem.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        beta: float</span>
+<span class="sd">            Inverse temperature for observable and GF calculations</span>
+<span class="sd">        n_iw: int, default 4096</span>
+<span class="sd">            Number of Matsubara frequencies for impurity GF calculations</span>
+<span class="sd">        energy_window: (float, float), default (-5.0, 5.0)</span>
+<span class="sd">            Energy window for real-frequency impurity GF calculations</span>
+<span class="sd">        n_w: int, default 5000</span>
+<span class="sd">            Number of real-frequency points for impurity GF calculations</span>
+<span class="sd">        broadening: float, default 0.01</span>
+<span class="sd">            Broadening (eps) on the real axis</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># Pass parameters to EDIpack</span>
+        <span class="n">ed</span><span class="o">.</span><span class="n">beta</span> <span class="o">=</span> <span class="n">beta</span>
+        <span class="n">ed</span><span class="o">.</span><span class="n">Lmats</span> <span class="o">=</span> <span class="n">n_iw</span>
+        <span class="n">ed</span><span class="o">.</span><span class="n">wini</span><span class="p">,</span> <span class="n">ed</span><span class="o">.</span><span class="n">wfin</span> <span class="o">=</span> <span class="n">energy_window</span>
+        <span class="n">ed</span><span class="o">.</span><span class="n">Lreal</span> <span class="o">=</span> <span class="n">n_w</span>
+        <span class="n">ed</span><span class="o">.</span><span class="n">eps</span> <span class="o">=</span> <span class="n">broadening</span>
+
+        <span class="c1"># Solve!</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">comm</span><span class="o">.</span><span class="n">barrier</span><span class="p">()</span>
+        <span class="k">with</span> <span class="n">chdircontext</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">wdname</span><span class="p">):</span>
+            <span class="n">ed</span><span class="o">.</span><span class="n">set_hloc</span><span class="p">(</span><span class="n">hloc</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">h_params</span><span class="o">.</span><span class="n">Hloc</span><span class="p">)</span>
+            <span class="n">ed</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">h_params</span><span class="o">.</span><span class="n">bath</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">comm</span><span class="o">.</span><span class="n">barrier</span><span class="p">()</span></div>
+
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">energies</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="s2">&quot;Returns the impurity local energies components&quot;</span>
+        <span class="k">return</span> <span class="n">ed</span><span class="o">.</span><span class="n">get_eimp</span><span class="p">()</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">densities</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="s2">&quot;Returns the impurity occupations, one element per orbital&quot;</span>
+        <span class="k">return</span> <span class="n">ed</span><span class="o">.</span><span class="n">get_dens</span><span class="p">()</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">double_occ</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="s2">&quot;Returns the impurity double occupancy, one element per orbital&quot;</span>
+        <span class="k">return</span> <span class="n">ed</span><span class="o">.</span><span class="n">get_docc</span><span class="p">()</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">superconductive_phi</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="s2">&quot;Returns the impurity superconductive phi matrix&quot;</span>
+        <span class="k">return</span> <span class="n">ed</span><span class="o">.</span><span class="n">get_phi</span><span class="p">()</span>
+
+<div class="viewcode-block" id="EDIpackSolver.magnetization">
+<a class="viewcode-back" href="../../documentation.html#edipack2triqs.solver.EDIpackSolver.magnetization">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">magnetization</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">comp</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;z&#39;</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns a component of the impurity magnetization vector, one element</span>
+<span class="sd">        per orbital. The component selector &#39;comp&#39; can be one of &#39;x&#39;, &#39;y&#39;</span>
+<span class="sd">        and &#39;z&#39;.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">ed</span><span class="o">.</span><span class="n">get_mag</span><span class="p">(</span><span class="n">icomp</span><span class="o">=</span><span class="n">comp</span><span class="p">)</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_make_gf</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ed_func</span><span class="p">,</span> <span class="n">real_freq</span><span class="p">,</span> <span class="n">anomalous</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">anomalous</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">ed</span><span class="o">.</span><span class="n">get_ed_mode</span><span class="p">()</span> <span class="o">!=</span> <span class="mi">2</span><span class="p">:</span>  <span class="c1"># superc</span>
+                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;anomalous = True is only supported for &quot;</span>
+                                   <span class="s2">&quot;superconducting bath&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">real_freq</span><span class="p">:</span>
+            <span class="n">mesh</span> <span class="o">=</span> <span class="n">MeshReFreq</span><span class="p">(</span><span class="n">window</span><span class="o">=</span><span class="p">(</span><span class="n">ed</span><span class="o">.</span><span class="n">wini</span><span class="p">,</span> <span class="n">ed</span><span class="o">.</span><span class="n">wfin</span><span class="p">),</span> <span class="n">n_w</span><span class="o">=</span><span class="n">ed</span><span class="o">.</span><span class="n">Lreal</span><span class="p">)</span>
+            <span class="n">z_vals</span> <span class="o">=</span> <span class="p">[</span><span class="nb">complex</span><span class="p">(</span><span class="n">z</span><span class="p">)</span> <span class="o">+</span> <span class="n">ed</span><span class="o">.</span><span class="n">eps</span> <span class="o">*</span> <span class="mi">1</span><span class="n">j</span> <span class="k">for</span> <span class="n">z</span> <span class="ow">in</span> <span class="n">mesh</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">mesh</span> <span class="o">=</span> <span class="n">MeshImFreq</span><span class="p">(</span><span class="n">beta</span><span class="o">=</span><span class="n">ed</span><span class="o">.</span><span class="n">beta</span><span class="p">,</span> <span class="n">S</span><span class="o">=</span><span class="s2">&quot;Fermion&quot;</span><span class="p">,</span> <span class="n">n_iw</span><span class="o">=</span><span class="n">ed</span><span class="o">.</span><span class="n">Lmats</span><span class="p">)</span>
+            <span class="n">z_vals</span> <span class="o">=</span> <span class="p">[</span><span class="nb">complex</span><span class="p">(</span><span class="n">z</span><span class="p">)</span> <span class="k">for</span> <span class="n">z</span> <span class="ow">in</span> <span class="n">mesh</span><span class="p">]</span>
+
+        <span class="k">with</span> <span class="n">chdircontext</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">wdname</span><span class="p">):</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="n">ed_func</span><span class="p">(</span><span class="n">z_vals</span><span class="p">,</span> <span class="n">typ</span><span class="o">=</span><span class="s1">&#39;a&#39;</span> <span class="k">if</span> <span class="n">anomalous</span> <span class="k">else</span> <span class="s1">&#39;n&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">anomalous</span><span class="p">:</span>
+            <span class="n">F</span> <span class="o">=</span> <span class="n">Gf</span><span class="p">(</span><span class="n">mesh</span><span class="o">=</span><span class="n">mesh</span><span class="p">,</span> <span class="n">target_shape</span><span class="o">=</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">norb</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">norb</span><span class="p">))</span>
+            <span class="n">F</span><span class="o">.</span><span class="n">data</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">rollaxis</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:,</span> <span class="p">:],</span> <span class="mi">2</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">BlockGf</span><span class="p">(</span><span class="n">name_list</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">gf_an_block_names</span><span class="p">,</span>
+                           <span class="n">block_list</span><span class="o">=</span><span class="p">[</span><span class="n">F</span><span class="p">],</span>
+                           <span class="n">make_copies</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">ed</span><span class="o">.</span><span class="n">get_ed_mode</span><span class="p">()</span> <span class="ow">in</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">):</span>  <span class="c1"># 2 spin blocks</span>
+            <span class="n">blocks</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="n">Gf</span><span class="p">(</span><span class="n">mesh</span><span class="o">=</span><span class="n">mesh</span><span class="p">,</span> <span class="n">target_shape</span><span class="o">=</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">norb</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">norb</span><span class="p">))</span>
+                <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+            <span class="p">]</span>
+            <span class="c1"># Block up</span>
+            <span class="n">blocks</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">rollaxis</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:,</span> <span class="p">:],</span> <span class="mi">2</span><span class="p">)</span>
+            <span class="c1"># Block down</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">nspin</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">blocks</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">blocks</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">data</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">blocks</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">rollaxis</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:,</span> <span class="p">:],</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>  <span class="c1"># One block</span>
+            <span class="n">blocks</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="n">Gf</span><span class="p">(</span><span class="n">mesh</span><span class="o">=</span><span class="n">mesh</span><span class="p">,</span> <span class="n">target_shape</span><span class="o">=</span><span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">norb</span><span class="p">,</span> <span class="mi">2</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">norb</span><span class="p">))</span>
+            <span class="p">]</span>
+            <span class="n">blocks</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span>
+                <span class="nb">len</span><span class="p">(</span><span class="n">mesh</span><span class="p">),</span> <span class="mi">2</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">norb</span><span class="p">,</span> <span class="mi">2</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">norb</span>
+            <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">BlockGf</span><span class="p">(</span><span class="n">name_list</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">gf_block_names</span><span class="p">,</span>
+                       <span class="n">block_list</span><span class="o">=</span><span class="n">blocks</span><span class="p">,</span>
+                       <span class="n">make_copies</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+    <span class="c1">#</span>
+    <span class="c1"># GF and self-energy properties</span>
+    <span class="c1">#</span>
+
+    <span class="n">g_iw</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="k">lambda</span> <span class="n">s</span><span class="p">:</span> <span class="n">s</span><span class="o">.</span><span class="n">_make_gf</span><span class="p">(</span><span class="n">ed</span><span class="o">.</span><span class="n">build_gimp</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">False</span><span class="p">),</span>
+                    <span class="n">doc</span><span class="o">=</span><span class="s2">&quot;Matsubara impurity Green&#39;s function&quot;</span><span class="p">)</span>
+    <span class="n">g_an_iw</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="k">lambda</span> <span class="n">s</span><span class="p">:</span> <span class="n">s</span><span class="o">.</span><span class="n">_make_gf</span><span class="p">(</span><span class="n">ed</span><span class="o">.</span><span class="n">build_gimp</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">True</span><span class="p">),</span>
+                       <span class="n">doc</span><span class="o">=</span><span class="s2">&quot;Anomalous Matsubara impurity Green&#39;s function&quot;</span><span class="p">)</span>
+    <span class="n">Sigma_iw</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="k">lambda</span> <span class="n">s</span><span class="p">:</span> <span class="n">s</span><span class="o">.</span><span class="n">_make_gf</span><span class="p">(</span><span class="n">ed</span><span class="o">.</span><span class="n">build_sigma</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">False</span><span class="p">),</span>
+                        <span class="n">doc</span><span class="o">=</span><span class="s2">&quot;Matsubara impurity self-energy&quot;</span><span class="p">)</span>
+    <span class="n">Sigma_an_iw</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="k">lambda</span> <span class="n">s</span><span class="p">:</span> <span class="n">s</span><span class="o">.</span><span class="n">_make_gf</span><span class="p">(</span><span class="n">ed</span><span class="o">.</span><span class="n">build_sigma</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">True</span><span class="p">),</span>
+                           <span class="n">doc</span><span class="o">=</span><span class="s2">&quot;Anomalous Matsubara impurity self-energy&quot;</span><span class="p">)</span>
+
+    <span class="n">g_w</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="k">lambda</span> <span class="n">s</span><span class="p">:</span> <span class="n">s</span><span class="o">.</span><span class="n">_make_gf</span><span class="p">(</span><span class="n">ed</span><span class="o">.</span><span class="n">build_gimp</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="kc">False</span><span class="p">),</span>
+                   <span class="n">doc</span><span class="o">=</span><span class="s2">&quot;Real-frequency impurity Green&#39;s function&quot;</span><span class="p">)</span>
+    <span class="n">g_an_w</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="k">lambda</span> <span class="n">s</span><span class="p">:</span> <span class="n">s</span><span class="o">.</span><span class="n">_make_gf</span><span class="p">(</span><span class="n">ed</span><span class="o">.</span><span class="n">build_gimp</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="kc">True</span><span class="p">),</span>
+                      <span class="n">doc</span><span class="o">=</span><span class="s2">&quot;Anomalous real-frequency impurity Green&#39;s function&quot;</span><span class="p">)</span>
+    <span class="n">Sigma_w</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="k">lambda</span> <span class="n">s</span><span class="p">:</span> <span class="n">s</span><span class="o">.</span><span class="n">_make_gf</span><span class="p">(</span><span class="n">ed</span><span class="o">.</span><span class="n">build_sigma</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="kc">False</span><span class="p">),</span>
+                       <span class="n">doc</span><span class="o">=</span><span class="s2">&quot;Real-frequency impurity self-energy&quot;</span><span class="p">)</span>
+    <span class="n">Sigma_an_w</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="k">lambda</span> <span class="n">s</span><span class="p">:</span> <span class="n">s</span><span class="o">.</span><span class="n">_make_gf</span><span class="p">(</span><span class="n">ed</span><span class="o">.</span><span class="n">build_sigma</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="kc">True</span><span class="p">),</span>
+                          <span class="n">doc</span><span class="o">=</span><span class="s2">&quot;Anomalous real-frequency impurity self-energy&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Bath fitting</span>
+    <span class="n">chi2_fit_bath</span> <span class="o">=</span> <span class="n">_chi2_fit_bath</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024-2025, Igor Krivenko, Lorenzo Crippa.</p>
+  </div>
+
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

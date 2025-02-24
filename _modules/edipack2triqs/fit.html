@@ -1,0 +1,333 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>edipack2triqs.fit &mdash; edipack2triqs  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css?v=df4ffeb6" />
+      <link rel="stylesheet" type="text/css" href="../../_static/plot_directive.css" />
+
+  
+    <link rel="shortcut icon" href="../../_static/triqs_favicon.ico"/>
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="author" title="About these documents" href="../../about.html" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #7E588A" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            edipack2triqs
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../documentation.html">Documentation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../documentation.html#module-edipack2triqs.solver">Solver class</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../documentation.html#edipack2triqs.solver.EDIpackSolver"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../documentation.html#edipack2triqs.solver.EDIpackSolver.Sigma_an_iw"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.Sigma_an_iw</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../documentation.html#edipack2triqs.solver.EDIpackSolver.Sigma_an_w"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.Sigma_an_w</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../documentation.html#edipack2triqs.solver.EDIpackSolver.Sigma_iw"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.Sigma_iw</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../documentation.html#edipack2triqs.solver.EDIpackSolver.Sigma_w"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.Sigma_w</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../documentation.html#edipack2triqs.solver.EDIpackSolver.bath"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.bath</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../documentation.html#edipack2triqs.solver.EDIpackSolver.densities"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.densities</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../documentation.html#edipack2triqs.solver.EDIpackSolver.double_occ"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.double_occ</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../documentation.html#edipack2triqs.solver.EDIpackSolver.energies"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.energies</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../documentation.html#edipack2triqs.solver.EDIpackSolver.g_an_iw"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.g_an_iw</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../documentation.html#edipack2triqs.solver.EDIpackSolver.g_an_w"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.g_an_w</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../documentation.html#edipack2triqs.solver.EDIpackSolver.g_iw"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.g_iw</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../documentation.html#edipack2triqs.solver.EDIpackSolver.g_w"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.g_w</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../documentation.html#edipack2triqs.solver.EDIpackSolver.hloc"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.hloc</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../documentation.html#edipack2triqs.solver.EDIpackSolver.magnetization"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.magnetization()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../documentation.html#edipack2triqs.solver.EDIpackSolver.solve"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.solve()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../documentation.html#edipack2triqs.solver.EDIpackSolver.superconductive_phi"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.superconductive_phi</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../documentation.html#edipack2triqs.solver.EDIpackSolver.update_int_params"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.update_int_params()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../documentation.html#module-edipack2triqs.bath">Objects representing bath parameters</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../documentation.html#edipack2triqs.bath.BathNormal"><code class="docutils literal notranslate"><span class="pre">BathNormal</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../documentation.html#edipack2triqs.bath.BathNormal.ed_mode"><code class="docutils literal notranslate"><span class="pre">BathNormal.ed_mode()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../documentation.html#edipack2triqs.bath.BathHybrid"><code class="docutils literal notranslate"><span class="pre">BathHybrid</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../documentation.html#edipack2triqs.bath.BathHybrid.ed_mode"><code class="docutils literal notranslate"><span class="pre">BathHybrid.ed_mode()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../documentation.html#edipack2triqs.bath.BathGeneral"><code class="docutils literal notranslate"><span class="pre">BathGeneral</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../documentation.html#edipack2triqs.bath.BathGeneral.build_linear_combination"><code class="docutils literal notranslate"><span class="pre">BathGeneral.build_linear_combination()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../documentation.html#edipack2triqs.bath.BathGeneral.build_replica_bases"><code class="docutils literal notranslate"><span class="pre">BathGeneral.build_replica_bases()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../documentation.html#edipack2triqs.bath.BathGeneral.is_replica_valid"><code class="docutils literal notranslate"><span class="pre">BathGeneral.is_replica_valid()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../documentation.html#edipack2triqs.bath.BathGeneral.merge_inc_replicas"><code class="docutils literal notranslate"><span class="pre">BathGeneral.merge_inc_replicas()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../documentation.html#module-edipack2triqs.fit">Bath fitting</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../documentation.html#edipack2triqs.fit.BathFittingParams"><code class="docutils literal notranslate"><span class="pre">BathFittingParams</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../documentation.html#edipack2triqs.solver.EDIpackSolver.chi2_fit_bath"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.chi2_fit_bath()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../examples.html">Usage examples</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../examples.html#orbital-impurity-with-hubbard-kanamori-interaction">3 orbital impurity with Hubbard-Kanamori interaction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../examples.html#dmft-study-of-superconductivity-in-the-attractive-hubbard-model">DMFT study of superconductivity in the attractive Hubbard model</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../issues.html">Reporting issues</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ChangeLog.html">Changelog</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../ChangeLog.html#version-0-4-0">Version 0.4.0</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../about.html">About edipack2triqs</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../about.html#license">License</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../about.html#usage-disclaimer">Usage disclaimer</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #7E588A" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">edipack2triqs</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">edipack2triqs.fit</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for edipack2triqs.fit</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Bath fitting tools.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">copy</span><span class="w"> </span><span class="kn">import</span> <span class="n">deepcopy</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Optional</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">triqs.gf</span><span class="w"> </span><span class="kn">import</span> <span class="n">BlockGf</span><span class="p">,</span> <span class="n">MeshImFreq</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">edipy2</span><span class="w"> </span><span class="kn">import</span> <span class="n">global_env</span> <span class="k">as</span> <span class="n">ed</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">.util</span><span class="w"> </span><span class="kn">import</span> <span class="n">chdircontext</span>
+
+
+<div class="viewcode-block" id="BathFittingParams">
+<a class="viewcode-back" href="../../documentation.html#edipack2triqs.fit.BathFittingParams">[docs]</a>
+<span class="nd">@dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">kw_only</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">BathFittingParams</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Parameters of bath fitting&quot;&quot;&quot;</span>
+
+    <span class="c1"># Fitting scheme: delta, weiss</span>
+    <span class="n">scheme</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;weiss&quot;</span>
+    <span class="c1"># Minimization routine type: CGnr, minimize</span>
+    <span class="n">method</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;minimize&quot;</span>
+    <span class="c1"># Gradient evaluation: analytic, numeric</span>
+    <span class="n">grad</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;numeric&quot;</span>
+    <span class="c1"># Conjugate-gradient tolerance</span>
+    <span class="n">tol</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.00001</span>
+    <span class="c1"># Conjugate-gradient stopping condition:</span>
+    <span class="c1"># target (|F_{n-1} - F_n| &lt; tol * (1+F_n)),</span>
+    <span class="c1"># vars (||x_{n-1} - x_n|| &lt; tol * (1+||x_n||)),</span>
+    <span class="c1"># or both</span>
+    <span class="n">stop</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;both&quot;</span>
+    <span class="c1"># Max number of iterations</span>
+    <span class="n">niter</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">500</span>
+    <span class="c1"># Number of Matsubara frequencies used in the fit</span>
+    <span class="n">n_iw</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1000</span>
+    <span class="c1"># Conjugate-gradient weight form: 1, 1/n, 1/w_n</span>
+    <span class="n">weight</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;1&quot;</span>
+    <span class="c1"># Conjugate-gradient norm definition: elemental, frobenius</span>
+    <span class="n">norm</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;elemental&quot;</span>
+    <span class="c1"># Fit power for the calculation of the generalized distance as</span>
+    <span class="c1"># |G0 - G0and| ** pow</span>
+    <span class="nb">pow</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="c1"># Flag to pick old/False (Krauth) or new/True (Lichtenstein) version of</span>
+    <span class="c1"># the minimize CG routine</span>
+    <span class="n">minimize_ver</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="c1"># Unknown parameter used in the CG minimize procedure</span>
+    <span class="n">minimize_hh</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1e-4</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">__dict__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">scheme</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;delta&quot;</span><span class="p">,</span> <span class="s2">&quot;weiss&quot;</span><span class="p">),</span> <span class="s2">&quot;Invalid value of &#39;scheme&#39;&quot;</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">method</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;CGnr&quot;</span><span class="p">,</span> <span class="s2">&quot;minimize&quot;</span><span class="p">),</span> <span class="s2">&quot;Invalid value of &#39;method&#39;&quot;</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">grad</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;analytic&quot;</span><span class="p">,</span> <span class="s2">&quot;numeric&quot;</span><span class="p">),</span> <span class="s2">&quot;Invalid value of &#39;grad&#39;&quot;</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">tol</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;&#39;tol&#39; cannot be negative&quot;</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">stop</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;target&quot;</span><span class="p">,</span> <span class="s2">&quot;vars&quot;</span><span class="p">,</span> <span class="s2">&quot;both&quot;</span><span class="p">),</span> \
+            <span class="s2">&quot;Invalid value of &#39;stop&#39;&quot;</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">niter</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;&#39;niter&#39; must be positive&quot;</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_iw</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;&#39;n_iw&#39; must be positive&quot;</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">weight</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;1&quot;</span><span class="p">,</span> <span class="s2">&quot;1/n&quot;</span><span class="p">,</span> <span class="s2">&quot;1/w_n&quot;</span><span class="p">),</span> <span class="s2">&quot;Invalid value of &#39;weight&#39;&quot;</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">norm</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;elemental&quot;</span><span class="p">,</span> <span class="s2">&quot;frobenius&quot;</span><span class="p">),</span> \
+            <span class="s2">&quot;Invalid value of &#39;norm&#39;&quot;</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">pow</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;&#39;pow&#39; must be positive&quot;</span>
+
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s2">&quot;CG_SCHEME&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">scheme</span><span class="p">,</span>
+            <span class="s2">&quot;CG_METHOD&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;CGnr&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;minimize&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">}[</span><span class="bp">self</span><span class="o">.</span><span class="n">method</span><span class="p">],</span>
+            <span class="s2">&quot;CG_GRAD&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;analytic&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;numeric&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">}[</span><span class="bp">self</span><span class="o">.</span><span class="n">grad</span><span class="p">],</span>
+            <span class="s2">&quot;CG_FTOL&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">tol</span><span class="p">,</span>
+            <span class="s2">&quot;CG_STOP&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;target&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;vars&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="s2">&quot;both&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">}[</span><span class="bp">self</span><span class="o">.</span><span class="n">stop</span><span class="p">],</span>
+            <span class="s2">&quot;CG_NITER&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">niter</span><span class="p">,</span>
+            <span class="s2">&quot;CG_WEIGHT&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;1&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;1/n&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="s2">&quot;1/w_n&quot;</span><span class="p">:</span> <span class="mi">3</span><span class="p">}[</span><span class="bp">self</span><span class="o">.</span><span class="n">weight</span><span class="p">],</span>
+            <span class="s2">&quot;CG_NORM&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">norm</span><span class="p">,</span>
+            <span class="s2">&quot;CG_POW&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">pow</span><span class="p">,</span>
+            <span class="s2">&quot;CG_MINIMIZE_VER&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">minimize_ver</span><span class="p">,</span>
+            <span class="s2">&quot;CG_MINIMIZE_HH&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">minimize_hh</span><span class="p">,</span>
+            <span class="s2">&quot;LFIT&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_iw</span>
+        <span class="p">}</span></div>
+
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_chi2_fit_bath</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">g</span><span class="p">:</span> <span class="n">BlockGf</span><span class="p">,</span> <span class="n">f</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">BlockGf</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Perform bath parameter fit of a given Green&#39;s function.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="n">ed</span><span class="o">.</span><span class="n">get_ed_mode</span><span class="p">()</span> <span class="o">==</span> <span class="mi">2</span><span class="p">)</span> <span class="o">!=</span> <span class="p">(</span><span class="n">f</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+            <span class="s2">&quot;The anomalous GF is required iff the bath is superconducting&quot;</span>
+        <span class="p">)</span>
+
+    <span class="n">fitted_bath</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">h_params</span><span class="o">.</span><span class="n">bath</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">extract_triqs_data</span><span class="p">(</span><span class="n">d</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">d</span><span class="p">[</span><span class="n">ed</span><span class="o">.</span><span class="n">Lmats</span><span class="p">:,</span> <span class="o">...</span><span class="p">],</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+
+    <span class="k">with</span> <span class="n">chdircontext</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">wdname</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">ed</span><span class="o">.</span><span class="n">get_ed_mode</span><span class="p">()</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>  <span class="c1"># Normal, here nspin is important</span>
+            <span class="k">assert</span> <span class="nb">set</span><span class="p">(</span><span class="n">g</span><span class="o">.</span><span class="n">indices</span><span class="p">)</span> <span class="o">==</span> <span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">gf_block_names</span><span class="p">),</span> \
+                <span class="s2">&quot;Unexpected block structure of g&quot;</span>
+
+            <span class="n">func_up</span> <span class="o">=</span> <span class="n">extract_triqs_data</span><span class="p">(</span><span class="n">g</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">gf_block_names</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
+            <span class="n">fitted_bath</span><span class="o">.</span><span class="n">data</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">ed</span><span class="o">.</span><span class="n">chi2_fitgf</span><span class="p">(</span><span class="n">func_up</span><span class="p">,</span>
+                                                <span class="n">fitted_bath</span><span class="o">.</span><span class="n">data</span><span class="p">,</span>
+                                                <span class="n">ispin</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">ed</span><span class="o">.</span><span class="n">Nspin</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">fitted_bath</span><span class="o">.</span><span class="n">data</span><span class="p">[:]</span> <span class="o">=</span> \
+                    <span class="n">ed</span><span class="o">.</span><span class="n">spin_symmetrize_bath</span><span class="p">(</span><span class="n">fitted_bath</span><span class="o">.</span><span class="n">data</span><span class="p">[:])</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">func_dn</span> <span class="o">=</span> <span class="n">extract_triqs_data</span><span class="p">(</span><span class="n">g</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">gf_block_names</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
+                <span class="n">fitted_bath</span><span class="o">.</span><span class="n">data</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">ed</span><span class="o">.</span><span class="n">chi2_fitgf</span><span class="p">(</span><span class="n">func_dn</span><span class="p">,</span>
+                                                    <span class="n">fitted_bath</span><span class="o">.</span><span class="n">data</span><span class="p">,</span>
+                                                    <span class="n">ispin</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="k">elif</span> <span class="n">ed</span><span class="o">.</span><span class="n">get_ed_mode</span><span class="p">()</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>  <span class="c1"># superc, here nspin is 1</span>
+            <span class="n">func_up</span> <span class="o">=</span> <span class="n">extract_triqs_data</span><span class="p">(</span><span class="n">g</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">gf_block_names</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
+            <span class="n">func_an</span> <span class="o">=</span> <span class="n">extract_triqs_data</span><span class="p">(</span><span class="n">f</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">gf_an_block_names</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
+            <span class="n">fitted_bath</span><span class="o">.</span><span class="n">data</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">ed</span><span class="o">.</span><span class="n">chi2_fitgf</span><span class="p">(</span><span class="n">func_up</span><span class="p">,</span>
+                                                <span class="n">func_an</span><span class="p">,</span>
+                                                <span class="n">fitted_bath</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
+
+        <span class="k">elif</span> <span class="n">ed</span><span class="o">.</span><span class="n">get_ed_mode</span><span class="p">()</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>  <span class="c1"># nonsu2, here nspin is 2</span>
+            <span class="n">func</span> <span class="o">=</span> <span class="n">extract_triqs_data</span><span class="p">(</span><span class="n">g</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">gf_block_names</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
+            <span class="n">fitted_bath</span><span class="o">.</span><span class="n">data</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">ed</span><span class="o">.</span><span class="n">chi2_fitgf</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="n">fitted_bath</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Unrecognized ED mode&quot;</span><span class="p">)</span>
+
+    <span class="c1">#</span>
+    <span class="c1"># Create fitted G0 or \Delta</span>
+    <span class="c1">#</span>
+
+    <span class="n">mesh</span> <span class="o">=</span> <span class="n">MeshImFreq</span><span class="p">(</span><span class="n">beta</span><span class="o">=</span><span class="n">ed</span><span class="o">.</span><span class="n">beta</span><span class="p">,</span> <span class="n">S</span><span class="o">=</span><span class="s2">&quot;Fermion&quot;</span><span class="p">,</span> <span class="n">n_iw</span><span class="o">=</span><span class="n">ed</span><span class="o">.</span><span class="n">Lmats</span><span class="p">)</span>
+    <span class="n">z_vals</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="nb">complex</span><span class="p">(</span><span class="n">z</span><span class="p">)</span> <span class="k">for</span> <span class="n">z</span> <span class="ow">in</span> <span class="n">mesh</span><span class="p">])</span>
+    <span class="n">get_method</span> <span class="o">=</span> <span class="n">ed</span><span class="o">.</span><span class="n">get_g0and</span> <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;CG_SCHEME&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;weiss&quot;</span><span class="p">)</span> \
+        <span class="k">else</span> <span class="n">ed</span><span class="o">.</span><span class="n">get_delta</span>
+    <span class="n">g_out</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">pack_triqs_data</span><span class="p">(</span><span class="n">d</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+
+    <span class="k">with</span> <span class="n">chdircontext</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">wdname</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">ed</span><span class="o">.</span><span class="n">get_ed_mode</span><span class="p">()</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>  <span class="c1"># normal</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="n">get_method</span><span class="p">(</span><span class="n">z_vals</span><span class="p">,</span> <span class="n">fitted_bath</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">ishape</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">typ</span><span class="o">=</span><span class="s1">&#39;n&#39;</span><span class="p">)</span>
+            <span class="n">g_out</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">gf_block_names</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span><span class="o">.</span><span class="n">data</span><span class="p">[:]</span> <span class="o">=</span> \
+                <span class="n">pack_triqs_data</span><span class="p">(</span><span class="n">out</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">...</span><span class="p">])</span>
+            <span class="n">g_out</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">gf_block_names</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span><span class="o">.</span><span class="n">data</span><span class="p">[:]</span> <span class="o">=</span> \
+                <span class="n">pack_triqs_data</span><span class="p">(</span><span class="n">out</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nspin</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span>
+                                <span class="k">else</span> <span class="n">out</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="o">...</span><span class="p">])</span>
+            <span class="k">return</span> <span class="n">fitted_bath</span><span class="p">,</span> <span class="n">g_out</span>
+
+        <span class="k">elif</span> <span class="n">ed</span><span class="o">.</span><span class="n">get_ed_mode</span><span class="p">()</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>  <span class="c1"># superc</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="n">get_method</span><span class="p">(</span><span class="n">z_vals</span><span class="p">,</span> <span class="n">fitted_bath</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">ishape</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">typ</span><span class="o">=</span><span class="s1">&#39;n&#39;</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">bn</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">gf_block_names</span><span class="p">:</span>
+                <span class="n">g_out</span><span class="p">[</span><span class="n">bn</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">pack_triqs_data</span><span class="p">(</span><span class="n">out</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">...</span><span class="p">])</span>
+            <span class="n">out_an</span> <span class="o">=</span> <span class="n">get_method</span><span class="p">(</span><span class="n">z_vals</span><span class="p">,</span> <span class="n">fitted_bath</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">ishape</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">typ</span><span class="o">=</span><span class="s1">&#39;a&#39;</span><span class="p">)</span>
+            <span class="n">f_out</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+            <span class="n">f_out</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">gf_an_block_names</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span><span class="o">.</span><span class="n">data</span><span class="p">[:]</span> <span class="o">=</span> \
+                <span class="n">pack_triqs_data</span><span class="p">(</span><span class="n">out_an</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">...</span><span class="p">])</span>
+            <span class="k">return</span> <span class="n">fitted_bath</span><span class="p">,</span> <span class="n">g_out</span><span class="p">,</span> <span class="n">f_out</span>
+
+        <span class="k">else</span><span class="p">:</span>  <span class="c1"># nonsu2</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="n">get_method</span><span class="p">(</span><span class="n">z_vals</span><span class="p">,</span> <span class="n">fitted_bath</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">ishape</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+            <span class="n">g_out</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">gf_block_names</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span><span class="o">.</span><span class="n">data</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">pack_triqs_data</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">fitted_bath</span><span class="p">,</span> <span class="n">g_out</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024-2025, Igor Krivenko, Lorenzo Crippa.</p>
+  </div>
+
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
