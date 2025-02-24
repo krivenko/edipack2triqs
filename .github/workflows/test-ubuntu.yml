@@ -12,7 +12,7 @@ on:
     - cron:  '0 0 * * 2'
 
 jobs:
-  build-and-test:
+  test:
     runs-on: ubuntu-24.04
     strategy:
       matrix:
@@ -21,6 +21,10 @@ jobs:
           - "3.11"
           - "3.12"
           - "3.13"
+
+    env:
+      DEPLOY_DOCS: ${{ github.ref == 'refs/heads/main' &&
+                       matrix.python-version == '3.13' }}
 
     steps:
     - name: Install dependencies
@@ -59,6 +63,7 @@ jobs:
 
     - name: Install Python dependencies
       run: |
+           python -m pip install --upgrade pip
            pip install --user numpy scipy matplotlib mpi4py mako pytest networkx
 
     - name: Install EDIpy2
@@ -74,15 +79,15 @@ jobs:
       env:
         CXX: g++
       run: |
-        git clone https://github.com/TRIQS/triqs --branch 3.3.x triqs.git
-        mkdir triqs.build && pushd triqs.build
-        cmake ../triqs.git                                                     \
-          -DCMAKE_BUILD_TYPE=Release                                           \
-          -DCMAKE_INSTALL_PREFIX=${HOME}/opt/triqs                             \
-          -DBuild_Tests=OFF
-        make -j2
-        make install
-        popd
+           git clone https://github.com/TRIQS/triqs --branch 3.3.x triqs.git
+           mkdir triqs.build && pushd triqs.build
+           cmake ../triqs.git                                                  \
+             -DCMAKE_BUILD_TYPE=Release                                        \
+             -DCMAKE_INSTALL_PREFIX=${HOME}/opt/triqs                          \
+             -DBuild_Tests=OFF
+           make -j2
+           make install
+           popd
 
     - name: Checkout edipack2triqs
       uses: actions/checkout@v4
@@ -91,3 +96,21 @@ jobs:
       run: |
            source ${HOME}/opt/triqs/share/triqs/triqsvars.sh
            py.test -v tests/
+
+    - name: Install Sphinx and related packages
+      if: env.DEPLOY_DOCS == 'true'
+      run: >
+           pip install
+           sphinx sphinx-rtd-theme myst-parser nbsphinx linkify-it-py
+
+    - name: Build documentation
+      if: env.DEPLOY_DOCS == 'true'
+      run: sphinx-build -M html doc/ build/sphinx
+
+    - name: Deploy documentation
+      if: env.DEPLOY_DOCS == 'true'
+      uses: JamesIves/github-pages-deploy-action@v4
+      with:
+        branch: gh-pages
+        token: ${{ secrets.GITHUB_TOKEN }}
+        folder: build/sphinx/html
