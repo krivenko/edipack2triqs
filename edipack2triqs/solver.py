@@ -396,9 +396,14 @@ class EDIpackSolver:
         self.comm.barrier()
 
     @property
-    def energies(self):
-        "Returns the impurity local energies components"
-        return ed.get_eimp()
+    def e_pot(self):
+        "Potential energy from interaction"
+        return ed.get_eimp(ikind=0)
+
+    @property
+    def e_kin(self):
+        "Kinetic energy"
+        return ed.get_eimp(ikind=3)
 
     @property
     def densities(self):
