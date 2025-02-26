@@ -420,13 +420,13 @@ class EDIpackSolver:
         "Returns the impurity superconductive phi matrix"
         return ed.get_phi()
 
-    def magnetization(self, comp: str = 'z'):
+    @property
+    def magnetization(self):
         """
-        Returns a component of the impurity magnetization vector, one element
-        per orbital. The component selector 'comp' can be one of 'x', 'y'
-        and 'z'.
+        Cartesian components of impurity magnetization vectors,
+        one row per orbital.
         """
-        return ed.get_mag(icomp=comp)
+        return ed.get_mag().T
 
     def _make_gf(self, ed_func, real_freq, anomalous):
         if anomalous:

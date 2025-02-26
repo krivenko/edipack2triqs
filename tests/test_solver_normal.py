@@ -174,9 +174,9 @@ class TestEDIpackSolverBathNormal(unittest.TestCase):
     def assert_all(cls, s, **refs):
         assert_allclose(s.densities, refs['densities'], atol=1e-8)
         assert_allclose(s.double_occ, refs['double_occ'], atol=1e-8)
-        assert_allclose(s.magnetization(comp='x'), refs['magn_x'], atol=1e-8)
-        assert_allclose(s.magnetization(comp='y'), refs['magn_y'], atol=1e-8)
-        assert_allclose(s.magnetization(comp='z'), refs['magn_z'], atol=1e-8)
+        assert_allclose(s.magnetization[:, 0], refs['magn_x'], atol=1e-8)
+        assert_allclose(s.magnetization[:, 1], refs['magn_y'], atol=1e-8)
+        assert_allclose(s.magnetization[:, 2], refs['magn_z'], atol=1e-8)
         assert_block_gfs_are_close(s.g_iw, refs['g_iw'])
         assert_block_gfs_are_close(s.g_w, refs['g_w'])
         if 'Sigma_iw' in refs:
