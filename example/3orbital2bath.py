@@ -92,9 +92,9 @@ if MPI.COMM_WORLD.Get_rank() == 0:
 
     print("Densities (per orbital):", solver.densities)
     print("Double occupancy (per orbital):", solver.double_occ)
-    print("Magnetization M_x (per orbital):", solver.magnetization(comp='x'))
-    print("Magnetization M_y (per orbital):", solver.magnetization(comp='y'))
-    print("Magnetization M_z (per orbital):", solver.magnetization(comp='z'))
+    print("Magnetization M_x (per orbital):", solver.magnetization[:, 0])
+    print("Magnetization M_y (per orbital):", solver.magnetization[:, 1])
+    print("Magnetization M_z (per orbital):", solver.magnetization[:, 2])
 
     from triqs.plot.mpl_interface import plt, oplot
 
