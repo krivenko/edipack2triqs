@@ -236,13 +236,18 @@ class TestEDIpackSolverBathHybrid(unittest.TestCase):
                                      "nspin1_1")
         self.assert_all(solver, **refs)
 
-        # Part II: update_int_params()
+        # Part II: update interaction parameters
         new_int_params = {'Uloc': np.array([2.0, 3.0]),
                           'Ust': 0.6,
                           'Jh': 0.1,
                           'Jx': 0.2,
                           'Jp': 0.0}
-        solver.update_int_params(**new_int_params)
+        solver.Uloc = new_int_params['Uloc']
+        solver.Ust = new_int_params['Ust']
+        solver.Jh = new_int_params['Jh']
+        solver.Jx = new_int_params['Jx']
+        solver.Jp = new_int_params['Jp']
+        solver.comm.barrier()
 
         beta = 120.0
         n_iw = 200
@@ -355,13 +360,18 @@ class TestEDIpackSolverBathHybrid(unittest.TestCase):
                                      "nspin2_1")
         self.assert_all(solver, **refs)
 
-        # Part II: update_int_params()
+        # Part II: update interaction parameters
         new_int_params = {'Uloc': np.array([2.0, 3.0]),
                           'Ust': 0.6,
                           'Jh': 0.1,
                           'Jx': 0.2,
                           'Jp': 0.0}
-        solver.update_int_params(**new_int_params)
+        solver.Uloc = new_int_params['Uloc']
+        solver.Ust = new_int_params['Ust']
+        solver.Jh = new_int_params['Jh']
+        solver.Jx = new_int_params['Jx']
+        solver.Jp = new_int_params['Jp']
+        solver.comm.barrier()
 
         beta = 120.0
         n_iw = 200
@@ -475,13 +485,18 @@ class TestEDIpackSolverBathHybrid(unittest.TestCase):
                                      "nonsu2_hloc_1")
         self.assert_all(solver, **refs)
 
-        # Part II: update_int_params()
+        # Part II: update interaction parameters
         new_int_params = {'Uloc': np.array([2.0, 3.0]),
                           'Ust': 0.6,
                           'Jh': 0.1,
                           'Jx': 0.2,
                           'Jp': 0.0}
-        solver.update_int_params(**new_int_params)
+        solver.Uloc = new_int_params['Uloc']
+        solver.Ust = new_int_params['Ust']
+        solver.Jh = new_int_params['Jh']
+        solver.Jx = new_int_params['Jx']
+        solver.Jp = new_int_params['Jp']
+        solver.comm.barrier()
 
         beta = 120.0
         n_iw = 200
@@ -594,13 +609,18 @@ class TestEDIpackSolverBathHybrid(unittest.TestCase):
                                      "nonsu2_bath_1")
         self.assert_all(solver, **refs)
 
-        # Part II: update_int_params()
+        # Part II: update interaction parameters
         new_int_params = {'Uloc': np.array([2.0, 3.0]),
                           'Ust': 0.6,
                           'Jh': 0.1,
                           'Jx': 0.2,
                           'Jp': 0.0}
-        solver.update_int_params(**new_int_params)
+        solver.Uloc = new_int_params['Uloc']
+        solver.Ust = new_int_params['Ust']
+        solver.Jh = new_int_params['Jh']
+        solver.Jx = new_int_params['Jx']
+        solver.Jp = new_int_params['Jp']
+        solver.comm.barrier()
 
         beta = 120.0
         n_iw = 200
@@ -715,13 +735,18 @@ class TestEDIpackSolverBathHybrid(unittest.TestCase):
                                      "superc_1")
         self.assert_all(solver, **refs)
 
-        # Part II: update_int_params()
+        # Part II: update interaction parameters
         new_int_params = {'Uloc': np.array([2.0, 3.0]),
                           'Ust': 0.6,
                           'Jh': 0.1,
                           'Jx': 0.2,
                           'Jp': 0.0}
-        solver.update_int_params(**new_int_params)
+        solver.Uloc = new_int_params['Uloc']
+        solver.Ust = new_int_params['Ust']
+        solver.Jh = new_int_params['Jh']
+        solver.Jx = new_int_params['Jx']
+        solver.Jp = new_int_params['Jp']
+        solver.comm.barrier()
 
         beta = 120.0
         n_iw = 200

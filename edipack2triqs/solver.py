@@ -357,61 +357,6 @@ class EDIpackSolver:
         except TypeError:
             pass
 
-    def update_int_params(self, **kwargs):
-        r"""
-        Change parameters of the Hubbard-Kanamori interaction Hamiltonian.
-
-        Any subset of the parameters :math:`U_\text{loc}, U_\text{st}, J_h,
-        J_x, J_p` can be updated at once.
-
-        .. note::
-
-            Changing :math:`J_x` or :math:`J_p` from zero to a non-zero
-            value would change the symmetry of the impurity Hamiltonian and,
-            therefore, is not allowed by **EDIpack**.
-
-        :param Uloc: The local intra-orbital interaction :math:`U_\text{loc}`,
-            one value per orbital, up to 5 values.
-        :type Uloc: numpy.ndarray, optional
-
-        :param Ust: Value of the inter-orbital interaction :math:`U_\text{st}`.
-        :type Ust: float, optional
-
-        :param Jh: Hund's coupling :math:`J_h`.
-        :type Jh: float, optional
-
-        :param Jx: Spin-exchange coupling :math:`J_x`.
-        :type Jx: float, optional
-
-        :param Jp: Pair-hopping coupling :math:`J_p`.
-        :type Jp: float, optional
-        """
-
-        if 'Uloc' in kwargs:
-            Uloc = kwargs.pop("Uloc")
-            assert len(Uloc) == self.norb, \
-                "Required exactly {self.norb} values in Uloc"
-            Uloc_ = np.zeros(5, dtype=float)
-            Uloc_[:self.norb] = Uloc
-            ed.Uloc = Uloc_
-
-        ed.Ust = kwargs.pop("Ust", ed.Ust)
-        ed.Jh = kwargs.pop("Jh", ed.Jh)
-        ed.Jx = kwargs.pop("Jx", ed.Jx)
-        ed.Jp = kwargs.pop("Jp", ed.Jp)
-
-        if not ed.ed_total_ud:
-            if ed.Jx != 0:
-                raise RuntimeError("Cannot set Jx to a non-zero value")
-            if ed.Jp != 0:
-                raise RuntimeError("Cannot set Jp to a non-zero value")
-
-        if len(kwargs) > 0:
-            raise RuntimeError("Unrecognized interaction parameters: "
-                               + ', '.join(map(str, kwargs.keys()))
-                               )
-        self.comm.barrier()
-
     @property
     def hloc(self) -> np.ndarray:
         r"""
@@ -419,6 +364,59 @@ class EDIpackSolver:
         :math:`\hat H_\text{loc}`.
         """
         return self.h_params.Hloc
+
+    @property
+    def Uloc(self) -> np.ndarray:
+        r"""
+        Local intra-orbital interaction :math:`U_\text{loc}`, one value
+        per orbital, up to 5 values.
+        """
+        return ed.Uloc[:self.norb]
+
+    @Uloc.setter
+    def Uloc(self, values):
+        assert len(values) == self.norb, f"Required exactly {self.norb} values"
+        ed.Uloc = np.pad(values, (0, 5 - len(values)))
+
+    @property
+    def Ust(self) -> float:
+        r"Local inter-orbital interaction :math:`U_\text{st}`."
+        return ed.Ust
+
+    @Ust.setter
+    def Ust(self, value):
+        ed.Ust = value
+
+    @property
+    def Jh(self) -> float:
+        r"Hund's coupling :math:`J_h`."
+        return ed.Jh
+
+    @Jh.setter
+    def Jh(self, value):
+        ed.Jh = value
+
+    @property
+    def Jx(self) -> float:
+        r"Spin-exchange coupling :math:`J_x`."
+        return ed.Jx
+
+    @Jx.setter
+    def Jx(self, value) -> float:
+        if (not ed.ed_total_ud) and (value != 0):
+            raise RuntimeError("Cannot set Jx to a non-zero value")
+        ed.Jx = value
+
+    @property
+    def Jp(self) -> float:
+        r"Pair-hopping coupling :math:`J_p`."
+        return ed.Jp
+
+    @Jp.setter
+    def Jp(self, value):
+        if (not ed.ed_total_ud) and (value != 0):
+            raise RuntimeError("Cannot set Jp to a non-zero value")
+        ed.Jp = value
 
     @property
     def bath(self) -> Bath:

@@ -156,7 +156,7 @@ if MPI.COMM_WORLD.Get_rank() == 0:
 solver.hloc[0, 0, 1, 1] = -0.6  # spin1 = spin2 = up and down, orb1 = orb2 = 1
 
 # Change Jp
-solver.update_int_params(Jp=0.15)
+solver.Jp = 0.15
 
 # Update some bath parameters
 solver.bath.eps[0, 2, 1] = -0.4  # spin = up and down, orb1 = 2, nu = 1
