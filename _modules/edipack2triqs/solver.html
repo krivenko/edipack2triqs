@@ -55,7 +55,8 @@
 <li class="toctree-l4"><a class="reference internal" href="../../documentation.html#edipack2triqs.solver.EDIpackSolver.bath"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.bath</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../documentation.html#edipack2triqs.solver.EDIpackSolver.densities"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.densities</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../documentation.html#edipack2triqs.solver.EDIpackSolver.double_occ"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.double_occ</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../documentation.html#edipack2triqs.solver.EDIpackSolver.energies"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.energies</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../documentation.html#edipack2triqs.solver.EDIpackSolver.e_kin"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.e_kin</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../documentation.html#edipack2triqs.solver.EDIpackSolver.e_pot"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.e_pot</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../documentation.html#edipack2triqs.solver.EDIpackSolver.g_an_iw"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.g_an_iw</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../documentation.html#edipack2triqs.solver.EDIpackSolver.g_an_w"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.g_an_w</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../documentation.html#edipack2triqs.solver.EDIpackSolver.g_iw"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.g_iw</span></code></a></li>
@@ -542,9 +543,14 @@
 
 
     <span class="nd">@property</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">energies</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="s2">&quot;Returns the impurity local energies components&quot;</span>
-        <span class="k">return</span> <span class="n">ed</span><span class="o">.</span><span class="n">get_eimp</span><span class="p">()</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">e_pot</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="s2">&quot;Potential energy from interaction&quot;</span>
+        <span class="k">return</span> <span class="n">ed</span><span class="o">.</span><span class="n">get_eimp</span><span class="p">(</span><span class="n">ikind</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">e_kin</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="s2">&quot;Kinetic energy&quot;</span>
+        <span class="k">return</span> <span class="n">ed</span><span class="o">.</span><span class="n">get_eimp</span><span class="p">(</span><span class="n">ikind</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">densities</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
