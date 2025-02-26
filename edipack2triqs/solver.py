@@ -1,3 +1,7 @@
+"""
+TRIQS interface to **EDIpack** exact diagonalization solver.
+"""
+
 from pathlib import Path
 from tempfile import TemporaryDirectory
 from warnings import warn
@@ -19,6 +23,16 @@ from .fit import BathFittingParams, _chi2_fit_bath
 
 
 class EDIpackSolver:
+    """
+    This class represents the **EDIpack** exact diagonalization library and
+    incapsulates its internal state. Its methods and attributes allow to perform
+    ED calculations and to access their results.
+
+    .. note::
+
+        At most one instance of this type can exists at any time. An attempt to
+        create more such objects will raise an :py:class:`AssertionError`.
+    """
 
     # EDIpack maintains the state of a simulation as a set of global variables.
     # Therefore, this state must be controlled by at most one EDIpackSolver
@@ -70,66 +84,112 @@ class EDIpackSolver:
                  fops_bath_dn: list[IndicesType],
                  **kwargs
                  ):
-        """
-        Initialize internal state of the underlying EDIpack solver.
+        r"""
+        Initialize internal state of the underlying **EDIpack** solver.
 
-        Parameters
-        ----------
-        hamiltonian: triqs.operators.Operator
-            Many-body Hamiltonian to diagonalize
-        fops_imp_up: list of tuples of strings and ints
-            List of all spin-up impurity annihilation / creation operator
-            flavors (indices)
-        fops_imp_dn: list of tuples of strings and ints
-            List of all spin-down impurity annihilation / creation operator
-            flavors (indices)
-        fops_bath_up: list of tuples of strings and ints
-            List of all spin-up bath annihilation / creation operator
-            flavors (indices)
-        fops_bath_dn: list of tuples of strings and ints
-            List of all spin-down bath annihilation / creation operator
-            flavors (indices)
-        input_file: str
-            Path to an input file to be used by EDIpack. Mutually exclusive with
-            all other keyword arguments.
-        verbose: int, default 3
-            Verbosity level: 0=almost nothing --> 5:all
-        cutoff: float, default 1e-9
-            Spectrum cutoff, used to determine the number states to be retained
-        gs_threshold: float, default 1e-9
-            Energy threshold for ground state degeneracy loop up
-        ed_sparse_H: bool, default True
-            Flag to select storage of sparse matrix H (True), or direct
-            on-the-fly product H*v (False).
-        ed_total_ud: bool, default False
-            Force use of total spin-up and spin-down occupations as quantum
-            numbers
-        lanc_method: str, default "arpack"
-            Select the Lanczos method to be used in the determination of the
-            spectrum: "arpack", "dvdson" (no MPI only).
-        lanc_nstates_sector: int, default 2
-            Initial number of states per sector to be determined
-        lanc_nstates_total: int, default 2
-            Initial total number of states to be determined
-        lanc_nstates_step: int, default 2
-            Number of states added to the spectrum at each step
-        lanc_ncv_factor: int, default 10
-            Set the size of the block used in Lanczos-ARPACK by multiplying
-            the required Neigen (NCV = lanc_ncv_factor * Neigen + lanc_ncv_add)
-        lanc_ncv_add: int, default 0
-            Adds up to the size of the block to prevent it from becoming too
-            small (NCV = lanc_ncv_factor * Neigen + lanc_ncv_add)
-        lanc_niter: int, default 512
-            Number of Lanczos iterations in spectrum determination
-        lanc_ngfiter: int, default 200
-            Number of Lanczos iterations in GF determination (number of momenta)
-        lanc_tolerance: float, default 1e-18
-            Tolerance for the Lanczos iterations as used in ARPACK
-        lanc_dim_threshold: int, default 1024
-            Min dimension threshold to use Lanczos determination of the spectrum
-            rather than LAPACK based exact diagonalization
-        bath_fitting_params: BathFittingParams
-            Parameters used to perform bath fitting
+        The fundamental operator sets (**fops** for short) define sizes of
+        impurity and bath Hilbert spaces. The expected **fops** objects are
+        lists of tuples (pairs). Each element ``(i, j)`` of such a list
+        corresponds to a single fermionic degree of freedom created by
+        the many-body operator ``c_dag(i, j)``.
+
+        :param hamiltonian: Many-body electronic Hamiltonian to diagonalize.
+            Symmetries of this Hamiltonian are automatically analyzed and
+            dictate the choice of **EDIpacks**'s
+            :f:var:`ED mode <f/ed_input_vars/ed_mode>` and
+            :f:mod:`bath geometry <f/ed_bath>`. This choice
+            remains unchangeable throughout object's lifetime.
+        :type triqs.operators.operators.Operator:
+
+        :param fops_imp_up: Fundamental operator set for spin-up impurity
+            degrees of freedom.
+        :type fops_imp_up: list[tuple[int | str, int | str]]
+
+        :param fops_imp_dn: Fundamental operator set for spin-down impurity
+            degrees of freedom.
+        :type list[tuple[int | str, int | str]]:
+
+        :param fops_bath_up: Fundamental operator set for spin-up bath
+            degrees of freedom.
+        :type fops_bath_up: list[tuple[int | str, int | str]]
+
+        :param fops_bath_dn: Fundamental operator set for spin-down bath
+            degrees of freedom.
+        :type fops_bath_dn: list[tuple[int | str, int | str]]
+
+        :param input_file: Path to a custom input file compatible with
+            **EDIpack**'s :f:func:`f/ed_input_vars/ed_read_input`.
+            When specified, it is used to initialize **EDIpack**.
+            This option is mutually exclusive with all other keyword arguments.
+        :type input_file: str, optional
+
+        :param verbose: Verbosity level of the solver: 0 for almost no output,
+            5 for the full output from **EDIpack**.
+        :type verbose: int, default=3
+
+        :param cutoff: Spectrum cutoff used to determine the number of states
+                       to be retained.
+        :type cutoff: float, default=1e-9
+
+        :param gs_threshold: Energy threshold for ground state degeneracy loop.
+        :type gs_threshold: float, default=1e-9
+
+        :param ed_sparse_h: Switch between storing the sparse matrix
+            :math:`\hat H` (*True*) and direct on-the-fly evaluation of
+            the product :math:`\hat H |v\rangle` (*False*).
+        :type ed_sparse_h: bool, default=True
+
+        :param ed_total_ud: Force use of the total spin-up and spin-down
+            occupancies as quantum numbers instead of the orbital-resolved
+            occupancies.
+        :type ed_total_ud: bool, default=False
+
+        :param lanc_method: Select the Lanczos method to be used in
+            the determination of the spectrum, one of *"arpack"*,  *"dvdson"*
+            (no-MPI mode only).
+        :type lanc_method: str, default="arpack"
+
+        :param lanc_nstates_sector: Initial number of states per sector
+            to be determined.
+        :type lanc_nstates_sector: int, default=2
+
+        :param lanc_nstates_total: Initial total number of states
+            to be determined.
+        :type lanc_nstates_total: int, default=2
+
+        :param lanc_nstates_step: Number of states added to the spectrum
+            at each step.
+        :type lanc_nstates_step: int, default=2
+
+        :param lanc_ncv_factor: Set the size of the block used in
+            Lanczos-ARPACK by multiplying the required Neigen
+            (``NCV = lanc_ncv_factor * Neigen + lanc_ncv_add``).
+        :type lanc_ncv_factor: int, default=10
+
+        :param lanc_ncv_add: Adds up to the size of the block to prevent it
+            from becoming too small
+            (``NCV = lanc_ncv_factor * Neigen + lanc_ncv_add``).
+        :type lanc_ncv_add: int, default=0
+
+        :param lanc_niter: Number of Lanczos iterations in spectrum
+            determination.
+        :type lanc_niter: int, default=512
+
+        :param lanc_ngfiter: Number of Lanczos iterations in GF determination
+            (number of momenta).
+        :type lanc_ngfiter: int, default=200
+
+        :param lanc_tolerance: Tolerance for the Lanczos iterations as used
+            in ARPACK.
+        :type lanc_tolerance: float, default=1e-18
+
+        :param lanc_dim_threshold: Minimal dimension threshold to use Lanczos
+            determination of the spectrum rather than LAPACK-based
+            exact diagonalization.
+        :type lanc_dim_threshold: int, default=1024
+
+        :param bath_fitting_params: Parameters used to perform bath fitting.
+        :type bath_fitting_params: BathFittingParams, optional
         """
 
         assert self.instance_count[0] < 1, \
@@ -179,7 +239,7 @@ class EDIpackSolver:
             c["ED_VERBOSE"] = kwargs.get("verbose", 3)
             c["CUTOFF"] = kwargs.get("cutoff", 1e-9)
             c["GS_THRESHOLD"] = kwargs.get("gs_threshold", 1e-9)
-            c["ED_SPARSE_H"] = kwargs.get("ed_sparse_H", True)
+            c["ED_SPARSE_H"] = kwargs.get("ed_sparse_h", True)
             c["LANC_METHOD"] = kwargs.get("lanc_method", "arpack")
             c["LANC_NSTATES_SECTOR"] = kwargs.get("lanc_nstates_sector", 2)
             c["LANC_NSTATES_TOTAL"] = kwargs.get("lanc_nstates_total", 2)
@@ -298,21 +358,33 @@ class EDIpackSolver:
             pass
 
     def update_int_params(self, **kwargs):
-        """
-        Update interaction parameters.
+        r"""
+        Change parameters of the Hubbard-Kanamori interaction Hamiltonian.
 
-        Parameters
-        ----------
-        Uloc: numpy.ndarray
-            Values of the local interaction per orbital (max 5)
-        Ust: float
-            Value of the inter-orbital interaction term
-        Jh: float
-            Hund's coupling
-        Jx: float
-            Spin-exchange coupling
-        Jp: float
-            Pair-hopping coupling
+        Any subset of the parameters :math:`U_\text{loc}, U_\text{st}, J_h,
+        J_x, J_p` can be updated at once.
+
+        .. note::
+
+            Changing :math:`J_x` or :math:`J_p` from zero to a non-zero
+            value would change the symmetry of the impurity Hamiltonian and,
+            therefore, is not allowed by **EDIpack**.
+
+        :param Uloc: The local intra-orbital interaction :math:`U_\text{loc}`,
+            one value per orbital, up to 5 values.
+        :type Uloc: numpy.ndarray, optional
+
+        :param Ust: Value of the inter-orbital interaction :math:`U_\text{st}`.
+        :type Ust: float, optional
+
+        :param Jh: Hund's coupling :math:`J_h`.
+        :type Jh: float, optional
+
+        :param Jx: Spin-exchange coupling :math:`J_x`.
+        :type Jx: float, optional
+
+        :param Jp: Pair-hopping coupling :math:`J_p`.
+        :type Jp: float, optional
         """
 
         if 'Uloc' in kwargs:
@@ -341,13 +413,20 @@ class EDIpackSolver:
         self.comm.barrier()
 
     @property
-    def hloc(self):
-        "Access the local impurity Hamiltonian H_loc"
+    def hloc(self) -> np.ndarray:
+        r"""
+        Read-only access to the matrix of the local impurity Hamiltonian
+        :math:`\hat H_\text{loc}`.
+        """
         return self.h_params.Hloc
 
     @property
-    def bath(self):
-        "Get the bath object"
+    def bath(self) -> Bath:
+        r"""
+        Access to the current :py:class:`bath <edipack2triqs.bath.Bath>` object
+        stored in the solver. It is possible to assign a new bath object as long
+        as it has the matching type and describes a bath of the same geometry.
+        """
         return self.h_params.bath
 
     @bath.setter
@@ -363,22 +442,30 @@ class EDIpackSolver:
               energy_window: tuple[float, float] = (-5.0, 5.0),
               n_w: int = 5000,
               broadening: float = 0.01):
-        """
-        Solve the impurity problem.
+        r"""
+        Solve the impurity problem and calculate the observables, Green's
+        function and self-energy.
 
-        Parameters
-        ----------
-        beta: float
-            Inverse temperature for observable and GF calculations
-        n_iw: int, default 4096
-            Number of Matsubara frequencies for impurity GF calculations
-        energy_window: (float, float), default (-5.0, 5.0)
-            Energy window for real-frequency impurity GF calculations
-        n_w: int, default 5000
-            Number of real-frequency points for impurity GF calculations
-        broadening: float, default 0.01
-            Broadening (eps) on the real axis
+        :param beta:
+            Inverse temperature :math:`\beta = 1 / (k_B T)` for observable and
+            Green's function calculations.
+        :type beta: float
 
+        :param n_iw: Number of Matsubara frequencies for impurity GF
+            calculations.
+        :type n_iw: int, default=4096
+
+        :param energy_window: Energy window for real-frequency impurity GF
+            calculations.
+        :type energy_window: tuple[float, float], default=(-5.0, 5.0)
+
+        :param n_w: Number of real-frequency points for impurity GF
+            calculations.
+        :type n_w: int, default=5000
+
+        :param broadening: Broadening (imaginary shift away from the
+            real-frequency axis) for real-frequency impurity GF calculations.
+        :type broadening: float, default=0.01
         """
 
         # Pass parameters to EDIpack
@@ -396,39 +483,39 @@ class EDIpackSolver:
         self.comm.barrier()
 
     @property
-    def e_pot(self):
-        "Potential energy from interaction"
+    def e_pot(self) -> float:
+        "Potential energy from interaction."
         return ed.get_eimp(ikind=0)
 
     @property
-    def e_kin(self):
-        "Kinetic energy"
+    def e_kin(self) -> float:
+        "Kinetic energy."
         return ed.get_eimp(ikind=3)
 
     @property
-    def densities(self):
-        "Returns the impurity occupations, one element per orbital"
+    def densities(self) -> np.ndarray:
+        "Impurity occupations, one element per orbital."
         return ed.get_dens()
 
     @property
-    def double_occ(self):
-        "Returns the impurity double occupancy, one element per orbital"
+    def double_occ(self) -> np.ndarray:
+        "Impurity double occupancy, one element per orbital."
         return ed.get_docc()
 
     @property
-    def superconductive_phi(self):
-        "Returns the impurity superconductive phi matrix"
+    def superconductive_phi(self) -> np.ndarray:
+        r"Impurity superconductive :math:`\phi`-matrix in orbital space."
         return ed.get_phi()
 
     @property
-    def magnetization(self):
+    def magnetization(self) -> np.ndarray:
         """
         Cartesian components of impurity magnetization vectors,
         one row per orbital.
         """
         return ed.get_mag().T
 
-    def _make_gf(self, ed_func, real_freq, anomalous):
+    def _make_gf(self, ed_func, real_freq, anomalous) -> BlockGf:
         if anomalous:
             if ed.get_ed_mode() != 2:  # superc
                 raise RuntimeError("anomalous = True is only supported for "
@@ -479,23 +566,45 @@ class EDIpackSolver:
     # GF and self-energy properties
     #
 
-    g_iw = property(lambda s: s._make_gf(ed.build_gimp, False, False),
-                    doc="Matsubara impurity Green's function")
-    g_an_iw = property(lambda s: s._make_gf(ed.build_gimp, False, True),
-                       doc="Anomalous Matsubara impurity Green's function")
-    Sigma_iw = property(lambda s: s._make_gf(ed.build_sigma, False, False),
-                        doc="Matsubara impurity self-energy")
-    Sigma_an_iw = property(lambda s: s._make_gf(ed.build_sigma, False, True),
-                           doc="Anomalous Matsubara impurity self-energy")
+    @property
+    def g_iw(self) -> BlockGf:
+        "Matsubara impurity Green's function."
+        return self._make_gf(ed.build_gimp, False, False)
 
-    g_w = property(lambda s: s._make_gf(ed.build_gimp, True, False),
-                   doc="Real-frequency impurity Green's function")
-    g_an_w = property(lambda s: s._make_gf(ed.build_gimp, True, True),
-                      doc="Anomalous real-frequency impurity Green's function")
-    Sigma_w = property(lambda s: s._make_gf(ed.build_sigma, True, False),
-                       doc="Real-frequency impurity self-energy")
-    Sigma_an_w = property(lambda s: s._make_gf(ed.build_sigma, True, True),
-                          doc="Anomalous real-frequency impurity self-energy")
+    @property
+    def g_an_iw(self) -> BlockGf:
+        "Anomalous Matsubara impurity Green's function."
+        return self._make_gf(ed.build_gimp, False, True)
+
+    @property
+    def Sigma_iw(self) -> BlockGf:
+        "Matsubara impurity self-energy."
+        return self._make_gf(ed.build_sigma, False, False)
+
+    @property
+    def Sigma_an_iw(self) -> BlockGf:
+        "Anomalous Matsubara impurity self-energy."
+        return self._make_gf(ed.build_sigma, False, True)
+
+    @property
+    def g_w(self) -> BlockGf:
+        "Real-frequency impurity Green's function."
+        return self._make_gf(ed.build_gimp, True, False)
+
+    @property
+    def g_an_w(self) -> BlockGf:
+        "Anomalous real-frequency impurity Green's function."
+        return self._make_gf(ed.build_gimp, True, True)
+
+    @property
+    def Sigma_w(self) -> BlockGf:
+        "Real-frequency impurity self-energy."
+        return self._make_gf(ed.build_sigma, True, False)
+
+    @property
+    def Sigma_an_w(self) -> BlockGf:
+        "Anomalous real-frequency impurity self-energy."
+        return self._make_gf(ed.build_sigma, True, True)
 
     # Bath fitting
     chi2_fit_bath = _chi2_fit_bath

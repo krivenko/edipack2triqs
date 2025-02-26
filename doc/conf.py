@@ -28,7 +28,7 @@ extensions = ['sphinx.ext.autodoc',
               'myst_parser',
               'matplotlib.sphinxext.plot_directive',
               'sphinxfortran_ng.fortran_domain'
-             ]
+              ]
 
 myst_enable_extensions = [
     "amsmath",
@@ -44,26 +44,27 @@ myst_enable_extensions = [
     "tasklist",
 ]
 
-# The name of the Pygments (syntax highlighting) style to use.
-pygments_style = 'sphinx'
+project = 'edipack2triqs'
+version = '0.4.0'
+copyright = '2024-2025, Igor Krivenko, Lorenzo Crippa'
 
 source_suffix = '.rst'
+templates_path = ['_templates']
+
+# The name of the Pygments (syntax highlighting) style to use.
+pygments_style = 'sphinx'
 
 # Turn on sphinx.ext.autosummary
 autosummary_generate = True
 autosummary_imported_members = False
 
-project = 'edipack2triqs'
-version = '0.4.0'
+# sphinx.ext.autodoc options
+autodoc_member_order = 'bysource'
 
 # this makes the current project version available as var in every rst file
 rst_epilog = """
 .. |PROJECT_VERSION| replace:: {version}
 """.format(version=version)
-
-copyright = '2024-2025, Igor Krivenko, Lorenzo Crippa'
-
-templates_path = ['_templates']
 
 # this requires the sphinx_rtd_theme to be installed via pip
 html_theme = 'sphinx_rtd_theme'
@@ -103,6 +104,7 @@ plot_html_show_formats = False
 
 intersphinx_mapping = {
     'python': ('https://docs.python.org/3.12', None),
+    'numpy': ('https://numpy.org/doc/stable', None),
     'triqslibs': ('https://triqs.github.io/triqs/latest', None),
     'edipack2': ('https://edipack.github.io/EDIpack2.0', None)
 }
