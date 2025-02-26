@@ -62,7 +62,7 @@
 <li class="toctree-l4"><a class="reference internal" href="../../documentation.html#edipack2triqs.solver.EDIpackSolver.g_iw"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.g_iw</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../documentation.html#edipack2triqs.solver.EDIpackSolver.g_w"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.g_w</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../documentation.html#edipack2triqs.solver.EDIpackSolver.hloc"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.hloc</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../documentation.html#edipack2triqs.solver.EDIpackSolver.magnetization"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.magnetization()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../documentation.html#edipack2triqs.solver.EDIpackSolver.magnetization"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.magnetization</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../documentation.html#edipack2triqs.solver.EDIpackSolver.solve"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.solve()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../documentation.html#edipack2triqs.solver.EDIpackSolver.superconductive_phi"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.superconductive_phi</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../documentation.html#edipack2triqs.solver.EDIpackSolver.update_int_params"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.update_int_params()</span></code></a></li>
@@ -567,16 +567,13 @@
         <span class="s2">&quot;Returns the impurity superconductive phi matrix&quot;</span>
         <span class="k">return</span> <span class="n">ed</span><span class="o">.</span><span class="n">get_phi</span><span class="p">()</span>
 
-<div class="viewcode-block" id="EDIpackSolver.magnetization">
-<a class="viewcode-back" href="../../documentation.html#edipack2triqs.solver.EDIpackSolver.magnetization">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">magnetization</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">comp</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;z&#39;</span><span class="p">):</span>
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">magnetization</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Returns a component of the impurity magnetization vector, one element</span>
-<span class="sd">        per orbital. The component selector &#39;comp&#39; can be one of &#39;x&#39;, &#39;y&#39;</span>
-<span class="sd">        and &#39;z&#39;.</span>
+<span class="sd">        Cartesian components of impurity magnetization vectors,</span>
+<span class="sd">        one row per orbital.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">ed</span><span class="o">.</span><span class="n">get_mag</span><span class="p">(</span><span class="n">icomp</span><span class="o">=</span><span class="n">comp</span><span class="p">)</span></div>
-
+        <span class="k">return</span> <span class="n">ed</span><span class="o">.</span><span class="n">get_mag</span><span class="p">()</span><span class="o">.</span><span class="n">T</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_make_gf</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ed_func</span><span class="p">,</span> <span class="n">real_freq</span><span class="p">,</span> <span class="n">anomalous</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">anomalous</span><span class="p">:</span>

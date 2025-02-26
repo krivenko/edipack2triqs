@@ -65,7 +65,7 @@
 <li class="toctree-l4"><a class="reference internal" href="#edipack2triqs.solver.EDIpackSolver.g_iw"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.g_iw</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#edipack2triqs.solver.EDIpackSolver.g_w"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.g_w</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#edipack2triqs.solver.EDIpackSolver.hloc"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.hloc</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#edipack2triqs.solver.EDIpackSolver.magnetization"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.magnetization()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#edipack2triqs.solver.EDIpackSolver.magnetization"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.magnetization</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#edipack2triqs.solver.EDIpackSolver.solve"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.solve()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#edipack2triqs.solver.EDIpackSolver.superconductive_phi"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.superconductive_phi</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#edipack2triqs.solver.EDIpackSolver.update_int_params"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.update_int_params()</span></code></a></li>
@@ -234,12 +234,11 @@ can exist at a time.</p>
 <dd><p>Access the local impurity Hamiltonian H_loc</p>
 </dd></dl>
 
-<dl class="py method">
+<dl class="py property">
 <dt class="sig sig-object py" id="edipack2triqs.solver.EDIpackSolver.magnetization">
-<span class="sig-name descname"><span class="pre">magnetization</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">comp</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.12/library/stdtypes.html#str" rel="noopener noreferrer" target="_blank" title="(in Python v3.12)"><span class="pre">str</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'z'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/edipack2triqs/solver.html#EDIpackSolver.magnetization"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#edipack2triqs.solver.EDIpackSolver.magnetization" title="Link to this definition"></a></dt>
-<dd><p>Returns a component of the impurity magnetization vector, one element
-per orbital. The component selector ‘comp’ can be one of ‘x’, ‘y’
-and ‘z’.</p>
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">magnetization</span></span><a class="headerlink" href="#edipack2triqs.solver.EDIpackSolver.magnetization" title="Link to this definition"></a></dt>
+<dd><p>Cartesian components of impurity magnetization vectors,
+one row per orbital.</p>
 </dd></dl>
 
 <dl class="py method">
