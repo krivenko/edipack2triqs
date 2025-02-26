@@ -8,12 +8,8 @@ Solver class
 
 .. py:module:: edipack2triqs.solver
 
-The central class of **edipack2triqs** is
-:py:class:`EDIpackSolver`. It represents the underlying
-EDIpack solver library and its internal state. Only one instance of this class
-can exist at a time.
-
 .. autoclass:: EDIpackSolver
+   :special-members: __init__
    :members:
    :exclude-members: chi2_fit_bath
 
@@ -22,19 +18,19 @@ Objects representing bath parameters
 
 .. py:module:: edipack2triqs.bath
 
+.. autoclass:: Bath
+   :members:
+
 These classes represent collections of bath parameters used by EDIpack.
 Each of the classes corresponds to one bath geometry (*normal*, *hybrid* or
 *general*).
 
 .. autoclass:: BathNormal
    :members:
-   :inherited-members:
 .. autoclass:: BathHybrid
    :members:
-   :inherited-members:
 .. autoclass:: BathGeneral
    :members:
-   :inherited-members:
 
 Bath fitting
 ------------
