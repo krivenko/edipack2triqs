@@ -13,24 +13,29 @@ Solver class
    :members:
    :exclude-members: chi2_fit_bath
 
-Objects representing bath parameters
-------------------------------------
+Objects representing sets of bath parameters
+--------------------------------------------
 
 .. py:module:: edipack2triqs.bath
 
 .. autoclass:: Bath
    :members:
 
-These classes represent collections of bath parameters used by EDIpack.
-Each of the classes corresponds to one bath geometry (*normal*, *hybrid* or
-*general*).
+The following classes derived from :py:class:`Bath` represent sets of bath
+parameters used by **EDIpack**. Each of the classes corresponds to one bath
+geometry (*normal*, *hybrid* or *general*). They support addition, subtraction
+and multiplication by a scalar, which translate into the respective operations
+with the stored parameters.
 
 .. autoclass:: BathNormal
    :members:
+   :show-inheritance:
 .. autoclass:: BathHybrid
    :members:
+   :show-inheritance:
 .. autoclass:: BathGeneral
    :members:
+   :show-inheritance:
 
 Bath fitting
 ------------
