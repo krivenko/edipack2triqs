@@ -147,7 +147,7 @@ class TestHamiltonianBathNormal(TestHamiltonian):
 
         with HDFArchive(archive_name, 'r') as ar:
             b2 = ar["normal_" + h5_name]
-            self.assertEqual(b2.ed_mode(), b2.ed_mode())
+            self.assertEqual(b2.ed_mode, b.ed_mode)
             assert_equal(b2.data, b.data)
             assert_equal(b2.eps.base, b2.data)
             assert_equal(b2.V.base, b2.data)
@@ -452,7 +452,7 @@ class TestHamiltonianBathHybrid(TestHamiltonian):
 
         with HDFArchive(archive_name, 'r') as ar:
             b2 = ar["hybrid_" + h5_name]
-            self.assertEqual(b2.ed_mode(), b2.ed_mode())
+            self.assertEqual(b2.ed_mode, b.ed_mode)
             assert_equal(b2.data, b.data)
             assert_equal(b2.eps.base, b2.data)
             assert_equal(b2.V.base, b2.data)

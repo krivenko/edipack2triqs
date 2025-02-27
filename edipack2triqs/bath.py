@@ -140,6 +140,7 @@ class BathNormal(Bath):
         else:
             raise RuntimeError("Unknown ED mode")
 
+    @property
     def ed_mode(self):
         "ED mode this bath object is usable with"
         if hasattr(self, "U"):
@@ -151,11 +152,11 @@ class BathNormal(Bath):
 
     def __deepcopy__(self, memo):
         nspin, norb, nbath = self.V.shape
-        return BathNormal(self.ed_mode(), nspin, norb, nbath, self.data.copy())
+        return BathNormal(self.ed_mode, nspin, norb, nbath, self.data.copy())
 
     def __reduce_to_dict__(self):
         "HDFArchive serialization"
-        return {"ed_mode": self.ed_mode(),
+        return {"ed_mode": self.ed_mode,
                 "nspin": self.V.shape[0],
                 "norb": self.V.shape[1],
                 "nbath": self.V.shape[2],
@@ -299,6 +300,7 @@ class BathHybrid(Bath):
         else:
             raise RuntimeError("Unknown ED mode")
 
+    @property
     def ed_mode(self):
         "ED mode this bath object is usable with"
         if hasattr(self, "U"):
@@ -310,11 +312,11 @@ class BathHybrid(Bath):
 
     def __deepcopy__(self, memo):
         nspin, norb, nbath = self.V.shape
-        return BathHybrid(self.ed_mode(), nspin, norb, nbath, self.data.copy())
+        return BathHybrid(self.ed_mode, nspin, norb, nbath, self.data.copy())
 
     def __reduce_to_dict__(self):
         "HDFArchive serialization"
-        return {"ed_mode": self.ed_mode(),
+        return {"ed_mode": self.ed_mode,
                 "nspin": self.V.shape[0],
                 "norb": self.V.shape[1],
                 "nbath": self.V.shape[2],
