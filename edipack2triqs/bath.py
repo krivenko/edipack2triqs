@@ -39,7 +39,9 @@ def _orbs_to_bath_states(V: np.ndarray):
 
 
 class Bath:
-    """Base class for all bath classes"""
+    """
+    Base class for all bath classes.
+    """
 
     def assert_compatible(self, other):
         assert type(self) is type(other), "Incompatible bath object types"
@@ -89,10 +91,43 @@ class Bath:
 
 
 class BathNormal(Bath):
-    """Parameters of a bath with normal topology"""
+    """
+    Parameters of a bath with normal topology.
+    The normal topology means that each of ``norb`` impurity orbitals is
+    connected to ``nbath`` independent bath states. There are, therefore,
+    ``norb * nbath`` bath states in total.
+
+    Instances of this class are compatible with TRIQS'
+    :ref:`HDF5 </documentation/manual/hdf5/ref.rst>` interface.
+    """
 
     # EDIpack bath type
     name: str = 'normal'
+
+    nbath: int
+    "Number of bath states per impurity orbital."
+
+    eps: np.ndarray
+    """
+    Bath energy levels as an array of the shape ``(nspin, norb, nbath)``.
+    """
+    Delta: Optional[np.ndarray]
+    """
+    Local super-conducting order parameters of the bath as an array
+    of the shape ``(nspin, norb, nbath)``. Only present when ``ed_mode ==
+    "superc"``.
+    """
+    V: np.ndarray
+    """
+    Spin-diagonal hopping amplitudes between the impurity and the bath
+    as an array of the shape ``(nspin, norb, nbath)``.
+    """
+    U: Optional[np.ndarray]
+    """
+    Spin off-diagonal hopping amplitudes between the impurity and the bath
+    as an array of the shape ``(nspin, norb, nbath)``. Only present when
+    ``ed_mode == "nonsu2"``.
+    """
 
     def __init__(self,
                  ed_mode: str,
@@ -142,7 +177,10 @@ class BathNormal(Bath):
 
     @property
     def ed_mode(self):
-        "ED mode this bath object is usable with"
+        """
+        ED mode this bath object is usable with, one of *"normal"*, *"nonsu2"*
+        and *"superc"*.
+        """
         if hasattr(self, "U"):
             return "nonsu2"
         elif hasattr(self, "Delta"):
@@ -245,10 +283,42 @@ register_class(BathNormal)
 
 
 class BathHybrid(Bath):
-    """Parameters of a bath with hybrid topology"""
+    """
+    Parameters of a bath with hybrid topology.
+    In the hybrid topology there are ``nbath`` independent bath levels. Each of
+    these levels is connected to each impurity orbital via hopping amplitudes
+    ``V``.
+
+    Instances of this class are compatible with TRIQS'
+    :ref:`HDF5 </documentation/manual/hdf5/ref.rst>` interface.
+    """
 
     # EDIpack bath type
     name: str = 'hybrid'
+
+    nbath: int
+    "Total number of bath states."
+
+    eps: np.ndarray
+    """
+    Bath energy levels as an array of the shape ``(nspin, nbath)``.
+    """
+    Delta: Optional[np.ndarray]
+    """
+    Local super-conducting order parameters of the bath as an array
+    of the shape ``(nspin, nbath)``. Only present when ``ed_mode == "superc"``.
+    """
+    V: np.ndarray
+    """
+    Spin-diagonal hopping amplitudes between the impurity and the bath
+    as an array of the shape ``(nspin, norb, nbath)``.
+    """
+    U: Optional[np.ndarray]
+    """
+    Spin off-diagonal hopping amplitudes between the impurity and the bath
+    as an array of the shape ``(nspin, norb, nbath)``. Only present when
+    ``ed_mode == "nonsu2"``.
+    """
 
     def __init__(self,
                  ed_mode: str,
@@ -302,7 +372,10 @@ class BathHybrid(Bath):
 
     @property
     def ed_mode(self):
-        "ED mode this bath object is usable with"
+        """
+        ED mode this bath object is usable with, one of *"normal"*, *"nonsu2"*
+        and *"superc"*.
+        """
         if hasattr(self, "U"):
             return "nonsu2"
         elif hasattr(self, "Delta"):
@@ -369,10 +442,40 @@ register_class(BathHybrid)
 
 
 class BathGeneral(Bath):
-    """Parameters of a bath with general topology"""
+    r"""
+    Parameters of a bath with general topology. General bath is a set of
+    ``nbath`` independent replicas of the impurity. Hamiltonian of each replica
+    is constructed as a linear combination of ``nsym`` basis matrices
+    :math:`\hat O_i` with coefficients :math:`\lambda^\nu_i`. Each impurity
+    orbital is coupled to the corresponding orbital of each replica via hopping
+    amplitudes ``V``.
+
+    Instances of this class are compatible with TRIQS'
+    :ref:`HDF5 </documentation/manual/hdf5/ref.rst>` interface.
+    """
 
     # EDIpack bath type
     name: str = 'general'
+
+    nbath: int
+    "Number of replicas."
+    nsym: int
+    r"Number of bath basis matrices :math:`\hat O_i`."
+    hvec: np.ndarray
+    r"""
+    Basis matrices :math:`\hat O_i` as an array of the shape
+    (nspin, nspin, norb, norb, nsym).
+    """
+    l: list[np.ndarray]
+    r"""
+    Coefficients of linear combinations :math:`\lambda^\nu_i`. Each of the
+    ``nbath`` elements is an array of length ``nsym``.
+    """
+    V: list[np.ndarray]
+    r"""
+    Hopping amplitudes :math:`V^\nu_{\sigma,\alpha}`. Each of the ``nbath``
+    elements is an array of the shape ``(nspin, norb)``.
+    """
 
     def __init__(self,
                  nspin: int,
@@ -474,7 +577,7 @@ class BathGeneral(Bath):
         return self
 
     @classmethod
-    def is_replica_valid(cls, replica: set[int], bs2orbs: list[list[int]]):
+    def _is_replica_valid(cls, replica: set[int], bs2orbs: list[list[int]]):
         """
         Check that all bath states of a given replica are connected to different
         impurity orbitals (if any).
@@ -483,10 +586,10 @@ class BathGeneral(Bath):
         return len(set(orbs)) == len(orbs)
 
     @classmethod
-    def merge_inc_replicas(cls,
-                           inc_replicas: list[set[int]],
-                           norb: int,
-                           bs2orbs: list[list[int]]):
+    def _merge_inc_replicas(cls,
+                            inc_replicas: list[set[int]],
+                            norb: int,
+                            bs2orbs: list[list[int]]):
         """
         Merge incomplete replicas to form a few complete replicas of size norb.
         """
@@ -501,8 +604,8 @@ class BathGeneral(Bath):
             for rep in range(nreps):
                 selected_ireps = [irep for i, irep in enumerate(inc_replicas)
                                   if irep2rep[i] == rep]
-                if not cls.is_replica_valid(set().union(*selected_ireps),
-                                            bs2orbs):
+                if not cls._is_replica_valid(set().union(*selected_ireps),
+                                             bs2orbs):
                     return False
             return True
 
@@ -533,10 +636,10 @@ class BathGeneral(Bath):
             return replicas
 
     @classmethod
-    def build_replica_bases(cls,
-                            norb: int,
-                            h: np.ndarray,
-                            V: np.ndarray):
+    def _build_replica_bases(cls,
+                             norb: int,
+                             h: np.ndarray,
+                             V: np.ndarray):
         """
         Distribute nbath_total bath basis states between a few replicas, each
         of size norb. The replica bases being built are subject to three
@@ -586,7 +689,7 @@ class BathGeneral(Bath):
                     f"One of replicas has more than norb = {norb} states"
                 )
             elif len(replica) == norb:
-                if not cls.is_replica_valid(replica, bs2orbs):
+                if not cls._is_replica_valid(replica, bs2orbs):
                     raise RuntimeError(
                         "An impurity orbital is connected to a replica "
                         "more than once"
@@ -594,7 +697,7 @@ class BathGeneral(Bath):
                 replicas.append(replica)
             else:
                 inc_replicas.append(replica)
-        replicas += cls.merge_inc_replicas(inc_replicas, norb, bs2orbs)
+        replicas += cls._merge_inc_replicas(inc_replicas, norb, bs2orbs)
 
         # Order replica basis according to the orbital
         def order_replica(replica):
@@ -615,11 +718,11 @@ class BathGeneral(Bath):
         return ordered_replicas
 
     @classmethod
-    def build_linear_combination(cls,  # noqa: C901
-                                 replicas: list[list[int]],
-                                 nspin: int,
-                                 h: np.ndarray,
-                                 is_nambu: bool):
+    def _build_linear_combination(cls,  # noqa: C901
+                                  replicas: list[list[int]],
+                                  nspin: int,
+                                  h: np.ndarray,
+                                  is_nambu: bool):
         """
         Analyse a given bath Hamiltonian h and build its representation as a
         linear combination of basis matrices for a single replica. The basis
@@ -736,10 +839,10 @@ class BathGeneral(Bath):
             h[0, 1, :, :] = Delta
             h[1, 0, :, :] = np.conj(Delta.T)
 
-        replicas = cls.build_replica_bases(norb, h, V)
+        replicas = cls._build_replica_bases(norb, h, V)
 
         hvec, lambdavec = \
-            cls.build_linear_combination(replicas, nnambu * nspin, h, is_nambu)
+            cls._build_linear_combination(replicas, nnambu * nspin, h, is_nambu)
 
         bath = cls(nspin, norb, nbath, hvec, lambdavec)
 
