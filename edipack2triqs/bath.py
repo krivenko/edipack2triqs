@@ -152,26 +152,26 @@ class BathNormal(Bath):
 
         # View: Energy levels
         self.eps = self.data[:size].reshape(params_shape)
-        assert not self.eps.flags['OWNDATA']
+        assert self.eps.base is self.data
 
         if ed_mode == "nonsu2":
             # View: Same-spin hopping amplitudes
             self.V = self.data[size:2 * size].reshape(params_shape)
-            assert not self.V.flags['OWNDATA']
+            assert self.V.base is self.data
             # View: Spin-flip hopping amplitudes
             self.U = self.data[2 * size:].reshape(params_shape)
-            assert not self.U.flags['OWNDATA']
+            assert self.U.base is self.data
         elif ed_mode == "superc":
             # View: Local SC order parameters of the bath
             self.Delta = self.data[size:2 * size].reshape(params_shape)
-            assert not self.Delta.flags['OWNDATA']
+            assert self.Delta.base is self.data
             # View: Same-spin hopping amplitudes
             self.V = self.data[2 * size:].reshape(params_shape)
-            assert not self.V.flags['OWNDATA']
+            assert self.V.base is self.data
         elif ed_mode == "normal":
             # View: Same-spin hopping amplitudes
             self.V = self.data[size:2 * size].reshape(params_shape)
-            assert not self.V.flags['OWNDATA']
+            assert self.V.base is self.data
         else:
             raise RuntimeError("Unknown ED mode")
 
@@ -347,26 +347,26 @@ class BathHybrid(Bath):
 
         # View: Energy levels
         self.eps = self.data[:eps_size].reshape(eps_shape)
-        assert not self.eps.flags['OWNDATA']
+        assert self.eps.base is self.data
 
         if ed_mode == "nonsu2":
             # View: Same-spin hopping amplitudes
             self.V = self.data[eps_size:eps_size + size].reshape(shape)
-            assert not self.V.flags['OWNDATA']
+            assert self.V.base is self.data
             # View: Spin-flip hopping amplitudes
             self.U = self.data[eps_size + size:].reshape(shape)
-            assert not self.U.flags['OWNDATA']
+            assert self.U.base is self.data
         elif ed_mode == "superc":
             # View: Local SC order parameters of the bath
             self.Delta = self.data[eps_size:2 * eps_size].reshape(eps_shape)
-            assert not self.Delta.flags['OWNDATA']
+            assert self.Delta.base is self.data
             # View: Same-spin hopping amplitudes
             self.V = self.data[2 * eps_size:].reshape(shape)
-            assert not self.V.flags['OWNDATA']
+            assert self.V.base is self.data
         elif ed_mode == "normal":
             # View: Same-spin hopping amplitudes
             self.V = self.data[eps_size:].reshape(shape)
-            assert not self.V.flags['OWNDATA']
+            assert self.V.base is self.data
         else:
             raise RuntimeError("Unknown ED mode")
 
@@ -482,11 +482,9 @@ class BathGeneral(Bath):
                  norb: int,
                  nbath: int,
                  hvec: np.ndarray,
-                 lambdavec: np.ndarray,
                  data: Optional[np.ndarray] = None):
         self.nbath = nbath
         self.hvec = hvec
-        self.lambdavec = lambdavec
         self.nsym = hvec.shape[-1]
 
         V_size = nspin * norb
@@ -508,26 +506,20 @@ class BathGeneral(Bath):
         # View: Hopping amplitudes
         self.V = [self.data[replica_offset(nu):replica_offset(nu) + V_size].
                   reshape(nspin, norb)
-                  for nu in range(nbath)]
-        assert all(not V_nu.flags['OWNDATA'] for V_nu in self.V)
+                  for nu in range(self.nbath)]
+        assert all(V_nu.base is self.data for V_nu in self.V)
 
         # View: Linear coefficients of the replica matrix linear combination
         self.l = [self.data[replica_offset(nu) + V_size:  # noqa: E741
                             replica_offset(nu) + V_size + self.nsym].
                   reshape(self.nsym)
                   for nu in range(self.nbath)]
-        assert all(not l_nu.flags['OWNDATA'] for l_nu in self.l)
-
-        # Fill self.l
-        for nu in range(self.nbath):
-            for isym in range(self.nsym):
-                self.l[nu][isym] = self.lambdavec[nu, isym]
+        assert all(l_nu.base is self.data for l_nu in self.l)
 
     def __deepcopy__(self, memo):
         nspin, norb = self.V[0].shape
         return BathGeneral(nspin, norb, self.nbath,
                            deepcopy(self.hvec, memo),
-                           deepcopy(self.lambdavec, memo),
                            self.data.copy())
 
     def __reduce_to_dict__(self):
@@ -536,7 +528,6 @@ class BathGeneral(Bath):
                 "norb": self.V[0].shape[1],
                 "nbath": self.nbath,
                 "hvec": self.hvec,
-                "lambdavec": self.lambdavec,
                 "data": self.data}
 
     @classmethod
@@ -544,7 +535,7 @@ class BathGeneral(Bath):
         "HDFArchive deserialization"
         return BathGeneral(
             d["nspin"], d["norb"], d["nbath"],
-            d["hvec"], d["lambdavec"], d["data"]
+            d["hvec"], d["data"]
         )
 
     def assert_compatible(self, other):
@@ -558,22 +549,20 @@ class BathGeneral(Bath):
     def __imul__(self, x):
         # Skipping the first element that stores nsym
         self.data[1:] *= x
-        self.lambdavec *= x
         return self
 
-    # Addition and subtraction of bath parameters
+    # Addition of bath parameters
     def __iadd__(self, other):
         self.assert_compatible(other)
         # Skipping the first element that stores nsym
         self.data[1:] += other.data[1:]
-        self.lambdavec += other.lambdavec
         return self
 
+    # Subtraction of bath parameters
     def __isub__(self, other):
         self.assert_compatible(other)
         # Skipping the first element that stores nsym
         self.data[1:] -= other.data[1:]
-        self.lambdavec -= other.lambdavec
         return self
 
     @classmethod
@@ -844,7 +833,12 @@ class BathGeneral(Bath):
         hvec, lambdavec = \
             cls._build_linear_combination(replicas, nnambu * nspin, h, is_nambu)
 
-        bath = cls(nspin, norb, nbath, hvec, lambdavec)
+        bath = cls(nspin, norb, nbath, hvec)
+
+        # Fill l
+        for nu in range(bath.nbath):
+            for isym in range(bath.nsym):
+                bath.l[nu][isym] = lambdavec[nu, isym]
 
         # Fill V
         for nu in range(bath.nbath):
@@ -854,6 +848,10 @@ class BathGeneral(Bath):
                     bath.V[nu][spin, orb] = V[spin, spin, orb, b]
 
         return bath
+
+    @property
+    def lambdavec(self):
+        return np.asarray(self.l, order='F')
 
 
 register_class(BathGeneral)
