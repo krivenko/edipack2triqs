@@ -313,26 +313,26 @@
 
         <span class="c1"># View: Energy levels</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">eps</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[:</span><span class="n">size</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">params_shape</span><span class="p">)</span>
-        <span class="k">assert</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">eps</span><span class="o">.</span><span class="n">flags</span><span class="p">[</span><span class="s1">&#39;OWNDATA&#39;</span><span class="p">]</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">eps</span><span class="o">.</span><span class="n">base</span> <span class="ow">is</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span>
 
         <span class="k">if</span> <span class="n">ed_mode</span> <span class="o">==</span> <span class="s2">&quot;nonsu2&quot;</span><span class="p">:</span>
             <span class="c1"># View: Same-spin hopping amplitudes</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">V</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">size</span><span class="p">:</span><span class="mi">2</span> <span class="o">*</span> <span class="n">size</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">params_shape</span><span class="p">)</span>
-            <span class="k">assert</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">V</span><span class="o">.</span><span class="n">flags</span><span class="p">[</span><span class="s1">&#39;OWNDATA&#39;</span><span class="p">]</span>
+            <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">V</span><span class="o">.</span><span class="n">base</span> <span class="ow">is</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span>
             <span class="c1"># View: Spin-flip hopping amplitudes</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">U</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="mi">2</span> <span class="o">*</span> <span class="n">size</span><span class="p">:]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">params_shape</span><span class="p">)</span>
-            <span class="k">assert</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">U</span><span class="o">.</span><span class="n">flags</span><span class="p">[</span><span class="s1">&#39;OWNDATA&#39;</span><span class="p">]</span>
+            <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">U</span><span class="o">.</span><span class="n">base</span> <span class="ow">is</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span>
         <span class="k">elif</span> <span class="n">ed_mode</span> <span class="o">==</span> <span class="s2">&quot;superc&quot;</span><span class="p">:</span>
             <span class="c1"># View: Local SC order parameters of the bath</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">Delta</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">size</span><span class="p">:</span><span class="mi">2</span> <span class="o">*</span> <span class="n">size</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">params_shape</span><span class="p">)</span>
-            <span class="k">assert</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">Delta</span><span class="o">.</span><span class="n">flags</span><span class="p">[</span><span class="s1">&#39;OWNDATA&#39;</span><span class="p">]</span>
+            <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">Delta</span><span class="o">.</span><span class="n">base</span> <span class="ow">is</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span>
             <span class="c1"># View: Same-spin hopping amplitudes</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">V</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="mi">2</span> <span class="o">*</span> <span class="n">size</span><span class="p">:]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">params_shape</span><span class="p">)</span>
-            <span class="k">assert</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">V</span><span class="o">.</span><span class="n">flags</span><span class="p">[</span><span class="s1">&#39;OWNDATA&#39;</span><span class="p">]</span>
+            <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">V</span><span class="o">.</span><span class="n">base</span> <span class="ow">is</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span>
         <span class="k">elif</span> <span class="n">ed_mode</span> <span class="o">==</span> <span class="s2">&quot;normal&quot;</span><span class="p">:</span>
             <span class="c1"># View: Same-spin hopping amplitudes</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">V</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">size</span><span class="p">:</span><span class="mi">2</span> <span class="o">*</span> <span class="n">size</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">params_shape</span><span class="p">)</span>
-            <span class="k">assert</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">V</span><span class="o">.</span><span class="n">flags</span><span class="p">[</span><span class="s1">&#39;OWNDATA&#39;</span><span class="p">]</span>
+            <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">V</span><span class="o">.</span><span class="n">base</span> <span class="ow">is</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Unknown ED mode&quot;</span><span class="p">)</span>
 
@@ -511,26 +511,26 @@
 
         <span class="c1"># View: Energy levels</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">eps</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[:</span><span class="n">eps_size</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">eps_shape</span><span class="p">)</span>
-        <span class="k">assert</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">eps</span><span class="o">.</span><span class="n">flags</span><span class="p">[</span><span class="s1">&#39;OWNDATA&#39;</span><span class="p">]</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">eps</span><span class="o">.</span><span class="n">base</span> <span class="ow">is</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span>
 
         <span class="k">if</span> <span class="n">ed_mode</span> <span class="o">==</span> <span class="s2">&quot;nonsu2&quot;</span><span class="p">:</span>
             <span class="c1"># View: Same-spin hopping amplitudes</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">V</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">eps_size</span><span class="p">:</span><span class="n">eps_size</span> <span class="o">+</span> <span class="n">size</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">shape</span><span class="p">)</span>
-            <span class="k">assert</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">V</span><span class="o">.</span><span class="n">flags</span><span class="p">[</span><span class="s1">&#39;OWNDATA&#39;</span><span class="p">]</span>
+            <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">V</span><span class="o">.</span><span class="n">base</span> <span class="ow">is</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span>
             <span class="c1"># View: Spin-flip hopping amplitudes</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">U</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">eps_size</span> <span class="o">+</span> <span class="n">size</span><span class="p">:]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">shape</span><span class="p">)</span>
-            <span class="k">assert</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">U</span><span class="o">.</span><span class="n">flags</span><span class="p">[</span><span class="s1">&#39;OWNDATA&#39;</span><span class="p">]</span>
+            <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">U</span><span class="o">.</span><span class="n">base</span> <span class="ow">is</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span>
         <span class="k">elif</span> <span class="n">ed_mode</span> <span class="o">==</span> <span class="s2">&quot;superc&quot;</span><span class="p">:</span>
             <span class="c1"># View: Local SC order parameters of the bath</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">Delta</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">eps_size</span><span class="p">:</span><span class="mi">2</span> <span class="o">*</span> <span class="n">eps_size</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">eps_shape</span><span class="p">)</span>
-            <span class="k">assert</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">Delta</span><span class="o">.</span><span class="n">flags</span><span class="p">[</span><span class="s1">&#39;OWNDATA&#39;</span><span class="p">]</span>
+            <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">Delta</span><span class="o">.</span><span class="n">base</span> <span class="ow">is</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span>
             <span class="c1"># View: Same-spin hopping amplitudes</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">V</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="mi">2</span> <span class="o">*</span> <span class="n">eps_size</span><span class="p">:]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">shape</span><span class="p">)</span>
-            <span class="k">assert</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">V</span><span class="o">.</span><span class="n">flags</span><span class="p">[</span><span class="s1">&#39;OWNDATA&#39;</span><span class="p">]</span>
+            <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">V</span><span class="o">.</span><span class="n">base</span> <span class="ow">is</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span>
         <span class="k">elif</span> <span class="n">ed_mode</span> <span class="o">==</span> <span class="s2">&quot;normal&quot;</span><span class="p">:</span>
             <span class="c1"># View: Same-spin hopping amplitudes</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">V</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">eps_size</span><span class="p">:]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">shape</span><span class="p">)</span>
-            <span class="k">assert</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">V</span><span class="o">.</span><span class="n">flags</span><span class="p">[</span><span class="s1">&#39;OWNDATA&#39;</span><span class="p">]</span>
+            <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">V</span><span class="o">.</span><span class="n">base</span> <span class="ow">is</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Unknown ED mode&quot;</span><span class="p">)</span>
 
@@ -649,11 +649,9 @@
                  <span class="n">norb</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
                  <span class="n">nbath</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
                  <span class="n">hvec</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
-                 <span class="n">lambdavec</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
                  <span class="n">data</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">nbath</span> <span class="o">=</span> <span class="n">nbath</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">hvec</span> <span class="o">=</span> <span class="n">hvec</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">lambdavec</span> <span class="o">=</span> <span class="n">lambdavec</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">nsym</span> <span class="o">=</span> <span class="n">hvec</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
 
         <span class="n">V_size</span> <span class="o">=</span> <span class="n">nspin</span> <span class="o">*</span> <span class="n">norb</span>
@@ -675,26 +673,20 @@
         <span class="c1"># View: Hopping amplitudes</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">V</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">replica_offset</span><span class="p">(</span><span class="n">nu</span><span class="p">):</span><span class="n">replica_offset</span><span class="p">(</span><span class="n">nu</span><span class="p">)</span> <span class="o">+</span> <span class="n">V_size</span><span class="p">]</span><span class="o">.</span>
                   <span class="n">reshape</span><span class="p">(</span><span class="n">nspin</span><span class="p">,</span> <span class="n">norb</span><span class="p">)</span>
-                  <span class="k">for</span> <span class="n">nu</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nbath</span><span class="p">)]</span>
-        <span class="k">assert</span> <span class="nb">all</span><span class="p">(</span><span class="ow">not</span> <span class="n">V_nu</span><span class="o">.</span><span class="n">flags</span><span class="p">[</span><span class="s1">&#39;OWNDATA&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">V_nu</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">V</span><span class="p">)</span>
+                  <span class="k">for</span> <span class="n">nu</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nbath</span><span class="p">)]</span>
+        <span class="k">assert</span> <span class="nb">all</span><span class="p">(</span><span class="n">V_nu</span><span class="o">.</span><span class="n">base</span> <span class="ow">is</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="k">for</span> <span class="n">V_nu</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">V</span><span class="p">)</span>
 
         <span class="c1"># View: Linear coefficients of the replica matrix linear combination</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">l</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">replica_offset</span><span class="p">(</span><span class="n">nu</span><span class="p">)</span> <span class="o">+</span> <span class="n">V_size</span><span class="p">:</span>  <span class="c1"># noqa: E741</span>
                             <span class="n">replica_offset</span><span class="p">(</span><span class="n">nu</span><span class="p">)</span> <span class="o">+</span> <span class="n">V_size</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">nsym</span><span class="p">]</span><span class="o">.</span>
                   <span class="n">reshape</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nsym</span><span class="p">)</span>
                   <span class="k">for</span> <span class="n">nu</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nbath</span><span class="p">)]</span>
-        <span class="k">assert</span> <span class="nb">all</span><span class="p">(</span><span class="ow">not</span> <span class="n">l_nu</span><span class="o">.</span><span class="n">flags</span><span class="p">[</span><span class="s1">&#39;OWNDATA&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">l_nu</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">l</span><span class="p">)</span>
-
-        <span class="c1"># Fill self.l</span>
-        <span class="k">for</span> <span class="n">nu</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nbath</span><span class="p">):</span>
-            <span class="k">for</span> <span class="n">isym</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nsym</span><span class="p">):</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">l</span><span class="p">[</span><span class="n">nu</span><span class="p">][</span><span class="n">isym</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">lambdavec</span><span class="p">[</span><span class="n">nu</span><span class="p">,</span> <span class="n">isym</span><span class="p">]</span>
+        <span class="k">assert</span> <span class="nb">all</span><span class="p">(</span><span class="n">l_nu</span><span class="o">.</span><span class="n">base</span> <span class="ow">is</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="k">for</span> <span class="n">l_nu</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">l</span><span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">__deepcopy__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">memo</span><span class="p">):</span>
         <span class="n">nspin</span><span class="p">,</span> <span class="n">norb</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">V</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span>
         <span class="k">return</span> <span class="n">BathGeneral</span><span class="p">(</span><span class="n">nspin</span><span class="p">,</span> <span class="n">norb</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">nbath</span><span class="p">,</span>
                            <span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">hvec</span><span class="p">,</span> <span class="n">memo</span><span class="p">),</span>
-                           <span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lambdavec</span><span class="p">,</span> <span class="n">memo</span><span class="p">),</span>
                            <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">copy</span><span class="p">())</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">__reduce_to_dict__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -703,7 +695,6 @@
                 <span class="s2">&quot;norb&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">V</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
                 <span class="s2">&quot;nbath&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">nbath</span><span class="p">,</span>
                 <span class="s2">&quot;hvec&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">hvec</span><span class="p">,</span>
-                <span class="s2">&quot;lambdavec&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">lambdavec</span><span class="p">,</span>
                 <span class="s2">&quot;data&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">}</span>
 
     <span class="nd">@classmethod</span>
@@ -711,7 +702,7 @@
         <span class="s2">&quot;HDFArchive deserialization&quot;</span>
         <span class="k">return</span> <span class="n">BathGeneral</span><span class="p">(</span>
             <span class="n">d</span><span class="p">[</span><span class="s2">&quot;nspin&quot;</span><span class="p">],</span> <span class="n">d</span><span class="p">[</span><span class="s2">&quot;norb&quot;</span><span class="p">],</span> <span class="n">d</span><span class="p">[</span><span class="s2">&quot;nbath&quot;</span><span class="p">],</span>
-            <span class="n">d</span><span class="p">[</span><span class="s2">&quot;hvec&quot;</span><span class="p">],</span> <span class="n">d</span><span class="p">[</span><span class="s2">&quot;lambdavec&quot;</span><span class="p">],</span> <span class="n">d</span><span class="p">[</span><span class="s2">&quot;data&quot;</span><span class="p">]</span>
+            <span class="n">d</span><span class="p">[</span><span class="s2">&quot;hvec&quot;</span><span class="p">],</span> <span class="n">d</span><span class="p">[</span><span class="s2">&quot;data&quot;</span><span class="p">]</span>
         <span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">assert_compatible</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
@@ -725,22 +716,20 @@
     <span class="k">def</span><span class="w"> </span><span class="fm">__imul__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
         <span class="c1"># Skipping the first element that stores nsym</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span> <span class="o">*=</span> <span class="n">x</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">lambdavec</span> <span class="o">*=</span> <span class="n">x</span>
         <span class="k">return</span> <span class="bp">self</span>
 
-    <span class="c1"># Addition and subtraction of bath parameters</span>
+    <span class="c1"># Addition of bath parameters</span>
     <span class="k">def</span><span class="w"> </span><span class="fm">__iadd__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">assert_compatible</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
         <span class="c1"># Skipping the first element that stores nsym</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span> <span class="o">+=</span> <span class="n">other</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">lambdavec</span> <span class="o">+=</span> <span class="n">other</span><span class="o">.</span><span class="n">lambdavec</span>
         <span class="k">return</span> <span class="bp">self</span>
 
+    <span class="c1"># Subtraction of bath parameters</span>
     <span class="k">def</span><span class="w"> </span><span class="fm">__isub__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">assert_compatible</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
         <span class="c1"># Skipping the first element that stores nsym</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span> <span class="o">-=</span> <span class="n">other</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">lambdavec</span> <span class="o">-=</span> <span class="n">other</span><span class="o">.</span><span class="n">lambdavec</span>
         <span class="k">return</span> <span class="bp">self</span>
 
     <span class="nd">@classmethod</span>
@@ -1011,7 +1000,12 @@
         <span class="n">hvec</span><span class="p">,</span> <span class="n">lambdavec</span> <span class="o">=</span> \
             <span class="bp">cls</span><span class="o">.</span><span class="n">_build_linear_combination</span><span class="p">(</span><span class="n">replicas</span><span class="p">,</span> <span class="n">nnambu</span> <span class="o">*</span> <span class="n">nspin</span><span class="p">,</span> <span class="n">h</span><span class="p">,</span> <span class="n">is_nambu</span><span class="p">)</span>
 
-        <span class="n">bath</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">(</span><span class="n">nspin</span><span class="p">,</span> <span class="n">norb</span><span class="p">,</span> <span class="n">nbath</span><span class="p">,</span> <span class="n">hvec</span><span class="p">,</span> <span class="n">lambdavec</span><span class="p">)</span>
+        <span class="n">bath</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">(</span><span class="n">nspin</span><span class="p">,</span> <span class="n">norb</span><span class="p">,</span> <span class="n">nbath</span><span class="p">,</span> <span class="n">hvec</span><span class="p">)</span>
+
+        <span class="c1"># Fill l</span>
+        <span class="k">for</span> <span class="n">nu</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">bath</span><span class="o">.</span><span class="n">nbath</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">isym</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">bath</span><span class="o">.</span><span class="n">nsym</span><span class="p">):</span>
+                <span class="n">bath</span><span class="o">.</span><span class="n">l</span><span class="p">[</span><span class="n">nu</span><span class="p">][</span><span class="n">isym</span><span class="p">]</span> <span class="o">=</span> <span class="n">lambdavec</span><span class="p">[</span><span class="n">nu</span><span class="p">,</span> <span class="n">isym</span><span class="p">]</span>
 
         <span class="c1"># Fill V</span>
         <span class="k">for</span> <span class="n">nu</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">bath</span><span class="o">.</span><span class="n">nbath</span><span class="p">):</span>
@@ -1020,7 +1014,11 @@
                 <span class="k">for</span> <span class="n">orb</span><span class="p">,</span> <span class="n">b</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">replica</span><span class="p">):</span>
                     <span class="n">bath</span><span class="o">.</span><span class="n">V</span><span class="p">[</span><span class="n">nu</span><span class="p">][</span><span class="n">spin</span><span class="p">,</span> <span class="n">orb</span><span class="p">]</span> <span class="o">=</span> <span class="n">V</span><span class="p">[</span><span class="n">spin</span><span class="p">,</span> <span class="n">spin</span><span class="p">,</span> <span class="n">orb</span><span class="p">,</span> <span class="n">b</span><span class="p">]</span>
 
-        <span class="k">return</span> <span class="n">bath</span></div>
+        <span class="k">return</span> <span class="n">bath</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">lambdavec</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">l</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="s1">&#39;F&#39;</span><span class="p">)</span></div>
 
 
 
