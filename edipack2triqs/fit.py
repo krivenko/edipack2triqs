@@ -17,37 +17,71 @@ from .util import chdircontext
 
 @dataclass(frozen=True, kw_only=True)
 class BathFittingParams:
-    """Parameters of bath fitting"""
+    """Parameters of bath fitting."""
 
-    # Fitting scheme: delta, weiss
     scheme: str = "weiss"
+    """
+    Fitting scheme: *"delta"* to fit the hybridization function, *"weiss"* to
+    fit the Weiss field.
+    """
     # Minimization routine type: CGnr, minimize
     method: str = "minimize"
-    # Gradient evaluation: analytic, numeric
+    """
+    Minimization routine to use: *"CGnr"* for an algorithm from Numerical
+    Recipes, *"minimize"* for an older FORTRAN 77 minimization procedure.
+    """
     grad: str = "numeric"
-    # Conjugate-gradient tolerance
-    tol: float = 0.00001
-    # Conjugate-gradient stopping condition:
-    # target (|F_{n-1} - F_n| < tol * (1+F_n)),
-    # vars (||x_{n-1} - x_n|| < tol * (1+||x_n||)),
-    # or both
+    """
+    Gradient evaluation method, either *"analytic"* or *"numeric"*.
+    """
+    tol: float = 1e-5
+    """
+    Tolerance level for the conjugate gradient method.
+    """
     stop: str = "both"
-    # Max number of iterations
+    """
+    Stopping condition for the conjugate gradient method.
+
+        - *"target"*: :math:`|F_{n-1} - F_n| < tol (1+F_n)`.
+        - *"vars"*: :math:`||x_{n-1} - x_n|| < tol (1+||x_n||)`.
+        - *"both"*: Both conditions are fulfilled.
+    """
     niter: int = 500
-    # Number of Matsubara frequencies used in the fit
+    """
+    Maximal number of iterations.
+    """
     n_iw: int = 1000
-    # Conjugate-gradient weight form: 1, 1/n, 1/w_n
+    """
+    The number of Matsubara frequencies used in the fit.
+    """
     weight: str = "1"
-    # Conjugate-gradient norm definition: elemental, frobenius
+    r"""
+    Weight function for the conjugate gradient minimization.
+
+        - *"1"*: :math:`1`
+        - *"1/n"*: :math:`1/n`, where :math:`n` is a Matsubara frequency number.
+        - *"1/w_n"*: :math:`1/\omega_n`, where :math:`\omega_n` is a Matsubara
+          frequency.
+    """
     norm: str = "elemental"
-    # Fit power for the calculation of the generalized distance as
-    # |G0 - G0and| ** pow
+    r"""
+    Matrix norm to use in optimization, either *"elemental"* (sum of
+    :math:`\chi^2`-norms for each matrix element) or *"frobenius"*.
+    """
     pow: int = 2
-    # Flag to pick old/False (Krauth) or new/True (Lichtenstein) version of
-    # the minimize CG routine
+    r"""
+    Fit power for the calculation of the generalized distance as
+    :math:`|G_0 - G_{0,\text{and}}| ^ \text{pow}`.
+    """
     minimize_ver: bool = False
-    # Unknown parameter used in the CG minimize procedure
+    """
+    Use the old/Krauth (*False*) or the new/Lichtenstein (*True*) version of the
+    minimization conjugate gradient procedure.
+    """
     minimize_hh: float = 1e-4
+    """
+    An unknown parameter used in the conjugate gradient minimization procedure.
+    """
 
     def __dict__(self):
         assert self.scheme in ("delta", "weiss"), "Invalid value of 'scheme'"
@@ -82,6 +116,22 @@ class BathFittingParams:
 def _chi2_fit_bath(self, g: BlockGf, f: Optional[BlockGf] = None):
     """
     Perform bath parameter fit of a given Green's function.
+
+    :param g: Normal component of the function to fit (either the hybridization
+              function or the Weiss field).
+    :type g: triqs.gf.block_gf.BlockGf
+
+    :param f: Anomalous component of the function to fit (either the
+              hybridization function or the Weiss field). Required iff the bath
+              is superconducting.
+    :type g: triqs.gf.block_gf.BlockGf
+
+    :return: - A bath object that contains resulting parameters of the fit.
+             - The normal component of the fitted function.
+             - (*optional*) The anomalous component of the fitted function.
+
+    :rtype: tuple[Bath, triqs.gf.block_gf.BlockGf] or
+            tuple[Bath, triqs.gf.block_gf.BlockGf, triqs.gf.block_gf.BlockGf]
     """
 
     if (ed.get_ed_mode() == 2) != (f is not None):

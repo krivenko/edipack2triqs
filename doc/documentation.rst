@@ -43,8 +43,9 @@ Bath fitting
 .. py:module:: edipack2triqs.fit
 
 :py:class:`BathFittingParams` is a collection of parameters used
-in EDIpack's bath fitting procedure. The procedure can be invoked by calling
-a method of :py:class:`edipack2triqs.solver.EDIpackSolver`.
+in **EDIpack**'s bath fitting procedure. The procedure can be invoked by
+calling a method of :py:class:`edipack2triqs.solver.EDIpackSolver`.
 
 .. autoclass:: BathFittingParams
+   :members:
 .. automethod:: edipack2triqs.solver.EDIpackSolver.chi2_fit_bath

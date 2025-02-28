@@ -107,7 +107,7 @@ class EDIpackSolver:
 
         :param fops_imp_dn: Fundamental operator set for spin-down impurity
             degrees of freedom.
-        :type list[tuple[int | str, int | str]]:
+        :type fops_imp_dn: list[tuple[int | str, int | str]]
 
         :param fops_bath_up: Fundamental operator set for spin-up bath
             degrees of freedom.
