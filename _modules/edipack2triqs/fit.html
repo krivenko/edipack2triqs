@@ -106,7 +106,21 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../../documentation.html#module-edipack2triqs.fit">Bath fitting</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../../documentation.html#edipack2triqs.fit.BathFittingParams"><code class="docutils literal notranslate"><span class="pre">BathFittingParams</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../documentation.html#edipack2triqs.fit.BathFittingParams"><code class="docutils literal notranslate"><span class="pre">BathFittingParams</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../documentation.html#edipack2triqs.fit.BathFittingParams.scheme"><code class="docutils literal notranslate"><span class="pre">BathFittingParams.scheme</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../documentation.html#edipack2triqs.fit.BathFittingParams.method"><code class="docutils literal notranslate"><span class="pre">BathFittingParams.method</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../documentation.html#edipack2triqs.fit.BathFittingParams.grad"><code class="docutils literal notranslate"><span class="pre">BathFittingParams.grad</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../documentation.html#edipack2triqs.fit.BathFittingParams.tol"><code class="docutils literal notranslate"><span class="pre">BathFittingParams.tol</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../documentation.html#edipack2triqs.fit.BathFittingParams.stop"><code class="docutils literal notranslate"><span class="pre">BathFittingParams.stop</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../documentation.html#edipack2triqs.fit.BathFittingParams.niter"><code class="docutils literal notranslate"><span class="pre">BathFittingParams.niter</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../documentation.html#edipack2triqs.fit.BathFittingParams.n_iw"><code class="docutils literal notranslate"><span class="pre">BathFittingParams.n_iw</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../documentation.html#edipack2triqs.fit.BathFittingParams.weight"><code class="docutils literal notranslate"><span class="pre">BathFittingParams.weight</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../documentation.html#edipack2triqs.fit.BathFittingParams.norm"><code class="docutils literal notranslate"><span class="pre">BathFittingParams.norm</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../documentation.html#edipack2triqs.fit.BathFittingParams.pow"><code class="docutils literal notranslate"><span class="pre">BathFittingParams.pow</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../documentation.html#edipack2triqs.fit.BathFittingParams.minimize_ver"><code class="docutils literal notranslate"><span class="pre">BathFittingParams.minimize_ver</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../documentation.html#edipack2triqs.fit.BathFittingParams.minimize_hh"><code class="docutils literal notranslate"><span class="pre">BathFittingParams.minimize_hh</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l3"><a class="reference internal" href="../../documentation.html#edipack2triqs.solver.EDIpackSolver.chi2_fit_bath"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.chi2_fit_bath()</span></code></a></li>
 </ul>
 </li>
@@ -119,7 +133,7 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../issues.html">Reporting issues</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../ChangeLog.html">Changelog</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../../ChangeLog.html#version-0-4-0">Version 0.4.0</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../ChangeLog.html#version-0-5-0">Version 0.5.0</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../about.html">About edipack2triqs</a><ul>
@@ -175,37 +189,71 @@
 <a class="viewcode-back" href="../../documentation.html#edipack2triqs.fit.BathFittingParams">[docs]</a>
 <span class="nd">@dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">kw_only</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">BathFittingParams</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Parameters of bath fitting&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Parameters of bath fitting.&quot;&quot;&quot;</span>
 
-    <span class="c1"># Fitting scheme: delta, weiss</span>
     <span class="n">scheme</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;weiss&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Fitting scheme: *&quot;delta&quot;* to fit the hybridization function, *&quot;weiss&quot;* to</span>
+<span class="sd">    fit the Weiss field.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># Minimization routine type: CGnr, minimize</span>
     <span class="n">method</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;minimize&quot;</span>
-    <span class="c1"># Gradient evaluation: analytic, numeric</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Minimization routine to use: *&quot;CGnr&quot;* for an algorithm from Numerical</span>
+<span class="sd">    Recipes, *&quot;minimize&quot;* for an older FORTRAN 77 minimization procedure.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">grad</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;numeric&quot;</span>
-    <span class="c1"># Conjugate-gradient tolerance</span>
-    <span class="n">tol</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.00001</span>
-    <span class="c1"># Conjugate-gradient stopping condition:</span>
-    <span class="c1"># target (|F_{n-1} - F_n| &lt; tol * (1+F_n)),</span>
-    <span class="c1"># vars (||x_{n-1} - x_n|| &lt; tol * (1+||x_n||)),</span>
-    <span class="c1"># or both</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Gradient evaluation method, either *&quot;analytic&quot;* or *&quot;numeric&quot;*.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">tol</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1e-5</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Tolerance level for the conjugate gradient method.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">stop</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;both&quot;</span>
-    <span class="c1"># Max number of iterations</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Stopping condition for the conjugate gradient method.</span>
+
+<span class="sd">        - *&quot;target&quot;*: :math:`|F_{n-1} - F_n| &lt; tol (1+F_n)`.</span>
+<span class="sd">        - *&quot;vars&quot;*: :math:`||x_{n-1} - x_n|| &lt; tol (1+||x_n||)`.</span>
+<span class="sd">        - *&quot;both&quot;*: Both conditions are fulfilled.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">niter</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">500</span>
-    <span class="c1"># Number of Matsubara frequencies used in the fit</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Maximal number of iterations.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">n_iw</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1000</span>
-    <span class="c1"># Conjugate-gradient weight form: 1, 1/n, 1/w_n</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    The number of Matsubara frequencies used in the fit.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">weight</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;1&quot;</span>
-    <span class="c1"># Conjugate-gradient norm definition: elemental, frobenius</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Weight function for the conjugate gradient minimization.</span>
+
+<span class="sd">        - *&quot;1&quot;*: :math:`1`</span>
+<span class="sd">        - *&quot;1/n&quot;*: :math:`1/n`, where :math:`n` is a Matsubara frequency number.</span>
+<span class="sd">        - *&quot;1/w_n&quot;*: :math:`1/\omega_n`, where :math:`\omega_n` is a Matsubara</span>
+<span class="sd">          frequency.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">norm</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;elemental&quot;</span>
-    <span class="c1"># Fit power for the calculation of the generalized distance as</span>
-    <span class="c1"># |G0 - G0and| ** pow</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Matrix norm to use in optimization, either *&quot;elemental&quot;* (sum of</span>
+<span class="sd">    :math:`\chi^2`-norms for each matrix element) or *&quot;frobenius&quot;*.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="nb">pow</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">2</span>
-    <span class="c1"># Flag to pick old/False (Krauth) or new/True (Lichtenstein) version of</span>
-    <span class="c1"># the minimize CG routine</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Fit power for the calculation of the generalized distance as</span>
+<span class="sd">    :math:`|G_0 - G_{0,\text{and}}| ^ \text{pow}`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">minimize_ver</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
-    <span class="c1"># Unknown parameter used in the CG minimize procedure</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Use the old/Krauth (*False*) or the new/Lichtenstein (*True*) version of the</span>
+<span class="sd">    minimization conjugate gradient procedure.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">minimize_hh</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1e-4</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    An unknown parameter used in the conjugate gradient minimization procedure.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">__dict__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">scheme</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;delta&quot;</span><span class="p">,</span> <span class="s2">&quot;weiss&quot;</span><span class="p">),</span> <span class="s2">&quot;Invalid value of &#39;scheme&#39;&quot;</span>
@@ -241,6 +289,22 @@
 <span class="k">def</span><span class="w"> </span><span class="nf">_chi2_fit_bath</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">g</span><span class="p">:</span> <span class="n">BlockGf</span><span class="p">,</span> <span class="n">f</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">BlockGf</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Perform bath parameter fit of a given Green&#39;s function.</span>
+
+<span class="sd">    :param g: Normal component of the function to fit (either the hybridization</span>
+<span class="sd">              function or the Weiss field).</span>
+<span class="sd">    :type g: triqs.gf.block_gf.BlockGf</span>
+
+<span class="sd">    :param f: Anomalous component of the function to fit (either the</span>
+<span class="sd">              hybridization function or the Weiss field). Required iff the bath</span>
+<span class="sd">              is superconducting.</span>
+<span class="sd">    :type g: triqs.gf.block_gf.BlockGf</span>
+
+<span class="sd">    :return: - A bath object that contains resulting parameters of the fit.</span>
+<span class="sd">             - The normal component of the fitted function.</span>
+<span class="sd">             - (*optional*) The anomalous component of the fitted function.</span>
+
+<span class="sd">    :rtype: tuple[Bath, triqs.gf.block_gf.BlockGf] or</span>
+<span class="sd">            tuple[Bath, triqs.gf.block_gf.BlockGf, triqs.gf.block_gf.BlockGf]</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">if</span> <span class="p">(</span><span class="n">ed</span><span class="o">.</span><span class="n">get_ed_mode</span><span class="p">()</span> <span class="o">==</span> <span class="mi">2</span><span class="p">)</span> <span class="o">!=</span> <span class="p">(</span><span class="n">f</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">):</span>
