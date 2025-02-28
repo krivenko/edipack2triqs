@@ -263,9 +263,12 @@
 
 <span class="sd">        The fundamental operator sets (**fops** for short) define sizes of</span>
 <span class="sd">        impurity and bath Hilbert spaces. The expected **fops** objects are</span>
-<span class="sd">        lists of tuples (pairs). Each element ``(i, j)`` of such a list</span>
+<span class="sd">        lists of tuples (pairs). Each element ``(b, i)`` of such a list</span>
 <span class="sd">        corresponds to a single fermionic degree of freedom created by</span>
-<span class="sd">        the many-body operator ``c_dag(i, j)``.</span>
+<span class="sd">        the many-body operator ``c_dag(b, i)``. ``b`` and ``i`` are a (string or</span>
+<span class="sd">        integer) block index and an index within a block respectively, which</span>
+<span class="sd">        are used to construct output :py:class:`Green&#39;s function</span>
+<span class="sd">        containers &lt;triqs.gf.block_gf.BlockGf&gt;`.</span>
 
 <span class="sd">        :param hamiltonian: Many-body electronic Hamiltonian to diagonalize.</span>
 <span class="sd">            Symmetries of this Hamiltonian are automatically analyzed and</span>
@@ -318,8 +321,10 @@
 <span class="sd">            occupancies.</span>
 <span class="sd">        :type ed_total_ud: bool, default=False</span>
 
-<span class="sd">        :param lanc_method: Select the Lanczos method to be used in</span>
-<span class="sd">            the determination of the spectrum, one of *&quot;arpack&quot;*,  *&quot;dvdson&quot;*</span>
+<span class="sd">        :param lanc_method: Select the method to be used in</span>
+<span class="sd">            the determination of the spectrum, one of *&quot;arpack&quot;*, *&quot;lanczos&quot;*</span>
+<span class="sd">            (simple Lanczos method, only works at zero temperature, can be</span>
+<span class="sd">            useful in some rare cases, when ARPACK fails) and *&quot;dvdson&quot;*</span>
 <span class="sd">            (no-MPI mode only).</span>
 <span class="sd">        :type lanc_method: str, default=&quot;arpack&quot;</span>
 

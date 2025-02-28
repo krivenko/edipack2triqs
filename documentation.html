@@ -193,9 +193,12 @@ create more such objects will raise an <a class="reference external" href="https
 <dd><p>Initialize internal state of the underlying <strong>EDIpack</strong> solver.</p>
 <p>The fundamental operator sets (<strong>fops</strong> for short) define sizes of
 impurity and bath Hilbert spaces. The expected <strong>fops</strong> objects are
-lists of tuples (pairs). Each element <code class="docutils literal notranslate"><span class="pre">(i,</span> <span class="pre">j)</span></code> of such a list
+lists of tuples (pairs). Each element <code class="docutils literal notranslate"><span class="pre">(b,</span> <span class="pre">i)</span></code> of such a list
 corresponds to a single fermionic degree of freedom created by
-the many-body operator <code class="docutils literal notranslate"><span class="pre">c_dag(i,</span> <span class="pre">j)</span></code>.</p>
+the many-body operator <code class="docutils literal notranslate"><span class="pre">c_dag(b,</span> <span class="pre">i)</span></code>. <code class="docutils literal notranslate"><span class="pre">b</span></code> and <code class="docutils literal notranslate"><span class="pre">i</span></code> are a (string or
+integer) block index and an index within a block respectively, which
+are used to construct output <a class="reference external" href="https://triqs.github.io/triqs/latest/documentation/python_api/triqs.gf.block_gf.BlockGf.html#triqs.gf.block_gf.BlockGf" rel="noopener noreferrer" target="_blank" title="(in TRIQS v3.3.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Green's</span> <span class="pre">function</span>
+<span class="pre">containers</span></code></a>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -228,8 +231,10 @@ the product <span class="math notranslate nohighlight">\(\hat H |v\rangle\)</spa
 <li><p><strong>ed_total_ud</strong> (<a class="reference external" href="https://docs.python.org/3.12/library/functions.html#bool" rel="noopener noreferrer" target="_blank" title="(in Python v3.12)"><em>bool</em></a><em>, </em><em>default=False</em>) – Force use of the total spin-up and spin-down
 occupancies as quantum numbers instead of the orbital-resolved
 occupancies.</p></li>
-<li><p><strong>lanc_method</strong> (<a class="reference external" href="https://docs.python.org/3.12/library/stdtypes.html#str" rel="noopener noreferrer" target="_blank" title="(in Python v3.12)"><em>str</em></a><em>, </em><em>default=&quot;arpack&quot;</em>) – Select the Lanczos method to be used in
-the determination of the spectrum, one of <em>“arpack”</em>,  <em>“dvdson”</em>
+<li><p><strong>lanc_method</strong> (<a class="reference external" href="https://docs.python.org/3.12/library/stdtypes.html#str" rel="noopener noreferrer" target="_blank" title="(in Python v3.12)"><em>str</em></a><em>, </em><em>default=&quot;arpack&quot;</em>) – Select the method to be used in
+the determination of the spectrum, one of <em>“arpack”</em>, <em>“lanczos”</em>
+(simple Lanczos method, only works at zero temperature, can be
+useful in some rare cases, when ARPACK fails) and <em>“dvdson”</em>
 (no-MPI mode only).</p></li>
 <li><p><strong>lanc_nstates_sector</strong> (<a class="reference external" href="https://docs.python.org/3.12/library/functions.html#int" rel="noopener noreferrer" target="_blank" title="(in Python v3.12)"><em>int</em></a><em>, </em><em>default=2</em>) – Initial number of states per sector
 to be determined.</p></li>
@@ -434,14 +439,14 @@ with the stored parameters.</p>
 <dd><p>Bases: <a class="reference internal" href="#edipack2triqs.bath.Bath" title="edipack2triqs.bath.Bath"><code class="xref py py-class docutils literal notranslate"><span class="pre">Bath</span></code></a></p>
 <p>Parameters of a bath with normal topology.
 The normal topology means that each of <code class="docutils literal notranslate"><span class="pre">norb</span></code> impurity orbitals is
-connected to <code class="docutils literal notranslate"><span class="pre">nbath</span></code> independent bath states. There are, therefore,
-<code class="docutils literal notranslate"><span class="pre">norb</span> <span class="pre">*</span> <span class="pre">nbath</span></code> bath states in total.</p>
+connected to <code class="docutils literal notranslate"><span class="pre">nbath</span></code> independent bath levels. There are, therefore,
+<code class="docutils literal notranslate"><span class="pre">norb</span> <span class="pre">*</span> <span class="pre">nbath</span></code> bath levels in total.</p>
 <p>Instances of this class are compatible with TRIQS’
 <a class="reference external" href="https://triqs.github.io/triqs/latest/documentation/manual/hdf5/ref.html" rel="noopener noreferrer" target="_blank" title="(in TRIQS v3.3.1)"><span class="xref std std-ref">HDF5</span></a> interface.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="edipack2triqs.bath.BathNormal.nbath">
 <span class="sig-name descname"><span class="pre">nbath</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.12/library/functions.html#int" rel="noopener noreferrer" target="_blank" title="(in Python v3.12)"><span class="pre">int</span></a></em><a class="headerlink" href="#edipack2triqs.bath.BathNormal.nbath" title="Link to this definition"></a></dt>
-<dd><p>Number of bath states per impurity orbital.</p>
+<dd><p>Number of bath levels per impurity orbital.</p>
 </dd></dl>
 
 <dl class="py attribute">
@@ -495,7 +500,7 @@ these levels is connected to each impurity orbital via hopping amplitudes
 <dl class="py attribute">
 <dt class="sig sig-object py" id="edipack2triqs.bath.BathHybrid.nbath">
 <span class="sig-name descname"><span class="pre">nbath</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.12/library/functions.html#int" rel="noopener noreferrer" target="_blank" title="(in Python v3.12)"><span class="pre">int</span></a></em><a class="headerlink" href="#edipack2triqs.bath.BathHybrid.nbath" title="Link to this definition"></a></dt>
-<dd><p>Total number of bath states.</p>
+<dd><p>Total number of bath levels.</p>
 </dd></dl>
 
 <dl class="py attribute">
@@ -570,14 +575,16 @@ amplitudes <code class="docutils literal notranslate"><span class="pre">V</span>
 <dt class="sig sig-object py" id="edipack2triqs.bath.BathGeneral.V">
 <span class="sig-name descname"><span class="pre">V</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.12/library/stdtypes.html#list" rel="noopener noreferrer" target="_blank" title="(in Python v3.12)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" rel="noopener noreferrer" target="_blank" title="(in NumPy v2.2)"><span class="pre">ndarray</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#edipack2triqs.bath.BathGeneral.V" title="Link to this definition"></a></dt>
 <dd><p>Hopping amplitudes <span class="math notranslate nohighlight">\(V^\nu_{\sigma,\alpha}\)</span>. Each of the <code class="docutils literal notranslate"><span class="pre">nbath</span></code>
-elements is an array of the shape <code class="docutils literal notranslate"><span class="pre">(nspin,</span> <span class="pre">norb)</span></code>.</p>
+elements is an array of the shape <code class="docutils literal notranslate"><span class="pre">(nspin,</span> <span class="pre">norb)</span></code> corresponding to the
+<span class="math notranslate nohighlight">\(\nu\)</span>-th replica.</p>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="edipack2triqs.bath.BathGeneral.l">
 <span class="sig-name descname"><span class="pre">l</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.12/library/stdtypes.html#list" rel="noopener noreferrer" target="_blank" title="(in Python v3.12)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" rel="noopener noreferrer" target="_blank" title="(in NumPy v2.2)"><span class="pre">ndarray</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#edipack2triqs.bath.BathGeneral.l" title="Link to this definition"></a></dt>
 <dd><p>Coefficients of linear combinations <span class="math notranslate nohighlight">\(\lambda^\nu_i\)</span>. Each of the
-<code class="docutils literal notranslate"><span class="pre">nbath</span></code> elements is an array of length <code class="docutils literal notranslate"><span class="pre">nsym</span></code>.</p>
+<code class="docutils literal notranslate"><span class="pre">nbath</span></code> elements is an array of length <code class="docutils literal notranslate"><span class="pre">nsym</span></code> corresponding to the
+<span class="math notranslate nohighlight">\(\nu\)</span>-th replica.</p>
 </dd></dl>
 
 </dd></dl>
@@ -675,7 +682,8 @@ frequency.</p></li>
 <dt class="sig sig-object py" id="edipack2triqs.fit.BathFittingParams.minimize_ver">
 <span class="sig-name descname"><span class="pre">minimize_ver</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.12/library/functions.html#bool" rel="noopener noreferrer" target="_blank" title="(in Python v3.12)"><span class="pre">bool</span></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">False</span></em><a class="headerlink" href="#edipack2triqs.fit.BathFittingParams.minimize_ver" title="Link to this definition"></a></dt>
 <dd><p>Use the old/Krauth (<em>False</em>) or the new/Lichtenstein (<em>True</em>) version of the
-minimization conjugate gradient procedure.</p>
+minimization conjugate gradient procedure. Only relevant for
+<em>method=”minimize”</em>.</p>
 </dd></dl>
 
 <dl class="py attribute">
