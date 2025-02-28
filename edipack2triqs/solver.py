@@ -89,9 +89,12 @@ class EDIpackSolver:
 
         The fundamental operator sets (**fops** for short) define sizes of
         impurity and bath Hilbert spaces. The expected **fops** objects are
-        lists of tuples (pairs). Each element ``(i, j)`` of such a list
+        lists of tuples (pairs). Each element ``(b, i)`` of such a list
         corresponds to a single fermionic degree of freedom created by
-        the many-body operator ``c_dag(i, j)``.
+        the many-body operator ``c_dag(b, i)``. ``b`` and ``i`` are a (string or
+        integer) block index and an index within a block respectively, which
+        are used to construct output :py:class:`Green's function
+        containers <triqs.gf.block_gf.BlockGf>`.
 
         :param hamiltonian: Many-body electronic Hamiltonian to diagonalize.
             Symmetries of this Hamiltonian are automatically analyzed and
@@ -144,8 +147,10 @@ class EDIpackSolver:
             occupancies.
         :type ed_total_ud: bool, default=False
 
-        :param lanc_method: Select the Lanczos method to be used in
-            the determination of the spectrum, one of *"arpack"*,  *"dvdson"*
+        :param lanc_method: Select the method to be used in
+            the determination of the spectrum, one of *"arpack"*, *"lanczos"*
+            (simple Lanczos method, only works at zero temperature, can be
+            useful in some rare cases, when ARPACK fails) and *"dvdson"*
             (no-MPI mode only).
         :type lanc_method: str, default="arpack"
 

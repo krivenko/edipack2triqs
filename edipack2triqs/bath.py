@@ -28,10 +28,10 @@ def _bath_states_to_orbs(V: np.ndarray):
 
 def _orbs_to_bath_states(V: np.ndarray):
     """
-    For each impurity orbital, find all bath states it is connected to by
+    For each impurity orbital, find all bath levels it is connected to by
     a hopping amplitude matrix 'V'.
     """
-    # np.unique() removes repeated bath states possibly introduced by multiple
+    # np.unique() removes repeated bath levels possibly introduced by multiple
     # combinations of spin indices
     norb = V.shape[2]
     return [list(np.unique(np.nonzero(V[:, :, orb, :])[2]))
@@ -94,8 +94,8 @@ class BathNormal(Bath):
     """
     Parameters of a bath with normal topology.
     The normal topology means that each of ``norb`` impurity orbitals is
-    connected to ``nbath`` independent bath states. There are, therefore,
-    ``norb * nbath`` bath states in total.
+    connected to ``nbath`` independent bath levels. There are, therefore,
+    ``norb * nbath`` bath levels in total.
 
     Instances of this class are compatible with TRIQS'
     :ref:`HDF5 </documentation/manual/hdf5/ref.rst>` interface.
@@ -105,7 +105,7 @@ class BathNormal(Bath):
     name: str = 'normal'
 
     nbath: int
-    "Number of bath states per impurity orbital."
+    "Number of bath levels per impurity orbital."
 
     eps: np.ndarray
     """
@@ -297,7 +297,7 @@ class BathHybrid(Bath):
     name: str = 'hybrid'
 
     nbath: int
-    "Total number of bath states."
+    "Total number of bath levels."
 
     eps: np.ndarray
     """
@@ -469,12 +469,14 @@ class BathGeneral(Bath):
     l: list[np.ndarray]
     r"""
     Coefficients of linear combinations :math:`\lambda^\nu_i`. Each of the
-    ``nbath`` elements is an array of length ``nsym``.
+    ``nbath`` elements is an array of length ``nsym`` corresponding to the
+    :math:`\nu`-th replica.
     """
     V: list[np.ndarray]
     r"""
     Hopping amplitudes :math:`V^\nu_{\sigma,\alpha}`. Each of the ``nbath``
-    elements is an array of the shape ``(nspin, norb)``.
+    elements is an array of the shape ``(nspin, norb)`` corresponding to the
+    :math:`\nu`-th replica.
     """
 
     def __init__(self,
@@ -644,7 +646,7 @@ class BathGeneral(Bath):
 
         if nbath_total % norb != 0:
             raise RuntimeError(
-                "Total number of bath states is not a multiple of norb"
+                "Total number of bath levels is not a multiple of norb"
             )
 
         if not is_spin_diagonal(V):
@@ -655,7 +657,7 @@ class BathGeneral(Bath):
 
         if any(len(orbs) > 1 for orbs in bs2orbs):
             raise RuntimeError(
-                "A bath state is connected to more than one impurity orbital"
+                "A bath level is connected to more than one impurity orbital"
             )
 
         # Graph representation of the bath Hamiltonian

@@ -76,7 +76,8 @@ class BathFittingParams:
     minimize_ver: bool = False
     """
     Use the old/Krauth (*False*) or the new/Lichtenstein (*True*) version of the
-    minimization conjugate gradient procedure.
+    minimization conjugate gradient procedure. Only relevant for
+    *method="minimize"*.
     """
     minimize_hh: float = 1e-4
     """
