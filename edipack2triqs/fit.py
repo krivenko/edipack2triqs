@@ -153,10 +153,7 @@ def _chi2_fit_bath(self, g: BlockGf, f: Optional[BlockGf] = None):
             fitted_bath.data[:] = ed.chi2_fitgf(func_up,
                                                 fitted_bath.data,
                                                 ispin=0)
-            if ed.Nspin == 1:
-                fitted_bath.data[:] = \
-                    ed.spin_symmetrize_bath(fitted_bath.data[:])
-            else:
+            if ed.Nspin != 1:
                 func_dn = extract_triqs_data(g[self.gf_block_names[1]].data)
                 fitted_bath.data[:] = ed.chi2_fitgf(func_dn,
                                                     fitted_bath.data,
