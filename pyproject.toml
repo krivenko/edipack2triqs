@@ -24,7 +24,7 @@ classifiers = [
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13"
 ]
-dependencies = ["edipy2>=0.1.0",
+dependencies = ["edipy2>=2.0.8",
                 "numpy",
                 "mpi4py",
                 "networkx"]
