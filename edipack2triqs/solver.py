@@ -130,6 +130,10 @@ class EDIpackSolver:
             5 for the full output from **EDIpack**.
         :type verbose: int, default=3
 
+        :param print_input_vars: Flag to toggle the printing of all the input
+            variables and their values on the console.
+        :type print_input_vars: bool, default=False
+
         :param cutoff: Spectrum cutoff used to determine the number of states
                        to be retained.
         :type cutoff: float, default=1e-9
@@ -242,6 +246,7 @@ class EDIpackSolver:
 
             c = self.default_config.copy()
             c["ED_VERBOSE"] = kwargs.get("verbose", 3)
+            c["PRINT_INPUT_VARS"] = kwargs.get("print_input_vars", False)
             c["CUTOFF"] = kwargs.get("cutoff", 1e-9)
             c["GS_THRESHOLD"] = kwargs.get("gs_threshold", 1e-9)
             c["ED_SPARSE_H"] = kwargs.get("ed_sparse_h", True)
