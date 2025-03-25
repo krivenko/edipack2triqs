@@ -85,6 +85,7 @@ jobs:
 
     - name: Test edipack2triqs
       run: |
+           source $(readlink -f ${HOME}/opt/edipack2/gnu/*/bin/edipack2_config_user.sh)
            source ${HOME}/opt/triqs/share/triqs/triqsvars.sh
            py.test -v tests/
 
