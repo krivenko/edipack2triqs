@@ -28,7 +28,8 @@ jobs:
       run: |
            sudo apt-get update -q
            sudo apt-get install -y gfortran libopenmpi-dev libboost-dev \
-               libblas-dev liblapack-dev libfftw3-dev libgmp-dev libhdf5-dev
+               libblas-dev liblapack-dev libfftw3-dev libgmp-dev libhdf5-dev \
+               libscalapack-mpi-dev
 
     - name: Build & install SciFortran
       env:
@@ -36,8 +37,8 @@ jobs:
       run: |
            git clone https://github.com/SciFortran/SciFortran.git scifor.git
            mkdir scifor.build && pushd scifor.build
-           cmake ../scifor.git -DCMAKE_BUILD_TYPE=Release
-           make -j2
+           cmake ../scifor.git
+           make -j
            make install
            popd
 
@@ -48,8 +49,8 @@ jobs:
            git clone https://github.com/edipack/EDIpack2.0 EDIpack2.git
            mkdir EDIpack2.build && pushd EDIpack2.build
            source $(readlink -f ${HOME}/opt/scifor/gnu/*/bin/scifor_config_user.sh)
-           cmake ../EDIpack2.git -DCMAKE_BUILD_TYPE=Release
-           make -j2
+           cmake ../EDIpack2.git
+           make -j
            make install
            popd
 
@@ -63,7 +64,7 @@ jobs:
            source $(readlink -f ${HOME}/opt/scifor/gnu/*/bin/scifor_config_user.sh)
            source $(readlink -f ${HOME}/opt/edipack2/gnu/*/bin/edipack2_config_user.sh)
            python -m pip install --upgrade pip
-           pip install --user numpy scipy matplotlib mako pytest networkx edipy2
+           pip install --user numpy scipy matplotlib mako mpi4py pytest networkx edipy2
            ldd /home/runner/opt/edipack2/gnu/3.0.0-3-g4889ee9/lib/libedipack2_cbinding.so
            python3 -c "from ctypes import *; asd=CDLL('/home/runner/opt/edipack2/gnu/3.0.0-3-g4889ee9/lib/libedipack2_cbinding.so'); print(c_int.in_dll(asd,'Nspin'))"
 
