@@ -37,8 +37,8 @@ jobs:
       run: |
            git clone https://github.com/SciFortran/SciFortran.git scifor.git
            mkdir scifor.build && pushd scifor.build
-           cmake ../scifor.git
-           make -j
+           cmake ../scifor.git -DCMAKE_BUILD_TYPE=Release
+           make -j2
            make install
            popd
 
@@ -49,8 +49,8 @@ jobs:
            git clone https://github.com/edipack/EDIpack2.0 EDIpack2.git
            mkdir EDIpack2.build && pushd EDIpack2.build
            source $(readlink -f ${HOME}/opt/scifor/gnu/*/bin/scifor_config_user.sh)
-           cmake ../EDIpack2.git
-           make -j
+           cmake ../EDIpack2.git -DCMAKE_BUILD_TYPE=Release
+           make -j2
            make install
            popd
 
