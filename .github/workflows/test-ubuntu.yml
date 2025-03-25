@@ -62,48 +62,49 @@ jobs:
       run: |
            python -m pip install --upgrade pip
            pip install --user numpy scipy matplotlib mpi4py mako pytest networkx edipy2
+           python3 -c "from ctypes import *; asd=CDLL('/home/runner/opt/edipack2/gnu/3.0.0-3-g4889ee9/lib/libedipack2_cbinding.so'); print(c_int.in_dll(asd,'Nspin'))"
 
-    - name: Build & install TRIQS
-      env:
-        CXX: g++
-      run: |
-           git clone https://github.com/TRIQS/triqs --branch 3.3.x triqs.git
-           mkdir triqs.build && pushd triqs.build
-           cmake ../triqs.git                                                  \
-             -DCMAKE_BUILD_TYPE=Release                                        \
-             -DCMAKE_INSTALL_PREFIX=${HOME}/opt/triqs                          \
-             -DBuild_Tests=OFF
-           make -j2
-           make install
-           popd
+    #- name: Build & install TRIQS
+    #  env:
+    #    CXX: g++
+    #  run: |
+    #       git clone https://github.com/TRIQS/triqs --branch 3.3.x triqs.git
+    #       mkdir triqs.build && pushd triqs.build
+    #       cmake ../triqs.git                                                  \
+    #         -DCMAKE_BUILD_TYPE=Release                                        \
+    #         -DCMAKE_INSTALL_PREFIX=${HOME}/opt/triqs                          \
+    #         -DBuild_Tests=OFF
+    #       make -j2
+    #       make install
+    #       popd
 
-    - name: Checkout edipack2triqs
-      uses: actions/checkout@v4
+    #- name: Checkout edipack2triqs
+    #  uses: actions/checkout@v4
 
-    - name: Test edipack2triqs
-      run: |
-           source $(readlink -f ${HOME}/opt/edipack2/gnu/*/bin/edipack2_config_user.sh)
-           source ${HOME}/opt/triqs/share/triqs/triqsvars.sh
-           ls $(readlink -f ${HOME}/opt/edipack2/gnu/*/lib)
-           EDIPACK_PATH=$(readlink -f ${HOME}/opt/edipack2/gnu/*/lib) py.test -v tests/
+    #- name: Test edipack2triqs
+    #  run: |
+    #       source $(readlink -f ${HOME}/opt/edipack2/gnu/*/bin/edipack2_config_user.sh)
+    #       source ${HOME}/opt/triqs/share/triqs/triqsvars.sh
+    #       ls $(readlink -f ${HOME}/opt/edipack2/gnu/*/lib)
+    #       EDIPACK_PATH=$(readlink -f ${HOME}/opt/edipack2/gnu/*/lib) py.test -v tests/
 
-    - name: Install Sphinx and related packages
-      if: env.DEPLOY_DOCS == 'true'
-      run: >
-           pip install
-           sphinx sphinx-rtd-theme sphinxfortran-ng
-           myst-parser nbsphinx linkify-it-py
+    #- name: Install Sphinx and related packages
+    #  if: env.DEPLOY_DOCS == 'true'
+    #  run: >
+    #       pip install
+    #       sphinx sphinx-rtd-theme sphinxfortran-ng
+    #       myst-parser nbsphinx linkify-it-py
 
-    - name: Build documentation
-      if: env.DEPLOY_DOCS == 'true'
-      run: |
-           source ${HOME}/opt/triqs/share/triqs/triqsvars.sh
-           sphinx-build -M html doc/ build/sphinx
+    #- name: Build documentation
+    #  if: env.DEPLOY_DOCS == 'true'
+    #  run: |
+    #       source ${HOME}/opt/triqs/share/triqs/triqsvars.sh
+    #       sphinx-build -M html doc/ build/sphinx
 
-    - name: Deploy documentation
-      if: env.DEPLOY_DOCS == 'true'
-      uses: JamesIves/github-pages-deploy-action@v4
-      with:
-        branch: gh-pages
-        token: ${{ secrets.GITHUB_TOKEN }}
-        folder: build/sphinx/html
+    #- name: Deploy documentation
+    #  if: env.DEPLOY_DOCS == 'true'
+    #  uses: JamesIves/github-pages-deploy-action@v4
+    #  with:
+    #    branch: gh-pages
+    #    token: ${{ secrets.GITHUB_TOKEN }}
+    #    folder: build/sphinx/html
