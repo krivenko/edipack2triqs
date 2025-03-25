@@ -84,8 +84,8 @@ jobs:
       run: |
            source $(readlink -f ${HOME}/opt/edipack2/gnu/*/bin/edipack2_config_user.sh)
            source ${HOME}/opt/triqs/share/triqs/triqsvars.sh
-           env
-           py.test -v tests/
+           ls $(readlink -f ${HOME}/opt/edipack2/gnu/*/lib)
+           EDIPACK_PATH=$(readlink -f ${HOME}/opt/edipack2/gnu/*/lib) py.test -v tests/
 
     - name: Install Sphinx and related packages
       if: env.DEPLOY_DOCS == 'true'
