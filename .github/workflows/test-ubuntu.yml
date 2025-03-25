@@ -31,7 +31,8 @@ jobs:
       run: |
            sudo apt-get update -q
            sudo apt-get install -y gfortran libopenmpi-dev libboost-dev \
-               libblas-dev liblapack-dev libfftw3-dev libgmp-dev libhdf5-dev
+               libblas-dev liblapack-dev libfftw3-dev libgmp-dev libhdf5-dev \
+               libscalapack-mpi-dev
 
     - name: Build & install SciFortran
       env:
