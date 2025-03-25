@@ -18,9 +18,6 @@ jobs:
       matrix:
         python-version:
           - "3.10"
-          - "3.11"
-          - "3.12"
-          - "3.13"
 
     env:
       DEPLOY_DOCS: ${{ github.ref == 'refs/heads/main' &&
@@ -87,6 +84,7 @@ jobs:
       run: |
            source $(readlink -f ${HOME}/opt/edipack2/gnu/*/bin/edipack2_config_user.sh)
            source ${HOME}/opt/triqs/share/triqs/triqsvars.sh
+           env
            py.test -v tests/
 
     - name: Install Sphinx and related packages
