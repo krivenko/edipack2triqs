@@ -36,14 +36,6 @@ Usage examples
 
 See https://krivenko.github.io/edipack2triqs/examples.html.
 
-Missing features
-----------------
-
-* Phonons
-* Imaginary time susceptibilities
-* Sector selection
-* Conversion of bath objects into operator expressions
-
 License
 -------
 
