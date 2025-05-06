@@ -1,0 +1,37 @@
+package:
+  name: "edipack2triqs"
+  version: {{ environ["EDIPACK2TRIQS_VERSION"] }}
+
+about:
+  home: https://github.com/krivenko/edipack2triqs
+  license: GPL-3.0-or-later
+  license_file: LICENSE.txt
+  license_family: GPL
+  license_url: https://github.com/krivenko/edipack2triqs/blob/main/LICENSE.txt
+  summary: "Compatibility layer between EDIpack2 and TRIQS"
+  description: |
+    edipack2triqs is a thin compatibility layer between EDIpack2 (A Massively
+    Parallel Exact Diagonalization solver for generic Quantum Impurity problems)
+    and TRIQS (Toolbox for Research on Interacting Quantum Systems).
+  dev_url: https://github.com/krivenko/edipack2triqs
+  doc_url: https://krivenko.github.io/edipack2triqs
+
+source:
+  path: ..
+
+build:
+  noarch: python
+  number: 0
+  script: python -m pip install .
+
+requirements:
+  host:
+    - python
+    - pip
+  run:
+    - python
+    - numpy
+    - mpi4py
+    - networkx
+    - edipack::edipack2>=4.0.5
+    - conda-forge::triqs>=3.1.0

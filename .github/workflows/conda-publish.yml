@@ -1,0 +1,52 @@
+name: Publish Conda package
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build-upload:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Conda
+        uses: conda-incubator/setup-miniconda@v3
+        with:
+          activate-environment: conda-env
+          auto-update-conda: true
+          channels: conda-forge, edipack, defaults
+          python-version: 3.12
+          miniforge-version: "latest"
+
+      - name: Detect version of edipack2triqs
+        shell: "bash -l {0}"
+        run: |
+             conda install -q -y toml
+             TOML='toml.load("pyproject.toml")["project"]["version"]'
+             VERSION=$(python -c "import toml; print(${TOML})")
+
+             echo "edipack2triqs version: ${VERSION}"
+             echo "EDIPACK2TRIQS_VERSION=${VERSION}" >> $GITHUB_ENV
+
+      - name: Build Conda package
+        shell: "bash -l {0}"
+        run: |
+             conda install -q -y conda-build
+             conda build .conda/ --output-folder "${HOME}/output"
+
+             # Get the path to the built package from the output folder
+             BUILT_PKG=$(conda build  .conda/ --output-folder "${HOME}/output" --output)
+             echo "Built package: ${BUILT_PKG}"
+             echo "BUILT_PKG=${BUILT_PKG}" >> $GITHUB_ENV
+
+      - name: Upload package to Anaconda
+        shell: "bash -l {0}"
+        env:
+          ANACONDA_API_TOKEN: ${{ secrets.ANACONDA_API_TOKEN }}
+        run: |
+             conda install -q -y anaconda-client
+             echo "Uploading ${BUILT_PKG} to Anaconda..."
+             anaconda upload -u edipack "${BUILT_PKG}"
