@@ -27,6 +27,14 @@ Dependencies
 Installation
 ------------
 
+**Via [Conda](https://anaconda.org/anaconda/conda)**
+
+```bash
+conda install -c conda-forge -c edipack edipack2triqs
+```
+
+**From the source code [repository on GitHub](https://github.com/krivenko/edipack2triqs)**
+
 ```bash
 git clone https://github.com/krivenko/edipack2triqs
 cd edipack2triqs
