@@ -8,9 +8,9 @@ about:
   license_file: LICENSE.txt
   license_family: GPL
   license_url: https://github.com/krivenko/edipack2triqs/blob/main/LICENSE.txt
-  summary: "Compatibility layer between EDIpack2 and TRIQS"
+  summary: "Compatibility layer between EDIpack and TRIQS"
   description: |
-    edipack2triqs is a thin compatibility layer between EDIpack2 (A Massively
+    edipack2triqs is a thin compatibility layer between EDIpack (A Massively
     Parallel Exact Diagonalization solver for generic Quantum Impurity problems)
     and TRIQS (Toolbox for Research on Interacting Quantum Systems).
   dev_url: https://github.com/krivenko/edipack2triqs
@@ -33,5 +33,5 @@ requirements:
     - numpy
     - mpi4py
     - networkx
-    - edipack::edipack2>=4.0.5
+    - edipack::edipack>=5.0.0
     - conda-forge::triqs>=3.1.0

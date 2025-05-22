@@ -106,8 +106,8 @@ intersphinx_mapping = {
     'python': ('https://docs.python.org/3.12', None),
     'numpy': ('https://numpy.org/doc/stable', None),
     'triqslibs': ('https://triqs.github.io/triqs/latest', None),
-    'edipack2': ('https://edipack.github.io/EDIpack2.0', None),
-    'edipy2': ('https://edipack.github.io/EDIpy2.0', None)
+    'edipack': ('https://edipack.github.io/EDIpack', None),
+    'edipack2py': ('https://edipack.github.io/EDIpack2py', None)
 }
 
 

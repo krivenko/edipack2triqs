@@ -14,7 +14,7 @@ from mpi4py import MPI
 import triqs.operators as op
 from triqs.gf import BlockGf, Gf, MeshImFreq, MeshReFreq
 
-from edipy2 import global_env as ed
+from edipack2py import global_env as ed
 
 from .util import IndicesType, validate_fops_up_dn, write_config, chdircontext
 from .bath import Bath, BathNormal, BathHybrid, BathGeneral

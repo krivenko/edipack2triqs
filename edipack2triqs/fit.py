@@ -10,7 +10,7 @@ import numpy as np
 
 from triqs.gf import BlockGf, MeshImFreq
 
-from edipy2 import global_env as ed
+from edipack2py import global_env as ed
 
 from .util import chdircontext
 

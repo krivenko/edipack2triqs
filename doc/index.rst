@@ -14,7 +14,7 @@ edipack2triqs
          :target: https://github.com/krivenko/edipack2triqs
 
 **edipack2triqs** is a thin compatibility layer between
-`EDIpack2 <https://github.com/EDIpack/EDIpack2.0>`_ (A Massively Parallel Exact
+`EDIpack <https://github.com/EDIpack/EDIpack>`_ (A Massively Parallel Exact
 Diagonalization solver for generic Quantum Impurity problems) and
 `TRIQS <https://triqs.github.io/triqs/latest/>`_
 (Toolbox for Research on Interacting Quantum Systems).

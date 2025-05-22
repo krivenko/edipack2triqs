@@ -45,14 +45,14 @@ jobs:
            make install
            popd
 
-    - name: Build & install EDIpack2.0
+    - name: Build & install EDIpack
       env:
         FC: mpifort
       run: |
-           git clone https://github.com/edipack/EDIpack2.0 EDIpack2.git
-           mkdir EDIpack2.build && pushd EDIpack2.build
+           git clone https://github.com/edipack/EDIpack EDIpack.git
+           mkdir EDIpack.build && pushd EDIpack.build
            source $(readlink -f ${HOME}/opt/scifor/gnu/*/bin/scifor_config_user.sh)
-           cmake ../EDIpack2.git -DCMAKE_BUILD_TYPE=Release
+           cmake ../EDIpack.git -DCMAKE_BUILD_TYPE=Release
            make -j2
            make install
            popd
@@ -65,7 +65,7 @@ jobs:
     - name: Install Python dependencies
       run: |
            python -m pip install --upgrade pip
-           pip install --user numpy scipy matplotlib mpi4py mako pytest networkx edipy2
+           pip install --user numpy scipy matplotlib mpi4py mako pytest networkx edipack2py
 
     - name: Build & install TRIQS
       env:
@@ -86,7 +86,7 @@ jobs:
 
     - name: Test edipack2triqs
       run: |
-           source $(readlink -f ${HOME}/opt/edipack2/gnu/*/bin/edipack2_config_user.sh)
+           source $(readlink -f ${HOME}/opt/edipack/gnu/*/bin/edipack_config_user.sh)
            source ${HOME}/opt/triqs/share/triqs/triqsvars.sh
            py.test -v tests/
 

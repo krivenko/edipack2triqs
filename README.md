@@ -5,11 +5,11 @@ https://anaconda.org/edipack/edipack2triqs)
 [![Test (Ubuntu)](https://github.com/krivenko/edipack2triqs/actions/workflows/test-ubuntu.yml/badge.svg)](
 https://github.com/krivenko/edipack2triqs/actions/workflows/test-ubuntu.yml)
 
-edipack2triqs: Compatibility layer between EDIpack2 and TRIQS
-=============================================================
+edipack2triqs: Compatibility layer between EDIpack and TRIQS
+============================================================
 
 **edipack2triqs** is a thin compatibility layer between
-**EDIpack2** (A Massively Parallel Exact Diagonalization solver for generic
+**EDIpack** (A Massively Parallel Exact Diagonalization solver for generic
 Quantum Impurity problems) and **TRIQS** (Toolbox for Research on Interacting
 Quantum Systems).
 
@@ -21,7 +21,7 @@ Dependencies
 * NumPy
 * NetworkX
 * mpi4py
-* [edipy2 >= 2.0.8 (EDIpack2.0)](https://github.com/edipack/EDIpack2.0)
+* [edipack2py >= 5.0.0](https://github.com/EDIpack/EDIpack2py)
 * [TRIQS 3.x.y](https://github.com/TRIQS/triqs), tested with TRIQS 3.2.1
 
 Installation
