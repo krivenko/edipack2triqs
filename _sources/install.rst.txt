@@ -18,11 +18,11 @@ is available from Anaconda.
 Current development version from GitHub
 ---------------------------------------
 
-#. Install `EDIpack2 <https://edipack.github.io/EDIpack2.0>`_ following the
-   :ref:`installation instructions <edipack2:edipack_install>`.
+#. Install `EDIpack <https://edipack.github.io/EDIpack>`_ following the
+   :ref:`installation instructions <edipack:edipack_install>`.
 
-#. Install `the Python API for EDIpack2 <https://edipack.github.io/EDIpy2.0>`_
-   using one of the :ref:`supported methods <edipy2:edipy_install>`.
+#. Install `the Python API for EDIpack <https://edipack.github.io/EDIpack2py>`_
+   using one of the :ref:`supported methods <edipack2py:edipack2py_install>`.
 
 #. Install :ref:`TRIQS <triqslibs:welcome>` library,
    see :ref:`TRIQS installation instruction <triqslibs:triqs_install>`.
