@@ -17,8 +17,8 @@ from triqs.gf import BlockGf, Gf, MeshImFreq, MeshReFreq
 from edipack2py import global_env as ed
 
 from .util import IndicesType, validate_fops_up_dn, write_config, chdircontext
-from .bath import Bath, BathNormal, BathHybrid, BathGeneral
-from .hamiltonian import parse_hamiltonian
+from .bath import Bath, BathNormal, BathGeneral
+from .hamiltonian import parse_hamiltonian, _is_density, _is_density_density
 from .fit import BathFittingParams, _chi2_fit_bath
 
 
@@ -57,6 +57,8 @@ class EDIpackSolver:
         "NDELTA": 0.0,
         "NCOEFF": 0.0,
         # ED
+        "ED_USE_KANAMORI": False,
+        "ED_READ_UMATRIX": False,
         "ED_PRINT_SIGMA": False,
         "ED_PRINT_G": False,
         "ED_PRINT_G0": False,
@@ -210,8 +212,6 @@ class EDIpackSolver:
                             "fops_bath_up", "fops_bath_dn")
 
         self.norb = len(fops_imp_up)
-        assert self.norb <= 5, \
-            f"At most 5 orbitals are allowed, got {self.norb}"
 
         self.fops_imp_up = fops_imp_up
         self.fops_imp_dn = fops_imp_dn
@@ -270,22 +270,16 @@ class EDIpackSolver:
             c["BATH_TYPE"] = self.h_params.bath.name
             c["NBATH"] = self.h_params.bath.nbath
 
-            # Interaction parameters
-            c["ULOC"] = self.h_params.Uloc
-            c["UST"] = self.h_params.Ust
-            c["JH"] = self.h_params.Jh
-            c["JX"] = self.h_params.Jx
-            c["JP"] = self.h_params.Jp
-
             # ed_total_ud
             ed_total_ud = kwargs.get("ed_total_ud", False)
-            if isinstance(self.h_params.bath, BathNormal):
-                c["ED_TOTAL_UD"] = ed_total_ud or (not (self.h_params.Jx == 0
-                                                   and self.h_params.Jp == 0))
-            elif isinstance(self.h_params.bath, (BathHybrid, BathGeneral)):
-                c["ED_TOTAL_UD"] = True
-            else:
-                raise RuntimeError("Unrecognized bath type")
+            self.denden_int = _is_density_density(self.h_params.U)
+            if not ((not ed_total_ud)
+                    and self.h_params.ed_mode == "normal"
+                    and isinstance(self.h_params.bath, BathNormal)
+                    and _is_density(self.h_params.Hloc)
+                    and self.denden_int):
+                ed_total_ud = True
+            c["ED_TOTAL_UD"] = ed_total_ud
 
             # Bath fitting
             bfp = kwargs.get("bath_fitting_params", BathFittingParams())
@@ -376,57 +370,23 @@ class EDIpackSolver:
         return self.h_params.Hloc
 
     @property
-    def Uloc(self) -> np.ndarray:
+    def U(self) -> np.ndarray:
         r"""
-        Local intra-orbital interaction :math:`U_\text{loc}`, one value
-        per orbital, up to 5 values.
+        Access to the two-particle interaction tensor
+        :math:`U_{o_1 \sigma_1 o_2 \sigma_2 o_3 \sigma_3 o_4 \sigma_4}`.
+        Contributions to the impurity interaction Hamiltonian are defined
+        according to
+
+        .. math::
+
+            \hat H_{int} = \frac{1}{2}
+                \sum_{\sigma_1 \sigma_2 \sigma_3 \sigma_4}\sum_{o_1 o_2 o_3 o_4}
+                    U_{o_1 \sigma_1 o_2 \sigma_2 o_3 \sigma_3 o_4 \sigma_4}
+                    c^\dagger_{\sigma_1 o_1} c^\dagger_{\sigma_2 o_2}
+                    c_{\sigma_4 o_4} c_{\sigma_3 o_3}.
+
         """
-        return ed.Uloc[:self.norb]
-
-    @Uloc.setter
-    def Uloc(self, values):
-        assert len(values) == self.norb, f"Required exactly {self.norb} values"
-        ed.Uloc = np.pad(values, (0, 5 - len(values)))
-
-    @property
-    def Ust(self) -> float:
-        r"Local inter-orbital interaction :math:`U_\text{st}`."
-        return ed.Ust
-
-    @Ust.setter
-    def Ust(self, value):
-        ed.Ust = value
-
-    @property
-    def Jh(self) -> float:
-        r"Hund's coupling :math:`J_h`."
-        return ed.Jh
-
-    @Jh.setter
-    def Jh(self, value):
-        ed.Jh = value
-
-    @property
-    def Jx(self) -> float:
-        r"Spin-exchange coupling :math:`J_x`."
-        return ed.Jx
-
-    @Jx.setter
-    def Jx(self, value) -> float:
-        if (not ed.ed_total_ud) and (value != 0):
-            raise RuntimeError("Cannot set Jx to a non-zero value")
-        ed.Jx = value
-
-    @property
-    def Jp(self) -> float:
-        r"Pair-hopping coupling :math:`J_p`."
-        return ed.Jp
-
-    @Jp.setter
-    def Jp(self, value):
-        if (not ed.ed_total_ud) and (value != 0):
-            raise RuntimeError("Cannot set Jp to a non-zero value")
-        ed.Jp = value
+        return self.h_params.U
 
     @property
     def bath(self) -> Bath:
@@ -483,10 +443,29 @@ class EDIpackSolver:
         ed.Lreal = n_w
         ed.eps = broadening
 
-        # Solve!
+        # The interactions must remain of the density-density type, if this is
+        # how they were at the construction time.
+        if self.denden_int and (not _is_density_density(self.h_params.U)):
+            raise RuntimeError(
+                "Cannot add non-density-density terms to the interaction"
+            )
+
         self.comm.barrier()
         with chdircontext(self.wdname):
+            # Set H_{loc}
             ed.set_hloc(hloc=self.h_params.Hloc)
+
+            # Add interaction terms
+            ed.reset_umatrix()
+            for ind in np.ndindex(self.h_params.U.shape):
+                val = self.h_params.U[ind]
+                if val == 0:
+                    continue
+                o1, o2, o3, o4 = ind[0:8:2]
+                s1, s2, s3, s4 = (('u' if s == 0 else 'd') for s in ind[1:8:2])
+                ed.add_twobody_operator(o1, s1, o2, s2, o3, s3, o4, s4, val)
+
+            # Solve!
             ed.solve(self.h_params.bath.data)
         self.comm.barrier()
 

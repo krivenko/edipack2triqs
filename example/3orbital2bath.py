@@ -155,8 +155,15 @@ if MPI.COMM_WORLD.Get_rank() == 0:
 # energy splitting the shape would be (2, 2, 3, 3).
 solver.hloc[0, 0, 1, 1] = -0.6  # spin1 = spin2 = up and down, orb1 = orb2 = 1
 
-# Change Jp
-solver.Jp = 0.15
+# Change elements of the interaction matrix corresponding to Jp
+# The order of indices of solver.U is
+# orb1, spin1, orb2, spin2, orb3, spin3, orb4, spin4.
+Jp = 0.15
+for s, o1, o2 in product(range(2), orbs, orbs):
+    if o1 == o2:
+        continue
+    solver.U[o1, s, o1, 1 - s, o2, s, o2, 1 - s] = 0.5 * Jp
+    solver.U[o1, s, o1, 1 - s, o2, 1 - s, o2, s] = -0.5 * Jp
 
 # Update some bath parameters
 solver.bath.eps[0, 2, 1] = -0.4  # spin = up and down, orb1 = 2, nu = 1
