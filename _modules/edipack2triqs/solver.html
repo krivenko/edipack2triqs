@@ -54,11 +54,7 @@
 <li class="toctree-l3"><a class="reference internal" href="../../documentation.html#edipack2triqs.solver.EDIpackSolver"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver</span></code></a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../documentation.html#edipack2triqs.solver.EDIpackSolver.__init__"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.__init__()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../documentation.html#edipack2triqs.solver.EDIpackSolver.hloc"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.hloc</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../documentation.html#edipack2triqs.solver.EDIpackSolver.Uloc"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.Uloc</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../documentation.html#edipack2triqs.solver.EDIpackSolver.Ust"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.Ust</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../documentation.html#edipack2triqs.solver.EDIpackSolver.Jh"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.Jh</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../documentation.html#edipack2triqs.solver.EDIpackSolver.Jx"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.Jx</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../documentation.html#edipack2triqs.solver.EDIpackSolver.Jp"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.Jp</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../documentation.html#edipack2triqs.solver.EDIpackSolver.U"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.U</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../documentation.html#edipack2triqs.solver.EDIpackSolver.bath"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.bath</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../documentation.html#edipack2triqs.solver.EDIpackSolver.solve"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.solve()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../documentation.html#edipack2triqs.solver.EDIpackSolver.e_pot"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.e_pot</span></code></a></li>
@@ -192,8 +188,8 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">edipack2py</span><span class="w"> </span><span class="kn">import</span> <span class="n">global_env</span> <span class="k">as</span> <span class="n">ed</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">.util</span><span class="w"> </span><span class="kn">import</span> <span class="n">IndicesType</span><span class="p">,</span> <span class="n">validate_fops_up_dn</span><span class="p">,</span> <span class="n">write_config</span><span class="p">,</span> <span class="n">chdircontext</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">.bath</span><span class="w"> </span><span class="kn">import</span> <span class="n">Bath</span><span class="p">,</span> <span class="n">BathNormal</span><span class="p">,</span> <span class="n">BathHybrid</span><span class="p">,</span> <span class="n">BathGeneral</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">.hamiltonian</span><span class="w"> </span><span class="kn">import</span> <span class="n">parse_hamiltonian</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.bath</span><span class="w"> </span><span class="kn">import</span> <span class="n">Bath</span><span class="p">,</span> <span class="n">BathNormal</span><span class="p">,</span> <span class="n">BathGeneral</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.hamiltonian</span><span class="w"> </span><span class="kn">import</span> <span class="n">parse_hamiltonian</span><span class="p">,</span> <span class="n">_is_density</span><span class="p">,</span> <span class="n">_is_density_density</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">.fit</span><span class="w"> </span><span class="kn">import</span> <span class="n">BathFittingParams</span><span class="p">,</span> <span class="n">_chi2_fit_bath</span>
 
 
@@ -234,6 +230,8 @@
         <span class="s2">&quot;NDELTA&quot;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>
         <span class="s2">&quot;NCOEFF&quot;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>
         <span class="c1"># ED</span>
+        <span class="s2">&quot;ED_USE_KANAMORI&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="s2">&quot;ED_READ_UMATRIX&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
         <span class="s2">&quot;ED_PRINT_SIGMA&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
         <span class="s2">&quot;ED_PRINT_G&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
         <span class="s2">&quot;ED_PRINT_G0&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
@@ -389,8 +387,6 @@
                             <span class="s2">&quot;fops_bath_up&quot;</span><span class="p">,</span> <span class="s2">&quot;fops_bath_dn&quot;</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">norb</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">fops_imp_up</span><span class="p">)</span>
-        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">norb</span> <span class="o">&lt;=</span> <span class="mi">5</span><span class="p">,</span> \
-            <span class="sa">f</span><span class="s2">&quot;At most 5 orbitals are allowed, got </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">norb</span><span class="si">}</span><span class="s2">&quot;</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">fops_imp_up</span> <span class="o">=</span> <span class="n">fops_imp_up</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">fops_imp_dn</span> <span class="o">=</span> <span class="n">fops_imp_dn</span>
@@ -449,22 +445,16 @@
             <span class="n">c</span><span class="p">[</span><span class="s2">&quot;BATH_TYPE&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">h_params</span><span class="o">.</span><span class="n">bath</span><span class="o">.</span><span class="n">name</span>
             <span class="n">c</span><span class="p">[</span><span class="s2">&quot;NBATH&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">h_params</span><span class="o">.</span><span class="n">bath</span><span class="o">.</span><span class="n">nbath</span>
 
-            <span class="c1"># Interaction parameters</span>
-            <span class="n">c</span><span class="p">[</span><span class="s2">&quot;ULOC&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">h_params</span><span class="o">.</span><span class="n">Uloc</span>
-            <span class="n">c</span><span class="p">[</span><span class="s2">&quot;UST&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">h_params</span><span class="o">.</span><span class="n">Ust</span>
-            <span class="n">c</span><span class="p">[</span><span class="s2">&quot;JH&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">h_params</span><span class="o">.</span><span class="n">Jh</span>
-            <span class="n">c</span><span class="p">[</span><span class="s2">&quot;JX&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">h_params</span><span class="o">.</span><span class="n">Jx</span>
-            <span class="n">c</span><span class="p">[</span><span class="s2">&quot;JP&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">h_params</span><span class="o">.</span><span class="n">Jp</span>
-
             <span class="c1"># ed_total_ud</span>
             <span class="n">ed_total_ud</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;ed_total_ud&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
-            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">h_params</span><span class="o">.</span><span class="n">bath</span><span class="p">,</span> <span class="n">BathNormal</span><span class="p">):</span>
-                <span class="n">c</span><span class="p">[</span><span class="s2">&quot;ED_TOTAL_UD&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ed_total_ud</span> <span class="ow">or</span> <span class="p">(</span><span class="ow">not</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">h_params</span><span class="o">.</span><span class="n">Jx</span> <span class="o">==</span> <span class="mi">0</span>
-                                                   <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">h_params</span><span class="o">.</span><span class="n">Jp</span> <span class="o">==</span> <span class="mi">0</span><span class="p">))</span>
-            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">h_params</span><span class="o">.</span><span class="n">bath</span><span class="p">,</span> <span class="p">(</span><span class="n">BathHybrid</span><span class="p">,</span> <span class="n">BathGeneral</span><span class="p">)):</span>
-                <span class="n">c</span><span class="p">[</span><span class="s2">&quot;ED_TOTAL_UD&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Unrecognized bath type&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">denden_int</span> <span class="o">=</span> <span class="n">_is_density_density</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">h_params</span><span class="o">.</span><span class="n">U</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="p">((</span><span class="ow">not</span> <span class="n">ed_total_ud</span><span class="p">)</span>
+                    <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">h_params</span><span class="o">.</span><span class="n">ed_mode</span> <span class="o">==</span> <span class="s2">&quot;normal&quot;</span>
+                    <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">h_params</span><span class="o">.</span><span class="n">bath</span><span class="p">,</span> <span class="n">BathNormal</span><span class="p">)</span>
+                    <span class="ow">and</span> <span class="n">_is_density</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">h_params</span><span class="o">.</span><span class="n">Hloc</span><span class="p">)</span>
+                    <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">denden_int</span><span class="p">):</span>
+                <span class="n">ed_total_ud</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="n">c</span><span class="p">[</span><span class="s2">&quot;ED_TOTAL_UD&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ed_total_ud</span>
 
             <span class="c1"># Bath fitting</span>
             <span class="n">bfp</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;bath_fitting_params&quot;</span><span class="p">,</span> <span class="n">BathFittingParams</span><span class="p">())</span>
@@ -556,57 +546,23 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">h_params</span><span class="o">.</span><span class="n">Hloc</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">Uloc</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">U</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Local intra-orbital interaction :math:`U_\text{loc}`, one value</span>
-<span class="sd">        per orbital, up to 5 values.</span>
+<span class="sd">        Access to the two-particle interaction tensor</span>
+<span class="sd">        :math:`U_{o_1 \sigma_1 o_2 \sigma_2 o_3 \sigma_3 o_4 \sigma_4}`.</span>
+<span class="sd">        Contributions to the impurity interaction Hamiltonian are defined</span>
+<span class="sd">        according to</span>
+
+<span class="sd">        .. math::</span>
+
+<span class="sd">            \hat H_{int} = \frac{1}{2}</span>
+<span class="sd">                \sum_{\sigma_1 \sigma_2 \sigma_3 \sigma_4}\sum_{o_1 o_2 o_3 o_4}</span>
+<span class="sd">                    U_{o_1 \sigma_1 o_2 \sigma_2 o_3 \sigma_3 o_4 \sigma_4}</span>
+<span class="sd">                    c^\dagger_{\sigma_1 o_1} c^\dagger_{\sigma_2 o_2}</span>
+<span class="sd">                    c_{\sigma_4 o_4} c_{\sigma_3 o_3}.</span>
+
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">ed</span><span class="o">.</span><span class="n">Uloc</span><span class="p">[:</span><span class="bp">self</span><span class="o">.</span><span class="n">norb</span><span class="p">]</span>
-
-    <span class="nd">@Uloc</span><span class="o">.</span><span class="n">setter</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">Uloc</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">values</span><span class="p">):</span>
-        <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">values</span><span class="p">)</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">norb</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;Required exactly </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">norb</span><span class="si">}</span><span class="s2"> values&quot;</span>
-        <span class="n">ed</span><span class="o">.</span><span class="n">Uloc</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">pad</span><span class="p">(</span><span class="n">values</span><span class="p">,</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">5</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="n">values</span><span class="p">)))</span>
-
-    <span class="nd">@property</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">Ust</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-        <span class="sa">r</span><span class="s2">&quot;Local inter-orbital interaction :math:`U_\text</span><span class="si">{st}</span><span class="s2">`.&quot;</span>
-        <span class="k">return</span> <span class="n">ed</span><span class="o">.</span><span class="n">Ust</span>
-
-    <span class="nd">@Ust</span><span class="o">.</span><span class="n">setter</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">Ust</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
-        <span class="n">ed</span><span class="o">.</span><span class="n">Ust</span> <span class="o">=</span> <span class="n">value</span>
-
-    <span class="nd">@property</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">Jh</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-        <span class="sa">r</span><span class="s2">&quot;Hund&#39;s coupling :math:`J_h`.&quot;</span>
-        <span class="k">return</span> <span class="n">ed</span><span class="o">.</span><span class="n">Jh</span>
-
-    <span class="nd">@Jh</span><span class="o">.</span><span class="n">setter</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">Jh</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
-        <span class="n">ed</span><span class="o">.</span><span class="n">Jh</span> <span class="o">=</span> <span class="n">value</span>
-
-    <span class="nd">@property</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">Jx</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-        <span class="sa">r</span><span class="s2">&quot;Spin-exchange coupling :math:`J_x`.&quot;</span>
-        <span class="k">return</span> <span class="n">ed</span><span class="o">.</span><span class="n">Jx</span>
-
-    <span class="nd">@Jx</span><span class="o">.</span><span class="n">setter</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">Jx</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-        <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="n">ed</span><span class="o">.</span><span class="n">ed_total_ud</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">value</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Cannot set Jx to a non-zero value&quot;</span><span class="p">)</span>
-        <span class="n">ed</span><span class="o">.</span><span class="n">Jx</span> <span class="o">=</span> <span class="n">value</span>
-
-    <span class="nd">@property</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">Jp</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-        <span class="sa">r</span><span class="s2">&quot;Pair-hopping coupling :math:`J_p`.&quot;</span>
-        <span class="k">return</span> <span class="n">ed</span><span class="o">.</span><span class="n">Jp</span>
-
-    <span class="nd">@Jp</span><span class="o">.</span><span class="n">setter</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">Jp</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
-        <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="n">ed</span><span class="o">.</span><span class="n">ed_total_ud</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">value</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Cannot set Jp to a non-zero value&quot;</span><span class="p">)</span>
-        <span class="n">ed</span><span class="o">.</span><span class="n">Jp</span> <span class="o">=</span> <span class="n">value</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">h_params</span><span class="o">.</span><span class="n">U</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">bath</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Bath</span><span class="p">:</span>
@@ -665,10 +621,29 @@
         <span class="n">ed</span><span class="o">.</span><span class="n">Lreal</span> <span class="o">=</span> <span class="n">n_w</span>
         <span class="n">ed</span><span class="o">.</span><span class="n">eps</span> <span class="o">=</span> <span class="n">broadening</span>
 
-        <span class="c1"># Solve!</span>
+        <span class="c1"># The interactions must remain of the density-density type, if this is</span>
+        <span class="c1"># how they were at the construction time.</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">denden_int</span> <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="n">_is_density_density</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">h_params</span><span class="o">.</span><span class="n">U</span><span class="p">)):</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+                <span class="s2">&quot;Cannot add non-density-density terms to the interaction&quot;</span>
+            <span class="p">)</span>
+
         <span class="bp">self</span><span class="o">.</span><span class="n">comm</span><span class="o">.</span><span class="n">barrier</span><span class="p">()</span>
         <span class="k">with</span> <span class="n">chdircontext</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">wdname</span><span class="p">):</span>
+            <span class="c1"># Set H_{loc}</span>
             <span class="n">ed</span><span class="o">.</span><span class="n">set_hloc</span><span class="p">(</span><span class="n">hloc</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">h_params</span><span class="o">.</span><span class="n">Hloc</span><span class="p">)</span>
+
+            <span class="c1"># Add interaction terms</span>
+            <span class="n">ed</span><span class="o">.</span><span class="n">reset_umatrix</span><span class="p">()</span>
+            <span class="k">for</span> <span class="n">ind</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">ndindex</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">h_params</span><span class="o">.</span><span class="n">U</span><span class="o">.</span><span class="n">shape</span><span class="p">):</span>
+                <span class="n">val</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">h_params</span><span class="o">.</span><span class="n">U</span><span class="p">[</span><span class="n">ind</span><span class="p">]</span>
+                <span class="k">if</span> <span class="n">val</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="k">continue</span>
+                <span class="n">o1</span><span class="p">,</span> <span class="n">o2</span><span class="p">,</span> <span class="n">o3</span><span class="p">,</span> <span class="n">o4</span> <span class="o">=</span> <span class="n">ind</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">8</span><span class="p">:</span><span class="mi">2</span><span class="p">]</span>
+                <span class="n">s1</span><span class="p">,</span> <span class="n">s2</span><span class="p">,</span> <span class="n">s3</span><span class="p">,</span> <span class="n">s4</span> <span class="o">=</span> <span class="p">((</span><span class="s1">&#39;u&#39;</span> <span class="k">if</span> <span class="n">s</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">else</span> <span class="s1">&#39;d&#39;</span><span class="p">)</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">ind</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="mi">8</span><span class="p">:</span><span class="mi">2</span><span class="p">])</span>
+                <span class="n">ed</span><span class="o">.</span><span class="n">add_twobody_operator</span><span class="p">(</span><span class="n">o1</span><span class="p">,</span> <span class="n">s1</span><span class="p">,</span> <span class="n">o2</span><span class="p">,</span> <span class="n">s2</span><span class="p">,</span> <span class="n">o3</span><span class="p">,</span> <span class="n">s3</span><span class="p">,</span> <span class="n">o4</span><span class="p">,</span> <span class="n">s4</span><span class="p">,</span> <span class="n">val</span><span class="p">)</span>
+
+            <span class="c1"># Solve!</span>
             <span class="n">ed</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">h_params</span><span class="o">.</span><span class="n">bath</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">comm</span><span class="o">.</span><span class="n">barrier</span><span class="p">()</span></div>
 

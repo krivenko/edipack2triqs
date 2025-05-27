@@ -59,11 +59,7 @@
 <li class="toctree-l3"><a class="reference internal" href="#edipack2triqs.solver.EDIpackSolver"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver</span></code></a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#edipack2triqs.solver.EDIpackSolver.__init__"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.__init__()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#edipack2triqs.solver.EDIpackSolver.hloc"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.hloc</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#edipack2triqs.solver.EDIpackSolver.Uloc"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.Uloc</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#edipack2triqs.solver.EDIpackSolver.Ust"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.Ust</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#edipack2triqs.solver.EDIpackSolver.Jh"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.Jh</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#edipack2triqs.solver.EDIpackSolver.Jx"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.Jx</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#edipack2triqs.solver.EDIpackSolver.Jp"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.Jp</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#edipack2triqs.solver.EDIpackSolver.U"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.U</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#edipack2triqs.solver.EDIpackSolver.bath"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.bath</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#edipack2triqs.solver.EDIpackSolver.solve"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.solve()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#edipack2triqs.solver.EDIpackSolver.e_pot"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.e_pot</span></code></a></li>
@@ -278,34 +274,18 @@ exact diagonalization.</p></li>
 </dd></dl>
 
 <dl class="py property">
-<dt class="sig sig-object py" id="edipack2triqs.solver.EDIpackSolver.Uloc">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Uloc</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" rel="noopener noreferrer" target="_blank" title="(in NumPy v2.2)"><span class="pre">ndarray</span></a></em><a class="headerlink" href="#edipack2triqs.solver.EDIpackSolver.Uloc" title="Link to this definition"></a></dt>
-<dd><p>Local intra-orbital interaction <span class="math notranslate nohighlight">\(U_\text{loc}\)</span>, one value
-per orbital, up to 5 values.</p>
-</dd></dl>
-
-<dl class="py property">
-<dt class="sig sig-object py" id="edipack2triqs.solver.EDIpackSolver.Ust">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Ust</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.12/library/functions.html#float" rel="noopener noreferrer" target="_blank" title="(in Python v3.12)"><span class="pre">float</span></a></em><a class="headerlink" href="#edipack2triqs.solver.EDIpackSolver.Ust" title="Link to this definition"></a></dt>
-<dd><p>Local inter-orbital interaction <span class="math notranslate nohighlight">\(U_\text{st}\)</span>.</p>
-</dd></dl>
-
-<dl class="py property">
-<dt class="sig sig-object py" id="edipack2triqs.solver.EDIpackSolver.Jh">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Jh</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.12/library/functions.html#float" rel="noopener noreferrer" target="_blank" title="(in Python v3.12)"><span class="pre">float</span></a></em><a class="headerlink" href="#edipack2triqs.solver.EDIpackSolver.Jh" title="Link to this definition"></a></dt>
-<dd><p>Hund’s coupling <span class="math notranslate nohighlight">\(J_h\)</span>.</p>
-</dd></dl>
-
-<dl class="py property">
-<dt class="sig sig-object py" id="edipack2triqs.solver.EDIpackSolver.Jx">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Jx</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.12/library/functions.html#float" rel="noopener noreferrer" target="_blank" title="(in Python v3.12)"><span class="pre">float</span></a></em><a class="headerlink" href="#edipack2triqs.solver.EDIpackSolver.Jx" title="Link to this definition"></a></dt>
-<dd><p>Spin-exchange coupling <span class="math notranslate nohighlight">\(J_x\)</span>.</p>
-</dd></dl>
-
-<dl class="py property">
-<dt class="sig sig-object py" id="edipack2triqs.solver.EDIpackSolver.Jp">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Jp</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.12/library/functions.html#float" rel="noopener noreferrer" target="_blank" title="(in Python v3.12)"><span class="pre">float</span></a></em><a class="headerlink" href="#edipack2triqs.solver.EDIpackSolver.Jp" title="Link to this definition"></a></dt>
-<dd><p>Pair-hopping coupling <span class="math notranslate nohighlight">\(J_p\)</span>.</p>
+<dt class="sig sig-object py" id="edipack2triqs.solver.EDIpackSolver.U">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">U</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" rel="noopener noreferrer" target="_blank" title="(in NumPy v2.2)"><span class="pre">ndarray</span></a></em><a class="headerlink" href="#edipack2triqs.solver.EDIpackSolver.U" title="Link to this definition"></a></dt>
+<dd><p>Access to the two-particle interaction tensor
+<span class="math notranslate nohighlight">\(U_{o_1 \sigma_1 o_2 \sigma_2 o_3 \sigma_3 o_4 \sigma_4}\)</span>.
+Contributions to the impurity interaction Hamiltonian are defined
+according to</p>
+<div class="math notranslate nohighlight">
+\[\hat H_{int} = \frac{1}{2}
+    \sum_{\sigma_1 \sigma_2 \sigma_3 \sigma_4}\sum_{o_1 o_2 o_3 o_4}
+        U_{o_1 \sigma_1 o_2 \sigma_2 o_3 \sigma_3 o_4 \sigma_4}
+        c^\dagger_{\sigma_1 o_1} c^\dagger_{\sigma_2 o_2}
+        c_{\sigma_4 o_4} c_{\sigma_3 o_3}.\]</div>
 </dd></dl>
 
 <dl class="py property">
