@@ -3,7 +3,7 @@ Hamiltonian and its parameters
 """
 
 from itertools import product
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from typing import Union
 
 import numpy as np
@@ -19,10 +19,6 @@ from .util import (is_spin_diagonal,
 from .bath import BathNormal, BathHybrid, BathGeneral
 
 
-def default_Uloc():
-    return np.array([2.0, 0, 0, 0, 0])
-
-
 @dataclass
 class HamiltonianParams:
     """Parameters of the Hamiltonian"""
@@ -33,16 +29,37 @@ class HamiltonianParams:
     Hloc: np.ndarray
     # Bath parameters
     bath: Union[BathNormal, BathHybrid, BathGeneral]
-    # Local intra-orbital interactions U (one value per orbital)
-    Uloc: np.ndarray = field(default_factory=default_Uloc)
-    # Local inter-orbital interaction U'
-    Ust: float = 0
-    # Hund's coupling
-    Jh: float = 0
-    # Spin-exchange coupling constant
-    Jx: float = 0
-    # Pair-hopping coupling constant
-    Jp: float = 0
+    # Interaction matrix U_{ijkl}
+    U: np.ndarray
+
+
+def _is_density(hloc: np.ndarray):
+    "Check if a given local Hamiltonian is diagonal in both spin and orbital"
+    nspin = hloc.shape[0]
+    norb = hloc.shape[2]
+    assert hloc.shape == (nspin, nspin, norb, norb)
+    for s1, s2, o1, o2 in np.ndindex(hloc.shape):
+        # Skip the density terms
+        if s1 == s2 and o1 == o2:
+            continue
+        if hloc[s1, s2, o1, o2] != 0:
+            return False
+    return True
+
+
+def _is_density_density(U: np.ndarray):
+    "Check if a given interaction matrix is of density-density type"
+    assert U.ndim == 8
+    norb = U.shape[0]
+    assert U.shape == (norb, 2) * 4
+    for o1, s1, o2, s2, o3, s3, o4, s4 in np.ndindex(U.shape):
+        i1, i2, i3, i4 = (o1, s1), (o2, s2), (o3, s3), (o4, s4)
+        # Skip the density-density terms
+        if (i1 == i3 and i2 == i4) or (i1 == i4 and i2 == i3):
+            continue
+        if U[o1, s1, o2, s2, o3, s3, o4, s4] != 0:
+            return False
+    return True
 
 
 def _make_bath(ed_mode: str,
@@ -108,10 +125,10 @@ def parse_hamiltonian(hamiltonian: op.Operator,  # noqa: C901
     V = np.zeros((2, 2, norb, nbath_total))
     # Coefficients \Delta[b1, b2] in front of c^+(up, b1) c^+(dn, b2)
     Delta = np.zeros((nbath_total, nbath_total), dtype=complex)
-
-    Uloc = np.zeros(5, dtype=float)
-    Ust, UstmJ = [], []
-    Jx, Jp = [], []
+    # Coefficients U[orb1, spin1, orb2, spin2, orb3, spin3, orb4, spin4]
+    # in front of
+    # (1/2) c^+(spin1, orb1) c^+(spin2, orb2) c(spin4, orb4) c(spin3, orb3)
+    U = np.zeros((norb, 2) * 4, dtype=float)
 
     for mon, coeff in hamiltonian:
         # Skipping an irrelevant constant term
@@ -158,36 +175,16 @@ def parse_hamiltonian(hamiltonian: op.Operator,  # noqa: C901
                     f"Unexpected interaction term {coeff * monomial2op(mon)}"
                 )
 
-            # A density-density interaction
-            if (spin1, orb1) == (spin4, orb4) and \
-               (spin2, orb2) == (spin3, orb3):
-                # Interaction with different spins
-                if spin1 != spin2:
-                    # Intra-orbital
-                    if orb1 == orb2:
-                        Uloc[orb1] = coeff
-                    # Inter-orbital
-                    else:
-                        Ust.append(coeff)
-                # Interaction with the same spin
-                else:
-                    UstmJ.append(coeff)
+            if coeff.imag != 0:
+                raise RuntimeError(
+                    "Unsupported complex interaction term "
+                    f"{coeff * monomial2op(mon)}"
+                )
 
-            # A non-density-density interaction
-            else:
-                # Pair-hopping
-                if (orb1 == orb2) and (orb3 == orb4):
-                    Jp.append(coeff if spin2 == spin3 else -coeff)
-                # Spin-exchange
-                elif (spin1 == spin4) and (spin2 == spin3) and \
-                     (orb1 == orb3) and (orb2 == orb4):
-                    Jx.append(coeff)
-                elif (spin1 == spin3) and (spin2 == spin4) and \
-                     (orb1 == orb4) and (orb2 == orb3):
-                    Jx.append(-coeff)
-                else:
-                    term = coeff * monomial2op(mon)
-                    raise RuntimeError(f"Unexpected interaction term {term}")
+            U[orb1, spin1, orb2, spin2, orb4, spin4, orb3, spin3] = 0.5 * coeff
+            U[orb1, spin1, orb2, spin2, orb3, spin3, orb4, spin4] = -0.5 * coeff
+            U[orb2, spin2, orb1, spin1, orb4, spin4, orb3, spin3] = -0.5 * coeff
+            U[orb2, spin2, orb1, spin1, orb3, spin3, orb4, spin4] = 0.5 * coeff
 
         # Anomalous term creation-creation
         elif daggers == [True, True]:
@@ -225,18 +222,6 @@ def parse_hamiltonian(hamiltonian: op.Operator,  # noqa: C901
                 f"Unsupported Hamiltonian term {coeff * monomial2op(mon)}"
             )
 
-    def all_close(vals):
-        return all(np.isclose(v, vals[0], atol=1e-10) for v in vals)
-
-    assert all_close(Ust), \
-        "Inconsistent values of U' for different pairs of orbitals"
-    assert all_close(UstmJ), \
-        "Inconsistent values of U' - J for different pairs of orbitals"
-    assert all_close(Jx), \
-        "Inconsistent values of J_X for different pairs of orbitals"
-    assert all_close(Jp), \
-        "Inconsistent values of J_P for different pairs of orbitals"
-
     hamiltonian_n = normal_part(hamiltonian)
     hamiltonian_n_conj = spin_conjugate(
         hamiltonian_n, fops_imp_up + fops_bath_up, fops_imp_dn + fops_bath_dn
@@ -268,12 +253,8 @@ def parse_hamiltonian(hamiltonian: op.Operator,  # noqa: C901
         ed_mode,
         Hloc=np.zeros((nspin, nspin, norb, norb), dtype=complex, order='F'),
         bath=_make_bath(ed_mode, nspin, Hloc, h, V, Delta),
-        Uloc=Uloc,
-        Ust=Ust[0] if len(Ust) > 0 else .0,
-        Jx=Jx[0] if len(Jx) > 0 else .0,
-        Jp=Jp[0] if len(Jp) > 0 else .0
+        U=U
     )
-    params.Jh = -(UstmJ[0] if len(UstmJ) > 0 else .0) + params.Ust
 
     for spin1, spin2 in product(range(nspin), range(nspin)):
         params.Hloc[spin1, spin2, ...] = Hloc[spin1, spin2, ...]

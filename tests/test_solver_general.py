@@ -171,6 +171,33 @@ class TestEDIpackSolverBathGeneral(unittest.TestCase):
         return results
 
     @classmethod
+    def change_int_params(cls, U, new_int_params):
+        Uloc = new_int_params["Uloc"]
+        Ust = new_int_params["Ust"]
+        Jh = new_int_params["Jh"]
+        Jx = new_int_params["Jx"]
+        Jp = new_int_params["Jp"]
+        # Uloc
+        for s, o in product(range(2), cls.orbs):
+            U[o, s, o, 1 - s, o, s, o, 1 - s] = 0.5 * Uloc[o]
+            U[o, s, o, 1 - s, o, 1 - s, o, s] = -0.5 * Uloc[o]
+        for s, o1, o2 in product(range(2), cls.orbs, cls.orbs):
+            if o1 == o2:
+                continue
+            # Ust
+            U[o1, s, o2, 1 - s, o1, s, o2, 1 - s] = 0.5 * Ust
+            U[o1, s, o2, 1 - s, o2, 1 - s, o1, s] = -0.5 * Ust
+            # Ust - Jh
+            U[o1, s, o2, s, o1, s, o2, s] = 0.5 * (Ust - Jh)
+            U[o1, s, o2, s, o2, s, o1, s] = -0.5 * (Ust - Jh)
+            # Jx
+            U[o1, s, o2, 1 - s, o2, s, o1, 1 - s] = 0.5 * Jx
+            U[o1, s, o2, 1 - s, o1, 1 - s, o2, s] = -0.5 * Jx
+            # Jp
+            U[o1, s, o1, 1 - s, o2, s, o2, 1 - s] = 0.5 * Jp
+            U[o1, s, o1, 1 - s, o2, 1 - s, o2, s] = -0.5 * Jp
+
+    @classmethod
     def assert_all(cls, s, **refs):
         assert_allclose(s.densities, refs['densities'], atol=1e-8)
         assert_allclose(s.double_occ, refs['double_occ'], atol=1e-8)
@@ -251,11 +278,7 @@ class TestEDIpackSolverBathGeneral(unittest.TestCase):
                           'Jh': 0.1,
                           'Jx': 0.2,
                           'Jp': 0.0}
-        solver.Uloc = new_int_params['Uloc']
-        solver.Ust = new_int_params['Ust']
-        solver.Jh = new_int_params['Jh']
-        solver.Jx = new_int_params['Jx']
-        solver.Jp = new_int_params['Jp']
+        self.change_int_params(solver.U, new_int_params)
         solver.comm.barrier()
 
         beta = 120.0
@@ -382,11 +405,7 @@ class TestEDIpackSolverBathGeneral(unittest.TestCase):
                           'Jh': 0.1,
                           'Jx': 0.2,
                           'Jp': 0.0}
-        solver.Uloc = new_int_params['Uloc']
-        solver.Ust = new_int_params['Ust']
-        solver.Jh = new_int_params['Jh']
-        solver.Jx = new_int_params['Jx']
-        solver.Jp = new_int_params['Jp']
+        self.change_int_params(solver.U, new_int_params)
         solver.comm.barrier()
 
         beta = 120.0
@@ -518,11 +537,7 @@ class TestEDIpackSolverBathGeneral(unittest.TestCase):
                           'Jh': 0.1,
                           'Jx': 0.2,
                           'Jp': 0.0}
-        solver.Uloc = new_int_params['Uloc']
-        solver.Ust = new_int_params['Ust']
-        solver.Jh = new_int_params['Jh']
-        solver.Jx = new_int_params['Jx']
-        solver.Jp = new_int_params['Jp']
+        self.change_int_params(solver.U, new_int_params)
         solver.comm.barrier()
 
         beta = 120.0
@@ -654,11 +669,7 @@ class TestEDIpackSolverBathGeneral(unittest.TestCase):
                           'Jh': 0.1,
                           'Jx': 0.2,
                           'Jp': 0.0}
-        solver.Uloc = new_int_params['Uloc']
-        solver.Ust = new_int_params['Ust']
-        solver.Jh = new_int_params['Jh']
-        solver.Jx = new_int_params['Jx']
-        solver.Jp = new_int_params['Jp']
+        self.change_int_params(solver.U, new_int_params)
         solver.comm.barrier()
 
         beta = 120.0
@@ -798,11 +809,7 @@ class TestEDIpackSolverBathGeneral(unittest.TestCase):
                           'Jh': 0.1,
                           'Jx': 0.2,
                           'Jp': 0.0}
-        solver.Uloc = new_int_params['Uloc']
-        solver.Ust = new_int_params['Ust']
-        solver.Jh = new_int_params['Jh']
-        solver.Jx = new_int_params['Jx']
-        solver.Jp = new_int_params['Jp']
+        self.change_int_params(solver.U, new_int_params)
         solver.comm.barrier()
 
         beta = 120.0

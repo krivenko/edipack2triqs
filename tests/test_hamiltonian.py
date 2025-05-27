@@ -34,7 +34,7 @@ class TestHamiltonian(unittest.TestCase):
     fops_imp_dn = [('dn', o) for o in orbs]
 
     # Interaction parameters for make_H_int()
-    Uloc = np.array([1.0, 2.0, 3.0, .0, .0])
+    Uloc = np.array([1.0, 2.0, 3.0])
     Ust = 0.6
     Jh = 0.15
     Jx = 0.01
@@ -66,13 +66,34 @@ class TestHamiltonian(unittest.TestCase):
                               for o1, o2 in product(cls.orbs, cls.orbs))
         return h_int
 
-    @classmethod
-    def check_int_params(cls, params):
-        assert_allclose(params.Uloc, cls.Uloc)
-        assert_allclose(params.Ust, cls.Ust)
-        assert_allclose(params.Jh, cls.Jh)
-        assert_allclose(params.Jx, cls.Jx)
-        assert_allclose(params.Jp, cls.Jp)
+    def check_int_params(self, params, **ref):
+        Uloc = ref.get("Uloc", self.Uloc)
+        U_ref = np.zeros((3, 2) * 4, dtype=float)
+        Ust = ref.get("Ust", self.Ust)
+        Jh = ref.get("Jh", self.Jh)
+        Jx = ref.get("Jx", self.Jx)
+        Jp = ref.get("Jp", self.Jp)
+        # Uloc
+        for s, o in product(range(2), self.orbs):
+            U_ref[o, s, o, 1 - s, o, s, o, 1 - s] = 0.5 * Uloc[o]
+            U_ref[o, s, o, 1 - s, o, 1 - s, o, s] = -0.5 * Uloc[o]
+        for s, o1, o2 in product(range(2), self.orbs, self.orbs):
+            if o1 == o2:
+                continue
+            # Ust
+            U_ref[o1, s, o2, 1 - s, o1, s, o2, 1 - s] = 0.5 * Ust
+            U_ref[o1, s, o2, 1 - s, o2, 1 - s, o1, s] = -0.5 * Ust
+            # Ust - Jh
+            U_ref[o1, s, o2, s, o1, s, o2, s] = 0.5 * (Ust - Jh)
+            U_ref[o1, s, o2, s, o2, s, o1, s] = -0.5 * (Ust - Jh)
+            # Jx
+            U_ref[o1, s, o2, 1 - s, o2, s, o1, 1 - s] = 0.5 * Jx
+            U_ref[o1, s, o2, 1 - s, o1, 1 - s, o2, s] = -0.5 * Jx
+            # Jp
+            U_ref[o1, s, o1, 1 - s, o2, s, o2, 1 - s] = 0.5 * Jp
+            U_ref[o1, s, o1, 1 - s, o2, 1 - s, o2, s] = -0.5 * Jp
+
+        assert_equal(params.U, U_ref)
 
 
 class TestHamiltonianNoBath(TestHamiltonian):
@@ -90,11 +111,7 @@ class TestHamiltonianNoBath(TestHamiltonian):
             h, self.fops_imp_up, self.fops_imp_dn, [], []
         )
 
-        assert_allclose(params.Uloc[:3], Uloc)
-        assert_allclose(params.Ust, Ust)
-        assert_allclose(params.Jh, J)
-        assert_allclose(params.Jx, J)
-        assert_allclose(params.Jp, J)
+        self.check_int_params(params, Uloc=Uloc, Ust=Ust, Jh=J, Jx=J, Jp=J)
 
 
 class TestHamiltonianBathNormal(TestHamiltonian):
