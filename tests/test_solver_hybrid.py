@@ -37,7 +37,7 @@ class TestEDIpackSolverBathHybrid(unittest.TestCase):
     fops_bath_dn = [('B_dn', nu) for nu in range(3)]
 
     @classmethod
-    def make_fops_imp(cls, spin_blocks):
+    def make_fops_imp(cls, spin_blocks=True):
         if spin_blocks:
             return ([('up', o) for o in cls.orbs],
                     [('dn', o) for o in cls.orbs])
@@ -54,7 +54,7 @@ class TestEDIpackSolverBathHybrid(unittest.TestCase):
                                     len(cls.orbs) * cls.spins.index(spin) + o)
 
     @classmethod
-    def make_h_loc(cls, h_loc, spin_blocks):
+    def make_h_loc(cls, h_loc, spin_blocks=True):
         mki = cls.make_mkind(spin_blocks)
         return sum(h_loc[s1, s2, o1, o2]
                    * op.c_dag(*mki(spin1, o1)) * op.c(*mki(spin2, o2))
@@ -63,7 +63,7 @@ class TestEDIpackSolverBathHybrid(unittest.TestCase):
                               cls.orbs, cls.orbs))
 
     @classmethod
-    def make_h_int(cls, spin_blocks, *, Uloc, Ust, Jh, Jx, Jp):
+    def make_h_int(cls, *, Uloc, Ust, Jh, Jx, Jp, spin_blocks=True):
         mki = cls.make_mkind(spin_blocks)
         h_int = sum(Uloc[o] * op.n(*mki('up', o)) * op.n(*mki('dn', o))
                     for o in cls.orbs)
@@ -84,7 +84,7 @@ class TestEDIpackSolverBathHybrid(unittest.TestCase):
         return h_int
 
     @classmethod
-    def make_h_bath(cls, eps, V, spin_blocks):
+    def make_h_bath(cls, eps, V, spin_blocks=True):
         mki = cls.make_mkind(spin_blocks)
         h_bath = sum(eps[s, nu]
                      * op.c_dag("B_" + spin, nu) * op.c("B_" + spin, nu)
@@ -109,8 +109,8 @@ class TestEDIpackSolverBathHybrid(unittest.TestCase):
     @classmethod
     def make_ref_results(
         cls, h, fops, beta, n_iw, energy_window, n_w, eta,
-        spin_blocks, superc,
-        h5_name
+        h5_name,
+        spin_blocks=True, superc=False
     ):
         if not generate_packaged_ref_results:
             with HDFArchive(packaged_ref_results_name, 'r') as ar:
@@ -209,23 +209,20 @@ class TestEDIpackSolverBathHybrid(unittest.TestCase):
             assert_block_gfs_are_close(s.Sigma_w, refs['Sigma_w'])
 
     def test_nspin1(self):
-        h_loc = self.make_h_loc(mul.outer(s0, np.diag([0.5, 0.6])), True)
-        h_int = self.make_h_int(True,
-                                Uloc=np.array([1.0, 2.0]),
+        h_loc = self.make_h_loc(mul.outer(s0, np.diag([0.5, 0.6])))
+        h_int = self.make_h_int(Uloc=np.array([1.0, 2.0]),
                                 Ust=0.8,
                                 Jh=0.2,
                                 Jx=0.1,
                                 Jp=0.15)
 
-        fops_imp_up, fops_imp_dn = self.make_fops_imp(True)
+        fops_imp_up, fops_imp_dn = self.make_fops_imp()
         fops = fops_imp_up + fops_imp_dn + self.fops_bath_up + self.fops_bath_dn
 
         eps = np.array([-0.1, -0.2, -0.3])
         V = np.array([[0.4, 0.7, 0.1],
                       [0.3, 0.5, 0.2]])
-        h_bath = self.make_h_bath(mul.outer([1, 1], eps),
-                                  mul.outer(s0, V),
-                                  True)
+        h_bath = self.make_h_bath(mul.outer([1, 1], eps), mul.outer(s0, V))
 
         h = h_loc + h_int + h_bath
         solver = EDIpackSolver(h,
@@ -258,8 +255,6 @@ class TestEDIpackSolverBathHybrid(unittest.TestCase):
         refs = self.make_ref_results(h, fops, beta,
                                      n_iw,
                                      energy_window, n_w, broadening,
-                                     True,
-                                     False,
                                      "nspin1_1")
         self.assert_all(solver, **refs)
 
@@ -284,13 +279,11 @@ class TestEDIpackSolverBathHybrid(unittest.TestCase):
                      broadening=broadening)
 
         ## Reference solution
-        h_int = self.make_h_int(True, **new_int_params)
+        h_int = self.make_h_int(**new_int_params)
         h = h_loc + h_int + h_bath
         refs = self.make_ref_results(h, fops, beta,
                                      n_iw,
                                      energy_window, n_w, broadening,
-                                     True,
-                                     False,
                                      "nspin1_2")
         self.assert_all(solver, **refs)
 
@@ -314,38 +307,31 @@ class TestEDIpackSolverBathHybrid(unittest.TestCase):
                      broadening=broadening)
 
         ## Reference solution
-        h_bath = self.make_h_bath(mul.outer([1, 1], eps),
-                                  mul.outer(s0, V),
-                                  True)
+        h_bath = self.make_h_bath(mul.outer([1, 1], eps), mul.outer(s0, V))
         h = h_loc + h_int + h_bath
         refs = self.make_ref_results(h, fops, beta,
                                      n_iw,
                                      energy_window, n_w, broadening,
-                                     True,
-                                     False,
                                      "nspin1_3")
         self.assert_all(solver, **refs)
 
     def test_nspin2(self):
         h_loc = self.make_h_loc(mul.outer(np.diag([0.8, 1.2]),
-                                          np.diag([0.5, 0.6])),
-                                True)
-        h_int = self.make_h_int(True,
-                                Uloc=np.array([1.0, 2.0]),
+                                          np.diag([0.5, 0.6])))
+        h_int = self.make_h_int(Uloc=np.array([1.0, 2.0]),
                                 Ust=0.8,
                                 Jh=0.2,
                                 Jx=0.1,
                                 Jp=0.15)
 
-        fops_imp_up, fops_imp_dn = self.make_fops_imp(True)
+        fops_imp_up, fops_imp_dn = self.make_fops_imp()
         fops = fops_imp_up + fops_imp_dn + self.fops_bath_up + self.fops_bath_dn
 
         eps = np.array([-0.1, -0.2, -0.3])
         V = np.array([[0.4, 0.7, 0.1],
                       [0.3, 0.5, 0.2]])
         h_bath = self.make_h_bath(mul.outer([1, -1], eps),
-                                  mul.outer(np.diag([1, 0.9]), V),
-                                  True)
+                                  mul.outer(np.diag([1, 0.9]), V))
 
         h = h_loc + h_int + h_bath
         solver = EDIpackSolver(h,
@@ -378,8 +364,6 @@ class TestEDIpackSolverBathHybrid(unittest.TestCase):
         refs = self.make_ref_results(h, fops, beta,
                                      n_iw,
                                      energy_window, n_w, broadening,
-                                     True,
-                                     False,
                                      "nspin2_1")
         self.assert_all(solver, **refs)
 
@@ -404,13 +388,11 @@ class TestEDIpackSolverBathHybrid(unittest.TestCase):
                      broadening=broadening)
 
         ## Reference solution
-        h_int = self.make_h_int(True, **new_int_params)
+        h_int = self.make_h_int(**new_int_params)
         h = h_loc + h_int + h_bath
         refs = self.make_ref_results(h, fops, beta,
                                      n_iw,
                                      energy_window, n_w, broadening,
-                                     True,
-                                     False,
                                      "nspin2_2")
         self.assert_all(solver, **refs)
 
@@ -435,14 +417,11 @@ class TestEDIpackSolverBathHybrid(unittest.TestCase):
 
         ## Reference solution
         h_bath = self.make_h_bath(mul.outer([1, -1], eps),
-                                  mul.outer(np.diag([1, 0.9]), V),
-                                  True)
+                                  mul.outer(np.diag([1, 0.9]), V))
         h = h_loc + h_int + h_bath
         refs = self.make_ref_results(h, fops, beta,
                                      n_iw,
                                      energy_window, n_w, broadening,
-                                     True,
-                                     False,
                                      "nspin2_3")
         self.assert_all(solver, **refs)
 
@@ -450,15 +429,15 @@ class TestEDIpackSolverBathHybrid(unittest.TestCase):
         h_loc = self.make_h_loc(mul.outer(np.array([[0.8, 0.2],
                                                     [0.2, 1.2]]),
                                           np.diag([0.5, 0.6])),
-                                False)
-        h_int = self.make_h_int(False,
-                                Uloc=np.array([1.0, 2.0]),
+                                spin_blocks=False)
+        h_int = self.make_h_int(Uloc=np.array([1.0, 2.0]),
                                 Ust=0.8,
                                 Jh=0.2,
                                 Jx=0.1,
-                                Jp=0.15)
+                                Jp=0.15,
+                                spin_blocks=False)
 
-        fops_imp_up, fops_imp_dn = self.make_fops_imp(False)
+        fops_imp_up, fops_imp_dn = self.make_fops_imp(spin_blocks=False)
         fops = fops_imp_up + fops_imp_dn + self.fops_bath_up + self.fops_bath_dn
 
         eps = np.array([-0.1, -0.2, -0.3])
@@ -466,7 +445,7 @@ class TestEDIpackSolverBathHybrid(unittest.TestCase):
                       [0.3, 0.5, 0.2]])
         h_bath = self.make_h_bath(mul.outer([1, -1], eps),
                                   mul.outer(np.diag([1, 0.9]), V),
-                                  False)
+                                  spin_blocks=False)
 
         h = h_loc + h_int + h_bath
         solver = EDIpackSolver(h,
@@ -499,9 +478,8 @@ class TestEDIpackSolverBathHybrid(unittest.TestCase):
         refs = self.make_ref_results(h, fops, beta,
                                      n_iw,
                                      energy_window, n_w, broadening,
-                                     False,
-                                     False,
-                                     "nonsu2_hloc_1")
+                                     "nonsu2_hloc_1",
+                                     spin_blocks=False)
         self.assert_all(solver, **refs)
 
         # Part II: update interaction parameters
@@ -525,14 +503,13 @@ class TestEDIpackSolverBathHybrid(unittest.TestCase):
                      broadening=broadening)
 
         ## Reference solution
-        h_int = self.make_h_int(False, **new_int_params)
+        h_int = self.make_h_int(**new_int_params, spin_blocks=False)
         h = h_loc + h_int + h_bath
         refs = self.make_ref_results(h, fops, beta,
                                      n_iw,
                                      energy_window, n_w, broadening,
-                                     False,
-                                     False,
-                                     "nonsu2_hloc_2")
+                                     "nonsu2_hloc_2",
+                                     spin_blocks=False)
         self.assert_all(solver, **refs)
 
         # Part III: Updated bath parameters
@@ -557,28 +534,27 @@ class TestEDIpackSolverBathHybrid(unittest.TestCase):
         ## Reference solution
         h_bath = self.make_h_bath(mul.outer([1, -1], eps),
                                   mul.outer(np.diag([1, 0.9]), V),
-                                  False)
+                                  spin_blocks=False)
         h = h_loc + h_int + h_bath
         refs = self.make_ref_results(h, fops, beta,
                                      n_iw,
                                      energy_window, n_w, broadening,
-                                     False,
-                                     False,
-                                     "nonsu2_hloc_3")
+                                     "nonsu2_hloc_3",
+                                     spin_blocks=False)
         self.assert_all(solver, **refs)
 
     def test_nonsu2_bath(self):
         h_loc = self.make_h_loc(mul.outer(np.diag([0.8, 1.2]),
                                           np.diag([0.5, 0.6])),
-                                False)
-        h_int = self.make_h_int(False,
-                                Uloc=np.array([1.0, 2.0]),
+                                spin_blocks=False)
+        h_int = self.make_h_int(Uloc=np.array([1.0, 2.0]),
                                 Ust=0.8,
                                 Jh=0.2,
                                 Jx=0.1,
-                                Jp=0.15)
+                                Jp=0.15,
+                                spin_blocks=False)
 
-        fops_imp_up, fops_imp_dn = self.make_fops_imp(False)
+        fops_imp_up, fops_imp_dn = self.make_fops_imp(spin_blocks=False)
         fops = fops_imp_up + fops_imp_dn + self.fops_bath_up + self.fops_bath_dn
 
         eps = np.array([-0.1, -0.2, -0.3])
@@ -586,7 +562,7 @@ class TestEDIpackSolverBathHybrid(unittest.TestCase):
                       [0.3, 0.5, 0.2]])
         h_bath = self.make_h_bath(mul.outer([1, -1], eps),
                                   mul.outer(sz + 0.2 * sx, V),
-                                  False)
+                                  spin_blocks=False)
 
         h = h_loc + h_int + h_bath
         solver = EDIpackSolver(h,
@@ -619,9 +595,8 @@ class TestEDIpackSolverBathHybrid(unittest.TestCase):
         refs = self.make_ref_results(h, fops, beta,
                                      n_iw,
                                      energy_window, n_w, broadening,
-                                     False,
-                                     False,
-                                     "nonsu2_bath_1")
+                                     "nonsu2_bath_1",
+                                     spin_blocks=False)
         self.assert_all(solver, **refs)
 
         # Part II: update interaction parameters
@@ -645,14 +620,13 @@ class TestEDIpackSolverBathHybrid(unittest.TestCase):
                      broadening=broadening)
 
         ## Reference solution
-        h_int = self.make_h_int(False, **new_int_params)
+        h_int = self.make_h_int(**new_int_params, spin_blocks=False)
         h = h_loc + h_int + h_bath
         refs = self.make_ref_results(h, fops, beta,
                                      n_iw,
                                      energy_window, n_w, broadening,
-                                     False,
-                                     False,
-                                     "nonsu2_bath_2")
+                                     "nonsu2_bath_2",
+                                     spin_blocks=False)
         self.assert_all(solver, **refs)
 
         # Part III: Updated bath parameters
@@ -678,34 +652,30 @@ class TestEDIpackSolverBathHybrid(unittest.TestCase):
         ## Reference solution
         h_bath = self.make_h_bath(mul.outer([1, -1], eps),
                                   mul.outer(np.diag([1, 0.9]) + 0.2 * sx, V),
-                                  False)
+                                  spin_blocks=False)
         h = h_loc + h_int + h_bath
         refs = self.make_ref_results(h, fops, beta,
                                      n_iw,
                                      energy_window, n_w, broadening,
-                                     False,
-                                     False,
-                                     "nonsu2_bath_3")
+                                     "nonsu2_bath_3",
+                                     spin_blocks=False)
         self.assert_all(solver, **refs)
 
     def test_superc(self):
-        h_loc = self.make_h_loc(mul.outer(s0, np.diag([0.5, 0.6])), True)
-        h_int = self.make_h_int(True,
-                                Uloc=np.array([1.0, 2.0]),
+        h_loc = self.make_h_loc(mul.outer(s0, np.diag([0.5, 0.6])))
+        h_int = self.make_h_int(Uloc=np.array([1.0, 2.0]),
                                 Ust=0.8,
                                 Jh=0.2,
                                 Jx=0.1,
                                 Jp=0.15)
 
-        fops_imp_up, fops_imp_dn = self.make_fops_imp(True)
+        fops_imp_up, fops_imp_dn = self.make_fops_imp()
         fops = fops_imp_up + fops_imp_dn + self.fops_bath_up + self.fops_bath_dn
 
         eps = np.array([-0.1, -0.2, -0.3])
         V = np.array([[0.4, 0.7, 0.1],
                       [0.3, 0.5, 0.2]])
-        h_bath = self.make_h_bath(mul.outer([1, 1], eps),
-                                  mul.outer(s0, V),
-                                  True)
+        h_bath = self.make_h_bath(mul.outer([1, 1], eps), mul.outer(s0, V))
 
         Delta = np.array([0.6, 0.7, 0.8])
         h_sc = self.make_h_sc(Delta)
@@ -741,9 +711,8 @@ class TestEDIpackSolverBathHybrid(unittest.TestCase):
         refs = self.make_ref_results(h, fops, beta,
                                      n_iw,
                                      energy_window, n_w, broadening,
-                                     True,
-                                     True,
-                                     "superc_1")
+                                     "superc_1",
+                                     superc=True)
         self.assert_all(solver, **refs)
 
         # Part II: update interaction parameters
@@ -767,14 +736,13 @@ class TestEDIpackSolverBathHybrid(unittest.TestCase):
                      broadening=broadening)
 
         ## Reference solution
-        h_int = self.make_h_int(True, **new_int_params)
+        h_int = self.make_h_int(**new_int_params)
         h = h_loc + h_int + h_bath + h_sc
         refs = self.make_ref_results(h, fops, beta,
                                      n_iw,
                                      energy_window, n_w, broadening,
-                                     True,
-                                     True,
-                                     "superc_2")
+                                     "superc_2",
+                                     superc=True)
         self.assert_all(solver, **refs)
 
         # Part III: Updated bath parameters
@@ -799,17 +767,14 @@ class TestEDIpackSolverBathHybrid(unittest.TestCase):
                      broadening=broadening)
 
         ## Reference solution
-        h_bath = self.make_h_bath(mul.outer([1, 1], eps),
-                                  mul.outer(s0, V),
-                                  True)
+        h_bath = self.make_h_bath(mul.outer([1, 1], eps), mul.outer(s0, V))
         h_sc = self.make_h_sc(Delta)
         h = h_loc + h_int + h_bath + h_sc
         refs = self.make_ref_results(h, fops, beta,
                                      n_iw,
                                      energy_window, n_w, broadening,
-                                     True,
-                                     True,
-                                     "superc_3")
+                                     "superc_3",
+                                     superc=True)
         self.assert_all(solver, **refs)
 
         solver.g_an_iw
