@@ -413,7 +413,7 @@ class EDIpackSolver:
         self.h_params.bath = new_bath
 
     def solve(self,
-              beta: float = np.inf,
+              beta: float = 1000,
               *,
               n_iw: int = 4096,
               energy_window: tuple[float, float] = (-5.0, 5.0),
@@ -428,7 +428,7 @@ class EDIpackSolver:
             Green's function calculations. In the zero temperature mode, this
             parameter determines spacing between fictitious Matsubara
             frequencies used as a mesh for the Green's functions.
-        :type beta: float, default=numpy.inf
+        :type beta: float, default=1000
 
         :param n_iw: Number of Matsubara frequencies for impurity GF
             calculations.
@@ -446,12 +446,6 @@ class EDIpackSolver:
             real-frequency axis) for real-frequency impurity GF calculations.
         :type broadening: float, default=0.01
         """
-
-        # Pass parameters to EDIpack
-        if (not self.zerotemp) and np.isinf(beta):
-            raise RuntimeError(
-                "Finite beta must be provided in the finite-temperature mode"
-            )
 
         ed.beta = beta
         ed.Lmats = n_iw
