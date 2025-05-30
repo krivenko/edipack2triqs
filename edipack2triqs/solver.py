@@ -63,7 +63,6 @@ class EDIpackSolver:
         "ED_PRINT_G": False,
         "ED_PRINT_G0": False,
         "RDM_FLAG": False,
-        "ED_FINITE_TEMP": True,
         "ED_TWIN": False,
         "ED_SECTORS": False,
         "ED_SECTORS_SHIFT": 0,
@@ -135,6 +134,9 @@ class EDIpackSolver:
         :param print_input_vars: Flag to toggle the printing of all the input
             variables and their values on the console.
         :type print_input_vars: bool, default=False
+
+        :param zerotemp: Enable zero temperature calculations.
+        :type zerotemp: bool, default=False
 
         :param cutoff: Spectrum cutoff used to determine the number of states
                        to be retained.
@@ -251,8 +253,6 @@ class EDIpackSolver:
             c["GS_THRESHOLD"] = kwargs.get("gs_threshold", 1e-9)
             c["ED_SPARSE_H"] = kwargs.get("ed_sparse_h", True)
             c["LANC_METHOD"] = kwargs.get("lanc_method", "arpack")
-            c["LANC_NSTATES_SECTOR"] = kwargs.get("lanc_nstates_sector", 2)
-            c["LANC_NSTATES_TOTAL"] = kwargs.get("lanc_nstates_total", 2)
             c["LANC_NSTATES_STEP"] = kwargs.get("lanc_nstates_step", 2)
             c["LANC_NCV_FACTOR"] = kwargs.get("lanc_ncv_factor", 10)
             c["LANC_NCV_ADD"] = kwargs.get("lanc_ncv_add", 0)
@@ -280,6 +280,15 @@ class EDIpackSolver:
                     and self.denden_int):
                 ed_total_ud = True
             c["ED_TOTAL_UD"] = ed_total_ud
+
+            # Zero temperature calculations
+            self.zerotemp = kwargs.get("zerotemp", False)
+            c["ED_FINITE_TEMP"] = not self.zerotemp
+            if self.zerotemp:
+                c["LANC_NSTATES_TOTAL"] = 1
+            else:
+                c["LANC_NSTATES_SECTOR"] = kwargs.get("lanc_nstates_sector", 2)
+                c["LANC_NSTATES_TOTAL"] = kwargs.get("lanc_nstates_total", 2)
 
             # Bath fitting
             bfp = kwargs.get("bath_fitting_params", BathFittingParams())
@@ -404,7 +413,7 @@ class EDIpackSolver:
         self.h_params.bath = new_bath
 
     def solve(self,
-              beta: float,
+              beta: float = np.inf,
               *,
               n_iw: int = 4096,
               energy_window: tuple[float, float] = (-5.0, 5.0),
@@ -416,8 +425,10 @@ class EDIpackSolver:
 
         :param beta:
             Inverse temperature :math:`\beta = 1 / (k_B T)` for observable and
-            Green's function calculations.
-        :type beta: float
+            Green's function calculations. In the zero temperature mode, this
+            parameter determines spacing between fictitious Matsubara
+            frequencies used as a mesh for the Green's functions.
+        :type beta: float, default=numpy.inf
 
         :param n_iw: Number of Matsubara frequencies for impurity GF
             calculations.
@@ -437,6 +448,11 @@ class EDIpackSolver:
         """
 
         # Pass parameters to EDIpack
+        if (not self.zerotemp) and np.isinf(beta):
+            raise RuntimeError(
+                "Finite beta must be provided in the finite-temperature mode"
+            )
+
         ed.beta = beta
         ed.Lmats = n_iw
         ed.wini, ed.wfin = energy_window

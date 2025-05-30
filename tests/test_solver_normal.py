@@ -113,7 +113,7 @@ class TestEDIpackSolverBathNormal(unittest.TestCase):
     def make_ref_results(
         cls, h, fops, beta, n_iw, energy_window, n_w, eta,
         h5_name,
-        spin_blocks=True, superc=False,
+        spin_blocks=True, superc=False, zerotemp=False
     ):
         if not generate_packaged_ref_results:
             with HDFArchive(packaged_ref_results_name, 'r') as ar:
@@ -141,7 +141,6 @@ class TestEDIpackSolverBathNormal(unittest.TestCase):
 
         ad = AtomDiag(h, fops)
         rho = atomic_density_matrix(ad, beta)
-        g_iw = atomic_g_iw(ad, beta, gf_struct, n_iw)
         g_w = atomic_g_w(ad, beta, gf_struct, energy_window, n_w, eta)
 
         def avg(ops):
@@ -152,16 +151,20 @@ class TestEDIpackSolverBathNormal(unittest.TestCase):
                    'magn_x': avg(S_x),
                    'magn_y': 1j * avg(S_y),
                    'magn_z': avg(S_z),
-                   'g_iw': g_iw,
                    'g_w': g_w}
+
+        if not zerotemp:
+            g_iw = atomic_g_iw(ad, beta, gf_struct, n_iw)
+            results['g_iw'] = g_iw
 
         if not superc:
             h0 = non_int_part(h)
             ad0 = AtomDiag(h0, fops)
-            g0_iw = atomic_g_iw(ad0, beta, gf_struct, n_iw)
             g0_w = atomic_g_w(ad0, beta, gf_struct, energy_window, n_w, eta)
-            results['Sigma_iw'] = dyson(G0_iw=g0_iw, G_iw=g_iw)
             results['Sigma_w'] = dyson(G0_iw=g0_w, G_iw=g_w)
+            if not zerotemp:
+                g0_iw = atomic_g_iw(ad0, beta, gf_struct, n_iw)
+                results['Sigma_iw'] = dyson(G0_iw=g0_iw, G_iw=g_iw)
 
         if generate_packaged_ref_results:
             with HDFArchive(packaged_ref_results_name, 'a') as ar:
@@ -204,12 +207,61 @@ class TestEDIpackSolverBathNormal(unittest.TestCase):
         assert_allclose(s.magnetization[:, 0], refs['magn_x'], atol=1e-8)
         assert_allclose(s.magnetization[:, 1], refs['magn_y'], atol=1e-8)
         assert_allclose(s.magnetization[:, 2], refs['magn_z'], atol=1e-8)
-        assert_block_gfs_are_close(s.g_iw, refs['g_iw'])
         assert_block_gfs_are_close(s.g_w, refs['g_w'])
-        if 'Sigma_iw' in refs:
-            assert_block_gfs_are_close(s.Sigma_iw, refs['Sigma_iw'])
+        if 'g_iw' in refs:
+            assert_block_gfs_are_close(s.g_iw, refs['g_iw'])
         if 'Sigma_w' in refs:
             assert_block_gfs_are_close(s.Sigma_w, refs['Sigma_w'])
+        if 'Sigma_iw' in refs:
+            assert_block_gfs_are_close(s.Sigma_iw, refs['Sigma_iw'])
+
+    def test_zerotemp(self):
+        h_loc = self.make_h_loc(mul.outer(s0, np.diag([0.5, 0.6])))
+        h_int = self.make_h_int(Uloc=np.array([1.0, 2.0]),
+                                Ust=0.8,
+                                Jh=0.2,
+                                Jx=0.1,
+                                Jp=0.15)
+
+        fops_imp_up, fops_imp_dn = self.make_fops_imp()
+        fops = fops_imp_up + fops_imp_dn + self.fops_bath_up + self.fops_bath_dn
+
+        eps = np.array([[-0.5, 0.5],
+                        [-0.7, 0.7]])
+        V = np.array([[0.1, 0.2],
+                      [0.3, 0.4]])
+        h_bath = self.make_h_bath(mul.outer([1, 1], eps), mul.outer(s0, V))
+
+        h = h_loc + h_int + h_bath
+        solver = EDIpackSolver(
+            h,
+            fops_imp_up, fops_imp_dn,
+            self.fops_bath_up, self.fops_bath_dn,
+            zerotemp=True,
+            verbose=0
+        )
+
+        self.assertEqual(solver.nspin, 1)
+        self.assertEqual(solver.norb, 2)
+        self.assertEqual(solver.bath.name, "normal")
+        self.assertEqual(solver.bath.nbath, 2)
+
+        n_iw = 100
+        energy_window = (-2.0, 2.0)
+        n_w = 600
+        broadening = 0.05
+        solver.solve(n_iw=n_iw,
+                     energy_window=energy_window,
+                     n_w=n_w,
+                     broadening=broadening)
+
+        ## Reference solution
+        refs = self.make_ref_results(h, fops, 10000,
+                                     n_iw,
+                                     energy_window, n_w, broadening,
+                                     "zerotemp",
+                                     zerotemp=True)
+        self.assert_all(solver, **refs)
 
     def test_nspin1(self):
         h_loc = self.make_h_loc(mul.outer(s0, np.diag([0.5, 0.6])))
