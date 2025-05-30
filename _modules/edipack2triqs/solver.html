@@ -133,6 +133,7 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../issues.html">Reporting issues</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../ChangeLog.html">Changelog</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../ChangeLog.html#version-0-7-0">Version 0.7.0</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../ChangeLog.html#version-0-6-0">Version 0.6.0</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../ChangeLog.html#version-0-5-0">Version 0.5.0</a></li>
 </ul>
@@ -236,7 +237,6 @@
         <span class="s2">&quot;ED_PRINT_G&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
         <span class="s2">&quot;ED_PRINT_G0&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
         <span class="s2">&quot;RDM_FLAG&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
-        <span class="s2">&quot;ED_FINITE_TEMP&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
         <span class="s2">&quot;ED_TWIN&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
         <span class="s2">&quot;ED_SECTORS&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
         <span class="s2">&quot;ED_SECTORS_SHIFT&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
@@ -310,6 +310,9 @@
 <span class="sd">        :param print_input_vars: Flag to toggle the printing of all the input</span>
 <span class="sd">            variables and their values on the console.</span>
 <span class="sd">        :type print_input_vars: bool, default=False</span>
+
+<span class="sd">        :param zerotemp: Enable zero temperature calculations.</span>
+<span class="sd">        :type zerotemp: bool, default=False</span>
 
 <span class="sd">        :param cutoff: Spectrum cutoff used to determine the number of states</span>
 <span class="sd">                       to be retained.</span>
@@ -426,8 +429,6 @@
             <span class="n">c</span><span class="p">[</span><span class="s2">&quot;GS_THRESHOLD&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;gs_threshold&quot;</span><span class="p">,</span> <span class="mf">1e-9</span><span class="p">)</span>
             <span class="n">c</span><span class="p">[</span><span class="s2">&quot;ED_SPARSE_H&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;ed_sparse_h&quot;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
             <span class="n">c</span><span class="p">[</span><span class="s2">&quot;LANC_METHOD&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;lanc_method&quot;</span><span class="p">,</span> <span class="s2">&quot;arpack&quot;</span><span class="p">)</span>
-            <span class="n">c</span><span class="p">[</span><span class="s2">&quot;LANC_NSTATES_SECTOR&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;lanc_nstates_sector&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
-            <span class="n">c</span><span class="p">[</span><span class="s2">&quot;LANC_NSTATES_TOTAL&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;lanc_nstates_total&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
             <span class="n">c</span><span class="p">[</span><span class="s2">&quot;LANC_NSTATES_STEP&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;lanc_nstates_step&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
             <span class="n">c</span><span class="p">[</span><span class="s2">&quot;LANC_NCV_FACTOR&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;lanc_ncv_factor&quot;</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
             <span class="n">c</span><span class="p">[</span><span class="s2">&quot;LANC_NCV_ADD&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;lanc_ncv_add&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
@@ -455,6 +456,15 @@
                     <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">denden_int</span><span class="p">):</span>
                 <span class="n">ed_total_ud</span> <span class="o">=</span> <span class="kc">True</span>
             <span class="n">c</span><span class="p">[</span><span class="s2">&quot;ED_TOTAL_UD&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ed_total_ud</span>
+
+            <span class="c1"># Zero temperature calculations</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">zerotemp</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;zerotemp&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+            <span class="n">c</span><span class="p">[</span><span class="s2">&quot;ED_FINITE_TEMP&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">zerotemp</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">zerotemp</span><span class="p">:</span>
+                <span class="n">c</span><span class="p">[</span><span class="s2">&quot;LANC_NSTATES_TOTAL&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">c</span><span class="p">[</span><span class="s2">&quot;LANC_NSTATES_SECTOR&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;lanc_nstates_sector&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+                <span class="n">c</span><span class="p">[</span><span class="s2">&quot;LANC_NSTATES_TOTAL&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;lanc_nstates_total&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
 
             <span class="c1"># Bath fitting</span>
             <span class="n">bfp</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;bath_fitting_params&quot;</span><span class="p">,</span> <span class="n">BathFittingParams</span><span class="p">())</span>
@@ -582,7 +592,7 @@
 <div class="viewcode-block" id="EDIpackSolver.solve">
 <a class="viewcode-back" href="../../documentation.html#edipack2triqs.solver.EDIpackSolver.solve">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">solve</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
-              <span class="n">beta</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+              <span class="n">beta</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">1000</span><span class="p">,</span>
               <span class="o">*</span><span class="p">,</span>
               <span class="n">n_iw</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">4096</span><span class="p">,</span>
               <span class="n">energy_window</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="o">-</span><span class="mf">5.0</span><span class="p">,</span> <span class="mf">5.0</span><span class="p">),</span>
@@ -594,8 +604,10 @@
 
 <span class="sd">        :param beta:</span>
 <span class="sd">            Inverse temperature :math:`\beta = 1 / (k_B T)` for observable and</span>
-<span class="sd">            Green&#39;s function calculations.</span>
-<span class="sd">        :type beta: float</span>
+<span class="sd">            Green&#39;s function calculations. In the zero temperature mode, this</span>
+<span class="sd">            parameter determines spacing between fictitious Matsubara</span>
+<span class="sd">            frequencies used as a mesh for the Green&#39;s functions.</span>
+<span class="sd">        :type beta: float, default=1000</span>
 
 <span class="sd">        :param n_iw: Number of Matsubara frequencies for impurity GF</span>
 <span class="sd">            calculations.</span>
@@ -614,7 +626,6 @@
 <span class="sd">        :type broadening: float, default=0.01</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="c1"># Pass parameters to EDIpack</span>
         <span class="n">ed</span><span class="o">.</span><span class="n">beta</span> <span class="o">=</span> <span class="n">beta</span>
         <span class="n">ed</span><span class="o">.</span><span class="n">Lmats</span> <span class="o">=</span> <span class="n">n_iw</span>
         <span class="n">ed</span><span class="o">.</span><span class="n">wini</span><span class="p">,</span> <span class="n">ed</span><span class="o">.</span><span class="n">wfin</span> <span class="o">=</span> <span class="n">energy_window</span>
