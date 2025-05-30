@@ -2,6 +2,11 @@
 
 # Changelog
 
+## Version 0.7.0
+
+* Add support for general two-particle interactions.
+* Add support for zero temperature calculations.
+
 ## Version 0.6.0
 
 Updated codebase following the naming change of EDIpack2 and EDIpy2.
