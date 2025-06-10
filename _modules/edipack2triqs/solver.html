@@ -176,6 +176,8 @@
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">tempfile</span><span class="w"> </span><span class="kn">import</span> <span class="n">TemporaryDirectory</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">types</span><span class="w"> </span><span class="kn">import</span> <span class="n">NoneType</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Union</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">warnings</span><span class="w"> </span><span class="kn">import</span> <span class="n">warn</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
@@ -189,7 +191,7 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">edipack2py</span><span class="w"> </span><span class="kn">import</span> <span class="n">global_env</span> <span class="k">as</span> <span class="n">ed</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">.util</span><span class="w"> </span><span class="kn">import</span> <span class="n">IndicesType</span><span class="p">,</span> <span class="n">validate_fops_up_dn</span><span class="p">,</span> <span class="n">write_config</span><span class="p">,</span> <span class="n">chdircontext</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">.bath</span><span class="w"> </span><span class="kn">import</span> <span class="n">Bath</span><span class="p">,</span> <span class="n">BathNormal</span><span class="p">,</span> <span class="n">BathGeneral</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.bath</span><span class="w"> </span><span class="kn">import</span> <span class="n">Bath</span><span class="p">,</span> <span class="n">BathNormal</span><span class="p">,</span> <span class="n">BathHybrid</span><span class="p">,</span> <span class="n">BathGeneral</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">.hamiltonian</span><span class="w"> </span><span class="kn">import</span> <span class="n">parse_hamiltonian</span><span class="p">,</span> <span class="n">_is_density</span><span class="p">,</span> <span class="n">_is_density_density</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">.fit</span><span class="w"> </span><span class="kn">import</span> <span class="n">BathFittingParams</span><span class="p">,</span> <span class="n">_chi2_fit_bath</span>
 
@@ -257,8 +259,8 @@
                  <span class="n">hamiltonian</span><span class="p">:</span> <span class="n">op</span><span class="o">.</span><span class="n">Operator</span><span class="p">,</span>
                  <span class="n">fops_imp_up</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">IndicesType</span><span class="p">],</span>
                  <span class="n">fops_imp_dn</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">IndicesType</span><span class="p">],</span>
-                 <span class="n">fops_bath_up</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">IndicesType</span><span class="p">],</span>
-                 <span class="n">fops_bath_dn</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">IndicesType</span><span class="p">],</span>
+                 <span class="n">fops_bath_up</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">IndicesType</span><span class="p">]</span> <span class="o">=</span> <span class="p">[],</span>
+                 <span class="n">fops_bath_dn</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">IndicesType</span><span class="p">]</span> <span class="o">=</span> <span class="p">[],</span>
                  <span class="o">**</span><span class="n">kwargs</span>
                  <span class="p">):</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
@@ -290,12 +292,14 @@
 <span class="sd">        :type fops_imp_dn: list[tuple[int | str, int | str]]</span>
 
 <span class="sd">        :param fops_bath_up: Fundamental operator set for spin-up bath</span>
-<span class="sd">            degrees of freedom.</span>
-<span class="sd">        :type fops_bath_up: list[tuple[int | str, int | str]]</span>
+<span class="sd">            degrees of freedom. Must be empty for calculations without bath.</span>
+<span class="sd">        :type fops_bath_up: list[tuple[int | str, int | str]], optional,</span>
+<span class="sd">            default=[]</span>
 
 <span class="sd">        :param fops_bath_dn: Fundamental operator set for spin-down bath</span>
-<span class="sd">            degrees of freedom.</span>
-<span class="sd">        :type fops_bath_dn: list[tuple[int | str, int | str]]</span>
+<span class="sd">            degrees of freedom. Must be empty for calculations without bath.</span>
+<span class="sd">        :type fops_bath_dn: list[tuple[int | str, int | str]], optional,</span>
+<span class="sd">            default=[]</span>
 
 <span class="sd">        :param input_file: Path to a custom input file compatible with</span>
 <span class="sd">            **EDIpack**&#39;s :f:func:`f/ed_input_vars/ed_read_input`.</span>
@@ -384,6 +388,8 @@
         <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance_count</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">,</span> \
             <span class="s2">&quot;Only one instance of EDIpackSolver can exist at any time&quot;</span>
 
+        <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">fops_imp_up</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;fops_imp_up must not be empty&quot;</span>
+        <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">fops_imp_dn</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;fops_imp_dn must not be empty&quot;</span>
         <span class="n">validate_fops_up_dn</span><span class="p">(</span><span class="n">fops_imp_up</span><span class="p">,</span> <span class="n">fops_imp_dn</span><span class="p">,</span>
                             <span class="s2">&quot;fops_imp_up&quot;</span><span class="p">,</span> <span class="s2">&quot;fops_imp_dn&quot;</span><span class="p">)</span>
         <span class="n">validate_fops_up_dn</span><span class="p">(</span><span class="n">fops_bath_up</span><span class="p">,</span> <span class="n">fops_bath_dn</span><span class="p">,</span>
@@ -443,8 +449,11 @@
             <span class="n">c</span><span class="p">[</span><span class="s2">&quot;NORB&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">norb</span>
 
             <span class="c1"># Bath geometry</span>
-            <span class="n">c</span><span class="p">[</span><span class="s2">&quot;BATH_TYPE&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">h_params</span><span class="o">.</span><span class="n">bath</span><span class="o">.</span><span class="n">name</span>
-            <span class="n">c</span><span class="p">[</span><span class="s2">&quot;NBATH&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">h_params</span><span class="o">.</span><span class="n">bath</span><span class="o">.</span><span class="n">nbath</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">h_params</span><span class="o">.</span><span class="n">bath</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">c</span><span class="p">[</span><span class="s2">&quot;BATH_TYPE&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">h_params</span><span class="o">.</span><span class="n">bath</span><span class="o">.</span><span class="n">name</span>
+                <span class="n">c</span><span class="p">[</span><span class="s2">&quot;NBATH&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">h_params</span><span class="o">.</span><span class="n">bath</span><span class="o">.</span><span class="n">nbath</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">c</span><span class="p">[</span><span class="s2">&quot;NBATH&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
 
             <span class="c1"># ed_total_ud</span>
             <span class="n">ed_total_ud</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;ed_total_ud&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
@@ -517,11 +526,16 @@
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">h_params</span><span class="o">.</span><span class="n">bath</span><span class="p">,</span> <span class="n">BathGeneral</span><span class="p">):</span>
             <span class="n">ed</span><span class="o">.</span><span class="n">set_hgeneral</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">h_params</span><span class="o">.</span><span class="n">bath</span><span class="o">.</span><span class="n">hvec</span><span class="p">,</span>
                             <span class="bp">self</span><span class="o">.</span><span class="n">h_params</span><span class="o">.</span><span class="n">bath</span><span class="o">.</span><span class="n">lambdavec</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">h_params</span><span class="o">.</span><span class="n">bath</span><span class="p">,</span> <span class="p">(</span><span class="n">BathNormal</span><span class="p">,</span> <span class="n">BathHybrid</span><span class="p">)):</span>
             <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">h_params</span><span class="o">.</span><span class="n">bath</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">size</span> <span class="o">==</span> <span class="n">ed</span><span class="o">.</span><span class="n">get_bath_dimension</span><span class="p">()</span>
 
         <span class="c1"># Initialize EDIpack</span>
-        <span class="n">ed</span><span class="o">.</span><span class="n">init_solver</span><span class="p">(</span><span class="n">bath</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">h_params</span><span class="o">.</span><span class="n">bath</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">size</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">))</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">h_params</span><span class="o">.</span><span class="n">bath</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">ed</span><span class="o">.</span><span class="n">init_solver</span><span class="p">(</span>
+                <span class="n">bath</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">h_params</span><span class="o">.</span><span class="n">bath</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">size</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">ed</span><span class="o">.</span><span class="n">init_solver</span><span class="p">(</span><span class="n">bath</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">((),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">))</span>
 
         <span class="c1"># GF block names</span>
         <span class="k">if</span> <span class="n">ed</span><span class="o">.</span><span class="n">get_ed_mode</span><span class="p">()</span> <span class="ow">in</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">):</span>  <span class="c1"># normal or superc</span>
@@ -575,19 +589,24 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">h_params</span><span class="o">.</span><span class="n">U</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">bath</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Bath</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">bath</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">Bath</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]:</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Access to the current :py:class:`bath &lt;edipack2triqs.bath.Bath&gt;` object</span>
 <span class="sd">        stored in the solver. It is possible to assign a new bath object as long</span>
 <span class="sd">        as it has the matching type and describes a bath of the same geometry.</span>
+<span class="sd">        In the no-bath mode this attribute is set to :py:data:`None`.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">h_params</span><span class="o">.</span><span class="n">bath</span>
 
     <span class="nd">@bath</span><span class="o">.</span><span class="n">setter</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">bath</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_bath</span><span class="p">:</span> <span class="n">Bath</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">bath</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_bath</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Bath</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]):</span>
         <span class="s2">&quot;Set the bath object&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">h_params</span><span class="o">.</span><span class="n">bath</span><span class="o">.</span><span class="n">assert_compatible</span><span class="p">(</span><span class="n">new_bath</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">h_params</span><span class="o">.</span><span class="n">bath</span> <span class="o">=</span> <span class="n">new_bath</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">h_params</span><span class="o">.</span><span class="n">bath</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="n">new_bath</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">,</span> \
+                <span class="s2">&quot;Cannot set a new bath object in a no-bath calculation&quot;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">h_params</span><span class="o">.</span><span class="n">bath</span><span class="o">.</span><span class="n">assert_compatible</span><span class="p">(</span><span class="n">new_bath</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">h_params</span><span class="o">.</span><span class="n">bath</span> <span class="o">=</span> <span class="n">new_bath</span>
 
 <div class="viewcode-block" id="EDIpackSolver.solve">
 <a class="viewcode-back" href="../../documentation.html#edipack2triqs.solver.EDIpackSolver.solve">[docs]</a>
@@ -655,7 +674,10 @@
                 <span class="n">ed</span><span class="o">.</span><span class="n">add_twobody_operator</span><span class="p">(</span><span class="n">o1</span><span class="p">,</span> <span class="n">s1</span><span class="p">,</span> <span class="n">o2</span><span class="p">,</span> <span class="n">s2</span><span class="p">,</span> <span class="n">o3</span><span class="p">,</span> <span class="n">s3</span><span class="p">,</span> <span class="n">o4</span><span class="p">,</span> <span class="n">s4</span><span class="p">,</span> <span class="n">val</span><span class="p">)</span>
 
             <span class="c1"># Solve!</span>
-            <span class="n">ed</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">h_params</span><span class="o">.</span><span class="n">bath</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">h_params</span><span class="o">.</span><span class="n">bath</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">ed</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">h_params</span><span class="o">.</span><span class="n">bath</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">ed</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">((),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">))</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">comm</span><span class="o">.</span><span class="n">barrier</span><span class="p">()</span></div>
 
 
