@@ -135,6 +135,11 @@ def _chi2_fit_bath(self, g: BlockGf, f: Optional[BlockGf] = None):
             tuple[Bath, triqs.gf.block_gf.BlockGf, triqs.gf.block_gf.BlockGf]
     """
 
+    if self.h_params.bath is None:
+        raise RuntimeError(
+            "Cannot use bath parameter fitting in the no-bath mode"
+        )
+
     if (ed.get_ed_mode() == 2) != (f is not None):
         raise RuntimeError(
             "The anomalous GF is required iff the bath is superconducting"

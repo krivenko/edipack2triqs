@@ -4,6 +4,7 @@ Hamiltonian and its parameters
 
 from itertools import product
 from dataclasses import dataclass
+from types import NoneType
 from typing import Union
 
 import numpy as np
@@ -27,8 +28,8 @@ class HamiltonianParams:
     ed_mode: str
     # Non-interacting part of the impurity Hamiltonian
     Hloc: np.ndarray
-    # Bath parameters
-    bath: Union[BathNormal, BathHybrid, BathGeneral]
+    # Bath object (None if no bath is present)
+    bath: Union[BathNormal, BathHybrid, BathGeneral, NoneType]
     # Interaction matrix U_{ijkl}
     U: np.ndarray
 
@@ -249,10 +250,12 @@ def parse_hamiltonian(hamiltonian: op.Operator,  # noqa: C901
         else:
             ed_mode = "nonsu2"
 
+    bath = _make_bath(ed_mode, nspin, Hloc, h, V, Delta) \
+        if nbath_total > 0 else None
     params = HamiltonianParams(
         ed_mode,
         Hloc=np.zeros((nspin, nspin, norb, norb), dtype=complex, order='F'),
-        bath=_make_bath(ed_mode, nspin, Hloc, h, V, Delta),
+        bath=bath,
         U=U
     )
 

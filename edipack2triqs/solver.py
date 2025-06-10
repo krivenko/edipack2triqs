@@ -4,6 +4,8 @@ TRIQS interface to **EDIpack** exact diagonalization solver.
 
 from pathlib import Path
 from tempfile import TemporaryDirectory
+from types import NoneType
+from typing import Union
 from warnings import warn
 import os
 import re
@@ -17,7 +19,7 @@ from triqs.gf import BlockGf, Gf, MeshImFreq, MeshReFreq
 from edipack2py import global_env as ed
 
 from .util import IndicesType, validate_fops_up_dn, write_config, chdircontext
-from .bath import Bath, BathNormal, BathGeneral
+from .bath import Bath, BathNormal, BathHybrid, BathGeneral
 from .hamiltonian import parse_hamiltonian, _is_density, _is_density_density
 from .fit import BathFittingParams, _chi2_fit_bath
 
@@ -81,8 +83,8 @@ class EDIpackSolver:
                  hamiltonian: op.Operator,
                  fops_imp_up: list[IndicesType],
                  fops_imp_dn: list[IndicesType],
-                 fops_bath_up: list[IndicesType],
-                 fops_bath_dn: list[IndicesType],
+                 fops_bath_up: list[IndicesType] = [],
+                 fops_bath_dn: list[IndicesType] = [],
                  **kwargs
                  ):
         r"""
@@ -114,12 +116,14 @@ class EDIpackSolver:
         :type fops_imp_dn: list[tuple[int | str, int | str]]
 
         :param fops_bath_up: Fundamental operator set for spin-up bath
-            degrees of freedom.
-        :type fops_bath_up: list[tuple[int | str, int | str]]
+            degrees of freedom. Must be empty for calculations without bath.
+        :type fops_bath_up: list[tuple[int | str, int | str]], optional,
+            default=[]
 
         :param fops_bath_dn: Fundamental operator set for spin-down bath
-            degrees of freedom.
-        :type fops_bath_dn: list[tuple[int | str, int | str]]
+            degrees of freedom. Must be empty for calculations without bath.
+        :type fops_bath_dn: list[tuple[int | str, int | str]], optional,
+            default=[]
 
         :param input_file: Path to a custom input file compatible with
             **EDIpack**'s :f:func:`f/ed_input_vars/ed_read_input`.
@@ -208,6 +212,8 @@ class EDIpackSolver:
         assert self.instance_count[0] < 1, \
             "Only one instance of EDIpackSolver can exist at any time"
 
+        assert len(fops_imp_up) > 0, "fops_imp_up must not be empty"
+        assert len(fops_imp_dn) > 0, "fops_imp_dn must not be empty"
         validate_fops_up_dn(fops_imp_up, fops_imp_dn,
                             "fops_imp_up", "fops_imp_dn")
         validate_fops_up_dn(fops_bath_up, fops_bath_dn,
@@ -267,8 +273,11 @@ class EDIpackSolver:
             c["NORB"] = self.norb
 
             # Bath geometry
-            c["BATH_TYPE"] = self.h_params.bath.name
-            c["NBATH"] = self.h_params.bath.nbath
+            if self.h_params.bath is not None:
+                c["BATH_TYPE"] = self.h_params.bath.name
+                c["NBATH"] = self.h_params.bath.nbath
+            else:
+                c["NBATH"] = 0
 
             # ed_total_ud
             ed_total_ud = kwargs.get("ed_total_ud", False)
@@ -341,11 +350,16 @@ class EDIpackSolver:
         if isinstance(self.h_params.bath, BathGeneral):
             ed.set_hgeneral(self.h_params.bath.hvec,
                             self.h_params.bath.lambdavec)
-        else:
+        elif isinstance(self.h_params.bath, (BathNormal, BathHybrid)):
             assert self.h_params.bath.data.size == ed.get_bath_dimension()
 
         # Initialize EDIpack
-        ed.init_solver(bath=np.zeros(self.h_params.bath.data.size, dtype=float))
+        if self.h_params.bath is not None:
+            ed.init_solver(
+                bath=np.zeros(self.h_params.bath.data.size, dtype=float)
+            )
+        else:
+            ed.init_solver(bath=np.array((), dtype=float))
 
         # GF block names
         if ed.get_ed_mode() in (1, 2):  # normal or superc
@@ -398,19 +412,24 @@ class EDIpackSolver:
         return self.h_params.U
 
     @property
-    def bath(self) -> Bath:
+    def bath(self) -> Union[Bath, NoneType]:
         r"""
         Access to the current :py:class:`bath <edipack2triqs.bath.Bath>` object
         stored in the solver. It is possible to assign a new bath object as long
         as it has the matching type and describes a bath of the same geometry.
+        In the no-bath mode this attribute is set to :py:data:`None`.
         """
         return self.h_params.bath
 
     @bath.setter
-    def bath(self, new_bath: Bath):
+    def bath(self, new_bath: Union[Bath, NoneType]):
         "Set the bath object"
-        self.h_params.bath.assert_compatible(new_bath)
-        self.h_params.bath = new_bath
+        if self.h_params.bath is None:
+            assert new_bath is None, \
+                "Cannot set a new bath object in a no-bath calculation"
+        else:
+            self.h_params.bath.assert_compatible(new_bath)
+            self.h_params.bath = new_bath
 
     def solve(self,
               beta: float = 1000,
@@ -476,7 +495,10 @@ class EDIpackSolver:
                 ed.add_twobody_operator(o1, s1, o2, s2, o3, s3, o4, s4, val)
 
             # Solve!
-            ed.solve(self.h_params.bath.data)
+            if self.h_params.bath is not None:
+                ed.solve(self.h_params.bath.data)
+            else:
+                ed.solve(np.array((), dtype=float))
         self.comm.barrier()
 
     @property
