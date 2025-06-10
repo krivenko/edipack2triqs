@@ -52,15 +52,12 @@ def validate_fops_up_dn(fops_up: list[IndicesType],
                         name_fops_dn: str):
     """
     Check that two fundamental sets fops_up and fops_dn
-    - are not empty
     - do not contain repeated elements
     - have the same size
     - are disjoint
     """
     fops_up_s = set(fops_up)
     fops_dn_s = set(fops_dn)
-    assert len(fops_up) > 0, f"{name_fops_up} must not be empty"
-    assert len(fops_dn) > 0, f"{name_fops_dn} must not be empty"
     assert len(fops_up) == len(fops_up_s), \
         f"No repeated entries are allowed in {name_fops_up}"
     assert len(fops_dn) == len(fops_dn_s), \
