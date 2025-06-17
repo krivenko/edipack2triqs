@@ -18,7 +18,12 @@ from triqs.gf import BlockGf, Gf, MeshImFreq, MeshReFreq
 
 from edipack2py import global_env as ed
 
-from .util import IndicesType, validate_fops_up_dn, write_config, chdircontext
+from .util import (IndicesType,
+                   validate_fops_up_dn,
+                   is_spin_diagonal,
+                   is_spin_degenerate,
+                   write_config,
+                   chdircontext)
 from .bath import Bath, BathNormal, BathHybrid, BathGeneral
 from .hamiltonian import parse_hamiltonian, _is_density, _is_density_density
 from .fit import BathFittingParams, _chi2_fit_bath
@@ -387,7 +392,7 @@ class EDIpackSolver:
     @property
     def hloc(self) -> np.ndarray:
         r"""
-        Read-only access to the matrix of the local impurity Hamiltonian
+        Access to the matrix of the local impurity Hamiltonian
         :math:`\hat H_\text{loc}`.
         """
         return self.h_params.Hloc
@@ -471,6 +476,10 @@ class EDIpackSolver:
         ed.wini, ed.wfin = energy_window
         ed.Lreal = n_w
         ed.eps = broadening
+
+        if (self.nspin == 2) and (self.h_params.ed_mode == "normal") and \
+                (not is_spin_diagonal(self.h_params.Hloc)):
+            raise RuntimeError("Local Hamiltonian must remain spin-diagonal")
 
         # The interactions must remain of the density-density type, if this is
         # how they were at the construction time.
