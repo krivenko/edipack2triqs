@@ -191,7 +191,12 @@
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">edipack2py</span><span class="w"> </span><span class="kn">import</span> <span class="n">global_env</span> <span class="k">as</span> <span class="n">ed</span>
 
-<span class="kn">from</span><span class="w"> </span><span class="nn">.util</span><span class="w"> </span><span class="kn">import</span> <span class="n">IndicesType</span><span class="p">,</span> <span class="n">validate_fops_up_dn</span><span class="p">,</span> <span class="n">write_config</span><span class="p">,</span> <span class="n">chdircontext</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.util</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span><span class="n">IndicesType</span><span class="p">,</span>
+                   <span class="n">validate_fops_up_dn</span><span class="p">,</span>
+                   <span class="n">is_spin_diagonal</span><span class="p">,</span>
+                   <span class="n">is_spin_degenerate</span><span class="p">,</span>
+                   <span class="n">write_config</span><span class="p">,</span>
+                   <span class="n">chdircontext</span><span class="p">)</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">.bath</span><span class="w"> </span><span class="kn">import</span> <span class="n">Bath</span><span class="p">,</span> <span class="n">BathNormal</span><span class="p">,</span> <span class="n">BathHybrid</span><span class="p">,</span> <span class="n">BathGeneral</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">.hamiltonian</span><span class="w"> </span><span class="kn">import</span> <span class="n">parse_hamiltonian</span><span class="p">,</span> <span class="n">_is_density</span><span class="p">,</span> <span class="n">_is_density_density</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">.fit</span><span class="w"> </span><span class="kn">import</span> <span class="n">BathFittingParams</span><span class="p">,</span> <span class="n">_chi2_fit_bath</span>
@@ -565,7 +570,7 @@
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">hloc</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Read-only access to the matrix of the local impurity Hamiltonian</span>
+<span class="sd">        Access to the matrix of the local impurity Hamiltonian</span>
 <span class="sd">        :math:`\hat H_\text{loc}`.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">h_params</span><span class="o">.</span><span class="n">Hloc</span>
@@ -651,6 +656,10 @@
         <span class="n">ed</span><span class="o">.</span><span class="n">wini</span><span class="p">,</span> <span class="n">ed</span><span class="o">.</span><span class="n">wfin</span> <span class="o">=</span> <span class="n">energy_window</span>
         <span class="n">ed</span><span class="o">.</span><span class="n">Lreal</span> <span class="o">=</span> <span class="n">n_w</span>
         <span class="n">ed</span><span class="o">.</span><span class="n">eps</span> <span class="o">=</span> <span class="n">broadening</span>
+
+        <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nspin</span> <span class="o">==</span> <span class="mi">2</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">h_params</span><span class="o">.</span><span class="n">ed_mode</span> <span class="o">==</span> <span class="s2">&quot;normal&quot;</span><span class="p">)</span> <span class="ow">and</span> \
+                <span class="p">(</span><span class="ow">not</span> <span class="n">is_spin_diagonal</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">h_params</span><span class="o">.</span><span class="n">Hloc</span><span class="p">)):</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Local Hamiltonian must remain spin-diagonal&quot;</span><span class="p">)</span>
 
         <span class="c1"># The interactions must remain of the density-density type, if this is</span>
         <span class="c1"># how they were at the construction time.</span>

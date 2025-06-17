@@ -5,6 +5,7 @@
 ## Version 0.8.0
 
 * Add support for calculations without bath.
+* Allow for read-write access to `EDIpackSolver.hloc`.
 
 ## Version 0.7.0
 
