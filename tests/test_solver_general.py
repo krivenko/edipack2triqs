@@ -127,6 +127,9 @@ class TestEDIpackSolverBathGeneral(unittest.TestCase):
         assert_allclose(s.magnetization[:, 0], refs['magn_x'], atol=1e-8)
         assert_allclose(s.magnetization[:, 1], refs['magn_y'], atol=1e-8)
         assert_allclose(s.magnetization[:, 2], refs['magn_z'], atol=1e-8)
+        if 'phi' in refs:
+            # FIXME: Is it necessary to take the real part here?
+            assert_allclose(s.superconductive_phi, refs['phi'].real, atol=1e-8)
         assert_block_gfs_are_close(s.g_w, refs['g_w'])
         if 'g_iw' in refs:
             assert_block_gfs_are_close(s.g_iw, refs['g_iw'])
@@ -143,9 +146,9 @@ class TestEDIpackSolverBathGeneral(unittest.TestCase):
         raise ValueError(f"Basis matrix {mat} not found")
 
     def test_zerotemp(self):
-        h_loc = self.make_h_loc(mul.outer(s0, np.diag([0.5, 0.6])))
-        h_int = self.make_h_int(Uloc=np.array([1.0, 2.0]),
-                                Ust=0.8,
+        h_loc = self.make_h_loc(mul.outer(s0, np.diag([-0.5, -0.6])))
+        h_int = self.make_h_int(Uloc=np.array([0.1, 0.2]),
+                                Ust=0.4,
                                 Jh=0.2,
                                 Jx=0.1,
                                 Jp=0.15)
@@ -190,9 +193,9 @@ class TestEDIpackSolverBathGeneral(unittest.TestCase):
         self.assert_all(solver, **refs)
 
     def test_nspin1(self):
-        h_loc = self.make_h_loc(mul.outer(s0, np.diag([0.5, 0.6])))
-        h_int = self.make_h_int(Uloc=np.array([1.0, 2.0]),
-                                Ust=0.8,
+        h_loc = self.make_h_loc(mul.outer(s0, np.diag([-0.5, -0.6])))
+        h_int = self.make_h_int(Uloc=np.array([0.1, 0.2]),
+                                Ust=0.4,
                                 Jh=0.2,
                                 Jx=0.1,
                                 Jp=0.15)
@@ -214,6 +217,8 @@ class TestEDIpackSolverBathGeneral(unittest.TestCase):
             h,
             fops_imp_up, fops_imp_dn,
             self.fops_bath_up, self.fops_bath_dn,
+            lanc_nstates_sector=4,
+            lanc_nstates_total=14,
             verbose=0
         )
 
@@ -237,8 +242,8 @@ class TestEDIpackSolverBathGeneral(unittest.TestCase):
         self.assert_all(solver, **refs)
 
         # Part II: update interaction parameters
-        new_int_params = {'Uloc': np.array([2.0, 3.0]),
-                          'Ust': 0.6,
+        new_int_params = {'Uloc': np.array([0.15, 0.25]),
+                          'Ust': 0.35,
                           'Jh': 0.1,
                           'Jx': 0.2,
                           'Jp': 0.0}
@@ -293,9 +298,9 @@ class TestEDIpackSolverBathGeneral(unittest.TestCase):
 
     def test_nspin2(self):
         h_loc = self.make_h_loc(mul.outer(np.diag([0.8, 1.2]),
-                                          np.diag([0.5, 0.6])))
-        h_int = self.make_h_int(Uloc=np.array([1.0, 2.0]),
-                                Ust=0.8,
+                                          np.diag([-0.5, -0.6])))
+        h_int = self.make_h_int(Uloc=np.array([0.1, 0.2]),
+                                Ust=0.4,
                                 Jh=0.2,
                                 Jx=0.1,
                                 Jp=0.15)
@@ -318,6 +323,8 @@ class TestEDIpackSolverBathGeneral(unittest.TestCase):
             h,
             fops_imp_up, fops_imp_dn,
             self.fops_bath_up, self.fops_bath_dn,
+            lanc_nstates_sector=4,
+            lanc_nstates_total=14,
             verbose=0
         )
 
@@ -341,8 +348,8 @@ class TestEDIpackSolverBathGeneral(unittest.TestCase):
         self.assert_all(solver, **refs)
 
         # Part II: update interaction parameters
-        new_int_params = {'Uloc': np.array([2.0, 3.0]),
-                          'Ust': 0.6,
+        new_int_params = {'Uloc': np.array([0.15, 0.25]),
+                          'Ust': 0.35,
                           'Jh': 0.1,
                           'Jx': 0.2,
                           'Jp': 0.0}
@@ -401,10 +408,10 @@ class TestEDIpackSolverBathGeneral(unittest.TestCase):
     def test_nonsu2_hloc(self):
         h_loc = self.make_h_loc(mul.outer(np.array([[0.8, 0.2],
                                                     [0.2, 1.2]]),
-                                          np.diag([0.5, 0.6])),
+                                          np.diag([-0.5, -0.6])),
                                 spin_blocks=False)
-        h_int = self.make_h_int(Uloc=np.array([1.0, 2.0]),
-                                Ust=0.8,
+        h_int = self.make_h_int(Uloc=np.array([0.1, 0.2]),
+                                Ust=0.4,
                                 Jh=0.2,
                                 Jx=0.1,
                                 Jp=0.15,
@@ -429,6 +436,8 @@ class TestEDIpackSolverBathGeneral(unittest.TestCase):
             h,
             fops_imp_up, fops_imp_dn,
             self.fops_bath_up, self.fops_bath_dn,
+            lanc_nstates_sector=4,
+            lanc_nstates_total=14,
             verbose=0
         )
 
@@ -453,8 +462,8 @@ class TestEDIpackSolverBathGeneral(unittest.TestCase):
         self.assert_all(solver, **refs)
 
         # Part II: update interaction parameters
-        new_int_params = {'Uloc': np.array([2.0, 3.0]),
-                          'Ust': 0.6,
+        new_int_params = {'Uloc': np.array([0.15, 0.25]),
+                          'Ust': 0.35,
                           'Jh': 0.1,
                           'Jx': 0.2,
                           'Jp': 0.0}
@@ -466,7 +475,7 @@ class TestEDIpackSolverBathGeneral(unittest.TestCase):
             "n_iw": 200,
             "energy_window": (-1.0, 1.0),
             "n_w": 400,
-            "broadening": 0.03,
+            "broadening": 0.03
         }
         solver.solve(**solve_params)
 
@@ -483,7 +492,7 @@ class TestEDIpackSolverBathGeneral(unittest.TestCase):
                                   [[-0.5, 0.0],
                                    [0.0, -0.6]]]), 0, 2)
         V = np.array([[0.1, 0.2],
-                      [0.5, 0.4]])
+                      [0.35, 0.4]])
 
         mat_up = np.zeros((2, 2, 2, 2), dtype=complex)
         mat_dn = np.zeros((2, 2, 2, 2), dtype=complex)
@@ -516,10 +525,10 @@ class TestEDIpackSolverBathGeneral(unittest.TestCase):
 
     def test_nonsu2_bath(self):
         h_loc = self.make_h_loc(mul.outer(np.diag([0.8, 1.2]),
-                                          np.diag([0.5, 0.6])),
+                                          np.diag([-0.5, -0.6])),
                                 spin_blocks=False)
-        h_int = self.make_h_int(Uloc=np.array([1.0, 2.0]),
-                                Ust=0.8,
+        h_int = self.make_h_int(Uloc=np.array([0.1, 0.2]),
+                                Ust=0.4,
                                 Jh=0.2,
                                 Jx=0.1,
                                 Jp=0.15,
@@ -544,6 +553,8 @@ class TestEDIpackSolverBathGeneral(unittest.TestCase):
             h,
             fops_imp_up, fops_imp_dn,
             self.fops_bath_up, self.fops_bath_dn,
+            lanc_nstates_sector=4,
+            lanc_nstates_total=14,
             verbose=0
         )
 
@@ -568,8 +579,8 @@ class TestEDIpackSolverBathGeneral(unittest.TestCase):
         self.assert_all(solver, **refs)
 
         # Part II: update interaction parameters
-        new_int_params = {'Uloc': np.array([2.0, 3.0]),
-                          'Ust': 0.6,
+        new_int_params = {'Uloc': np.array([0.15, 0.25]),
+                          'Ust': 0.35,
                           'Jh': 0.1,
                           'Jx': 0.2,
                           'Jp': 0.0}
@@ -598,7 +609,7 @@ class TestEDIpackSolverBathGeneral(unittest.TestCase):
                                   [[-0.5, 0.0],
                                    [0.0, -0.6]]]), 0, 2)
         V = np.array([[0.1, 0.2],
-                      [0.5, 0.4]])
+                      [0.35, 0.4]])
 
         mat_up = np.zeros((2, 2, 2, 2), dtype=complex)
         mat_dn = np.zeros((2, 2, 2, 2), dtype=complex)
@@ -636,9 +647,9 @@ class TestEDIpackSolverBathGeneral(unittest.TestCase):
         self.assert_all(solver, **refs)
 
     def test_superc(self):
-        h_loc = self.make_h_loc(mul.outer(s0, np.diag([0.5, 0.6])))
-        h_int = self.make_h_int(Uloc=np.array([1.0, 2.0]),
-                                Ust=0.8,
+        h_loc = self.make_h_loc(mul.outer(s0, np.diag([-0.5, -0.6])))
+        h_int = self.make_h_int(Uloc=np.array([0.1, 0.2]),
+                                Ust=0.4,
                                 Jh=0.2,
                                 Jx=0.1,
                                 Jp=0.15)
@@ -666,6 +677,8 @@ class TestEDIpackSolverBathGeneral(unittest.TestCase):
             h,
             fops_imp_up, fops_imp_dn,
             self.fops_bath_up, self.fops_bath_dn,
+            lanc_nstates_sector=4,
+            lanc_nstates_total=14,
             verbose=0
         )
 
@@ -690,8 +703,8 @@ class TestEDIpackSolverBathGeneral(unittest.TestCase):
         self.assert_all(solver, **refs)
 
         # Part II: update interaction parameters
-        new_int_params = {'Uloc': np.array([2.0, 3.0]),
-                          'Ust': 0.6,
+        new_int_params = {'Uloc': np.array([0.15, 0.25]),
+                          'Ust': 0.35,
                           'Jh': 0.1,
                           'Jx': 0.2,
                           'Jp': 0.0}

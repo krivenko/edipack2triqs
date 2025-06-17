@@ -21,7 +21,6 @@ from edipack2py import global_env as ed
 from .util import (IndicesType,
                    validate_fops_up_dn,
                    is_spin_diagonal,
-                   is_spin_degenerate,
                    write_config,
                    chdircontext)
 from .bath import Bath, BathNormal, BathHybrid, BathGeneral
