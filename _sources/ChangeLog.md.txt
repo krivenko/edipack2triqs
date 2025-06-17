@@ -2,6 +2,10 @@
 
 # Changelog
 
+## Version 0.8.0
+
+* Add support for calculations without bath.
+
 ## Version 0.7.0
 
 * Add support for general two-particle interactions.
