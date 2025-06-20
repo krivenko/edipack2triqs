@@ -381,6 +381,7 @@ class EDIpackSolver:
 
     def __del__(self):
         self.comm.barrier()
+
         try:
             ed.finalize_solver()
             self.instance_count[0] -= 1
@@ -388,6 +389,11 @@ class EDIpackSolver:
         # part of interpreter destruction procedure.
         except TypeError:
             pass
+
+        # Manually remove the temporary directory in a synchronized manner
+        self.comm.barrier()
+        if self.comm.Get_rank() == 0:
+            self.workdir.cleanup()
 
     @property
     def hloc(self) -> np.ndarray:
