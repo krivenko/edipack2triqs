@@ -288,7 +288,7 @@ class EDIpackSolver:
             self.denden_int = _is_density_density(self.h_params.U)
             if not ((not ed_total_ud)
                     and self.h_params.ed_mode == "normal"
-                    and isinstance(self.h_params.bath, BathNormal)
+                    and isinstance(self.h_params.bath, (NoneType, BathNormal))
                     and _is_density(self.h_params.Hloc)
                     and self.denden_int):
                 ed_total_ud = True
