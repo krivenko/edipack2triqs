@@ -67,6 +67,7 @@
 <li class="toctree-l4"><a class="reference internal" href="#edipack2triqs.solver.EDIpackSolver.densities"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.densities</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#edipack2triqs.solver.EDIpackSolver.double_occ"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.double_occ</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#edipack2triqs.solver.EDIpackSolver.superconductive_phi"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.superconductive_phi</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#edipack2triqs.solver.EDIpackSolver.superconductive_phi_arg"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.superconductive_phi_arg</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#edipack2triqs.solver.EDIpackSolver.magnetization"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.magnetization</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#edipack2triqs.solver.EDIpackSolver.g_iw"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.g_iw</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#edipack2triqs.solver.EDIpackSolver.g_an_iw"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.g_an_iw</span></code></a></li>
@@ -354,7 +355,17 @@ real-frequency axis) for real-frequency impurity GF calculations.</p></li>
 <dl class="py property">
 <dt class="sig sig-object py" id="edipack2triqs.solver.EDIpackSolver.superconductive_phi">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">superconductive_phi</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" rel="noopener noreferrer" target="_blank" title="(in NumPy v2.3)"><span class="pre">ndarray</span></a></em><a class="headerlink" href="#edipack2triqs.solver.EDIpackSolver.superconductive_phi" title="Link to this definition"></a></dt>
-<dd><p>Impurity superconductive <span class="math notranslate nohighlight">\(\phi\)</span>-matrix in orbital space.</p>
+<dd><p>Modulus of the impurity superconductive order parameter
+<span class="math notranslate nohighlight">\(\phi = \langle c_{o_1,\uparrow} c_{o_2,\downarrow} \rangle\)</span>
+(matrix in the orbital space).</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="edipack2triqs.solver.EDIpackSolver.superconductive_phi_arg">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">superconductive_phi_arg</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" rel="noopener noreferrer" target="_blank" title="(in NumPy v2.3)"><span class="pre">ndarray</span></a></em><a class="headerlink" href="#edipack2triqs.solver.EDIpackSolver.superconductive_phi_arg" title="Link to this definition"></a></dt>
+<dd><p>Complex argument of the impurity superconductive order parameter
+<span class="math notranslate nohighlight">\(\phi = \langle c_{o_1,\uparrow} c_{o_2,\downarrow} \rangle\)</span>
+(matrix in the orbital space).</p>
 </dd></dl>
 
 <dl class="py property">
