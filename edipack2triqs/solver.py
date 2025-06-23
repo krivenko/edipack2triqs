@@ -537,8 +537,21 @@ class EDIpackSolver:
 
     @property
     def superconductive_phi(self) -> np.ndarray:
-        r"Impurity superconductive :math:`\phi`-matrix in orbital space."
-        return ed.get_phi()
+        r"""
+        Modulus of the impurity superconductive order parameter
+        :math:`\phi = \langle c_{o_1,\uparrow} c_{o_2,\downarrow} \rangle`
+        (matrix in the orbital space).
+        """
+        return ed.get_phi(component='mod')
+
+    @property
+    def superconductive_phi_arg(self) -> np.ndarray:
+        r"""
+        Complex argument of the impurity superconductive order parameter
+        :math:`\phi = \langle c_{o_1,\uparrow} c_{o_2,\downarrow} \rangle`
+        (matrix in the orbital space).
+        """
+        return ed.get_phi(component='arg')
 
     @property
     def magnetization(self) -> np.ndarray:

@@ -21,7 +21,7 @@ Dependencies
 * NumPy
 * NetworkX
 * mpi4py
-* [edipack2py >= 5.0.0](https://github.com/EDIpack/EDIpack2py)
+* [edipack2py >= 5.2.5](https://github.com/EDIpack/EDIpack2py)
 * [TRIQS 3.x.y](https://github.com/TRIQS/triqs), tested with TRIQS 3.2.1
 
 Installation
