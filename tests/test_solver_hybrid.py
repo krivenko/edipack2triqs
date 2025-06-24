@@ -130,13 +130,10 @@ class TestEDIpackSolverBathHybrid(unittest.TestCase):
                 refs['phi'],
                 atol=1e-8
             )
-        assert_block_gfs_are_close(s.g_w, refs['g_w'])
-        if 'g_iw' in refs:
-            assert_block_gfs_are_close(s.g_iw, refs['g_iw'])
-        if 'Sigma_w' in refs:
-            assert_block_gfs_are_close(s.Sigma_w, refs['Sigma_w'])
-        if 'Sigma_iw' in refs:
-            assert_block_gfs_are_close(s.Sigma_iw, refs['Sigma_iw'])
+        for gf in ('g_iw', 'g_an_iw', 'Sigma_iw', 'Sigma_an_iw',
+                   'g_w', 'g_an_w', 'Sigma_w', 'Sigma_an_w'):
+            if gf in refs:
+                assert_block_gfs_are_close(getattr(s, gf), refs[gf])
 
     def test_zerotemp(self):
         h_loc = self.make_h_loc(mul.outer(s0, np.diag([-0.5, -0.6])))
@@ -595,7 +592,6 @@ class TestEDIpackSolverBathHybrid(unittest.TestCase):
         V = np.array([[0.4, 0.7, 0.1],
                       [0.3, 0.5, 0.2]])
         h_bath = self.make_h_bath(mul.outer([1, 1], eps), mul.outer(s0, V))
-
         Delta = np.array([0.6, 0.7, 0.8])
         h_sc = self.make_h_sc(Delta)
 
@@ -680,12 +676,6 @@ class TestEDIpackSolverBathHybrid(unittest.TestCase):
         refs = ref.ref_results("superc_3", h=h, superc=True,
                                **struct_params, **solve_params)
         self.assert_all(solver, **refs)
-
-        # TODO
-        solver.g_an_iw
-        solver.Sigma_an_iw
-        solver.g_an_w
-        solver.Sigma_an_w
 
     def tearDown(self):
         # Make sure EDIpackSolver.__del__() is called
