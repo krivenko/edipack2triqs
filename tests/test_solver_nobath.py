@@ -107,12 +107,9 @@ class TestEDIpackSolverNoBath(unittest.TestCase):
         assert_allclose(s.magnetization[:, 1], refs['magn_y'], atol=1e-8)
         assert_allclose(s.magnetization[:, 2], refs['magn_z'], atol=1e-8)
         assert_block_gfs_are_close(s.g_w, refs['g_w'])
-        if 'g_iw' in refs:
-            assert_block_gfs_are_close(s.g_iw, refs['g_iw'])
-        if 'Sigma_w' in refs:
-            assert_block_gfs_are_close(s.Sigma_w, refs['Sigma_w'])
-        if 'Sigma_iw' in refs:
-            assert_block_gfs_are_close(s.Sigma_iw, refs['Sigma_iw'])
+        for gf in ('g_iw', 'Sigma_iw', 'g_w', 'Sigma_w'):
+            if gf in refs:
+                assert_block_gfs_are_close(getattr(s, gf), refs[gf])
 
     def test_zerotemp(self):
         h_loc = self.make_h_loc(mul.outer(s0, np.diag([-0.5, -0.6])))
