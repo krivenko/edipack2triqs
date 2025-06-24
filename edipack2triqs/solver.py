@@ -300,8 +300,8 @@ class EDIpackSolver:
             if self.zerotemp:
                 c["LANC_NSTATES_TOTAL"] = 1
             else:
-                c["LANC_NSTATES_SECTOR"] = kwargs.get("lanc_nstates_sector", 2)
                 c["LANC_NSTATES_TOTAL"] = kwargs.get("lanc_nstates_total", 2)
+            c["LANC_NSTATES_SECTOR"] = kwargs.get("lanc_nstates_sector", 2)
 
             # Bath fitting
             bfp = kwargs.get("bath_fitting_params", BathFittingParams())
