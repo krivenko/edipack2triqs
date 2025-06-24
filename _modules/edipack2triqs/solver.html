@@ -478,8 +478,8 @@
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">zerotemp</span><span class="p">:</span>
                 <span class="n">c</span><span class="p">[</span><span class="s2">&quot;LANC_NSTATES_TOTAL&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="n">c</span><span class="p">[</span><span class="s2">&quot;LANC_NSTATES_SECTOR&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;lanc_nstates_sector&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
                 <span class="n">c</span><span class="p">[</span><span class="s2">&quot;LANC_NSTATES_TOTAL&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;lanc_nstates_total&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+            <span class="n">c</span><span class="p">[</span><span class="s2">&quot;LANC_NSTATES_SECTOR&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;lanc_nstates_sector&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
 
             <span class="c1"># Bath fitting</span>
             <span class="n">bfp</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;bath_fitting_params&quot;</span><span class="p">,</span> <span class="n">BathFittingParams</span><span class="p">())</span>
