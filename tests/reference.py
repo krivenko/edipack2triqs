@@ -6,10 +6,12 @@ import inspect
 import numpy as np
 from itertools import product
 
+import triqs.operators as op
+from triqs.gf import BlockGf, Gf, MeshImFreq, conjugate, transpose
 from triqs.gf.tools import dyson
 from h5 import HDFArchive
 
-from edipack2triqs.util import non_int_part
+from edipack2triqs.util import monomial2op, non_int_part
 
 
 # Write computed reference results into HDF5 archive
@@ -49,15 +51,151 @@ def make_reference_results(*,
                            zerotemp=False):
     "Generate reference results using pomerol2triqs"
 
-    from pomerol2triqs import PomerolED
-
     up, dn = spins
     mki = make_mkind(spins, orbs, spin_blocks)
     norb = len(orbs)
 
-    # Conversion from TRIQS to Pomerol notation for operator indices
-    # TRIQS: block_name, inner_index
-    # Pomerol: site_label, orbital_index, spin_name
+    index_converter = _make_index_converter(fops, spins, norb, spin_blocks)
+    ed = _make_pomerol_ed(index_converter, h)
+
+    #
+    # Static observables
+    #
+
+    def make_avg(spins):
+        res = [
+            ed.ensemble_average(*[mki(s, o) for s in spins], beta) for o in orbs
+        ]
+        return np.array(res)
+
+    # Occupation and magnetization
+    n_up_avg = make_avg((up, up))
+    n_dn_avg = make_avg((dn, dn))
+    S_p_avg = make_avg((up, dn))
+    S_m_avg = make_avg((dn, up))
+    # Double occupancy
+    D_avg = make_avg((up, dn, dn, up))
+
+    results = {'densities': n_up_avg + n_dn_avg,
+               'double_occ': D_avg,
+               'magn_x': S_p_avg + S_m_avg,
+               'magn_y': -1j * (S_p_avg - S_m_avg),
+               'magn_z': n_up_avg - n_dn_avg}
+
+    # Superconductive \phi
+    if superc:
+        phi = np.empty((norb, norb), dtype=complex)
+        for o1, o2 in product(orbs, repeat=2):
+            phi[o1, o2] = ed.ensemble_average(
+                mki(up, o1), mki(dn, o2), beta, (False, False)
+            )
+        results['phi'] = phi
+
+    #
+    # Green's functions and self-energies
+    #
+
+    # Tolerances for construction of Lehmann representation
+    tols = {"pole_res": 1e-12, "coeff_tol": 1e-12}
+
+    # Structure of normal GF
+    gf_struct = [(up, norb), (dn, norb)] if spin_blocks else \
+                [(f"{up}_{dn}", 2 * norb)]
+
+    # Normal GF calculations
+    if not superc:
+        ed0 = _make_pomerol_ed(index_converter, non_int_part(h))
+
+        # Real frequency
+        g_w = ed.G_w(gf_struct, beta, energy_window, n_w, broadening, **tols)
+        g0_w = ed0.G_w(gf_struct, beta, energy_window, n_w, broadening, **tols)
+        results['g_w'] = g_w
+        results['Sigma_w'] = dyson(G0_iw=g0_w, G_iw=g_w)
+
+        # Matsubara frequency
+        if not zerotemp:
+            g_iw = ed.G_iw(gf_struct, beta, n_iw, **tols)
+            g0_iw = ed0.G_iw(gf_struct, beta, n_iw, **tols)
+            results['g_iw'] = g_iw
+            results['Sigma_iw'] = dyson(G0_iw=g0_iw, G_iw=g_iw)
+
+    # Nambu GF calculations
+    else:
+        # Calculations using the single block
+        fops = [_merge_spin_blocks(bl, i, spins, norb) for bl, i in fops]
+        index_converter = _make_index_converter(fops, spins, norb, False)
+        up_dn = f"{up}_{dn}"
+        gf_struct = [(up_dn, 2 * norb)]
+
+        h = _merge_spin_blocks_in_expr(h, spins, norb)
+        ed = _make_pomerol_ed(index_converter, h)
+        ed0 = _make_pomerol_ed(index_converter, non_int_part(h))
+
+        # Real frequency
+        gf_args = [gf_struct, beta, energy_window, n_w]
+
+        g_w = ed.G_w(*gf_args, broadening, **tols)[up_dn]
+        f_w = ed.F_w(*gf_args, broadening, **tols)[up_dn][:norb, norb:]
+        fbar_w = transpose(conjugate(
+            ed.F_w(*gf_args, -broadening, **tols)[up_dn][:norb, norb:]
+        ))
+
+        g0_w = ed0.G_w(*gf_args, broadening, **tols)[up_dn]
+        f0_w = ed0.F_w(*gf_args, broadening, **tols)[up_dn][:norb, norb:]
+        f0bar_w = transpose(conjugate(
+            ed0.F_w(*gf_args, -broadening, **tols)[up_dn][:norb, norb:]
+        ))
+
+        # Green's functions
+        results['g_w'] = BlockGf(
+            block_list=[g_w[:norb, :norb], g_w[norb:, norb:]],
+            name_list=[up, dn]
+        )
+        results['g_an_w'] = BlockGf(block_list=[f_w], name_list=[up_dn])
+
+        # Self-energies
+        G_nambu_w = _make_nambu_gf(g_w, f_w, fbar_w)
+        G0_nambu_w = _make_nambu_gf(g0_w, f0_w, f0bar_w)
+        Sigma_nambu_w = dyson(G0_iw=G0_nambu_w, G_iw=G_nambu_w)
+        Sigma_w, Sigma_an_w = _unpack_nambu_gf(Sigma_nambu_w, spins)
+        results['Sigma_w'] = Sigma_w
+        results['Sigma_an_w'] = Sigma_an_w
+
+        # Matsubara frequency
+        if not zerotemp:
+            g_iw = ed.G_iw(gf_struct, beta, n_iw, **tols)[up_dn]
+            f_iw = ed.F_iw(gf_struct, beta, n_iw, **tols)[up_dn][:norb, norb:]
+            fbar_iw = _reflect_freq(transpose(conjugate(f_iw)))
+
+            g0_iw = ed0.G_iw(gf_struct, beta, n_iw, **tols)[up_dn]
+            f0_iw = ed0.F_iw(gf_struct, beta, n_iw, **tols)[up_dn][:norb, norb:]
+            f0bar_iw = _reflect_freq(transpose(conjugate(f0_iw)))
+
+            # Green's functions
+            results['g_iw'] = BlockGf(
+                block_list=[g_iw[:norb, :norb], g_iw[norb:, norb:]],
+                name_list=[up, dn]
+            )
+            results['g_an_iw'] = BlockGf(block_list=[f_iw], name_list=[up_dn])
+
+            # Self-energies
+            G_nambu_iw = _make_nambu_gf(g_iw, f_iw, fbar_iw)
+            G0_nambu_iw = _make_nambu_gf(g0_iw, f0_iw, f0bar_iw)
+            Sigma_nambu_iw = dyson(G0_iw=G0_nambu_iw, G_iw=G_nambu_iw)
+            Sigma_iw, Sigma_an_iw = _unpack_nambu_gf(Sigma_nambu_iw, spins)
+            results['Sigma_iw'] = Sigma_iw
+            results['Sigma_an_iw'] = Sigma_an_iw
+
+    return results
+
+
+def _make_index_converter(fops, spins, norb, spin_blocks):
+    """
+    Conversion from TRIQS to Pomerol notation for operator indices
+    TRIQS: block_name, inner_index
+    Pomerol: site_label, orbital_index, spin_name
+    """
+    up, dn = spins
     index_converter = {}
     for bn, inner in fops:
         # Bath
@@ -73,63 +211,88 @@ def make_reference_results(*,
                 spin = "down" if inner >= norb else up
             orb = inner % norb
         index_converter[(bn, inner)] = (site, orb, spin)
+    return index_converter
 
-    def make_ed(h_):
-        ed = PomerolED(index_converter, verbose=False)
-        ed.ops_melem_tol = 0
-        ed.rho_threshold = 0
-        ed.diagonalize(h_)
-        return ed
 
-    ed = make_ed(h)
-
-    def make_avg(spins):
-        res = [ed.ensemble_average(*[mki(s, o) for s in spins], beta)
-               for o in orbs]
-        return np.array(res)
-
-    # Occupation and magnetization
-    n_up_avg = make_avg((up, up))
-    n_dn_avg = make_avg((dn, dn))
-    S_p_avg = make_avg((up, dn))
-    S_m_avg = make_avg((dn, up))
-    # Double occupancy
-    D_avg = make_avg((up, dn, dn, up))
-
-    # Green's functions
-    if spin_blocks:
-        gf_struct = [(up, norb), (dn, norb)]
+def _merge_spin_blocks(bl, i, spins, norb):
+    "Map from the spin block notation to the notation with a single block"
+    up, dn = spins
+    if bl == up:
+        return (f"{up}_{dn}", i)
+    elif bl == dn:
+        return (f"{up}_{dn}", norb + i)
     else:
-        gf_struct = [(f"{up}_{dn}", 2 * norb)]
+        return (bl, i)
 
-    tols = {"pole_res": 1e-12, "coeff_tol": 1e-12}
-    g_w = ed.G_w(gf_struct, beta, energy_window, n_w, broadening, **tols)
 
-    results = {'densities': n_up_avg + n_dn_avg,
-               'double_occ': D_avg,
-               'magn_x': S_p_avg + S_m_avg,
-               'magn_y': -1j * (S_p_avg - S_m_avg),
-               'magn_z': n_up_avg - n_dn_avg,
-               'g_w': g_w}
+def _merge_spin_blocks_in_expr(h, spins, norb):
+    """
+    Translate a many-body operator expression from the spin block notation to
+    the notation with a single block.
+    """
+    res = op.Operator()
+    for mon, coeff in h:
+        new_mon = [
+            (dag, _merge_spin_blocks(*ind, spins, norb)) for dag, ind in mon
+        ]
+        res += coeff * monomial2op(new_mon)
+    return res
 
-    # Superconductive \phi
-    if superc:
-        phi = np.empty((norb, norb), dtype=complex)
-        for o1, o2 in product(orbs, repeat=2):
-            phi[o1, o2] = ed.ensemble_average(mki(up, o1), mki(dn, o2),
-                                              beta, (False, False))
-        results['phi'] = phi
 
-    if not zerotemp:
-        g_iw = ed.G_iw(gf_struct, beta, n_iw, **tols)
-        results['g_iw'] = g_iw
+def _make_pomerol_ed(index_converter, h):
+    "Construct a PomerolED object"
+    from pomerol2triqs import PomerolED
 
-    if not superc:
-        ed0 = make_ed(non_int_part(h))
-        g0_w = ed0.G_w(gf_struct, beta, energy_window, n_w, broadening, **tols)
-        results['Sigma_w'] = dyson(G0_iw=g0_w, G_iw=g_w)
-        if not zerotemp:
-            g0_iw = ed0.G_iw(gf_struct, beta, n_iw, **tols)
-            results['Sigma_iw'] = dyson(G0_iw=g0_iw, G_iw=g_iw)
+    ed = PomerolED(index_converter, verbose=False)
+    ed.ops_melem_tol = 0
+    ed.rho_threshold = 0
+    ed.diagonalize(h)
+    return ed
 
-    return results
+
+def _reflect_freq(g):
+    "Apply (complex) frequency reflection z -> -z to a Green's function"
+    res = g.copy()
+    res.data[:] = np.flip(res.data, axis=0)
+    return res
+
+
+def _make_nambu_gf(g, f, fbar):
+    "Make a Nambu Green's function from spin-diagonal and anomalous components"
+    mesh = g.mesh
+    norb = g.target_shape[0] // 2
+
+    g_nam = Gf(mesh=mesh, target_shape=(2 * norb, 2 * norb))
+    g_nam[:norb, :norb] = g[:norb, :norb]
+    g_nam[:norb, norb:] = f
+    g_nam[norb:, :norb] = fbar
+    # Fill remaining Nambu blocks using symmetry relations
+    if isinstance(mesh, MeshImFreq):
+        g_nam[norb:, norb:] = -conjugate(g[norb:, norb:])
+    else:  # MeshReFreq
+        assert mesh.w_min == -mesh.w_max
+        g_nam[norb:, norb:] = -_reflect_freq(conjugate(g[norb:, norb:]))
+
+    return g_nam
+
+
+def _unpack_nambu_gf(g_nambu, spins):
+    """
+    Extract spin-diagonal and anomalous components from a Nambu Green's
+    function.
+    """
+    up, dn = spins
+    up_dn = f"{up}_{dn}"
+    mesh = g_nambu.mesh
+    norb = g_nambu.target_shape[0] // 2
+
+    G = BlockGf(mesh=mesh, gf_struct=[(up, norb), (dn, norb)])
+    G[up] = g_nambu[:norb, :norb]
+    # Use symmetry relation to fill g[dn]
+    if isinstance(mesh, MeshImFreq):
+        G[dn] = -conjugate(g_nambu[norb:, norb:])
+    else:
+        G[dn] = -_reflect_freq(conjugate(g_nambu[norb:, norb:]))
+    f = BlockGf(block_list=[g_nambu[:norb, norb:]], name_list=[up_dn])
+
+    return G, f
