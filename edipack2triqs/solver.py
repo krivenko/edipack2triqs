@@ -352,12 +352,12 @@ class EDIpackSolver:
 
             if self.comm.Get_rank() == 0:
                 self.scifor_version = re.match(
-                    r"^SCIFOR VERSION \(GIT\): (.*)",
-                    open("scifor_version.inc", 'r').readline())[1]
+                    r"^(.*): (.*)",
+                    open("scifor_version.inc", 'r').readline())[2]
 
                 self.edipack_version = re.match(
-                    r"^code VERSION: (.*)",
-                    open("code_version.inc", 'r').readline())[1]
+                    r"^(.*): (.*)",
+                    open("EDIpack_version.inc", 'r').readline())[2]
             else:
                 self.scifor_version = ""
                 self.edipack_version = ""
