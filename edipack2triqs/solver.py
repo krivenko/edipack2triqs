@@ -9,6 +9,8 @@ from typing import Union
 from warnings import warn
 import os
 import re
+import sys
+import warnings
 
 import numpy as np
 from mpi4py import MPI
@@ -83,7 +85,7 @@ class EDIpackSolver:
         "CHIEXCT_FLAG": False       # TODO: To be set in __init__()
     }
 
-    def __init__(self,
+    def __init__(self,  # noqa: C901
                  hamiltonian: op.Operator,
                  fops_imp_up: list[IndicesType],
                  fops_imp_dn: list[IndicesType],
@@ -319,12 +321,17 @@ class EDIpackSolver:
         # process with rank 0. The directory is assumed to be accessible to all
         # other MPI processes under the same name via a common file system.
         if self.comm.Get_rank() == 0:
-            self.workdir = TemporaryDirectory(
-                prefix="edipack-",
-                suffix=".tmp",
-                dir=os.getcwd(),
-                delete=not kwargs.get("keep_dir", False)
-            )
+            tdargs = {"prefix": "edipack-",
+                      "suffix": ".tmp",
+                      "dir": os.getcwd()}
+            if sys.version_info >= (3, 12, 0):
+                tdargs["delete"] = not kwargs.get("keep_dir", False)
+            elif kwargs.get("keep_dir", False):
+                warnings.warn(
+                    "keep_dir=True is ignored on Python versions prior to 3.12"
+                )
+
+            self.workdir = TemporaryDirectory(**tdargs)
             self.wdname = self.workdir.name
         else:
             self.wdname = None
