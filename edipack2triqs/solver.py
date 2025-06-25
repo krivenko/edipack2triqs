@@ -143,6 +143,10 @@ class EDIpackSolver:
             variables and their values on the console.
         :type print_input_vars: bool, default=False
 
+        :param keep_dir: Do not remove **EDIpack**'s temporary directory upon
+                         destruction of this :ref:`EDIpackSolver` object.
+        :type keep_dir: bool, default=False
+
         :param zerotemp: Enable zero temperature calculations.
         :type zerotemp: bool, default=False
 
@@ -315,9 +319,12 @@ class EDIpackSolver:
         # process with rank 0. The directory is assumed to be accessible to all
         # other MPI processes under the same name via a common file system.
         if self.comm.Get_rank() == 0:
-            self.workdir = TemporaryDirectory(prefix="edipack-",
-                                              suffix=".tmp",
-                                              dir=os.getcwd())
+            self.workdir = TemporaryDirectory(
+                prefix="edipack-",
+                suffix=".tmp",
+                dir=os.getcwd(),
+                delete=not kwargs.get("keep_dir", False)
+            )
             self.wdname = self.workdir.name
         else:
             self.wdname = None
