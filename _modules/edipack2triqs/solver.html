@@ -183,6 +183,8 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">warnings</span><span class="w"> </span><span class="kn">import</span> <span class="n">warn</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">mpi4py</span><span class="w"> </span><span class="kn">import</span> <span class="n">MPI</span>
@@ -261,7 +263,7 @@
 
 <div class="viewcode-block" id="EDIpackSolver.__init__">
 <a class="viewcode-back" href="../../documentation.html#edipack2triqs.solver.EDIpackSolver.__init__">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>  <span class="c1"># noqa: C901</span>
                  <span class="n">hamiltonian</span><span class="p">:</span> <span class="n">op</span><span class="o">.</span><span class="n">Operator</span><span class="p">,</span>
                  <span class="n">fops_imp_up</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">IndicesType</span><span class="p">],</span>
                  <span class="n">fops_imp_dn</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">IndicesType</span><span class="p">],</span>
@@ -320,6 +322,10 @@
 <span class="sd">        :param print_input_vars: Flag to toggle the printing of all the input</span>
 <span class="sd">            variables and their values on the console.</span>
 <span class="sd">        :type print_input_vars: bool, default=False</span>
+
+<span class="sd">        :param keep_dir: Do not remove **EDIpack**&#39;s temporary directory upon</span>
+<span class="sd">                         destruction of this :ref:`EDIpackSolver` object.</span>
+<span class="sd">        :type keep_dir: bool, default=False</span>
 
 <span class="sd">        :param zerotemp: Enable zero temperature calculations.</span>
 <span class="sd">        :type zerotemp: bool, default=False</span>
@@ -493,9 +499,17 @@
         <span class="c1"># process with rank 0. The directory is assumed to be accessible to all</span>
         <span class="c1"># other MPI processes under the same name via a common file system.</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">comm</span><span class="o">.</span><span class="n">Get_rank</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">workdir</span> <span class="o">=</span> <span class="n">TemporaryDirectory</span><span class="p">(</span><span class="n">prefix</span><span class="o">=</span><span class="s2">&quot;edipack-&quot;</span><span class="p">,</span>
-                                              <span class="n">suffix</span><span class="o">=</span><span class="s2">&quot;.tmp&quot;</span><span class="p">,</span>
-                                              <span class="nb">dir</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">())</span>
+            <span class="n">tdargs</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;prefix&quot;</span><span class="p">:</span> <span class="s2">&quot;edipack-&quot;</span><span class="p">,</span>
+                      <span class="s2">&quot;suffix&quot;</span><span class="p">:</span> <span class="s2">&quot;.tmp&quot;</span><span class="p">,</span>
+                      <span class="s2">&quot;dir&quot;</span><span class="p">:</span> <span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">()}</span>
+            <span class="k">if</span> <span class="n">sys</span><span class="o">.</span><span class="n">version_info</span> <span class="o">&gt;=</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">12</span><span class="p">,</span> <span class="mi">0</span><span class="p">):</span>
+                <span class="n">tdargs</span><span class="p">[</span><span class="s2">&quot;delete&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="ow">not</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;keep_dir&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;keep_dir&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
+                <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+                    <span class="s2">&quot;keep_dir=True is ignored on Python versions prior to 3.12&quot;</span>
+                <span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">workdir</span> <span class="o">=</span> <span class="n">TemporaryDirectory</span><span class="p">(</span><span class="o">**</span><span class="n">tdargs</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">wdname</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">workdir</span><span class="o">.</span><span class="n">name</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">wdname</span> <span class="o">=</span> <span class="kc">None</span>
@@ -516,12 +530,12 @@
 
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">comm</span><span class="o">.</span><span class="n">Get_rank</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">scifor_version</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span>
-                    <span class="sa">r</span><span class="s2">&quot;^SCIFOR VERSION \(GIT\): (.*)&quot;</span><span class="p">,</span>
-                    <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;scifor_version.inc&quot;</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">readline</span><span class="p">())[</span><span class="mi">1</span><span class="p">]</span>
+                    <span class="sa">r</span><span class="s2">&quot;^(.*): (.*)&quot;</span><span class="p">,</span>
+                    <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;scifor_version.inc&quot;</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">readline</span><span class="p">())[</span><span class="mi">2</span><span class="p">]</span>
 
                 <span class="bp">self</span><span class="o">.</span><span class="n">edipack_version</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span>
-                    <span class="sa">r</span><span class="s2">&quot;^code VERSION: (.*)&quot;</span><span class="p">,</span>
-                    <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;code_version.inc&quot;</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">readline</span><span class="p">())[</span><span class="mi">1</span><span class="p">]</span>
+                    <span class="sa">r</span><span class="s2">&quot;^(.*): (.*)&quot;</span><span class="p">,</span>
+                    <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;EDIpack_version.inc&quot;</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">readline</span><span class="p">())[</span><span class="mi">2</span><span class="p">]</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">scifor_version</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">edipack_version</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
@@ -559,7 +573,6 @@
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__del__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">comm</span><span class="o">.</span><span class="n">barrier</span><span class="p">()</span>
-
         <span class="k">try</span><span class="p">:</span>
             <span class="n">ed</span><span class="o">.</span><span class="n">finalize_solver</span><span class="p">()</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">instance_count</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-=</span> <span class="mi">1</span>
@@ -567,11 +580,6 @@
         <span class="c1"># part of interpreter destruction procedure.</span>
         <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
             <span class="k">pass</span>
-
-        <span class="c1"># Manually remove the temporary directory in a synchronized manner</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">comm</span><span class="o">.</span><span class="n">barrier</span><span class="p">()</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">comm</span><span class="o">.</span><span class="n">Get_rank</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">workdir</span><span class="o">.</span><span class="n">cleanup</span><span class="p">()</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">hloc</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
