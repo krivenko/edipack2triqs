@@ -10,7 +10,6 @@ from warnings import warn
 import os
 import re
 import sys
-import warnings
 
 import numpy as np
 from mpi4py import MPI
@@ -251,6 +250,12 @@ class EDIpackSolver:
         )
         self.nspin = self.h_params.Hloc.shape[0]
 
+        # Keep temporary directory?
+        keep_dir = kwargs.get("keep_dir", False)
+        if keep_dir and sys.version_info < (3, 12, 0):
+            keep_dir = False
+            warn("keep_dir=True is ignored on Python versions prior to 3.12")
+
         if "input_file" in kwargs:
             self.input_file = Path(kwargs.pop("input_file"))
             self.input_file = self.input_file.resolve(strict=True)
@@ -313,6 +318,12 @@ class EDIpackSolver:
             bfp = kwargs.get("bath_fitting_params", BathFittingParams())
             c.update(bfp.__dict__())
 
+            # Save G, G0 and \Sigma if the temporary directory is to be kept
+            if keep_dir:
+                c["ED_PRINT_G"] = True
+                c["ED_PRINT_G0"] = True
+                c["ED_PRINT_SIGMA"] = True
+
             self.config = c
 
         self.comm = MPI.COMM_WORLD
@@ -324,12 +335,8 @@ class EDIpackSolver:
             tdargs = {"prefix": "edipack-",
                       "suffix": ".tmp",
                       "dir": os.getcwd()}
-            if sys.version_info >= (3, 12, 0):
-                tdargs["delete"] = not kwargs.get("keep_dir", False)
-            elif kwargs.get("keep_dir", False):
-                warnings.warn(
-                    "keep_dir=True is ignored on Python versions prior to 3.12"
-                )
+            if keep_dir:
+                tdargs["delete"] = False
 
             self.workdir = TemporaryDirectory(**tdargs)
             self.wdname = self.workdir.name
