@@ -66,6 +66,7 @@ class EDIpackSolver:
         # ED
         "ED_USE_KANAMORI": False,
         "ED_READ_UMATRIX": False,
+        "PRINT_SECTOR_EIGENVALUES": False,
         "ED_PRINT_SIGMA": False,
         "ED_PRINT_G": False,
         "ED_PRINT_G0": False,
@@ -320,6 +321,7 @@ class EDIpackSolver:
 
             # Save G, G0 and \Sigma if the temporary directory is to be kept
             if keep_dir:
+                c["PRINT_SECTOR_EIGENVALUES"] = True
                 c["ED_PRINT_G"] = True
                 c["ED_PRINT_G0"] = True
                 c["ED_PRINT_SIGMA"] = True
