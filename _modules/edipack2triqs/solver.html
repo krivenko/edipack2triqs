@@ -242,6 +242,7 @@
         <span class="c1"># ED</span>
         <span class="s2">&quot;ED_USE_KANAMORI&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
         <span class="s2">&quot;ED_READ_UMATRIX&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="s2">&quot;PRINT_SECTOR_EIGENVALUES&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
         <span class="s2">&quot;ED_PRINT_SIGMA&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
         <span class="s2">&quot;ED_PRINT_G&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
         <span class="s2">&quot;ED_PRINT_G0&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
@@ -498,6 +499,7 @@
 
             <span class="c1"># Save G, G0 and \Sigma if the temporary directory is to be kept</span>
             <span class="k">if</span> <span class="n">keep_dir</span><span class="p">:</span>
+                <span class="n">c</span><span class="p">[</span><span class="s2">&quot;PRINT_SECTOR_EIGENVALUES&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
                 <span class="n">c</span><span class="p">[</span><span class="s2">&quot;ED_PRINT_G&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
                 <span class="n">c</span><span class="p">[</span><span class="s2">&quot;ED_PRINT_G0&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
                 <span class="n">c</span><span class="p">[</span><span class="s2">&quot;ED_PRINT_SIGMA&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
