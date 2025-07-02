@@ -12,6 +12,9 @@
 * `EDIpackSolver`'s constructor got a new keyword argument `keep_dir`, which
   disables automatic deletion of EDIpacks's temporary directory upon object
   destruction.
+* Fixed a bug in `EDIpackSolver.chi2_fit_bath()`, which made this method
+  unusable without first calling `EDIpackSolver.solve()`. There is now a unit
+  test that covers the bath fitting functionality.
 
 ## Version 0.7.0
 

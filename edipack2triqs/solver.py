@@ -146,7 +146,7 @@ class EDIpackSolver:
         :type print_input_vars: bool, default=False
 
         :param keep_dir: Do not remove **EDIpack**'s temporary directory upon
-                         destruction of this :ref:`EDIpackSolver` object.
+                         destruction of this :py:class:`EDIpackSolver` object.
         :type keep_dir: bool, default=False
 
         :param zerotemp: Enable zero temperature calculations.

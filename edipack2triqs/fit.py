@@ -118,6 +118,11 @@ def _chi2_fit_bath(self, g: BlockGf, f: Optional[BlockGf] = None):
     """
     Perform bath parameter fit of a given Green's function.
 
+    .. note::
+
+        Bath parameters currently stored in this :py:class:`EDIpackSolver`
+        instance are used as the starting point for the minimization procedure.
+
     :param g: Normal component of the function to fit (either the hybridization
               function or the Weiss field).
     :type g: triqs.gf.block_gf.BlockGf
@@ -145,36 +150,48 @@ def _chi2_fit_bath(self, g: BlockGf, f: Optional[BlockGf] = None):
             "The anomalous GF is required iff the bath is superconducting"
         )
 
-    fitted_bath = deepcopy(self.h_params.bath)
+    bath_fit = deepcopy(self.h_params.bath)
 
     def extract_triqs_data(d):
         return np.transpose(d[ed.Lmats:, ...], (1, 2, 0))
 
     with chdircontext(self.wdname):
+        assert isinstance(g.mesh, MeshImFreq), \
+            "Expected an imaginary frequency Green's function 'g'"
+
+        ed.beta = g.mesh.beta
+        ed.Lmats = len(g.mesh) // 2
+
         if ed.get_ed_mode() == 1:  # Normal, here nspin is important
             assert set(g.indices) == set(self.gf_block_names), \
-                "Unexpected block structure of g"
+                "Unexpected block structure of 'g'"
 
-            func_up = extract_triqs_data(g[self.gf_block_names[0]].data)
-            fitted_bath.data[:] = ed.chi2_fitgf(func_up,
-                                                fitted_bath.data,
-                                                ispin=0)
+            func = np.zeros((ed.Nspin, ed.Nspin, ed.Norb, ed.Norb, ed.Lmats),
+                            dtype=complex)
+            func[0, 0, ...] = extract_triqs_data(g[self.gf_block_names[0]].data)
+            bath_fit.data[:] = ed.chi2_fitgf(func, bath_fit.data, ispin=0)
+
             if ed.Nspin != 1:
-                func_dn = extract_triqs_data(g[self.gf_block_names[1]].data)
-                fitted_bath.data[:] = ed.chi2_fitgf(func_dn,
-                                                    fitted_bath.data,
-                                                    ispin=1)
+                func[1, 1, ...] = extract_triqs_data(
+                    g[self.gf_block_names[1]].data
+                )
+                bath_fit.data[:] = ed.chi2_fitgf(func, bath_fit.data, ispin=1)
 
         elif ed.get_ed_mode() == 2:  # superc, here nspin is 1
+            assert set(f.indices) == set(self.gf_an_block_names), \
+                "Unexpected block structure of 'f'"
+            assert isinstance(f.mesh, MeshImFreq), \
+                "Expected an imaginary frequency Green's function 'f'"
+            assert f.mesh == g.mesh, \
+                "Inconsistent frequency meshes of 'g' and 'f'"
+
             func_up = extract_triqs_data(g[self.gf_block_names[0]].data)
             func_an = extract_triqs_data(f[self.gf_an_block_names[0]].data)
-            fitted_bath.data[:] = ed.chi2_fitgf(func_up,
-                                                func_an,
-                                                fitted_bath.data)
+            bath_fit.data[:] = ed.chi2_fitgf(func_up, func_an, bath_fit.data)
 
         elif ed.get_ed_mode() == 3:  # nonsu2, here nspin is 2
             func = extract_triqs_data(g[self.gf_block_names[0]].data)
-            fitted_bath.data[:] = ed.chi2_fitgf(func, fitted_bath.data)
+            bath_fit.data[:] = ed.chi2_fitgf(func, bath_fit.data)
 
         else:
             raise RuntimeError("Unrecognized ED mode")
@@ -194,25 +211,25 @@ def _chi2_fit_bath(self, g: BlockGf, f: Optional[BlockGf] = None):
 
     with chdircontext(self.wdname):
         if ed.get_ed_mode() == 1:  # normal
-            out = get_method(z_vals, fitted_bath.data, ishape=5, typ='n')
+            out = get_method(z_vals, bath_fit.data, ishape=5, typ='n')
             g_out[self.gf_block_names[0]].data[:] = \
                 pack_triqs_data(out[0, 0, ...])
             g_out[self.gf_block_names[1]].data[:] = \
                 pack_triqs_data(out[0, 0, ...] if (self.nspin == 1)
                                 else out[1, 1, ...])
-            return fitted_bath, g_out
+            return bath_fit, g_out
 
         elif ed.get_ed_mode() == 2:  # superc
-            out = get_method(z_vals, fitted_bath.data, ishape=5, typ='n')
+            out = get_method(z_vals, bath_fit.data, ishape=5, typ='n')
             for bn in self.gf_block_names:
                 g_out[bn].data[:] = pack_triqs_data(out[0, 0, ...])
-            out_an = get_method(z_vals, fitted_bath.data, ishape=5, typ='a')
+            out_an = get_method(z_vals, bath_fit.data, ishape=5, typ='a')
             f_out = f.copy()
             f_out[self.gf_an_block_names[0]].data[:] = \
                 pack_triqs_data(out_an[0, 0, ...])
-            return fitted_bath, g_out, f_out
+            return bath_fit, g_out, f_out
 
         else:  # nonsu2
-            out = get_method(z_vals, fitted_bath.data, ishape=3)
+            out = get_method(z_vals, bath_fit.data, ishape=3)
             g_out[self.gf_block_names[0]].data[:] = pack_triqs_data(out)
-            return fitted_bath, g_out
+            return bath_fit, g_out
