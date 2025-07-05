@@ -187,6 +187,9 @@ parameter is now accessible as <code class="docutils literal notranslate"><span 
 <li><p><code class="docutils literal notranslate"><span class="pre">EDIpackSolver</span></code>’s constructor got a new keyword argument <code class="docutils literal notranslate"><span class="pre">keep_dir</span></code>, which
 disables automatic deletion of EDIpacks’s temporary directory upon object
 destruction.</p></li>
+<li><p>Fixed a bug in <code class="docutils literal notranslate"><span class="pre">EDIpackSolver.chi2_fit_bath()</span></code>, which made this method
+unusable without first calling <code class="docutils literal notranslate"><span class="pre">EDIpackSolver.solve()</span></code>. There is now a unit
+test that covers the bath fitting functionality.</p></li>
 </ul>
 </section>
 <section id="version-0-7-0">
