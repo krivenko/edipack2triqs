@@ -186,7 +186,9 @@ computed superconductive order parameter. The complex argument of the order
 parameter is now accessible as <code class="docutils literal notranslate"><span class="pre">EDIpackSolver.superconductive_phi_arg</span></code>.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">EDIpackSolver</span></code>’s constructor got a new keyword argument <code class="docutils literal notranslate"><span class="pre">keep_dir</span></code>, which
 disables automatic deletion of EDIpacks’s temporary directory upon object
-destruction.</p></li>
+destruction. This option is ignored on Python &lt; 3.12.</p></li>
+<li><p>Do not ignore the argument <code class="docutils literal notranslate"><span class="pre">lanc_nstates_sector</span></code> of <code class="docutils literal notranslate"><span class="pre">EDIpackSolver</span></code>’s
+constructor in the zero temperature mode.</p></li>
 <li><p>Fixed a bug in <code class="docutils literal notranslate"><span class="pre">EDIpackSolver.chi2_fit_bath()</span></code>, which made this method
 unusable without first calling <code class="docutils literal notranslate"><span class="pre">EDIpackSolver.solve()</span></code>. There is now a unit
 test that covers the bath fitting functionality.</p></li>
