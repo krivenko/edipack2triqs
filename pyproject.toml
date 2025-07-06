@@ -7,7 +7,7 @@ name = "edipack2triqs"
 version = "0.7.0"
 description = "Compatibility layer between EDIpack and TRIQS"
 readme = "README.md"
-requires-python = ">=3.8"
+requires-python = ">=3.10"
 keywords = ["edipack", "edipack2py", "triqs"]
 authors = [
     {name = "I. Krivenko", email = "iskrivenko@proton.me" },
