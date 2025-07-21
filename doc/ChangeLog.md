@@ -2,6 +2,11 @@
 
 # Changelog
 
+## Version 0.9.0
+
+* Expose non-interacting impurity Green's functions and hybridization functions
+  via attributes of `EDIpackSolver`.
+
 ## Version 0.8.0
 
 * Add support for calculations without bath.

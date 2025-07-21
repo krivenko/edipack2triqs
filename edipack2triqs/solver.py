@@ -586,10 +586,10 @@ class EDIpackSolver:
 
         if real_freq:
             mesh = MeshReFreq(window=(ed.wini, ed.wfin), n_w=ed.Lreal)
-            z_vals = [complex(z) + ed.eps * 1j for z in mesh]
+            z_vals = np.asarray([complex(z) + ed.eps * 1j for z in mesh])
         else:
             mesh = MeshImFreq(beta=ed.beta, S="Fermion", n_iw=ed.Lmats)
-            z_vals = [complex(z) for z in mesh]
+            z_vals = np.asarray([complex(z) for z in mesh])
 
         with chdircontext(self.wdname):
             data = ed_func(z_vals, typ='a' if anomalous else 'n')
@@ -626,7 +626,7 @@ class EDIpackSolver:
                        make_copies=False)
 
     #
-    # GF and self-energy properties
+    # Green's functions
     #
 
     @property
@@ -640,16 +640,6 @@ class EDIpackSolver:
         return self._make_gf(ed.build_gimp, False, True)
 
     @property
-    def Sigma_iw(self) -> BlockGf:
-        "Matsubara impurity self-energy."
-        return self._make_gf(ed.build_sigma, False, False)
-
-    @property
-    def Sigma_an_iw(self) -> BlockGf:
-        "Anomalous Matsubara impurity self-energy."
-        return self._make_gf(ed.build_sigma, False, True)
-
-    @property
     def g_w(self) -> BlockGf:
         "Real-frequency impurity Green's function."
         return self._make_gf(ed.build_gimp, True, False)
@@ -658,6 +648,52 @@ class EDIpackSolver:
     def g_an_w(self) -> BlockGf:
         "Anomalous real-frequency impurity Green's function."
         return self._make_gf(ed.build_gimp, True, True)
+
+    #
+    # Non-interacting Green's functions
+    #
+
+    @property
+    def g0_iw(self) -> BlockGf:
+        "Matsubara non-interacting impurity Green's function"
+        def ed_func(z_vals, typ):
+            return ed.get_g0and(z_vals, self.bath.data, typ=typ)
+        return self._make_gf(ed_func, False, False)
+
+    @property
+    def g0_an_iw(self) -> BlockGf:
+        "Anomalous Matsubara non-interacting impurity Green's function"
+        def ed_func(z_vals, typ):
+            return ed.get_g0and(z_vals, self.bath.data, typ=typ)
+        return self._make_gf(ed_func, False, True)
+
+    @property
+    def g0_w(self) -> BlockGf:
+        "Real-frequency non-interacting impurity Green's function"
+        def ed_func(z_vals, typ):
+            return ed.get_g0and(z_vals, self.bath.data, typ=typ)
+        return self._make_gf(ed_func, True, False)
+
+    @property
+    def g0_an_w(self) -> BlockGf:
+        "Anomalous real-frequency non-interacting impurity Green's function"
+        def ed_func(z_vals, typ):
+            return ed.get_g0and(z_vals, self.bath.data, typ=typ)
+        return self._make_gf(ed_func, True, True)
+
+    #
+    # Self-energies
+    #
+
+    @property
+    def Sigma_iw(self) -> BlockGf:
+        "Matsubara impurity self-energy."
+        return self._make_gf(ed.build_sigma, False, False)
+
+    @property
+    def Sigma_an_iw(self) -> BlockGf:
+        "Anomalous Matsubara impurity self-energy."
+        return self._make_gf(ed.build_sigma, False, True)
 
     @property
     def Sigma_w(self) -> BlockGf:
@@ -671,3 +707,35 @@ class EDIpackSolver:
 
     # Bath fitting
     chi2_fit_bath = _chi2_fit_bath
+
+    #
+    # Hybridization function
+    #
+
+    @property
+    def Delta_iw(self) -> BlockGf:
+        "Matsubara hybridization function"
+        def ed_func(z_vals, typ):
+            return ed.get_delta(z_vals, self.bath.data, typ=typ)
+        return self._make_gf(ed_func, False, False)
+
+    @property
+    def Delta_an_iw(self) -> BlockGf:
+        "Anomalous Matsubara hybridization function"
+        def ed_func(z_vals, typ):
+            return ed.get_delta(z_vals, self.bath.data, typ=typ)
+        return self._make_gf(ed_func, False, True)
+
+    @property
+    def Delta_w(self) -> BlockGf:
+        "Real-frequency hybridization function"
+        def ed_func(z_vals, typ):
+            return ed.get_delta(z_vals, self.bath.data, typ=typ)
+        return self._make_gf(ed_func, True, False)
+
+    @property
+    def Delta_an_w(self) -> BlockGf:
+        "Anomalous real-frequency hybridization function"
+        def ed_func(z_vals, typ):
+            return ed.get_delta(z_vals, self.bath.data, typ=typ)
+        return self._make_gf(ed_func, True, True)
