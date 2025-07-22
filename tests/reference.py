@@ -7,8 +7,10 @@ import numpy as np
 from itertools import product
 
 import triqs.operators as op
+from triqs.operators.util.extractors import extract_h_dict
 from triqs.gf import BlockGf, Gf, MeshImFreq, conjugate, transpose
-from triqs.gf.tools import dyson
+from triqs.gf.descriptors import Omega, iOmega_n
+from triqs.gf.tools import inverse, dyson
 from h5 import HDFArchive
 
 from edipack2triqs.util import monomial2op, non_int_part
@@ -106,18 +108,30 @@ def make_reference_results(*,
     if not superc:
         ed0 = _make_pomerol_ed(index_converter, non_int_part(h))
 
+        hloc = _extract_hloc(h, gf_struct)
+
         # Real frequency
         g_w = ed.G_w(gf_struct, beta, energy_window, n_w, broadening, **tols)
         g0_w = ed0.G_w(gf_struct, beta, energy_window, n_w, broadening, **tols)
         results['g_w'] = g_w
+        results['g0_w'] = g0_w
         results['Sigma_w'] = dyson(G0_iw=g0_w, G_iw=g_w)
+        Delta_w = g0_w.copy()
+        for b, sn in gf_struct:
+            Delta_w[b] << Omega + 1j * broadening - hloc[b] - inverse(g0_w[b])
+        results['Delta_w'] = Delta_w
 
         # Matsubara frequency
         if not zerotemp:
             g_iw = ed.G_iw(gf_struct, beta, n_iw, **tols)
             g0_iw = ed0.G_iw(gf_struct, beta, n_iw, **tols)
             results['g_iw'] = g_iw
+            results['g0_iw'] = g0_iw
             results['Sigma_iw'] = dyson(G0_iw=g0_iw, G_iw=g_iw)
+            Delta_iw = g0_iw.copy()
+            for b, sn in gf_struct:
+                Delta_iw[b] << iOmega_n - hloc[b] - inverse(g0_iw[b])
+            results['Delta_iw'] = Delta_iw
 
     # Nambu GF calculations
     else:
@@ -130,6 +144,9 @@ def make_reference_results(*,
         h = _merge_spin_blocks_in_expr(h, spins, norb)
         ed = _make_pomerol_ed(index_converter, h)
         ed0 = _make_pomerol_ed(index_converter, non_int_part(h))
+
+        hloc = _extract_hloc(h, gf_struct)[up_dn]
+        hloc[norb:, norb:] *= -1
 
         # Real frequency
         gf_args = [gf_struct, beta, energy_window, n_w]
@@ -153,6 +170,13 @@ def make_reference_results(*,
         )
         results['g_an_w'] = BlockGf(block_list=[f_w], name_list=[up_dn])
 
+        # Non-interacting Green's functions
+        results['g0_w'] = BlockGf(
+            block_list=[g0_w[:norb, :norb], g0_w[norb:, norb:]],
+            name_list=[up, dn]
+        )
+        results['g0_an_w'] = BlockGf(block_list=[f0_w], name_list=[up_dn])
+
         # Self-energies
         G_nambu_w = _make_nambu_gf(g_w, f_w, fbar_w)
         G0_nambu_w = _make_nambu_gf(g0_w, f0_w, f0bar_w)
@@ -160,6 +184,13 @@ def make_reference_results(*,
         Sigma_w, Sigma_an_w = _unpack_nambu_gf(Sigma_nambu_w, spins)
         results['Sigma_w'] = Sigma_w
         results['Sigma_an_w'] = Sigma_an_w
+
+        # Hybridization functions
+        Delta_nambu_w = G0_nambu_w.copy()
+        Delta_nambu_w << Omega + 1j * broadening - hloc - inverse(G0_nambu_w)
+        Delta_w, Delta_an_w = _unpack_nambu_gf(Delta_nambu_w, spins)
+        results['Delta_w'] = Delta_w
+        results['Delta_an_w'] = Delta_an_w
 
         # Matsubara frequency
         if not zerotemp:
@@ -178,6 +209,13 @@ def make_reference_results(*,
             )
             results['g_an_iw'] = BlockGf(block_list=[f_iw], name_list=[up_dn])
 
+            # Non-interacting Green's functions
+            results['g0_iw'] = BlockGf(
+                block_list=[g0_iw[:norb, :norb], g0_iw[norb:, norb:]],
+                name_list=[up, dn]
+            )
+            results['g0_an_iw'] = BlockGf(block_list=[f0_iw], name_list=[up_dn])
+
             # Self-energies
             G_nambu_iw = _make_nambu_gf(g_iw, f_iw, fbar_iw)
             G0_nambu_iw = _make_nambu_gf(g0_iw, f0_iw, f0bar_iw)
@@ -185,6 +223,13 @@ def make_reference_results(*,
             Sigma_iw, Sigma_an_iw = _unpack_nambu_gf(Sigma_nambu_iw, spins)
             results['Sigma_iw'] = Sigma_iw
             results['Sigma_an_iw'] = Sigma_an_iw
+
+            # Hybridization functions
+            Delta_nambu_iw = G0_nambu_iw.copy()
+            Delta_nambu_iw << iOmega_n - hloc - inverse(G0_nambu_iw)
+            Delta_iw, Delta_an_iw = _unpack_nambu_gf(Delta_nambu_iw, spins)
+            results['Delta_iw'] = Delta_iw
+            results['Delta_an_iw'] = Delta_an_iw
 
     return results
 
@@ -237,6 +282,20 @@ def _merge_spin_blocks_in_expr(h, spins, norb):
         ]
         res += coeff * monomial2op(new_mon)
     return res
+
+
+def _extract_hloc(h, gf_struct):
+    """
+    Extract local quadratic part from a Hamiltonian expression.
+    """
+    h_dict = extract_h_dict(h, True)
+    hloc = {}
+    for bn, bs in gf_struct:
+        hloc_b = np.zeros((bs, bs), dtype=complex)
+        for i, j in product(range(bs), repeat=2):
+            hloc_b[i, j] = h_dict.get(((bn, i), (bn, j)), .0)
+        hloc[bn] = hloc_b
+    return hloc
 
 
 def _make_pomerol_ed(index_converter, h):

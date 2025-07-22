@@ -133,10 +133,16 @@ class TestEDIpackSolverBathNormal(unittest.TestCase):
                 refs['phi'],
                 atol=1e-8
             )
-        for gf in ('g_iw', 'g_an_iw', 'Sigma_iw', 'Sigma_an_iw',
-                   'g_w', 'g_an_w', 'Sigma_w', 'Sigma_an_w'):
+        for gf in ('g_iw', 'g_an_iw', 'g_w', 'g_an_w',
+                   'g0_iw', 'g0_an_iw', 'g0_w', 'g0_an_w',
+                   'Sigma_iw', 'Sigma_an_iw', 'Sigma_w', 'Sigma_an_w',
+                   'Delta_iw', 'Delta_an_iw', 'Delta_w', 'Delta_an_w'):
             if gf in refs:
-                assert_block_gfs_are_close(getattr(s, gf), refs[gf])
+                try:
+                    assert_block_gfs_are_close(getattr(s, gf), refs[gf])
+                except AssertionError as error:
+                    print(f"Failed check for {gf}:")
+                    raise error
 
     def test_zerotemp(self):
         h_loc = self.make_h_loc(mul.outer(s0, np.diag([-0.5, -0.6])))
