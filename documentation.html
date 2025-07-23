@@ -71,12 +71,20 @@
 <li class="toctree-l4"><a class="reference internal" href="#edipack2triqs.solver.EDIpackSolver.magnetization"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.magnetization</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#edipack2triqs.solver.EDIpackSolver.g_iw"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.g_iw</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#edipack2triqs.solver.EDIpackSolver.g_an_iw"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.g_an_iw</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#edipack2triqs.solver.EDIpackSolver.Sigma_iw"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.Sigma_iw</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#edipack2triqs.solver.EDIpackSolver.Sigma_an_iw"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.Sigma_an_iw</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#edipack2triqs.solver.EDIpackSolver.g_w"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.g_w</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#edipack2triqs.solver.EDIpackSolver.g_an_w"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.g_an_w</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#edipack2triqs.solver.EDIpackSolver.g0_iw"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.g0_iw</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#edipack2triqs.solver.EDIpackSolver.g0_an_iw"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.g0_an_iw</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#edipack2triqs.solver.EDIpackSolver.g0_w"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.g0_w</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#edipack2triqs.solver.EDIpackSolver.g0_an_w"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.g0_an_w</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#edipack2triqs.solver.EDIpackSolver.Sigma_iw"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.Sigma_iw</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#edipack2triqs.solver.EDIpackSolver.Sigma_an_iw"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.Sigma_an_iw</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#edipack2triqs.solver.EDIpackSolver.Sigma_w"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.Sigma_w</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#edipack2triqs.solver.EDIpackSolver.Sigma_an_w"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.Sigma_an_w</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#edipack2triqs.solver.EDIpackSolver.Delta_iw"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.Delta_iw</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#edipack2triqs.solver.EDIpackSolver.Delta_an_iw"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.Delta_an_iw</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#edipack2triqs.solver.EDIpackSolver.Delta_w"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.Delta_w</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#edipack2triqs.solver.EDIpackSolver.Delta_an_w"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.Delta_an_w</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -139,6 +147,7 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="issues.html">Reporting issues</a></li>
 <li class="toctree-l1"><a class="reference internal" href="ChangeLog.html">Changelog</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="ChangeLog.html#version-0-9-0">Version 0.9.0</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ChangeLog.html#version-0-8-0">Version 0.8.0</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ChangeLog.html#version-0-7-0">Version 0.7.0</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ChangeLog.html#version-0-6-0">Version 0.6.0</a></li>
@@ -390,18 +399,6 @@ one row per orbital.</p>
 </dd></dl>
 
 <dl class="py property">
-<dt class="sig sig-object py" id="edipack2triqs.solver.EDIpackSolver.Sigma_iw">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Sigma_iw</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://triqs.github.io/triqs/latest/documentation/python_api/triqs.gf.block_gf.BlockGf.html#triqs.gf.block_gf.BlockGf" rel="noopener noreferrer" target="_blank" title="(in TRIQS v3.3.1)"><span class="pre">BlockGf</span></a></em><a class="headerlink" href="#edipack2triqs.solver.EDIpackSolver.Sigma_iw" title="Link to this definition"></a></dt>
-<dd><p>Matsubara impurity self-energy.</p>
-</dd></dl>
-
-<dl class="py property">
-<dt class="sig sig-object py" id="edipack2triqs.solver.EDIpackSolver.Sigma_an_iw">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Sigma_an_iw</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://triqs.github.io/triqs/latest/documentation/python_api/triqs.gf.block_gf.BlockGf.html#triqs.gf.block_gf.BlockGf" rel="noopener noreferrer" target="_blank" title="(in TRIQS v3.3.1)"><span class="pre">BlockGf</span></a></em><a class="headerlink" href="#edipack2triqs.solver.EDIpackSolver.Sigma_an_iw" title="Link to this definition"></a></dt>
-<dd><p>Anomalous Matsubara impurity self-energy.</p>
-</dd></dl>
-
-<dl class="py property">
 <dt class="sig sig-object py" id="edipack2triqs.solver.EDIpackSolver.g_w">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">g_w</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://triqs.github.io/triqs/latest/documentation/python_api/triqs.gf.block_gf.BlockGf.html#triqs.gf.block_gf.BlockGf" rel="noopener noreferrer" target="_blank" title="(in TRIQS v3.3.1)"><span class="pre">BlockGf</span></a></em><a class="headerlink" href="#edipack2triqs.solver.EDIpackSolver.g_w" title="Link to this definition"></a></dt>
 <dd><p>Real-frequency impurity Green’s function.</p>
@@ -414,6 +411,42 @@ one row per orbital.</p>
 </dd></dl>
 
 <dl class="py property">
+<dt class="sig sig-object py" id="edipack2triqs.solver.EDIpackSolver.g0_iw">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">g0_iw</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://triqs.github.io/triqs/latest/documentation/python_api/triqs.gf.block_gf.BlockGf.html#triqs.gf.block_gf.BlockGf" rel="noopener noreferrer" target="_blank" title="(in TRIQS v3.3.1)"><span class="pre">BlockGf</span></a></em><a class="headerlink" href="#edipack2triqs.solver.EDIpackSolver.g0_iw" title="Link to this definition"></a></dt>
+<dd><p>Matsubara non-interacting impurity Green’s function</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="edipack2triqs.solver.EDIpackSolver.g0_an_iw">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">g0_an_iw</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://triqs.github.io/triqs/latest/documentation/python_api/triqs.gf.block_gf.BlockGf.html#triqs.gf.block_gf.BlockGf" rel="noopener noreferrer" target="_blank" title="(in TRIQS v3.3.1)"><span class="pre">BlockGf</span></a></em><a class="headerlink" href="#edipack2triqs.solver.EDIpackSolver.g0_an_iw" title="Link to this definition"></a></dt>
+<dd><p>Anomalous Matsubara non-interacting impurity Green’s function</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="edipack2triqs.solver.EDIpackSolver.g0_w">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">g0_w</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://triqs.github.io/triqs/latest/documentation/python_api/triqs.gf.block_gf.BlockGf.html#triqs.gf.block_gf.BlockGf" rel="noopener noreferrer" target="_blank" title="(in TRIQS v3.3.1)"><span class="pre">BlockGf</span></a></em><a class="headerlink" href="#edipack2triqs.solver.EDIpackSolver.g0_w" title="Link to this definition"></a></dt>
+<dd><p>Real-frequency non-interacting impurity Green’s function</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="edipack2triqs.solver.EDIpackSolver.g0_an_w">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">g0_an_w</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://triqs.github.io/triqs/latest/documentation/python_api/triqs.gf.block_gf.BlockGf.html#triqs.gf.block_gf.BlockGf" rel="noopener noreferrer" target="_blank" title="(in TRIQS v3.3.1)"><span class="pre">BlockGf</span></a></em><a class="headerlink" href="#edipack2triqs.solver.EDIpackSolver.g0_an_w" title="Link to this definition"></a></dt>
+<dd><p>Anomalous real-frequency non-interacting impurity Green’s function</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="edipack2triqs.solver.EDIpackSolver.Sigma_iw">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Sigma_iw</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://triqs.github.io/triqs/latest/documentation/python_api/triqs.gf.block_gf.BlockGf.html#triqs.gf.block_gf.BlockGf" rel="noopener noreferrer" target="_blank" title="(in TRIQS v3.3.1)"><span class="pre">BlockGf</span></a></em><a class="headerlink" href="#edipack2triqs.solver.EDIpackSolver.Sigma_iw" title="Link to this definition"></a></dt>
+<dd><p>Matsubara impurity self-energy.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="edipack2triqs.solver.EDIpackSolver.Sigma_an_iw">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Sigma_an_iw</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://triqs.github.io/triqs/latest/documentation/python_api/triqs.gf.block_gf.BlockGf.html#triqs.gf.block_gf.BlockGf" rel="noopener noreferrer" target="_blank" title="(in TRIQS v3.3.1)"><span class="pre">BlockGf</span></a></em><a class="headerlink" href="#edipack2triqs.solver.EDIpackSolver.Sigma_an_iw" title="Link to this definition"></a></dt>
+<dd><p>Anomalous Matsubara impurity self-energy.</p>
+</dd></dl>
+
+<dl class="py property">
 <dt class="sig sig-object py" id="edipack2triqs.solver.EDIpackSolver.Sigma_w">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Sigma_w</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://triqs.github.io/triqs/latest/documentation/python_api/triqs.gf.block_gf.BlockGf.html#triqs.gf.block_gf.BlockGf" rel="noopener noreferrer" target="_blank" title="(in TRIQS v3.3.1)"><span class="pre">BlockGf</span></a></em><a class="headerlink" href="#edipack2triqs.solver.EDIpackSolver.Sigma_w" title="Link to this definition"></a></dt>
 <dd><p>Real-frequency impurity self-energy.</p>
@@ -423,6 +456,30 @@ one row per orbital.</p>
 <dt class="sig sig-object py" id="edipack2triqs.solver.EDIpackSolver.Sigma_an_w">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Sigma_an_w</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://triqs.github.io/triqs/latest/documentation/python_api/triqs.gf.block_gf.BlockGf.html#triqs.gf.block_gf.BlockGf" rel="noopener noreferrer" target="_blank" title="(in TRIQS v3.3.1)"><span class="pre">BlockGf</span></a></em><a class="headerlink" href="#edipack2triqs.solver.EDIpackSolver.Sigma_an_w" title="Link to this definition"></a></dt>
 <dd><p>Anomalous real-frequency impurity self-energy.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="edipack2triqs.solver.EDIpackSolver.Delta_iw">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Delta_iw</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://triqs.github.io/triqs/latest/documentation/python_api/triqs.gf.block_gf.BlockGf.html#triqs.gf.block_gf.BlockGf" rel="noopener noreferrer" target="_blank" title="(in TRIQS v3.3.1)"><span class="pre">BlockGf</span></a></em><a class="headerlink" href="#edipack2triqs.solver.EDIpackSolver.Delta_iw" title="Link to this definition"></a></dt>
+<dd><p>Matsubara hybridization function</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="edipack2triqs.solver.EDIpackSolver.Delta_an_iw">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Delta_an_iw</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://triqs.github.io/triqs/latest/documentation/python_api/triqs.gf.block_gf.BlockGf.html#triqs.gf.block_gf.BlockGf" rel="noopener noreferrer" target="_blank" title="(in TRIQS v3.3.1)"><span class="pre">BlockGf</span></a></em><a class="headerlink" href="#edipack2triqs.solver.EDIpackSolver.Delta_an_iw" title="Link to this definition"></a></dt>
+<dd><p>Anomalous Matsubara hybridization function</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="edipack2triqs.solver.EDIpackSolver.Delta_w">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Delta_w</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://triqs.github.io/triqs/latest/documentation/python_api/triqs.gf.block_gf.BlockGf.html#triqs.gf.block_gf.BlockGf" rel="noopener noreferrer" target="_blank" title="(in TRIQS v3.3.1)"><span class="pre">BlockGf</span></a></em><a class="headerlink" href="#edipack2triqs.solver.EDIpackSolver.Delta_w" title="Link to this definition"></a></dt>
+<dd><p>Real-frequency hybridization function</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="edipack2triqs.solver.EDIpackSolver.Delta_an_w">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Delta_an_w</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://triqs.github.io/triqs/latest/documentation/python_api/triqs.gf.block_gf.BlockGf.html#triqs.gf.block_gf.BlockGf" rel="noopener noreferrer" target="_blank" title="(in TRIQS v3.3.1)"><span class="pre">BlockGf</span></a></em><a class="headerlink" href="#edipack2triqs.solver.EDIpackSolver.Delta_an_w" title="Link to this definition"></a></dt>
+<dd><p>Anomalous real-frequency hybridization function</p>
 </dd></dl>
 
 </dd></dl>
