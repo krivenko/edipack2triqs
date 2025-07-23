@@ -15,7 +15,7 @@ import numpy as np
 from mpi4py import MPI
 
 import triqs.operators as op
-from triqs.gf import BlockGf, Gf, MeshImFreq, MeshReFreq
+from triqs.gf import BlockGf, Gf, MeshImFreq, MeshReFreq, MeshImTime
 
 from edipack2py import global_env as ed
 
@@ -464,7 +464,8 @@ class EDIpackSolver:
               n_iw: int = 4096,
               energy_window: tuple[float, float] = (-5.0, 5.0),
               n_w: int = 5000,
-              broadening: float = 0.01):
+              broadening: float = 0.01,
+              n_tau: int = 1024):
         r"""
         Solve the impurity problem and calculate the observables, Green's
         function and self-energy.
@@ -491,6 +492,10 @@ class EDIpackSolver:
         :param broadening: Broadening (imaginary shift away from the
             real-frequency axis) for real-frequency impurity GF calculations.
         :type broadening: float, default=0.01
+
+        :param n_tau: Number of imaginary time points for calculations of
+                      impurity response functions.
+        :type n_tau: int, default=1024
         """
 
         ed.beta = beta
@@ -498,6 +503,7 @@ class EDIpackSolver:
         ed.wini, ed.wfin = energy_window
         ed.Lreal = n_w
         ed.eps = broadening
+        ed.Ltau = n_tau
 
         if (self.nspin == 2) and (self.h_params.ed_mode == "normal") and \
                 (not is_spin_diagonal(self.h_params.Hloc)):
@@ -705,9 +711,6 @@ class EDIpackSolver:
         "Anomalous real-frequency impurity self-energy."
         return self._make_gf(ed.build_sigma, True, True)
 
-    # Bath fitting
-    chi2_fit_bath = _chi2_fit_bath
-
     #
     # Hybridization function
     #
@@ -739,3 +742,62 @@ class EDIpackSolver:
         def ed_func(z_vals, typ):
             return ed.get_delta(z_vals, self.bath.data, typ=typ)
         return self._make_gf(ed_func, True, True)
+
+    #
+    # Response functions
+    #
+
+    def _make_chi(self, chan, axis) -> Gf:
+        if ed.get_ed_mode() != 1:  # normal
+            raise RuntimeError(
+                "Response functions are only available in the normal ED mode"
+            )
+
+        match axis:
+            case "m":
+                mesh = MeshImFreq(beta=ed.beta, S="Fermion", n_iw=ed.Lmats)
+                z_vals = np.asarray([complex(z) for z in mesh])
+            case "r":
+                mesh = MeshReFreq(window=(ed.wini, ed.wfin), n_w=ed.Lreal)
+                z_vals = np.asarray([complex(z) + ed.eps * 1j for z in mesh])
+            case "t":
+                mesh = MeshImTime(beta=ed.beta, S="Fermion", n_tau=ed.Ltau)
+                z_vals = np.asarray([complex(z) for z in mesh])
+            case _:
+                raise AssertionError("Unexpected axis")
+
+        target_shape = (3, self.norb, self.norb) if chan == "exct" else \
+                       (self.norb, self.norb)
+
+        with chdircontext(self.wdname):
+            data = ed.get_chi(chan=chan, zeta=z_vals, axis=axis)
+
+        chi = Gf(mesh=mesh, target_shape=target_shape)
+        chi.data[:] = np.rollaxis(data, -1)
+
+        return chi
+
+    #
+    # Bath fitting
+    #
+
+    chi2_fit_bath = _chi2_fit_bath
+
+
+# Add response function properties to EDIpackSolver
+def _make_chi_property(chan, chan_name, axis, axis_name):
+    def getter(self) -> Gf:
+        return self._make_chi(chan, axis)
+    docstring = f"{axis_name} {chan_name} response function"
+    return property(fget=getter, doc=docstring)
+
+
+for chan, chan_name in [("spin", "spin"),
+                        ("dens", "density"),
+                        ("pair", "pairing"),
+                        ("exct", "exciton")]:
+    for axis, axis_name, axis_suffix in [("m", "Matsubara", "iw"),
+                                         ("r", "Real-frequency", "w"),
+                                         ("t", "Imaginary time", "tau")]:
+        setattr(EDIpackSolver, f"chi_{chan}_{axis_suffix}",
+                _make_chi_property(chan, chan_name, axis, axis_name))
