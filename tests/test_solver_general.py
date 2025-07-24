@@ -186,9 +186,9 @@ class TestEDIpackSolverBathGeneral(unittest.TestCase):
         self.assertEqual(solver.bath.nbath, 2)
 
         solve_params = {
-            "n_iw": 100,
+            "n_iw": 10,
             "energy_window": (-1.0, 1.0),
-            "n_w": 400,
+            "n_w": 40,
             "broadening": 0.05
         }
         solver.solve(**solve_params)
@@ -236,9 +236,9 @@ class TestEDIpackSolverBathGeneral(unittest.TestCase):
         # Part I: Initial solve()
         solve_params = {
             "beta": 70.0,
-            "n_iw": 100,
+            "n_iw": 10,
             "energy_window": (-1.0, 1.0),
-            "n_w": 400,
+            "n_w": 40,
             "broadening": 0.05
         }
         solver.solve(**solve_params)
@@ -258,9 +258,9 @@ class TestEDIpackSolverBathGeneral(unittest.TestCase):
 
         solve_params = {
             "beta": 80.0,
-            "n_iw": 100,
+            "n_iw": 10,
             "energy_window": (-1.0, 1.0),
-            "n_w": 400,
+            "n_w": 40,
             "broadening": 0.03
         }
         solver.solve(**solve_params)
@@ -289,9 +289,9 @@ class TestEDIpackSolverBathGeneral(unittest.TestCase):
 
         solve_params = {
             "beta": 70.0,
-            "n_iw": 100,
+            "n_iw": 10,
             "energy_window": (-1.0, 1.0),
-            "n_w": 400,
+            "n_w": 40,
             "broadening": 0.02
         }
         solver.solve(**solve_params)
@@ -342,9 +342,9 @@ class TestEDIpackSolverBathGeneral(unittest.TestCase):
         # Part I: Initial solve()
         solve_params = {
             "beta": 60.0,
-            "n_iw": 100,
+            "n_iw": 10,
             "energy_window": (-1.0, 1.0),
-            "n_w": 400,
+            "n_w": 40,
             "broadening": 0.05
         }
         solver.solve(**solve_params)
@@ -364,9 +364,9 @@ class TestEDIpackSolverBathGeneral(unittest.TestCase):
 
         solve_params = {
             "beta": 70.0,
-            "n_iw": 100,
+            "n_iw": 10,
             "energy_window": (-1.0, 1.0),
-            "n_w": 400,
+            "n_w": 40,
             "broadening": 0.03
         }
         solver.solve(**solve_params)
@@ -398,9 +398,9 @@ class TestEDIpackSolverBathGeneral(unittest.TestCase):
 
         solve_params = {
             "beta": 60.0,
-            "n_iw": 100,
+            "n_iw": 10,
             "energy_window": (-1.0, 1.0),
-            "n_w": 400,
+            "n_w": 40,
             "broadening": 0.02
         }
         solver.solve(**solve_params)
@@ -455,9 +455,9 @@ class TestEDIpackSolverBathGeneral(unittest.TestCase):
         # Part I: Initial solve()
         solve_params = {
             "beta": 60.0,
-            "n_iw": 100,
+            "n_iw": 10,
             "energy_window": (-1.0, 1.0),
-            "n_w": 400,
+            "n_w": 40,
             "broadening": 0.05
         }
         solver.solve(**solve_params)
@@ -478,9 +478,9 @@ class TestEDIpackSolverBathGeneral(unittest.TestCase):
 
         solve_params = {
             "beta": 70.0,
-            "n_iw": 200,
+            "n_iw": 20,
             "energy_window": (-1.0, 1.0),
-            "n_w": 400,
+            "n_w": 40,
             "broadening": 0.03
         }
         solver.solve(**solve_params)
@@ -513,9 +513,9 @@ class TestEDIpackSolverBathGeneral(unittest.TestCase):
 
         solve_params = {
             "beta": 60.0,
-            "n_iw": 200,
+            "n_iw": 20,
             "energy_window": (-1.0, 1.0),
-            "n_w": 400,
+            "n_w": 40,
             "broadening": 0.03
         }
         solver.solve(**solve_params)
@@ -572,9 +572,9 @@ class TestEDIpackSolverBathGeneral(unittest.TestCase):
         # Part I: Initial solve()
         solve_params = {
             "beta": 60.0,
-            "n_iw": 100,
+            "n_iw": 10,
             "energy_window": (-1.0, 1.0),
-            "n_w": 400,
+            "n_w": 40,
             "broadening": 0.05
         }
         solver.solve(**solve_params)
@@ -595,9 +595,9 @@ class TestEDIpackSolverBathGeneral(unittest.TestCase):
 
         solve_params = {
             "beta": 70.0,
-            "n_iw": 200,
+            "n_iw": 20,
             "energy_window": (-1.0, 1.0),
-            "n_w": 400,
+            "n_w": 40,
             "broadening": 0.03
         }
         solver.solve(**solve_params)
@@ -636,9 +636,9 @@ class TestEDIpackSolverBathGeneral(unittest.TestCase):
 
         solve_params = {
             "beta": 60.0,
-            "n_iw": 200,
+            "n_iw": 20,
             "energy_window": (-1.0, 1.0),
-            "n_w": 400,
+            "n_w": 40,
             "broadening": 0.03
         }
         solver.solve(**solve_params)
@@ -695,9 +695,9 @@ class TestEDIpackSolverBathGeneral(unittest.TestCase):
         # Part I: Initial solve()
         solve_params = {
             "beta": 60.0,
-            "n_iw": 100,
+            "n_iw": 10,
             "energy_window": (-1.0, 1.0),
-            "n_w": 400,
+            "n_w": 40,
             "broadening": 0.05
         }
         solver.solve(**solve_params)
@@ -718,9 +718,9 @@ class TestEDIpackSolverBathGeneral(unittest.TestCase):
 
         solve_params = {
             "beta": 70.0,
-            "n_iw": 100,
+            "n_iw": 10,
             "energy_window": (-1.0, 1.0),
-            "n_w": 400,
+            "n_w": 40,
             "broadening": 0.03
         }
         solver.solve(**solve_params)
@@ -764,9 +764,9 @@ class TestEDIpackSolverBathGeneral(unittest.TestCase):
 
         solve_params = {
             "beta": 60.0,
-            "n_iw": 100,
+            "n_iw": 10,
             "energy_window": (-1.0, 1.0),
-            "n_w": 400,
+            "n_w": 40,
             "broadening": 0.02
         }
         solver.solve(**solve_params)
