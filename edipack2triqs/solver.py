@@ -77,12 +77,11 @@ class EDIpackSolver:
         "ED_SOLVE_OFFDIAG_GF": False,   # TODO
         "ED_ALL_G": True,
         "ED_OFFSET_BATH": 0.0,
-        # TODO: Susceptibilities
-        "LTAU": 1000,               # TODO: To be set in solve()
-        "CHISPIN_FLAG": False,      # TODO: To be set in __init__()
-        "CHIDENS_FLAG": False,      # TODO: To be set in __init__()
-        "CHIPAIR_FLAG": False,      # TODO: To be set in __init__()
-        "CHIEXCT_FLAG": False       # TODO: To be set in __init__()
+        "LTAU": 1000,
+        "CHISPIN_FLAG": False,
+        "CHIDENS_FLAG": False,
+        "CHIPAIR_FLAG": False,
+        "CHIEXCT_FLAG": False
     }
 
     def __init__(self,  # noqa: C901
@@ -465,7 +464,11 @@ class EDIpackSolver:
               energy_window: tuple[float, float] = (-5.0, 5.0),
               n_w: int = 5000,
               broadening: float = 0.01,
-              n_tau: int = 1024):
+              n_tau: int = 1024,
+              chi_spin: bool = False,
+              chi_dens: bool = False,
+              chi_exct: bool = False,
+              chi_pair: bool = False):
         r"""
         Solve the impurity problem and calculate the observables, Green's
         function and self-energy.
@@ -477,25 +480,38 @@ class EDIpackSolver:
             frequencies used as a mesh for the Green's functions.
         :type beta: float, default=1000
 
-        :param n_iw: Number of Matsubara frequencies for impurity GF
-            calculations.
+        :param n_iw: Number of Matsubara frequencies for impurity GF and
+            response function calculations.
         :type n_iw: int, default=4096
 
-        :param energy_window: Energy window for real-frequency impurity GF
-            calculations.
+        :param energy_window: Energy window for real-frequency impurity GF and
+            response function calculations.
         :type energy_window: tuple[float, float], default=(-5.0, 5.0)
 
-        :param n_w: Number of real-frequency points for impurity GF
-            calculations.
+        :param n_w: Number of real-frequency points for impurity GF and
+            response function calculations.
         :type n_w: int, default=5000
 
         :param broadening: Broadening (imaginary shift away from the
-            real-frequency axis) for real-frequency impurity GF calculations.
+            real-frequency axis) for real-frequency impurity GF and
+            response function calculations.
         :type broadening: float, default=0.01
 
         :param n_tau: Number of imaginary time points for calculations of
                       impurity response functions.
         :type n_tau: int, default=1024
+
+        :param chi_spin: Compute spin response functions.
+        :type chi_spin: bool, default=False
+
+        :param chi_dens: Compute density response functions.
+        :type chi_dens: bool, default=False
+
+        :param chi_pair: Compute pairing response functions.
+        :type chi_pair: bool, default=False
+
+        :param chi_exct: Compute exciton response functions.
+        :type chi_exct:  bool, default=False
         """
 
         ed.beta = beta
@@ -515,6 +531,16 @@ class EDIpackSolver:
             raise RuntimeError(
                 "Cannot add non-density-density terms to the interaction"
             )
+
+        if (True in (chi_spin, chi_dens, chi_exct, chi_pair)) and \
+                ed.get_ed_mode() != 1:   # normal
+            raise RuntimeError(
+                "Response functions are only available in the normal ED mode"
+            )
+        ed.chispin_flag = chi_spin
+        ed.chidens_flag = chi_dens
+        ed.chipair_flag = chi_pair
+        ed.chiexct_flag = chi_exct
 
         self.comm.barrier()
         with chdircontext(self.wdname):
