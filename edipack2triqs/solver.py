@@ -755,13 +755,13 @@ class EDIpackSolver:
 
         match axis:
             case "m":
-                mesh = MeshImFreq(beta=ed.beta, S="Fermion", n_iw=ed.Lmats)
+                mesh = MeshImFreq(beta=ed.beta, S="Boson", n_iw=ed.Lmats)
                 z_vals = np.asarray([complex(z) for z in mesh])
             case "r":
                 mesh = MeshReFreq(window=(ed.wini, ed.wfin), n_w=ed.Lreal)
                 z_vals = np.asarray([complex(z) + ed.eps * 1j for z in mesh])
             case "t":
-                mesh = MeshImTime(beta=ed.beta, S="Fermion", n_tau=ed.Ltau)
+                mesh = MeshImTime(beta=ed.beta, S="Boson", n_tau=ed.Ltau)
                 z_vals = np.asarray([complex(z) for z in mesh])
             case _:
                 raise AssertionError("Unexpected axis")
