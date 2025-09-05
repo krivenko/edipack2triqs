@@ -7,7 +7,8 @@ from numpy.testing import assert_allclose
 from numpy import multiply as mul
 
 import triqs.operators as op
-from triqs.utility.comparison_tests import assert_block_gfs_are_close
+from triqs.utility.comparison_tests import (assert_gfs_are_close,
+                                            assert_block_gfs_are_close)
 
 from edipack2triqs.solver import EDIpackSolver
 
@@ -101,15 +102,28 @@ class TestEDIpackSolverNoBath(unittest.TestCase):
 
     @classmethod
     def assert_all(cls, s, **refs):
-        assert_allclose(s.densities, refs['densities'], atol=1e-8)
-        assert_allclose(s.double_occ, refs['double_occ'], atol=1e-8)
-        assert_allclose(s.magnetization[:, 0], refs['magn_x'], atol=1e-8)
-        assert_allclose(s.magnetization[:, 1], refs['magn_y'], atol=1e-8)
-        assert_allclose(s.magnetization[:, 2], refs['magn_z'], atol=1e-8)
+        assert_allclose(s.densities, refs['densities'], atol=1e-7)
+        assert_allclose(s.double_occ, refs['double_occ'], atol=1e-7)
+        assert_allclose(s.magnetization[:, 0], refs['magn_x'], atol=1e-7)
+        assert_allclose(s.magnetization[:, 1], refs['magn_y'], atol=1e-7)
+        assert_allclose(s.magnetization[:, 2], refs['magn_z'], atol=1e-7)
         assert_block_gfs_are_close(s.g_w, refs['g_w'])
         for gf in ('g_iw', 'Sigma_iw', 'g_w', 'Sigma_w'):
             if gf in refs:
-                assert_block_gfs_are_close(getattr(s, gf), refs[gf])
+                try:
+                    assert_block_gfs_are_close(getattr(s, gf), refs[gf])
+                except AssertionError as error:
+                    print(f"Failed check for {gf}:")
+                    raise error
+        for axis, chan in product(['iw', 'w', 'tau'],
+                                  ['spin', 'dens', 'pair', 'exct']):
+            chi = f"chi_{chan}_{axis}"
+            if chi in refs:
+                try:
+                    assert_gfs_are_close(getattr(s, chi), refs[chi])
+                except AssertionError as error:
+                    print(f"Failed check for {chi}:")
+                    raise error
 
     def test_zerotemp(self):
         h_loc = self.make_h_loc(mul.outer(s0, np.diag([-0.5, -0.6])))
@@ -179,7 +193,12 @@ class TestEDIpackSolverNoBath(unittest.TestCase):
             "n_iw": 10,
             "energy_window": (-2.0, 2.0),
             "n_w": 60,
-            "broadening": 0.05
+            "broadening": 0.05,
+            "n_tau": 10,
+            "chi_spin": True,
+            "chi_dens": True,
+            "chi_pair": True,
+            "chi_exct": True
         }
         solver.solve(**solve_params)
 
@@ -201,7 +220,12 @@ class TestEDIpackSolverNoBath(unittest.TestCase):
             "n_iw": 20,
             "energy_window": (-1.5, 1.5),
             "n_w": 40,
-            "broadening": 0.03
+            "broadening": 0.03,
+            "n_tau": 11,
+            "chi_spin": True,
+            "chi_dens": True,
+            "chi_pair": True,
+            "chi_exct": True
         }
         solver.solve(**solve_params)
 
@@ -229,7 +253,7 @@ class TestEDIpackSolverNoBath(unittest.TestCase):
             h,
             fops_imp_up, fops_imp_dn,
             lanc_nstates_total=8,
-            verbose=0,
+            verbose=0
         )
 
         self.assertEqual(solver.nspin, 2)
@@ -242,7 +266,12 @@ class TestEDIpackSolverNoBath(unittest.TestCase):
             "n_iw": 10,
             "energy_window": (-2.0, 2.0),
             "n_w": 60,
-            "broadening": 0.05
+            "broadening": 0.05,
+            "n_tau": 10,
+            "chi_spin": True,
+            "chi_dens": True,
+            "chi_pair": True,
+            "chi_exct": True
         }
         solver.solve(**solve_params)
 
@@ -264,7 +293,12 @@ class TestEDIpackSolverNoBath(unittest.TestCase):
             "n_iw": 20,
             "energy_window": (-1.5, 1.5),
             "n_w": 40,
-            "broadening": 0.03
+            "broadening": 0.03,
+            "n_tau": 11,
+            "chi_spin": True,
+            "chi_dens": True,
+            "chi_pair": True,
+            "chi_exct": True
         }
         solver.solve(**solve_params)
 

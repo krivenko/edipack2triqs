@@ -7,7 +7,8 @@ from numpy.testing import assert_allclose
 from numpy import multiply as mul
 
 import triqs.operators as op
-from triqs.utility.comparison_tests import assert_block_gfs_are_close
+from triqs.utility.comparison_tests import (assert_gfs_are_close,
+                                            assert_block_gfs_are_close)
 
 from edipack2triqs.solver import EDIpackSolver
 
@@ -143,6 +144,16 @@ class TestEDIpackSolverBathNormal(unittest.TestCase):
                 except AssertionError as error:
                     print(f"Failed check for {gf}:")
                     raise error
+        for axis, chan in product(['iw', 'w', 'tau'],
+                                  ['spin', 'dens', 'pair', 'exct']):
+            chi = f"chi_{chan}_{axis}"
+            if chi in refs:
+                try:
+                    assert_gfs_are_close(getattr(s, chi), refs[chi],
+                                         precision=5e-5)
+                except AssertionError as error:
+                    print(f"Failed check for {chi}:")
+                    raise error
 
     def test_zerotemp(self):
         h_loc = self.make_h_loc(mul.outer(s0, np.diag([-0.5, -0.6])))
@@ -232,7 +243,12 @@ class TestEDIpackSolverBathNormal(unittest.TestCase):
             "n_iw": 10,
             "energy_window": (-2.0, 2.0),
             "n_w": 60,
-            "broadening": 0.05
+            "broadening": 0.05,
+            "n_tau": 10,
+            "chi_spin": True,
+            "chi_dens": True,
+            "chi_pair": True,
+            "chi_exct": True
         }
         solver.solve(**solve_params)
 
@@ -254,7 +270,12 @@ class TestEDIpackSolverBathNormal(unittest.TestCase):
             "n_iw": 20,
             "energy_window": (-1.5, 1.5),
             "n_w": 40,
-            "broadening": 0.03
+            "broadening": 0.03,
+            "n_tau": 11,
+            "chi_spin": True,
+            "chi_dens": True,
+            "chi_pair": True,
+            "chi_exct": True
         }
         solver.solve(**solve_params)
 
@@ -278,7 +299,12 @@ class TestEDIpackSolverBathNormal(unittest.TestCase):
             "n_iw": 30,
             "energy_window": (-2.5, 2.5),
             "n_w": 80,
-            "broadening": 0.02
+            "broadening": 0.02,
+            "n_tau": 12,
+            "chi_spin": True,
+            "chi_dens": True,
+            "chi_pair": True,
+            "chi_exct": True
         }
         solver.solve(**solve_params)
 
@@ -329,7 +355,12 @@ class TestEDIpackSolverBathNormal(unittest.TestCase):
             "n_iw": 10,
             "energy_window": (-2.0, 2.0),
             "n_w": 60,
-            "broadening": 0.05
+            "broadening": 0.05,
+            "n_tau": 10,
+            "chi_spin": True,
+            "chi_dens": True,
+            "chi_pair": True,
+            "chi_exct": True
         }
         solver.solve(**solve_params)
 
@@ -351,7 +382,12 @@ class TestEDIpackSolverBathNormal(unittest.TestCase):
             "n_iw": 20,
             "energy_window": (-1.5, 1.5),
             "n_w": 40,
-            "broadening": 0.03
+            "broadening": 0.03,
+            "n_tau": 11,
+            "chi_spin": True,
+            "chi_dens": True,
+            "chi_pair": True,
+            "chi_exct": True
         }
         solver.solve(**solve_params)
 
@@ -375,7 +411,12 @@ class TestEDIpackSolverBathNormal(unittest.TestCase):
             "n_iw": 30,
             "energy_window": (-2.5, 2.5),
             "n_w": 80,
-            "broadening": 0.02
+            "broadening": 0.02,
+            "n_tau": 12,
+            "chi_spin": True,
+            "chi_dens": True,
+            "chi_pair": True,
+            "chi_exct": True
         }
         solver.solve(**solve_params)
 

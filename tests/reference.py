@@ -8,7 +8,13 @@ from itertools import product
 
 import triqs.operators as op
 from triqs.operators.util.extractors import extract_h_dict
-from triqs.gf import BlockGf, Gf, MeshImFreq, conjugate, transpose
+from triqs.gf import (BlockGf,
+                      Gf,
+                      MeshReFreq,
+                      MeshImFreq,
+                      MeshImTime,
+                      conjugate,
+                      transpose)
 from triqs.gf.descriptors import Omega, iOmega_n
 from triqs.gf.tools import inverse, dyson
 from h5 import HDFArchive
@@ -48,9 +54,14 @@ def make_reference_results(*,
                            h,
                            spins, orbs, fops,
                            beta, n_iw, energy_window, n_w, broadening,
+                           n_tau=None,
                            spin_blocks=True,
                            superc=False,
-                           zerotemp=False):
+                           zerotemp=False,
+                           chi_spin=False,
+                           chi_dens=False,
+                           chi_pair=False,
+                           chi_exct=False):
     "Generate reference results using pomerol2triqs"
 
     up, dn = spins
@@ -93,12 +104,12 @@ def make_reference_results(*,
             )
         results['phi'] = phi
 
+    # Tolerances for construction of Lehmann representation
+    tols = {"pole_res": 1e-12, "coeff_tol": 1e-12}
+
     #
     # Green's functions and self-energies
     #
-
-    # Tolerances for construction of Lehmann representation
-    tols = {"pole_res": 1e-12, "coeff_tol": 1e-12}
 
     # Structure of normal GF
     gf_struct = [(up, norb), (dn, norb)] if spin_blocks else \
@@ -231,7 +242,102 @@ def make_reference_results(*,
             results['Delta_iw'] = Delta_iw
             results['Delta_an_iw'] = Delta_an_iw
 
+    #
+    # Response functions
+    #
+
+    if True in (chi_spin, chi_dens, chi_pair, chi_exct):
+        make_reference_chi_results(results, ed, mki,
+                                   spins=spins, orbs=orbs,
+                                   beta=beta,
+                                   n_iw=n_iw,
+                                   energy_window=energy_window,
+                                   n_w=n_w,
+                                   broadening=broadening,
+                                   n_tau=n_tau,
+                                   tols=tols,
+                                   zerotemp=zerotemp,
+                                   chi_spin=chi_spin,
+                                   chi_dens=chi_dens,
+                                   chi_pair=chi_pair,
+                                   chi_exct=chi_exct)
+
     return results
+
+
+def make_reference_chi_results(results, ed, mki, *,
+                               spins, orbs, beta,
+                               n_iw,
+                               energy_window, n_w, broadening,
+                               n_tau,
+                               tols,
+                               zerotemp,
+                               chi_spin, chi_dens, chi_pair, chi_exct):
+    "Generate reference results for susceptibilities using pomerol2triqs"
+
+    up, dn = spins
+    norb = len(orbs)
+
+    def chi_w(ind1, ind2, ind3, ind4, channel='PH'):
+        return ed.chi_w(ind1, ind2, ind3, ind4, beta,
+                        energy_window, n_w, broadening, channel=channel, **tols)
+
+    def chi_iw(ind1, ind2, ind3, ind4, channel='PH'):
+        return ed.chi_iw(ind1, ind2, ind3, ind4, beta, n_iw,
+                         channel=channel, **tols)
+
+    def chi_tau(ind1, ind2, ind3, ind4, channel='PH'):
+        return ed.chi_tau(ind1, ind2, ind3, ind4, beta, n_tau,
+                          channel=channel, **tols)
+
+    axes = [('w', MeshReFreq(energy_window, n_w), chi_w)]
+    if not zerotemp:
+        axes.append(('iw', MeshImFreq(beta, "Boson", n_iw), chi_iw))
+        axes.append(('tau', MeshImTime(beta, "Boson", n_tau), chi_tau))
+
+    for axis, mesh, func in axes:
+        # Spin and density
+        if chi_spin or chi_dens:
+            chi_nn = np.asarray([
+                Gf(mesh=mesh, target_shape=(norb, norb)) for _ in range(4)
+            ]).reshape((2, 2))
+
+            for (s1, spin1), (s2, spin2) in product(enumerate(spins), repeat=2):
+                for o1, o2 in product(orbs, orbs):
+                    ind1, ind2 = mki(spin1, o1), mki(spin2, o2)
+                    chi_nn[s1, s2][o1, o2] = func(ind1, ind1, ind2, ind2)
+        if chi_spin:
+            results[f"chi_spin_{axis}"] = 0.25 * (
+                chi_nn[0, 0] - chi_nn[0, 1] - chi_nn[1, 0] + chi_nn[1, 1])
+        if chi_dens:
+            results[f"chi_dens_{axis}"] = np.sum(chi_nn)
+
+        # Exciton
+        if chi_exct:
+            chi_exct = Gf(mesh=mesh, target_shape=(3, norb, norb))
+            for o1, o2 in product(orbs, orbs):
+                for (s1, spin1), (s2, spin2) in product(enumerate(spins),
+                                                        repeat=2):
+                    chi_ss = func(mki(spin1, o2), mki(spin1, o1),
+                                  mki(spin2, o1), mki(spin2, o2))
+                    # Singlet
+                    chi_exct[0, o1, o2] += chi_ss
+                    # Triplet z
+                    chi_exct[2, o1, o2] += (-1) ** int(s1 != s2) * chi_ss
+                    # Triplet x
+                    chi_exct[1, o1, o2] += func(
+                        mki(spin1, o2), mki(spins[1 - s1], o1),
+                        mki(spin2, o1), mki(spins[1 - s2], o2))
+            results[f"chi_exct_{axis}"] = chi_exct
+
+        # Pair
+        if chi_pair:
+            chi_pair = Gf(mesh=mesh, target_shape=(norb, norb))
+            for o1, o2 in product(orbs, orbs):
+                chi_pair[o1, o2] = func(
+                    mki(dn, o1), mki(dn, o2), mki(up, o1), mki(up, o2),
+                    channel='PP')
+            results[f"chi_pair_{axis}"] = chi_pair
 
 
 def _make_index_converter(fops, spins, norb, spin_blocks):
