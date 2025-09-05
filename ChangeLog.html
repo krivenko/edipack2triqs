@@ -76,6 +76,18 @@
 <li class="toctree-l4"><a class="reference internal" href="documentation.html#edipack2triqs.solver.EDIpackSolver.g0_w"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.g0_w</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="documentation.html#edipack2triqs.solver.EDIpackSolver.g0_an_w"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.g0_an_w</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="documentation.html#edipack2triqs.solver.EDIpackSolver.Sigma_iw"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.Sigma_iw</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="documentation.html#edipack2triqs.solver.EDIpackSolver.chi_dens_iw"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.chi_dens_iw</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="documentation.html#edipack2triqs.solver.EDIpackSolver.chi_dens_tau"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.chi_dens_tau</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="documentation.html#edipack2triqs.solver.EDIpackSolver.chi_dens_w"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.chi_dens_w</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="documentation.html#edipack2triqs.solver.EDIpackSolver.chi_exct_iw"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.chi_exct_iw</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="documentation.html#edipack2triqs.solver.EDIpackSolver.chi_exct_tau"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.chi_exct_tau</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="documentation.html#edipack2triqs.solver.EDIpackSolver.chi_exct_w"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.chi_exct_w</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="documentation.html#edipack2triqs.solver.EDIpackSolver.chi_pair_iw"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.chi_pair_iw</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="documentation.html#edipack2triqs.solver.EDIpackSolver.chi_pair_tau"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.chi_pair_tau</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="documentation.html#edipack2triqs.solver.EDIpackSolver.chi_pair_w"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.chi_pair_w</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="documentation.html#edipack2triqs.solver.EDIpackSolver.chi_spin_iw"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.chi_spin_iw</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="documentation.html#edipack2triqs.solver.EDIpackSolver.chi_spin_tau"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.chi_spin_tau</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="documentation.html#edipack2triqs.solver.EDIpackSolver.chi_spin_w"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.chi_spin_w</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="documentation.html#edipack2triqs.solver.EDIpackSolver.Sigma_an_iw"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.Sigma_an_iw</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="documentation.html#edipack2triqs.solver.EDIpackSolver.Sigma_w"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.Sigma_w</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="documentation.html#edipack2triqs.solver.EDIpackSolver.Sigma_an_w"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.Sigma_an_w</span></code></a></li>
@@ -190,6 +202,10 @@
 <ul class="simple">
 <li><p>Expose non-interacting impurity Green’s functions and hybridization functions
 via attributes of <code class="docutils literal notranslate"><span class="pre">EDIpackSolver</span></code>.</p></li>
+<li><p>Expose dynamical susceptibilities (response functions) via attributes of
+<code class="docutils literal notranslate"><span class="pre">EDIpackSolver</span></code>. The attributes are called <code class="docutils literal notranslate"><span class="pre">chi_spin_{iw,w,tau}</span></code> for the spin
+channel, <code class="docutils literal notranslate"><span class="pre">chi_dens_{iw,w,tau}</span></code> for the charge channel, <code class="docutils literal notranslate"><span class="pre">chi_pair_{iw,w,tau}</span></code>
+for the pair channel, and <code class="docutils literal notranslate"><span class="pre">chi_exct_{iw,w,tau}</span></code> for the exciton channel.</p></li>
 </ul>
 </section>
 <section id="version-0-8-0">

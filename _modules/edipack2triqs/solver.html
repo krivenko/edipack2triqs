@@ -73,6 +73,18 @@
 <li class="toctree-l4"><a class="reference internal" href="../../documentation.html#edipack2triqs.solver.EDIpackSolver.g0_w"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.g0_w</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../documentation.html#edipack2triqs.solver.EDIpackSolver.g0_an_w"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.g0_an_w</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../documentation.html#edipack2triqs.solver.EDIpackSolver.Sigma_iw"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.Sigma_iw</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../documentation.html#edipack2triqs.solver.EDIpackSolver.chi_dens_iw"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.chi_dens_iw</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../documentation.html#edipack2triqs.solver.EDIpackSolver.chi_dens_tau"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.chi_dens_tau</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../documentation.html#edipack2triqs.solver.EDIpackSolver.chi_dens_w"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.chi_dens_w</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../documentation.html#edipack2triqs.solver.EDIpackSolver.chi_exct_iw"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.chi_exct_iw</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../documentation.html#edipack2triqs.solver.EDIpackSolver.chi_exct_tau"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.chi_exct_tau</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../documentation.html#edipack2triqs.solver.EDIpackSolver.chi_exct_w"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.chi_exct_w</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../documentation.html#edipack2triqs.solver.EDIpackSolver.chi_pair_iw"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.chi_pair_iw</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../documentation.html#edipack2triqs.solver.EDIpackSolver.chi_pair_tau"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.chi_pair_tau</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../documentation.html#edipack2triqs.solver.EDIpackSolver.chi_pair_w"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.chi_pair_w</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../documentation.html#edipack2triqs.solver.EDIpackSolver.chi_spin_iw"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.chi_spin_iw</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../documentation.html#edipack2triqs.solver.EDIpackSolver.chi_spin_tau"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.chi_spin_tau</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../documentation.html#edipack2triqs.solver.EDIpackSolver.chi_spin_w"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.chi_spin_w</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../documentation.html#edipack2triqs.solver.EDIpackSolver.Sigma_an_iw"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.Sigma_an_iw</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../documentation.html#edipack2triqs.solver.EDIpackSolver.Sigma_w"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.Sigma_w</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../documentation.html#edipack2triqs.solver.EDIpackSolver.Sigma_an_w"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.Sigma_an_w</span></code></a></li>
@@ -198,7 +210,7 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">mpi4py</span><span class="w"> </span><span class="kn">import</span> <span class="n">MPI</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">triqs.operators</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">op</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">triqs.gf</span><span class="w"> </span><span class="kn">import</span> <span class="n">BlockGf</span><span class="p">,</span> <span class="n">Gf</span><span class="p">,</span> <span class="n">MeshImFreq</span><span class="p">,</span> <span class="n">MeshReFreq</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">triqs.gf</span><span class="w"> </span><span class="kn">import</span> <span class="n">BlockGf</span><span class="p">,</span> <span class="n">Gf</span><span class="p">,</span> <span class="n">MeshImFreq</span><span class="p">,</span> <span class="n">MeshReFreq</span><span class="p">,</span> <span class="n">MeshImTime</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">edipack2py</span><span class="w"> </span><span class="kn">import</span> <span class="n">global_env</span> <span class="k">as</span> <span class="n">ed</span>
 
@@ -262,12 +274,11 @@
         <span class="s2">&quot;ED_SOLVE_OFFDIAG_GF&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>   <span class="c1"># TODO</span>
         <span class="s2">&quot;ED_ALL_G&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
         <span class="s2">&quot;ED_OFFSET_BATH&quot;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>
-        <span class="c1"># TODO: Susceptibilities</span>
-        <span class="s2">&quot;LTAU&quot;</span><span class="p">:</span> <span class="mi">1000</span><span class="p">,</span>               <span class="c1"># TODO: To be set in solve()</span>
-        <span class="s2">&quot;CHISPIN_FLAG&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>      <span class="c1"># TODO: To be set in __init__()</span>
-        <span class="s2">&quot;CHIDENS_FLAG&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>      <span class="c1"># TODO: To be set in __init__()</span>
-        <span class="s2">&quot;CHIPAIR_FLAG&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>      <span class="c1"># TODO: To be set in __init__()</span>
-        <span class="s2">&quot;CHIEXCT_FLAG&quot;</span><span class="p">:</span> <span class="kc">False</span>       <span class="c1"># TODO: To be set in __init__()</span>
+        <span class="s2">&quot;LTAU&quot;</span><span class="p">:</span> <span class="mi">1000</span><span class="p">,</span>
+        <span class="s2">&quot;CHISPIN_FLAG&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="s2">&quot;CHIDENS_FLAG&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="s2">&quot;CHIPAIR_FLAG&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="s2">&quot;CHIEXCT_FLAG&quot;</span><span class="p">:</span> <span class="kc">False</span>
     <span class="p">}</span>
 
 <div class="viewcode-block" id="EDIpackSolver.__init__">
@@ -654,7 +665,12 @@
               <span class="n">n_iw</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">4096</span><span class="p">,</span>
               <span class="n">energy_window</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="o">-</span><span class="mf">5.0</span><span class="p">,</span> <span class="mf">5.0</span><span class="p">),</span>
               <span class="n">n_w</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">5000</span><span class="p">,</span>
-              <span class="n">broadening</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.01</span><span class="p">):</span>
+              <span class="n">broadening</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.01</span><span class="p">,</span>
+              <span class="n">n_tau</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1024</span><span class="p">,</span>
+              <span class="n">chi_spin</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+              <span class="n">chi_dens</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+              <span class="n">chi_exct</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+              <span class="n">chi_pair</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Solve the impurity problem and calculate the observables, Green&#39;s</span>
 <span class="sd">        function and self-energy.</span>
@@ -666,21 +682,38 @@
 <span class="sd">            frequencies used as a mesh for the Green&#39;s functions.</span>
 <span class="sd">        :type beta: float, default=1000</span>
 
-<span class="sd">        :param n_iw: Number of Matsubara frequencies for impurity GF</span>
-<span class="sd">            calculations.</span>
+<span class="sd">        :param n_iw: Number of Matsubara frequencies for impurity GF and</span>
+<span class="sd">            response function calculations.</span>
 <span class="sd">        :type n_iw: int, default=4096</span>
 
-<span class="sd">        :param energy_window: Energy window for real-frequency impurity GF</span>
-<span class="sd">            calculations.</span>
+<span class="sd">        :param energy_window: Energy window for real-frequency impurity GF and</span>
+<span class="sd">            response function calculations.</span>
 <span class="sd">        :type energy_window: tuple[float, float], default=(-5.0, 5.0)</span>
 
-<span class="sd">        :param n_w: Number of real-frequency points for impurity GF</span>
-<span class="sd">            calculations.</span>
+<span class="sd">        :param n_w: Number of real-frequency points for impurity GF and</span>
+<span class="sd">            response function calculations.</span>
 <span class="sd">        :type n_w: int, default=5000</span>
 
 <span class="sd">        :param broadening: Broadening (imaginary shift away from the</span>
-<span class="sd">            real-frequency axis) for real-frequency impurity GF calculations.</span>
+<span class="sd">            real-frequency axis) for real-frequency impurity GF and</span>
+<span class="sd">            response function calculations.</span>
 <span class="sd">        :type broadening: float, default=0.01</span>
+
+<span class="sd">        :param n_tau: Number of imaginary time points for calculations of</span>
+<span class="sd">                      impurity response functions.</span>
+<span class="sd">        :type n_tau: int, default=1024</span>
+
+<span class="sd">        :param chi_spin: Compute spin response functions.</span>
+<span class="sd">        :type chi_spin: bool, default=False</span>
+
+<span class="sd">        :param chi_dens: Compute density response functions.</span>
+<span class="sd">        :type chi_dens: bool, default=False</span>
+
+<span class="sd">        :param chi_pair: Compute pairing response functions.</span>
+<span class="sd">        :type chi_pair: bool, default=False</span>
+
+<span class="sd">        :param chi_exct: Compute exciton response functions.</span>
+<span class="sd">        :type chi_exct:  bool, default=False</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">ed</span><span class="o">.</span><span class="n">beta</span> <span class="o">=</span> <span class="n">beta</span>
@@ -688,6 +721,7 @@
         <span class="n">ed</span><span class="o">.</span><span class="n">wini</span><span class="p">,</span> <span class="n">ed</span><span class="o">.</span><span class="n">wfin</span> <span class="o">=</span> <span class="n">energy_window</span>
         <span class="n">ed</span><span class="o">.</span><span class="n">Lreal</span> <span class="o">=</span> <span class="n">n_w</span>
         <span class="n">ed</span><span class="o">.</span><span class="n">eps</span> <span class="o">=</span> <span class="n">broadening</span>
+        <span class="n">ed</span><span class="o">.</span><span class="n">Ltau</span> <span class="o">=</span> <span class="n">n_tau</span>
 
         <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nspin</span> <span class="o">==</span> <span class="mi">2</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">h_params</span><span class="o">.</span><span class="n">ed_mode</span> <span class="o">==</span> <span class="s2">&quot;normal&quot;</span><span class="p">)</span> <span class="ow">and</span> \
                 <span class="p">(</span><span class="ow">not</span> <span class="n">is_spin_diagonal</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">h_params</span><span class="o">.</span><span class="n">Hloc</span><span class="p">)):</span>
@@ -699,6 +733,16 @@
             <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
                 <span class="s2">&quot;Cannot add non-density-density terms to the interaction&quot;</span>
             <span class="p">)</span>
+
+        <span class="k">if</span> <span class="p">(</span><span class="kc">True</span> <span class="ow">in</span> <span class="p">(</span><span class="n">chi_spin</span><span class="p">,</span> <span class="n">chi_dens</span><span class="p">,</span> <span class="n">chi_exct</span><span class="p">,</span> <span class="n">chi_pair</span><span class="p">))</span> <span class="ow">and</span> \
+                <span class="n">ed</span><span class="o">.</span><span class="n">get_ed_mode</span><span class="p">()</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>   <span class="c1"># normal</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+                <span class="s2">&quot;Response functions are only available in the normal ED mode&quot;</span>
+            <span class="p">)</span>
+        <span class="n">ed</span><span class="o">.</span><span class="n">chispin_flag</span> <span class="o">=</span> <span class="n">chi_spin</span>
+        <span class="n">ed</span><span class="o">.</span><span class="n">chidens_flag</span> <span class="o">=</span> <span class="n">chi_dens</span>
+        <span class="n">ed</span><span class="o">.</span><span class="n">chipair_flag</span> <span class="o">=</span> <span class="n">chi_pair</span>
+        <span class="n">ed</span><span class="o">.</span><span class="n">chiexct_flag</span> <span class="o">=</span> <span class="n">chi_exct</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">comm</span><span class="o">.</span><span class="n">barrier</span><span class="p">()</span>
         <span class="k">with</span> <span class="n">chdircontext</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">wdname</span><span class="p">):</span>
@@ -896,9 +940,6 @@
         <span class="s2">&quot;Anomalous real-frequency impurity self-energy.&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_make_gf</span><span class="p">(</span><span class="n">ed</span><span class="o">.</span><span class="n">build_sigma</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
 
-    <span class="c1"># Bath fitting</span>
-    <span class="n">chi2_fit_bath</span> <span class="o">=</span> <span class="n">_chi2_fit_bath</span>
-
     <span class="c1">#</span>
     <span class="c1"># Hybridization function</span>
     <span class="c1">#</span>
@@ -929,8 +970,67 @@
         <span class="s2">&quot;Anomalous real-frequency hybridization function&quot;</span>
         <span class="k">def</span><span class="w"> </span><span class="nf">ed_func</span><span class="p">(</span><span class="n">z_vals</span><span class="p">,</span> <span class="n">typ</span><span class="p">):</span>
             <span class="k">return</span> <span class="n">ed</span><span class="o">.</span><span class="n">get_delta</span><span class="p">(</span><span class="n">z_vals</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">bath</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">typ</span><span class="o">=</span><span class="n">typ</span><span class="p">)</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_make_gf</span><span class="p">(</span><span class="n">ed_func</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_make_gf</span><span class="p">(</span><span class="n">ed_func</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
 
+    <span class="c1">#</span>
+    <span class="c1"># Response functions</span>
+    <span class="c1">#</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_make_chi</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">chan</span><span class="p">,</span> <span class="n">axis</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Gf</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">ed</span><span class="o">.</span><span class="n">get_ed_mode</span><span class="p">()</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>  <span class="c1"># normal</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+                <span class="s2">&quot;Response functions are only available in the normal ED mode&quot;</span>
+            <span class="p">)</span>
+
+        <span class="k">match</span> <span class="n">axis</span><span class="p">:</span>
+            <span class="k">case</span> <span class="s2">&quot;m&quot;</span><span class="p">:</span>
+                <span class="n">mesh</span> <span class="o">=</span> <span class="n">MeshImFreq</span><span class="p">(</span><span class="n">beta</span><span class="o">=</span><span class="n">ed</span><span class="o">.</span><span class="n">beta</span><span class="p">,</span> <span class="n">S</span><span class="o">=</span><span class="s2">&quot;Boson&quot;</span><span class="p">,</span> <span class="n">n_iw</span><span class="o">=</span><span class="n">ed</span><span class="o">.</span><span class="n">Lmats</span><span class="p">)</span>
+                <span class="n">z_vals</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">([</span><span class="nb">complex</span><span class="p">(</span><span class="n">z</span><span class="p">)</span> <span class="k">for</span> <span class="n">z</span> <span class="ow">in</span> <span class="n">mesh</span><span class="p">])</span>
+            <span class="k">case</span> <span class="s2">&quot;r&quot;</span><span class="p">:</span>
+                <span class="n">mesh</span> <span class="o">=</span> <span class="n">MeshReFreq</span><span class="p">(</span><span class="n">window</span><span class="o">=</span><span class="p">(</span><span class="n">ed</span><span class="o">.</span><span class="n">wini</span><span class="p">,</span> <span class="n">ed</span><span class="o">.</span><span class="n">wfin</span><span class="p">),</span> <span class="n">n_w</span><span class="o">=</span><span class="n">ed</span><span class="o">.</span><span class="n">Lreal</span><span class="p">)</span>
+                <span class="n">z_vals</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">([</span><span class="nb">complex</span><span class="p">(</span><span class="n">z</span><span class="p">)</span> <span class="o">+</span> <span class="n">ed</span><span class="o">.</span><span class="n">eps</span> <span class="o">*</span> <span class="mi">1</span><span class="n">j</span> <span class="k">for</span> <span class="n">z</span> <span class="ow">in</span> <span class="n">mesh</span><span class="p">])</span>
+            <span class="k">case</span> <span class="s2">&quot;t&quot;</span><span class="p">:</span>
+                <span class="n">mesh</span> <span class="o">=</span> <span class="n">MeshImTime</span><span class="p">(</span><span class="n">beta</span><span class="o">=</span><span class="n">ed</span><span class="o">.</span><span class="n">beta</span><span class="p">,</span> <span class="n">S</span><span class="o">=</span><span class="s2">&quot;Boson&quot;</span><span class="p">,</span> <span class="n">n_tau</span><span class="o">=</span><span class="n">ed</span><span class="o">.</span><span class="n">Ltau</span><span class="p">)</span>
+                <span class="n">z_vals</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">([</span><span class="nb">complex</span><span class="p">(</span><span class="n">z</span><span class="p">)</span> <span class="k">for</span> <span class="n">z</span> <span class="ow">in</span> <span class="n">mesh</span><span class="p">])</span>
+            <span class="k">case</span><span class="w"> </span><span class="k">_</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">AssertionError</span><span class="p">(</span><span class="s2">&quot;Unexpected axis&quot;</span><span class="p">)</span>
+
+        <span class="n">target_shape</span> <span class="o">=</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">norb</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">norb</span><span class="p">)</span> <span class="k">if</span> <span class="n">chan</span> <span class="o">==</span> <span class="s2">&quot;exct&quot;</span> <span class="k">else</span> \
+                       <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">norb</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">norb</span><span class="p">)</span>
+
+        <span class="k">with</span> <span class="n">chdircontext</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">wdname</span><span class="p">):</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="n">ed</span><span class="o">.</span><span class="n">get_chi</span><span class="p">(</span><span class="n">chan</span><span class="o">=</span><span class="n">chan</span><span class="p">,</span> <span class="n">zeta</span><span class="o">=</span><span class="n">z_vals</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="n">axis</span><span class="p">)</span>
+
+        <span class="n">chi</span> <span class="o">=</span> <span class="n">Gf</span><span class="p">(</span><span class="n">mesh</span><span class="o">=</span><span class="n">mesh</span><span class="p">,</span> <span class="n">target_shape</span><span class="o">=</span><span class="n">target_shape</span><span class="p">)</span>
+        <span class="n">chi</span><span class="o">.</span><span class="n">data</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">rollaxis</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">chi</span>
+
+    <span class="c1">#</span>
+    <span class="c1"># Bath fitting</span>
+    <span class="c1">#</span>
+
+    <span class="n">chi2_fit_bath</span> <span class="o">=</span> <span class="n">_chi2_fit_bath</span></div>
+
+
+
+<span class="c1"># Add response function properties to EDIpackSolver</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_make_chi_property</span><span class="p">(</span><span class="n">chan</span><span class="p">,</span> <span class="n">chan_name</span><span class="p">,</span> <span class="n">axis</span><span class="p">,</span> <span class="n">axis_name</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">getter</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Gf</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_make_chi</span><span class="p">(</span><span class="n">chan</span><span class="p">,</span> <span class="n">axis</span><span class="p">)</span>
+    <span class="n">docstring</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">axis_name</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">chan_name</span><span class="si">}</span><span class="s2"> response function&quot;</span>
+    <span class="k">return</span> <span class="nb">property</span><span class="p">(</span><span class="n">fget</span><span class="o">=</span><span class="n">getter</span><span class="p">,</span> <span class="n">doc</span><span class="o">=</span><span class="n">docstring</span><span class="p">)</span>
+
+
+<span class="k">for</span> <span class="n">chan</span><span class="p">,</span> <span class="n">chan_name</span> <span class="ow">in</span> <span class="p">[(</span><span class="s2">&quot;spin&quot;</span><span class="p">,</span> <span class="s2">&quot;spin&quot;</span><span class="p">),</span>
+                        <span class="p">(</span><span class="s2">&quot;dens&quot;</span><span class="p">,</span> <span class="s2">&quot;density&quot;</span><span class="p">),</span>
+                        <span class="p">(</span><span class="s2">&quot;pair&quot;</span><span class="p">,</span> <span class="s2">&quot;pairing&quot;</span><span class="p">),</span>
+                        <span class="p">(</span><span class="s2">&quot;exct&quot;</span><span class="p">,</span> <span class="s2">&quot;exciton&quot;</span><span class="p">)]:</span>
+    <span class="k">for</span> <span class="n">axis</span><span class="p">,</span> <span class="n">axis_name</span><span class="p">,</span> <span class="n">axis_suffix</span> <span class="ow">in</span> <span class="p">[(</span><span class="s2">&quot;m&quot;</span><span class="p">,</span> <span class="s2">&quot;Matsubara&quot;</span><span class="p">,</span> <span class="s2">&quot;iw&quot;</span><span class="p">),</span>
+                                         <span class="p">(</span><span class="s2">&quot;r&quot;</span><span class="p">,</span> <span class="s2">&quot;Real-frequency&quot;</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">),</span>
+                                         <span class="p">(</span><span class="s2">&quot;t&quot;</span><span class="p">,</span> <span class="s2">&quot;Imaginary time&quot;</span><span class="p">,</span> <span class="s2">&quot;tau&quot;</span><span class="p">)]:</span>
+        <span class="nb">setattr</span><span class="p">(</span><span class="n">EDIpackSolver</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;chi_</span><span class="si">{</span><span class="n">chan</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">axis_suffix</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+                <span class="n">_make_chi_property</span><span class="p">(</span><span class="n">chan</span><span class="p">,</span> <span class="n">chan_name</span><span class="p">,</span> <span class="n">axis</span><span class="p">,</span> <span class="n">axis_name</span><span class="p">))</span>
 </pre></div>
 
            </div>
