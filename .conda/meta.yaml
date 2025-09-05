@@ -33,5 +33,5 @@ requirements:
     - numpy
     - mpi4py
     - networkx
-    - edipack::edipack>=5.3.0
+    - edipack::edipack>=5.4.1
     - conda-forge::triqs>=3.1.0
