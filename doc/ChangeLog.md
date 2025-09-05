@@ -6,6 +6,10 @@
 
 * Expose non-interacting impurity Green's functions and hybridization functions
   via attributes of `EDIpackSolver`.
+* Expose dynamical susceptibilities (response functions) via attributes of
+  `EDIpackSolver`. The attributes are called `chi_spin_{iw,w,tau}` for the spin
+  channel, `chi_dens_{iw,w,tau}` for the charge channel, `chi_pair_{iw,w,tau}`
+  for the pair channel, and `chi_exct_{iw,w,tau}` for the exciton channel.
 
 ## Version 0.8.0
 
