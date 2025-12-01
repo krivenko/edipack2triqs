@@ -398,12 +398,12 @@ class EDIpackSolver:
             ed.init_solver(bath=np.array((), dtype=float))
 
         # GF block names
-        if ed.get_ed_mode() in (1, 2):  # normal or superc
+        if ed.get_ed_mode() in (int(EDMode.NORMAL), int(EDMode.SUPERC)):
             self.gf_block_names = (block_names_up[0], block_names_dn[0])
         else:
             self.gf_block_names = (block_names_up[0],)
 
-        if ed.get_ed_mode() == 2:  # superc
+        if ed.get_ed_mode() == int(EDMode.SUPERC):
             self.gf_an_block_names = (block_names_up[0]
                                       + "_" + block_names_dn[0],)
 
@@ -543,7 +543,7 @@ class EDIpackSolver:
             )
 
         if (True in (chi_spin, chi_dens, chi_exct, chi_pair)) and \
-                ed.get_ed_mode() != 1:   # normal
+                ed.get_ed_mode() != int(EDMode.NORMAL):
             raise RuntimeError(
                 "Response functions are only available in the normal ED mode"
             )
@@ -622,7 +622,7 @@ class EDIpackSolver:
 
     def _make_gf(self, ed_func, real_freq, anomalous) -> BlockGf:
         if anomalous:
-            if ed.get_ed_mode() != 2:  # superc
+            if ed.get_ed_mode() != int(EDMode.SUPERC):
                 raise RuntimeError("anomalous = True is only supported for "
                                    "superconducting bath")
 
@@ -643,7 +643,8 @@ class EDIpackSolver:
                            block_list=[F],
                            make_copies=False)
 
-        if ed.get_ed_mode() in (1, 2):  # 2 spin blocks
+        if ed.get_ed_mode() in (int(EDMode.NORMAL), int(EDMode.SUPERC)):
+            # 2 spin blocks
             blocks = [
                 Gf(mesh=mesh, target_shape=(self.norb, self.norb))
                 for _ in range(2)
@@ -784,7 +785,7 @@ class EDIpackSolver:
     #
 
     def _make_chi(self, chan, axis) -> Gf:
-        if ed.get_ed_mode() != 1:  # normal
+        if ed.get_ed_mode() != int(EDMode.NORMAL):
             raise RuntimeError(
                 "Response functions are only available in the normal ED mode"
             )

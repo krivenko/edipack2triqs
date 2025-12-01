@@ -15,3 +15,7 @@ class EDMode(Enum):
     """
     Broken SU(2) symmetry
     """
+
+    def __int__(self):
+        "Integer IDs used by EDIpack"
+        return {self.NORMAL: 1, self.SUPERC: 2, self.NONSU2: 3}[self]
