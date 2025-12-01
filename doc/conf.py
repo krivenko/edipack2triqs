@@ -27,7 +27,8 @@ extensions = ['sphinx.ext.autodoc',
               'nbsphinx',
               'myst_parser',
               'matplotlib.sphinxext.plot_directive',
-              'sphinxfortran_ng.fortran_domain'
+              'sphinxfortran_ng.fortran_domain',
+              'enum_tools.autoenum'
               ]
 
 myst_enable_extensions = [
@@ -45,7 +46,7 @@ myst_enable_extensions = [
 ]
 
 project = 'edipack2triqs'
-version = '0.9.0'
+version = '0.10.0'
 copyright = '2024-2025, Igor Krivenko, Lorenzo Crippa'
 
 source_suffix = '.rst'

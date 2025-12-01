@@ -95,7 +95,7 @@ jobs:
       run: >
            pip install
            sphinx sphinx-rtd-theme sphinxfortran-ng
-           myst-parser nbsphinx linkify-it-py
+           myst-parser nbsphinx linkify-it-py enum-tools[sphinx]
 
     - name: Build documentation
       if: env.DEPLOY_DOCS == 'true'

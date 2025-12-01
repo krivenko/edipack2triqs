@@ -11,6 +11,7 @@ import networkx as nx
 
 from h5.formats import register_class
 
+from . import EDMode
 from .util import is_diagonal, is_spin_diagonal
 
 
@@ -115,7 +116,7 @@ class BathNormal(Bath):
     """
     Local super-conducting order parameters of the bath as an array
     of the shape ``(nspin, norb, nbath)``. Only present when ``ed_mode ==
-    "superc"``.
+    EDMode.SUPERC``.
     """
     V: np.ndarray
     """
@@ -126,11 +127,11 @@ class BathNormal(Bath):
     """
     Spin off-diagonal hopping amplitudes between the impurity and the bath
     as an array of the shape ``(nspin, norb, nbath)``. Only present when
-    ``ed_mode == "nonsu2"``.
+    ``ed_mode == EDMode.NONSU2``.
     """
 
     def __init__(self,
-                 ed_mode: str,
+                 ed_mode: EDMode,
                  nspin: int,
                  norb: int,
                  nbath: int,
@@ -140,7 +141,7 @@ class BathNormal(Bath):
         size = nspin * norb * nbath
 
         # EDIpack-compatible bath parameter array
-        data_size = size * (2 if ed_mode == "normal" else 3)
+        data_size = size * (2 if ed_mode == EDMode.NORMAL else 3)
         if data is None:
             self.data = np.zeros(data_size, dtype=float)
         else:
@@ -154,21 +155,21 @@ class BathNormal(Bath):
         self.eps = self.data[:size].reshape(params_shape)
         assert self.eps.base is self.data
 
-        if ed_mode == "nonsu2":
+        if ed_mode == EDMode.NONSU2:
             # View: Same-spin hopping amplitudes
             self.V = self.data[size:2 * size].reshape(params_shape)
             assert self.V.base is self.data
             # View: Spin-flip hopping amplitudes
             self.U = self.data[2 * size:].reshape(params_shape)
             assert self.U.base is self.data
-        elif ed_mode == "superc":
+        elif ed_mode == EDMode.SUPERC:
             # View: Local SC order parameters of the bath
             self.Delta = self.data[size:2 * size].reshape(params_shape)
             assert self.Delta.base is self.data
             # View: Same-spin hopping amplitudes
             self.V = self.data[2 * size:].reshape(params_shape)
             assert self.V.base is self.data
-        elif ed_mode == "normal":
+        elif ed_mode == EDMode.NORMAL:
             # View: Same-spin hopping amplitudes
             self.V = self.data[size:2 * size].reshape(params_shape)
             assert self.V.base is self.data
@@ -176,17 +177,16 @@ class BathNormal(Bath):
             raise RuntimeError("Unknown ED mode")
 
     @property
-    def ed_mode(self):
+    def ed_mode(self) -> EDMode:
         """
-        ED mode this bath object is usable with, one of *"normal"*, *"nonsu2"*
-        and *"superc"*.
+        ED mode this bath object is usable with.
         """
         if hasattr(self, "U"):
-            return "nonsu2"
+            return EDMode.NONSU2
         elif hasattr(self, "Delta"):
-            return "superc"
+            return EDMode.SUPERC
         else:
-            return "normal"
+            return EDMode.NORMAL
 
     def __deepcopy__(self, memo):
         nspin, norb, nbath = self.V.shape
@@ -194,7 +194,7 @@ class BathNormal(Bath):
 
     def __reduce_to_dict__(self):
         "HDFArchive serialization"
-        return {"ed_mode": self.ed_mode,
+        return {"ed_mode": self.ed_mode.value,
                 "nspin": self.V.shape[0],
                 "norb": self.V.shape[1],
                 "nbath": self.V.shape[2],
@@ -204,7 +204,7 @@ class BathNormal(Bath):
     def __factory_from_dict__(cls, name, d):
         "HDFArchive deserialization"
         return BathNormal(
-            d["ed_mode"], d["nspin"], d["norb"], d["nbath"], d["data"]
+            EDMode(d["ed_mode"]), d["nspin"], d["norb"], d["nbath"], d["data"]
         )
 
     @classmethod
@@ -236,7 +236,7 @@ class BathNormal(Bath):
 
     @classmethod
     def from_hamiltonian(cls,
-                         ed_mode: str,
+                         ed_mode: EDMode,
                          nspin: int,
                          Hloc: np.ndarray,
                          h: np.ndarray,
@@ -268,12 +268,12 @@ class BathNormal(Bath):
                         bath.eps[spin1, orb, nu] = np.real_if_close(
                             h[spin1, spin2, b, b]
                         )
-                        if ed_mode == "superc":
+                        if ed_mode == EDMode.SUPERC:
                             bath.Delta[spin1, orb, nu] = np.real_if_close(
                                 Delta[b, b]
                             )
                         bath.V[spin1, orb, nu] = V[spin1, spin2, orb, b]
-                    elif ed_mode == "nonsu2":
+                    elif ed_mode == EDMode.NONSU2:
                         bath.U[spin1, orb, nu] = V[spin1, spin2, orb, b]
 
         return bath
@@ -306,7 +306,8 @@ class BathHybrid(Bath):
     Delta: Optional[np.ndarray]
     """
     Local super-conducting order parameters of the bath as an array
-    of the shape ``(nspin, nbath)``. Only present when ``ed_mode == "superc"``.
+    of the shape ``(nspin, nbath)``. Only present when
+    ``ed_mode == EDMode.SUPERC``.
     """
     V: np.ndarray
     """
@@ -317,11 +318,11 @@ class BathHybrid(Bath):
     """
     Spin off-diagonal hopping amplitudes between the impurity and the bath
     as an array of the shape ``(nspin, norb, nbath)``. Only present when
-    ``ed_mode == "nonsu2"``.
+    ``ed_mode == EDMode.NONSU2``.
     """
 
     def __init__(self,
-                 ed_mode: str,
+                 ed_mode: EDMode,
                  nspin: int,
                  norb: int,
                  nbath: int,
@@ -332,9 +333,9 @@ class BathHybrid(Bath):
         size = eps_size * norb
 
         # EDIpack-compatible bath parameter array
-        data_size = {"normal": eps_size + size,
-                     "superc": 2 * eps_size + size,
-                     "nonsu2": eps_size + 2 * size}[ed_mode]
+        data_size = {EDMode.NORMAL: eps_size + size,
+                     EDMode.SUPERC: 2 * eps_size + size,
+                     EDMode.NONSU2: eps_size + 2 * size}[ed_mode]
         if data is None:
             self.data = np.zeros(data_size, dtype=float)
         else:
@@ -349,21 +350,21 @@ class BathHybrid(Bath):
         self.eps = self.data[:eps_size].reshape(eps_shape)
         assert self.eps.base is self.data
 
-        if ed_mode == "nonsu2":
+        if ed_mode == EDMode.NONSU2:
             # View: Same-spin hopping amplitudes
             self.V = self.data[eps_size:eps_size + size].reshape(shape)
             assert self.V.base is self.data
             # View: Spin-flip hopping amplitudes
             self.U = self.data[eps_size + size:].reshape(shape)
             assert self.U.base is self.data
-        elif ed_mode == "superc":
+        elif ed_mode == EDMode.SUPERC:
             # View: Local SC order parameters of the bath
             self.Delta = self.data[eps_size:2 * eps_size].reshape(eps_shape)
             assert self.Delta.base is self.data
             # View: Same-spin hopping amplitudes
             self.V = self.data[2 * eps_size:].reshape(shape)
             assert self.V.base is self.data
-        elif ed_mode == "normal":
+        elif ed_mode == EDMode.NORMAL:
             # View: Same-spin hopping amplitudes
             self.V = self.data[eps_size:].reshape(shape)
             assert self.V.base is self.data
@@ -371,17 +372,16 @@ class BathHybrid(Bath):
             raise RuntimeError("Unknown ED mode")
 
     @property
-    def ed_mode(self):
+    def ed_mode(self) -> EDMode:
         """
-        ED mode this bath object is usable with, one of *"normal"*, *"nonsu2"*
-        and *"superc"*.
+        ED mode this bath object is usable with.
         """
         if hasattr(self, "U"):
-            return "nonsu2"
+            return EDMode.NONSU2
         elif hasattr(self, "Delta"):
-            return "superc"
+            return EDMode.SUPERC
         else:
-            return "normal"
+            return EDMode.NORMAL
 
     def __deepcopy__(self, memo):
         nspin, norb, nbath = self.V.shape
@@ -389,7 +389,7 @@ class BathHybrid(Bath):
 
     def __reduce_to_dict__(self):
         "HDFArchive serialization"
-        return {"ed_mode": self.ed_mode,
+        return {"ed_mode": self.ed_mode.value,
                 "nspin": self.V.shape[0],
                 "norb": self.V.shape[1],
                 "nbath": self.V.shape[2],
@@ -399,7 +399,7 @@ class BathHybrid(Bath):
     def __factory_from_dict__(cls, name, d):
         "HDFArchive deserialization"
         return BathHybrid(
-            d["ed_mode"], d["nspin"], d["norb"], d["nbath"], d["data"]
+            EDMode(d["ed_mode"]), d["nspin"], d["norb"], d["nbath"], d["data"]
         )
 
     @classmethod
@@ -413,7 +413,7 @@ class BathHybrid(Bath):
 
     @classmethod
     def from_hamiltonian(cls,
-                         ed_mode: str,
+                         ed_mode: EDMode,
                          nspin: int,
                          Hloc: np.ndarray,
                          h: np.ndarray,
@@ -429,10 +429,10 @@ class BathHybrid(Bath):
                                         range(nbath)):
             if spin1 == spin2:
                 bath.eps[spin1, nu] = np.real_if_close(h[spin1, spin2, nu, nu])
-                if ed_mode == "superc":
+                if ed_mode == EDMode.SUPERC:
                     bath.Delta[spin1, nu] = np.real_if_close(Delta[nu, nu])
                 bath.V[spin1, :, nu] = V[spin1, spin2, :, nu]
-            elif ed_mode == "nonsu2":
+            elif ed_mode == EDMode.NONSU2:
                 bath.U[spin1, :, nu] = V[spin1, spin2, :, nu]
 
         return bath
@@ -807,7 +807,7 @@ class BathGeneral(Bath):
 
     @classmethod
     def from_hamiltonian(cls,
-                         ed_mode: str,
+                         ed_mode: EDMode,
                          nspin: int,
                          Hloc: np.ndarray,
                          h: np.ndarray,

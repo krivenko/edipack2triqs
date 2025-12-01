@@ -12,6 +12,7 @@ from triqs.gf import BlockGf, MeshImFreq
 
 from edipack2py import global_env as ed
 
+from . import EDMode
 from .util import chdircontext
 
 
@@ -145,7 +146,7 @@ def _chi2_fit_bath(self, g: BlockGf, f: Optional[BlockGf] = None):
             "Cannot use bath parameter fitting in the no-bath mode"
         )
 
-    if (ed.get_ed_mode() == 2) != (f is not None):
+    if (ed.get_ed_mode() == int(EDMode.SUPERC)) != (f is not None):
         raise RuntimeError(
             "The anomalous GF is required iff the bath is superconducting"
         )
@@ -162,7 +163,7 @@ def _chi2_fit_bath(self, g: BlockGf, f: Optional[BlockGf] = None):
         ed.beta = g.mesh.beta
         ed.Lmats = len(g.mesh) // 2
 
-        if ed.get_ed_mode() == 1:  # Normal, here nspin is important
+        if ed.get_ed_mode() == int(EDMode.NORMAL):  # Here nspin is important
             assert set(g.indices) == set(self.gf_block_names), \
                 "Unexpected block structure of 'g'"
 
@@ -177,7 +178,7 @@ def _chi2_fit_bath(self, g: BlockGf, f: Optional[BlockGf] = None):
                 )
                 bath_fit.data[:] = ed.chi2_fitgf(func, bath_fit.data, ispin=1)
 
-        elif ed.get_ed_mode() == 2:  # superc, here nspin is 1
+        elif ed.get_ed_mode() == int(EDMode.SUPERC):  # Here nspin is 1
             assert set(f.indices) == set(self.gf_an_block_names), \
                 "Unexpected block structure of 'f'"
             assert isinstance(f.mesh, MeshImFreq), \
@@ -189,7 +190,7 @@ def _chi2_fit_bath(self, g: BlockGf, f: Optional[BlockGf] = None):
             func_an = extract_triqs_data(f[self.gf_an_block_names[0]].data)
             bath_fit.data[:] = ed.chi2_fitgf(func_up, func_an, bath_fit.data)
 
-        elif ed.get_ed_mode() == 3:  # nonsu2, here nspin is 2
+        elif ed.get_ed_mode() == int(EDMode.NONSU2):  # Here nspin is 2
             func = extract_triqs_data(g[self.gf_block_names[0]].data)
             bath_fit.data[:] = ed.chi2_fitgf(func, bath_fit.data)
 
@@ -210,7 +211,7 @@ def _chi2_fit_bath(self, g: BlockGf, f: Optional[BlockGf] = None):
         return np.transpose(d, (2, 0, 1))
 
     with chdircontext(self.wdname):
-        if ed.get_ed_mode() == 1:  # normal
+        if ed.get_ed_mode() == int(EDMode.NORMAL):
             out = get_method(z_vals, bath_fit.data, ishape=5, typ='n')
             g_out[self.gf_block_names[0]].data[:] = \
                 pack_triqs_data(out[0, 0, ...])
@@ -219,7 +220,7 @@ def _chi2_fit_bath(self, g: BlockGf, f: Optional[BlockGf] = None):
                                 else out[1, 1, ...])
             return bath_fit, g_out
 
-        elif ed.get_ed_mode() == 2:  # superc
+        elif ed.get_ed_mode() == int(EDMode.SUPERC):
             out = get_method(z_vals, bath_fit.data, ishape=5, typ='n')
             for bn in self.gf_block_names:
                 g_out[bn].data[:] = pack_triqs_data(out[0, 0, ...])

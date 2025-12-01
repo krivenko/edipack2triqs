@@ -12,6 +12,7 @@ import triqs.operators as op
 from triqs.operators.util.hamiltonians import h_int_kanamori
 from h5 import HDFArchive
 
+from edipack2triqs import EDMode
 from edipack2triqs.hamiltonian import parse_hamiltonian
 from edipack2triqs.bath import BathNormal, BathHybrid, BathGeneral
 
@@ -184,7 +185,7 @@ class TestHamiltonianBathNormal(TestHamiltonian):
             self.fops_bath_up, self.fops_bath_dn
         )
 
-        self.assertEqual(params.ed_mode, "normal")
+        self.assertEqual(params.ed_mode, EDMode.NORMAL)
         assert_allclose(params.Hloc, self.h_loc.reshape((1, 1, 3, 3)))
         b = params.bath
         self.assertTrue(isinstance(b, BathNormal))
@@ -227,7 +228,7 @@ class TestHamiltonianBathNormal(TestHamiltonian):
             self.fops_bath_up, self.fops_bath_dn
         )
 
-        self.assertEqual(params.ed_mode, "normal")
+        self.assertEqual(params.ed_mode, EDMode.NORMAL)
         assert_allclose(params.Hloc, mul.outer(sz, self.h_loc))
         b = params.bath
         self.assertTrue(isinstance(b, BathNormal))
@@ -275,7 +276,7 @@ class TestHamiltonianBathNormal(TestHamiltonian):
             self.fops_bath_up, self.fops_bath_dn
         )
 
-        self.assertEqual(params.ed_mode, "nonsu2")
+        self.assertEqual(params.ed_mode, EDMode.NONSU2)
         assert_allclose(params.Hloc, mul.outer(sz + 0.2 * sx, self.h_loc))
         b = params.bath
         self.assertTrue(isinstance(b, BathNormal))
@@ -323,7 +324,7 @@ class TestHamiltonianBathNormal(TestHamiltonian):
             self.fops_bath_up, self.fops_bath_dn
         )
 
-        self.assertEqual(params.ed_mode, "nonsu2")
+        self.assertEqual(params.ed_mode, EDMode.NONSU2)
         assert_allclose(params.Hloc, mul.outer(s0, self.h_loc))
         b = params.bath
         self.assertTrue(isinstance(b, BathNormal))
@@ -382,7 +383,7 @@ class TestHamiltonianBathNormal(TestHamiltonian):
             self.fops_bath_up, self.fops_bath_dn
         )
 
-        self.assertEqual(params.ed_mode, "superc")
+        self.assertEqual(params.ed_mode, EDMode.SUPERC)
         assert_allclose(params.Hloc, self.h_loc.reshape(1, 1, 3, 3))
         b = params.bath
         self.assertTrue(isinstance(b, BathNormal))
@@ -489,7 +490,7 @@ class TestHamiltonianBathHybrid(TestHamiltonian):
             self.fops_bath_up, self.fops_bath_dn
         )
 
-        self.assertEqual(params.ed_mode, "normal")
+        self.assertEqual(params.ed_mode, EDMode.NORMAL)
         assert_allclose(params.Hloc, self.h_loc.reshape((1, 1, 3, 3)))
         self.assertTrue(isinstance(params.bath, BathHybrid))
         self.assertEqual(params.bath.nbath, 4)
@@ -521,7 +522,7 @@ class TestHamiltonianBathHybrid(TestHamiltonian):
             self.fops_bath_up, self.fops_bath_dn
         )
 
-        self.assertEqual(params.ed_mode, "normal")
+        self.assertEqual(params.ed_mode, EDMode.NORMAL)
         assert_allclose(params.Hloc, mul.outer(sz, self.h_loc))
         self.assertTrue(isinstance(params.bath, BathHybrid))
         self.assertEqual(params.bath.nbath, 4)
@@ -555,7 +556,7 @@ class TestHamiltonianBathHybrid(TestHamiltonian):
             self.fops_bath_up, self.fops_bath_dn
         )
 
-        self.assertEqual(params.ed_mode, "nonsu2")
+        self.assertEqual(params.ed_mode, EDMode.NONSU2)
         assert_allclose(params.Hloc, mul.outer(sz + 0.2 * sx, self.h_loc))
         self.assertTrue(isinstance(params.bath, BathHybrid))
         self.assertEqual(params.bath.nbath, 4)
@@ -589,7 +590,7 @@ class TestHamiltonianBathHybrid(TestHamiltonian):
             self.fops_bath_up, self.fops_bath_dn
         )
 
-        self.assertEqual(params.ed_mode, "nonsu2")
+        self.assertEqual(params.ed_mode, EDMode.NONSU2)
         assert_allclose(params.Hloc, mul.outer(s0, self.h_loc))
         self.assertTrue(isinstance(params.bath, BathHybrid))
         self.assertEqual(params.bath.nbath, 4)
@@ -627,7 +628,7 @@ class TestHamiltonianBathHybrid(TestHamiltonian):
             self.fops_bath_up, self.fops_bath_dn
         )
 
-        self.assertEqual(params.ed_mode, "superc")
+        self.assertEqual(params.ed_mode, EDMode.SUPERC)
         assert_allclose(params.Hloc, self.h_loc.reshape(1, 1, 3, 3))
         self.assertTrue(isinstance(params.bath, BathHybrid))
         self.assertEqual(params.bath.nbath, 4)
@@ -795,7 +796,7 @@ class TestHamiltonianBathGeneral(TestHamiltonian):
             self.fops_bath_up, self.fops_bath_dn
         )
 
-        self.assertEqual(params.ed_mode, "normal")
+        self.assertEqual(params.ed_mode, EDMode.NORMAL)
         assert_allclose(params.Hloc, self.h_loc.reshape((1, 1, 3, 3)))
         self.assertTrue(isinstance(params.bath, BathGeneral))
         self.assertEqual(params.bath.nbath, 4)
@@ -832,7 +833,7 @@ class TestHamiltonianBathGeneral(TestHamiltonian):
             self.fops_bath_up, self.fops_bath_dn
         )
 
-        self.assertEqual(params.ed_mode, "normal")
+        self.assertEqual(params.ed_mode, EDMode.NORMAL)
         assert_allclose(params.Hloc, mul.outer(sz, self.h_loc))
         self.assertTrue(isinstance(params.bath, BathGeneral))
         self.assertEqual(params.bath.nbath, 4)
@@ -870,7 +871,7 @@ class TestHamiltonianBathGeneral(TestHamiltonian):
             self.fops_bath_up, self.fops_bath_dn
         )
 
-        self.assertEqual(params.ed_mode, "nonsu2")
+        self.assertEqual(params.ed_mode, EDMode.NONSU2)
         assert_allclose(params.Hloc, mul.outer(sz + 0.2 * sx, self.h_loc))
         self.assertTrue(isinstance(params.bath, BathGeneral))
         self.assertEqual(params.bath.nbath, 4)
@@ -908,7 +909,7 @@ class TestHamiltonianBathGeneral(TestHamiltonian):
             self.fops_bath_up, self.fops_bath_dn
         )
 
-        self.assertEqual(params.ed_mode, "nonsu2")
+        self.assertEqual(params.ed_mode, EDMode.NONSU2)
         assert_allclose(params.Hloc, mul.outer(s0, self.h_loc))
         self.assertTrue(isinstance(params.bath, BathGeneral))
         self.assertEqual(params.bath.nbath, 4)
@@ -954,7 +955,7 @@ class TestHamiltonianBathGeneral(TestHamiltonian):
             self.fops_bath_up, self.fops_bath_dn
         )
 
-        self.assertEqual(params.ed_mode, "superc")
+        self.assertEqual(params.ed_mode, EDMode.SUPERC)
         assert_allclose(params.Hloc, self.h_loc.reshape(1, 1, 3, 3))
         self.assertTrue(isinstance(params.bath, BathGeneral))
         self.assertEqual(params.bath.nbath, 4)

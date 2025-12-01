@@ -19,6 +19,7 @@ from triqs.gf import BlockGf, Gf, MeshImFreq, MeshReFreq, MeshImTime
 
 from edipack2py import global_env as ed
 
+from . import EDMode
 from .util import (IndicesType,
                    validate_fops_up_dn,
                    is_spin_diagonal,
@@ -148,6 +149,14 @@ class EDIpackSolver:
                          destruction of this :py:class:`EDIpackSolver` object.
         :type keep_dir: bool, default=False
 
+        :param ed_mode: Force a specific EDIpack exact diagonalization mode.
+                        The requested mode still has to be compatible with the
+                        provided Hamiltonian. Using this parameter
+                        makes sense when :py:attr:`EDMode.NORMAL` is
+                        automatically selected, but :py:attr:`EDMode.SUPERC`
+                        or :py:attr:`EDMode.NONSU2` is desired instead.
+        :type ed_mode: EDMode, optional
+
         :param zerotemp: Enable zero temperature calculations.
         :type zerotemp: bool, default=False
 
@@ -246,7 +255,8 @@ class EDIpackSolver:
         self.h_params = parse_hamiltonian(
             hamiltonian,
             self.fops_imp_up, self.fops_imp_dn,
-            self.fops_bath_up, self.fops_bath_dn
+            self.fops_bath_up, self.fops_bath_dn,
+            kwargs.get("ed_mode", None)
         )
         self.nspin = self.h_params.Hloc.shape[0]
 
@@ -283,7 +293,7 @@ class EDIpackSolver:
             c["LANC_DIM_THRESHOLD"] = kwargs.get("lanc_dim_threshold", 1024)
 
             # Impurity structure
-            c["ED_MODE"] = self.h_params.ed_mode
+            c["ED_MODE"] = self.h_params.ed_mode.value
             c["NSPIN"] = self.nspin
             c["NORB"] = self.norb
 
@@ -298,7 +308,7 @@ class EDIpackSolver:
             ed_total_ud = kwargs.get("ed_total_ud", False)
             self.denden_int = _is_density_density(self.h_params.U)
             if not ((not ed_total_ud)
-                    and self.h_params.ed_mode == "normal"
+                    and self.h_params.ed_mode == EDMode.NORMAL
                     and isinstance(self.h_params.bath, (NoneType, BathNormal))
                     and _is_density(self.h_params.Hloc)
                     and self.denden_int):
@@ -388,12 +398,12 @@ class EDIpackSolver:
             ed.init_solver(bath=np.array((), dtype=float))
 
         # GF block names
-        if ed.get_ed_mode() in (1, 2):  # normal or superc
+        if ed.get_ed_mode() in (int(EDMode.NORMAL), int(EDMode.SUPERC)):
             self.gf_block_names = (block_names_up[0], block_names_dn[0])
         else:
             self.gf_block_names = (block_names_up[0],)
 
-        if ed.get_ed_mode() == 2:  # superc
+        if ed.get_ed_mode() == int(EDMode.SUPERC):
             self.gf_an_block_names = (block_names_up[0]
                                       + "_" + block_names_dn[0],)
 
@@ -521,7 +531,7 @@ class EDIpackSolver:
         ed.eps = broadening
         ed.Ltau = n_tau
 
-        if (self.nspin == 2) and (self.h_params.ed_mode == "normal") and \
+        if (self.nspin == 2) and (self.h_params.ed_mode == EDMode.NORMAL) and \
                 (not is_spin_diagonal(self.h_params.Hloc)):
             raise RuntimeError("Local Hamiltonian must remain spin-diagonal")
 
@@ -533,7 +543,7 @@ class EDIpackSolver:
             )
 
         if (True in (chi_spin, chi_dens, chi_exct, chi_pair)) and \
-                ed.get_ed_mode() != 1:   # normal
+                ed.get_ed_mode() != int(EDMode.NORMAL):
             raise RuntimeError(
                 "Response functions are only available in the normal ED mode"
             )
@@ -612,7 +622,7 @@ class EDIpackSolver:
 
     def _make_gf(self, ed_func, real_freq, anomalous) -> BlockGf:
         if anomalous:
-            if ed.get_ed_mode() != 2:  # superc
+            if ed.get_ed_mode() != int(EDMode.SUPERC):
                 raise RuntimeError("anomalous = True is only supported for "
                                    "superconducting bath")
 
@@ -633,7 +643,8 @@ class EDIpackSolver:
                            block_list=[F],
                            make_copies=False)
 
-        if ed.get_ed_mode() in (1, 2):  # 2 spin blocks
+        if ed.get_ed_mode() in (int(EDMode.NORMAL), int(EDMode.SUPERC)):
+            # 2 spin blocks
             blocks = [
                 Gf(mesh=mesh, target_shape=(self.norb, self.norb))
                 for _ in range(2)
@@ -774,7 +785,7 @@ class EDIpackSolver:
     #
 
     def _make_chi(self, chan, axis) -> Gf:
-        if ed.get_ed_mode() != 1:  # normal
+        if ed.get_ed_mode() != int(EDMode.NORMAL):
             raise RuntimeError(
                 "Response functions are only available in the normal ED mode"
             )

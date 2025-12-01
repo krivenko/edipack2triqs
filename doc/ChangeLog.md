@@ -2,6 +2,15 @@
 
 # Changelog
 
+## Version 0.10.0
+
+* Added an enumeration type `EDMode` that represents EDIpack's exact
+  diagonalization mode.
+* It is now possible to force a specific EDIpack diagonalization mode, as long
+  as the requested mode is compatible with the one deduced from the Hamiltonian.
+  The corresponding keyword argument of `EDIpackSolver`'s constructor is called
+  `ed_mode`.
+
 ## Version 0.9.0
 
 * Expose non-interacting impurity Green's functions and hybridization functions
