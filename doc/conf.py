@@ -27,7 +27,8 @@ extensions = ['sphinx.ext.autodoc',
               'nbsphinx',
               'myst_parser',
               'matplotlib.sphinxext.plot_directive',
-              'sphinxfortran_ng.fortran_domain'
+              'sphinxfortran_ng.fortran_domain',
+              'enum_tools.autoenum'
               ]
 
 myst_enable_extensions = [

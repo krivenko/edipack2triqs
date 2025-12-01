@@ -11,6 +11,7 @@ from triqs.gf.descriptors import SemiCircular, iOmega_n
 from triqs.gf.tools import inverse
 from triqs.utility.comparison_tests import assert_block_gfs_are_close
 
+from edipack2triqs import EDMode
 from edipack2triqs.solver import EDIpackSolver
 from edipack2triqs.bath import BathHybrid
 from edipack2triqs.fit import BathFittingParams
@@ -100,7 +101,7 @@ class TestFitBath(unittest.TestCase):
                                fops_bath_dn,
                                bath_fitting_params=fit_params,
                                verbose=0)
-        self.assertEqual(solver.h_params.ed_mode, "normal")
+        self.assertEqual(solver.h_params.ed_mode, EDMode.NORMAL)
         self.assertEqual(solver.nspin, 1)
 
         mesh = MeshImFreq(beta=50.0, S="Fermion", n_iw=200)
@@ -133,7 +134,7 @@ class TestFitBath(unittest.TestCase):
                                fops_bath_dn,
                                bath_fitting_params=fit_params,
                                verbose=0)
-        self.assertEqual(solver.h_params.ed_mode, "normal")
+        self.assertEqual(solver.h_params.ed_mode, EDMode.NORMAL)
         self.assertEqual(solver.nspin, 2)
 
         mesh = MeshImFreq(beta=50.0, S="Fermion", n_iw=200)
@@ -168,7 +169,7 @@ class TestFitBath(unittest.TestCase):
                                fops_bath_dn,
                                bath_fitting_params=fit_params,
                                verbose=3)
-        self.assertEqual(solver.h_params.ed_mode, "nonsu2")
+        self.assertEqual(solver.h_params.ed_mode, EDMode.NONSU2)
 
         mesh = MeshImFreq(beta=50.0, S="Fermion", n_iw=200)
         Delta = BlockGf(gf_struct=[("up_dn", 4)], mesh=mesh)
@@ -206,7 +207,7 @@ class TestFitBath(unittest.TestCase):
                                fops_bath_dn,
                                bath_fitting_params=fit_params,
                                verbose=0)
-        self.assertEqual(solver.h_params.ed_mode, "superc")
+        self.assertEqual(solver.h_params.ed_mode, EDMode.SUPERC)
 
         mesh = MeshImFreq(beta=50.0, S="Fermion", n_iw=200)
         Delta = BlockGf(gf_struct=[("up", 2), ("dn", 2)], mesh=mesh)

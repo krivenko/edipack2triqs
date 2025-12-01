@@ -11,6 +11,7 @@ import numpy as np
 
 import triqs.operators as op
 
+from . import EDMode
 from .util import (is_spin_diagonal,
                    is_spin_degenerate,
                    IndicesType,
@@ -19,13 +20,12 @@ from .util import (is_spin_diagonal,
                    spin_conjugate)
 from .bath import BathNormal, BathHybrid, BathGeneral
 
-
 @dataclass
 class HamiltonianParams:
     """Parameters of the Hamiltonian"""
 
-    # EDIpack exact diagonalization mode (normal, superc, nonsu2)
-    ed_mode: str
+    # Exact diagonalization mode
+    ed_mode: EDMode
     # Non-interacting part of the impurity Hamiltonian
     Hloc: np.ndarray
     # Bath object (None if no bath is present)
@@ -63,7 +63,7 @@ def _is_density_density(U: np.ndarray):
     return True
 
 
-def _make_bath(ed_mode: str,
+def _make_bath(ed_mode: EDMode,
                nspin: int,
                Hloc: np.ndarray,
                h: np.ndarray,
@@ -235,9 +235,9 @@ def parse_hamiltonian(hamiltonian: op.Operator,  # noqa: C901
         assert is_spin_degenerate(h)
         assert is_spin_degenerate(V)
         if (Delta == 0).all():
-            ed_mode = "normal"
+            ed_mode = EDMode.NORMAL
         else:
-            ed_mode = "superc"
+            ed_mode = EDMode.SUPERC
     else:  # nspin == 2
         if not (Delta == 0).all():
             raise RuntimeError(
@@ -246,9 +246,9 @@ def parse_hamiltonian(hamiltonian: op.Operator,  # noqa: C901
             )
         if is_spin_diagonal(Hloc) and \
            is_spin_diagonal(h) and is_spin_diagonal(V):
-            ed_mode = "normal"
+            ed_mode = EDMode.NORMAL
         else:
-            ed_mode = "nonsu2"
+            ed_mode = EDMode.NONSU2
 
     bath = _make_bath(ed_mode, nspin, Hloc, h, V, Delta) \
         if nbath_total > 0 else None

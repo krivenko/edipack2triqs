@@ -19,6 +19,7 @@ from triqs.gf import BlockGf, Gf, MeshImFreq, MeshReFreq, MeshImTime
 
 from edipack2py import global_env as ed
 
+from . import EDMode
 from .util import (IndicesType,
                    validate_fops_up_dn,
                    is_spin_diagonal,
@@ -283,7 +284,7 @@ class EDIpackSolver:
             c["LANC_DIM_THRESHOLD"] = kwargs.get("lanc_dim_threshold", 1024)
 
             # Impurity structure
-            c["ED_MODE"] = self.h_params.ed_mode
+            c["ED_MODE"] = self.h_params.ed_mode.value
             c["NSPIN"] = self.nspin
             c["NORB"] = self.norb
 
@@ -298,7 +299,7 @@ class EDIpackSolver:
             ed_total_ud = kwargs.get("ed_total_ud", False)
             self.denden_int = _is_density_density(self.h_params.U)
             if not ((not ed_total_ud)
-                    and self.h_params.ed_mode == "normal"
+                    and self.h_params.ed_mode == EDMode.NORMAL
                     and isinstance(self.h_params.bath, (NoneType, BathNormal))
                     and _is_density(self.h_params.Hloc)
                     and self.denden_int):
@@ -521,7 +522,7 @@ class EDIpackSolver:
         ed.eps = broadening
         ed.Ltau = n_tau
 
-        if (self.nspin == 2) and (self.h_params.ed_mode == "normal") and \
+        if (self.nspin == 2) and (self.h_params.ed_mode == EDMode.NORMAL) and \
                 (not is_spin_diagonal(self.h_params.Hloc)):
             raise RuntimeError("Local Hamiltonian must remain spin-diagonal")
 

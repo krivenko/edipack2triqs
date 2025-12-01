@@ -3,6 +3,10 @@
 Documentation
 =============
 
+.. py:module:: edipack2triqs
+
+.. autoenum:: EDMode
+
 Solver class
 ------------
 

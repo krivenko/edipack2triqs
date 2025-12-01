@@ -2,6 +2,11 @@
 
 # Changelog
 
+## Version 0.10.0
+
+* Added an enumeration type `EDMode` that represents EDIpack's exact
+  diagonalization mode.
+
 ## Version 0.9.0
 
 * Expose non-interacting impurity Green's functions and hybridization functions
