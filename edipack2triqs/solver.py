@@ -149,6 +149,14 @@ class EDIpackSolver:
                          destruction of this :py:class:`EDIpackSolver` object.
         :type keep_dir: bool, default=False
 
+        :param ed_mode: Force a specific EDIpack exact diagonalization mode.
+                        The requested mode still has to be compatible with the
+                        provided Hamiltonian. Using this parameter
+                        makes sense when :py:attr:`EDMode.NORMAL` is
+                        automatically selected, but :py:attr:`EDMode.SUPERC`
+                        or :py:attr:`EDMode.NONSU2` is desired instead.
+        :type ed_mode: EDMode, optional
+
         :param zerotemp: Enable zero temperature calculations.
         :type zerotemp: bool, default=False
 
@@ -247,7 +255,8 @@ class EDIpackSolver:
         self.h_params = parse_hamiltonian(
             hamiltonian,
             self.fops_imp_up, self.fops_imp_dn,
-            self.fops_bath_up, self.fops_bath_dn
+            self.fops_bath_up, self.fops_bath_dn,
+            kwargs.get("ed_mode", None)
         )
         self.nspin = self.h_params.Hloc.shape[0]
 

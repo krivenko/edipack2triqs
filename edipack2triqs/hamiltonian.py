@@ -5,7 +5,7 @@ Hamiltonian and its parameters
 from itertools import product
 from dataclasses import dataclass
 from types import NoneType
-from typing import Union
+from typing import Union, Optional
 
 import numpy as np
 
@@ -19,6 +19,7 @@ from .util import (is_spin_diagonal,
                    normal_part,
                    spin_conjugate)
 from .bath import BathNormal, BathHybrid, BathGeneral
+
 
 @dataclass
 class HamiltonianParams:
@@ -98,7 +99,8 @@ def parse_hamiltonian(hamiltonian: op.Operator,  # noqa: C901
                       fops_imp_up: list[IndicesType],
                       fops_imp_dn: list[IndicesType],
                       fops_bath_up: list[IndicesType],
-                      fops_bath_dn: list[IndicesType]) -> HamiltonianParams:
+                      fops_bath_dn: list[IndicesType],
+                      f_ed_mode: Optional[EDMode] = None) -> HamiltonianParams:
     """
     Parse a given Hamiltonian and extract parameters from it.
     """
@@ -249,6 +251,16 @@ def parse_hamiltonian(hamiltonian: op.Operator,  # noqa: C901
             ed_mode = EDMode.NORMAL
         else:
             ed_mode = EDMode.NONSU2
+
+    # Check if the forced ED mode is compatible with the deduced one
+    if (f_ed_mode is not None) and (ed_mode != f_ed_mode):
+        if ed_mode == EDMode.NORMAL:
+            ed_mode = f_ed_mode
+        else:
+            raise RuntimeError(
+                f"Requested exact diagonalization mode {f_ed_mode} "
+                f"is incompatible with the Hamiltonian (must be {ed_mode})"
+            )
 
     bath = _make_bath(ed_mode, nspin, Hloc, h, V, Delta) \
         if nbath_total > 0 else None

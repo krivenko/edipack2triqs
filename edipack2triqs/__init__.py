@@ -1,5 +1,6 @@
 from enum import Enum
 
+
 class EDMode(Enum):
     "EDIpack's :f:var:`exact diagonalization mode <f/ed_input_vars/ed_mode>`."
     NORMAL = "normal"
