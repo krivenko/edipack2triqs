@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "edipack2triqs"
-version = "0.9.0"
+version = "0.10.0"
 description = "Compatibility layer between EDIpack and TRIQS"
 readme = "README.md"
 requires-python = ">=3.10"
