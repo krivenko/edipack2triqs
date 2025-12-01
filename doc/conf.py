@@ -104,7 +104,7 @@ plot_html_show_source_link = False
 plot_html_show_formats = False
 
 intersphinx_mapping = {
-    'python': ('https://docs.python.org/3.13', None),
+    'python': ('https://docs.python.org/3/', None),
     'numpy': ('https://numpy.org/doc/stable', None),
     'triqslibs': ('https://triqs.github.io/triqs/latest', None),
     'edipack': ('https://edipack.github.io/EDIpack', None),
