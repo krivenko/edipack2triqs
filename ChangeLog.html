@@ -53,6 +53,12 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="documentation.html">Documentation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="documentation.html#edipack2triqs.EDMode"><code class="docutils literal notranslate"><span class="pre">EDMode</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="documentation.html#edipack2triqs.EDMode.NORMAL"><code class="docutils literal notranslate"><span class="pre">EDMode.NORMAL</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="documentation.html#edipack2triqs.EDMode.SUPERC"><code class="docutils literal notranslate"><span class="pre">EDMode.SUPERC</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="documentation.html#edipack2triqs.EDMode.NONSU2"><code class="docutils literal notranslate"><span class="pre">EDMode.NONSU2</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="documentation.html#module-edipack2triqs.solver">Solver class</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="documentation.html#edipack2triqs.solver.EDIpackSolver"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver</span></code></a><ul>
 <li class="toctree-l4"><a class="reference internal" href="documentation.html#edipack2triqs.solver.EDIpackSolver.__init__"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.__init__()</span></code></a></li>
@@ -157,6 +163,7 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="issues.html">Reporting issues</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Changelog</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#version-0-10-0">Version 0.10.0</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#version-0-9-0">Version 0.9.0</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#version-0-8-0">Version 0.8.0</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#version-0-7-0">Version 0.7.0</a></li>
@@ -197,6 +204,17 @@
              
   <section class="tex2jax_ignore mathjax_ignore" id="changelog">
 <span id="id1"></span><h1>Changelog<a class="headerlink" href="#changelog" title="Link to this heading"></a></h1>
+<section id="version-0-10-0">
+<h2>Version 0.10.0<a class="headerlink" href="#version-0-10-0" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p>Added an enumeration type <code class="docutils literal notranslate"><span class="pre">EDMode</span></code> that represents EDIpack’s exact
+diagonalization mode.</p></li>
+<li><p>It is now possible to force a specific EDIpack diagonalization mode, as long
+as the requested mode is compatible with the one deduced from the Hamiltonian.
+The corresponding keyword argument of <code class="docutils literal notranslate"><span class="pre">EDIpackSolver</span></code>’s constructor is called
+<code class="docutils literal notranslate"><span class="pre">ed_mode</span></code>.</p></li>
+</ul>
+</section>
 <section id="version-0-9-0">
 <h2>Version 0.9.0<a class="headerlink" href="#version-0-9-0" title="Link to this heading"></a></h2>
 <ul class="simple">

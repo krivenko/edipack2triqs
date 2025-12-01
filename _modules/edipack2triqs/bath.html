@@ -50,6 +50,12 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../documentation.html">Documentation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../documentation.html#edipack2triqs.EDMode"><code class="docutils literal notranslate"><span class="pre">EDMode</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../documentation.html#edipack2triqs.EDMode.NORMAL"><code class="docutils literal notranslate"><span class="pre">EDMode.NORMAL</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../documentation.html#edipack2triqs.EDMode.SUPERC"><code class="docutils literal notranslate"><span class="pre">EDMode.SUPERC</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../documentation.html#edipack2triqs.EDMode.NONSU2"><code class="docutils literal notranslate"><span class="pre">EDMode.NONSU2</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="../../documentation.html#module-edipack2triqs.solver">Solver class</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../documentation.html#edipack2triqs.solver.EDIpackSolver"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver</span></code></a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../documentation.html#edipack2triqs.solver.EDIpackSolver.__init__"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.__init__()</span></code></a></li>
@@ -154,6 +160,7 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../issues.html">Reporting issues</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../ChangeLog.html">Changelog</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../ChangeLog.html#version-0-10-0">Version 0.10.0</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../ChangeLog.html#version-0-9-0">Version 0.9.0</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../ChangeLog.html#version-0-8-0">Version 0.8.0</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../ChangeLog.html#version-0-7-0">Version 0.7.0</a></li>
@@ -183,6 +190,7 @@
   <ul class="wy-breadcrumbs">
       <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
           <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+          <li class="breadcrumb-item"><a href="../edipack2triqs.html">edipack2triqs</a></li>
       <li class="breadcrumb-item active">edipack2triqs.bath</li>
       <li class="wy-breadcrumbs-aside">
       </li>
@@ -206,6 +214,7 @@
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">h5.formats</span><span class="w"> </span><span class="kn">import</span> <span class="n">register_class</span>
 
+<span class="kn">from</span><span class="w"> </span><span class="nn">.</span><span class="w"> </span><span class="kn">import</span> <span class="n">EDMode</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">.util</span><span class="w"> </span><span class="kn">import</span> <span class="n">is_diagonal</span><span class="p">,</span> <span class="n">is_spin_diagonal</span>
 
 
@@ -315,7 +324,7 @@
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Local super-conducting order parameters of the bath as an array</span>
 <span class="sd">    of the shape ``(nspin, norb, nbath)``. Only present when ``ed_mode ==</span>
-<span class="sd">    &quot;superc&quot;``.</span>
+<span class="sd">    EDMode.SUPERC``.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">V</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
@@ -326,11 +335,11 @@
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Spin off-diagonal hopping amplitudes between the impurity and the bath</span>
 <span class="sd">    as an array of the shape ``(nspin, norb, nbath)``. Only present when</span>
-<span class="sd">    ``ed_mode == &quot;nonsu2&quot;``.</span>
+<span class="sd">    ``ed_mode == EDMode.NONSU2``.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
-                 <span class="n">ed_mode</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+                 <span class="n">ed_mode</span><span class="p">:</span> <span class="n">EDMode</span><span class="p">,</span>
                  <span class="n">nspin</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
                  <span class="n">norb</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
                  <span class="n">nbath</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
@@ -340,7 +349,7 @@
         <span class="n">size</span> <span class="o">=</span> <span class="n">nspin</span> <span class="o">*</span> <span class="n">norb</span> <span class="o">*</span> <span class="n">nbath</span>
 
         <span class="c1"># EDIpack-compatible bath parameter array</span>
-        <span class="n">data_size</span> <span class="o">=</span> <span class="n">size</span> <span class="o">*</span> <span class="p">(</span><span class="mi">2</span> <span class="k">if</span> <span class="n">ed_mode</span> <span class="o">==</span> <span class="s2">&quot;normal&quot;</span> <span class="k">else</span> <span class="mi">3</span><span class="p">)</span>
+        <span class="n">data_size</span> <span class="o">=</span> <span class="n">size</span> <span class="o">*</span> <span class="p">(</span><span class="mi">2</span> <span class="k">if</span> <span class="n">ed_mode</span> <span class="o">==</span> <span class="n">EDMode</span><span class="o">.</span><span class="n">NORMAL</span> <span class="k">else</span> <span class="mi">3</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">data</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">data_size</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
@@ -354,21 +363,21 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">eps</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[:</span><span class="n">size</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">params_shape</span><span class="p">)</span>
         <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">eps</span><span class="o">.</span><span class="n">base</span> <span class="ow">is</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span>
 
-        <span class="k">if</span> <span class="n">ed_mode</span> <span class="o">==</span> <span class="s2">&quot;nonsu2&quot;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">ed_mode</span> <span class="o">==</span> <span class="n">EDMode</span><span class="o">.</span><span class="n">NONSU2</span><span class="p">:</span>
             <span class="c1"># View: Same-spin hopping amplitudes</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">V</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">size</span><span class="p">:</span><span class="mi">2</span> <span class="o">*</span> <span class="n">size</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">params_shape</span><span class="p">)</span>
             <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">V</span><span class="o">.</span><span class="n">base</span> <span class="ow">is</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span>
             <span class="c1"># View: Spin-flip hopping amplitudes</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">U</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="mi">2</span> <span class="o">*</span> <span class="n">size</span><span class="p">:]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">params_shape</span><span class="p">)</span>
             <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">U</span><span class="o">.</span><span class="n">base</span> <span class="ow">is</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span>
-        <span class="k">elif</span> <span class="n">ed_mode</span> <span class="o">==</span> <span class="s2">&quot;superc&quot;</span><span class="p">:</span>
+        <span class="k">elif</span> <span class="n">ed_mode</span> <span class="o">==</span> <span class="n">EDMode</span><span class="o">.</span><span class="n">SUPERC</span><span class="p">:</span>
             <span class="c1"># View: Local SC order parameters of the bath</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">Delta</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">size</span><span class="p">:</span><span class="mi">2</span> <span class="o">*</span> <span class="n">size</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">params_shape</span><span class="p">)</span>
             <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">Delta</span><span class="o">.</span><span class="n">base</span> <span class="ow">is</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span>
             <span class="c1"># View: Same-spin hopping amplitudes</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">V</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="mi">2</span> <span class="o">*</span> <span class="n">size</span><span class="p">:]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">params_shape</span><span class="p">)</span>
             <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">V</span><span class="o">.</span><span class="n">base</span> <span class="ow">is</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span>
-        <span class="k">elif</span> <span class="n">ed_mode</span> <span class="o">==</span> <span class="s2">&quot;normal&quot;</span><span class="p">:</span>
+        <span class="k">elif</span> <span class="n">ed_mode</span> <span class="o">==</span> <span class="n">EDMode</span><span class="o">.</span><span class="n">NORMAL</span><span class="p">:</span>
             <span class="c1"># View: Same-spin hopping amplitudes</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">V</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">size</span><span class="p">:</span><span class="mi">2</span> <span class="o">*</span> <span class="n">size</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">params_shape</span><span class="p">)</span>
             <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">V</span><span class="o">.</span><span class="n">base</span> <span class="ow">is</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span>
@@ -376,17 +385,16 @@
             <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Unknown ED mode&quot;</span><span class="p">)</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">ed_mode</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">ed_mode</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">EDMode</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        ED mode this bath object is usable with, one of *&quot;normal&quot;*, *&quot;nonsu2&quot;*</span>
-<span class="sd">        and *&quot;superc&quot;*.</span>
+<span class="sd">        ED mode this bath object is usable with.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;U&quot;</span><span class="p">):</span>
-            <span class="k">return</span> <span class="s2">&quot;nonsu2&quot;</span>
+            <span class="k">return</span> <span class="n">EDMode</span><span class="o">.</span><span class="n">NONSU2</span>
         <span class="k">elif</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;Delta&quot;</span><span class="p">):</span>
-            <span class="k">return</span> <span class="s2">&quot;superc&quot;</span>
+            <span class="k">return</span> <span class="n">EDMode</span><span class="o">.</span><span class="n">SUPERC</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">return</span> <span class="s2">&quot;normal&quot;</span>
+            <span class="k">return</span> <span class="n">EDMode</span><span class="o">.</span><span class="n">NORMAL</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">__deepcopy__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">memo</span><span class="p">):</span>
         <span class="n">nspin</span><span class="p">,</span> <span class="n">norb</span><span class="p">,</span> <span class="n">nbath</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">V</span><span class="o">.</span><span class="n">shape</span>
@@ -394,7 +402,7 @@
 
     <span class="k">def</span><span class="w"> </span><span class="nf">__reduce_to_dict__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="s2">&quot;HDFArchive serialization&quot;</span>
-        <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;ed_mode&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">ed_mode</span><span class="p">,</span>
+        <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;ed_mode&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">ed_mode</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
                 <span class="s2">&quot;nspin&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">V</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
                 <span class="s2">&quot;norb&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">V</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
                 <span class="s2">&quot;nbath&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">V</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span>
@@ -404,7 +412,7 @@
     <span class="k">def</span><span class="w"> </span><span class="nf">__factory_from_dict__</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">d</span><span class="p">):</span>
         <span class="s2">&quot;HDFArchive deserialization&quot;</span>
         <span class="k">return</span> <span class="n">BathNormal</span><span class="p">(</span>
-            <span class="n">d</span><span class="p">[</span><span class="s2">&quot;ed_mode&quot;</span><span class="p">],</span> <span class="n">d</span><span class="p">[</span><span class="s2">&quot;nspin&quot;</span><span class="p">],</span> <span class="n">d</span><span class="p">[</span><span class="s2">&quot;norb&quot;</span><span class="p">],</span> <span class="n">d</span><span class="p">[</span><span class="s2">&quot;nbath&quot;</span><span class="p">],</span> <span class="n">d</span><span class="p">[</span><span class="s2">&quot;data&quot;</span><span class="p">]</span>
+            <span class="n">EDMode</span><span class="p">(</span><span class="n">d</span><span class="p">[</span><span class="s2">&quot;ed_mode&quot;</span><span class="p">]),</span> <span class="n">d</span><span class="p">[</span><span class="s2">&quot;nspin&quot;</span><span class="p">],</span> <span class="n">d</span><span class="p">[</span><span class="s2">&quot;norb&quot;</span><span class="p">],</span> <span class="n">d</span><span class="p">[</span><span class="s2">&quot;nbath&quot;</span><span class="p">],</span> <span class="n">d</span><span class="p">[</span><span class="s2">&quot;data&quot;</span><span class="p">]</span>
         <span class="p">)</span>
 
     <span class="nd">@classmethod</span>
@@ -436,7 +444,7 @@
 
     <span class="nd">@classmethod</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">from_hamiltonian</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span>
-                         <span class="n">ed_mode</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+                         <span class="n">ed_mode</span><span class="p">:</span> <span class="n">EDMode</span><span class="p">,</span>
                          <span class="n">nspin</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
                          <span class="n">Hloc</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
                          <span class="n">h</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
@@ -468,12 +476,12 @@
                         <span class="n">bath</span><span class="o">.</span><span class="n">eps</span><span class="p">[</span><span class="n">spin1</span><span class="p">,</span> <span class="n">orb</span><span class="p">,</span> <span class="n">nu</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">real_if_close</span><span class="p">(</span>
                             <span class="n">h</span><span class="p">[</span><span class="n">spin1</span><span class="p">,</span> <span class="n">spin2</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">b</span><span class="p">]</span>
                         <span class="p">)</span>
-                        <span class="k">if</span> <span class="n">ed_mode</span> <span class="o">==</span> <span class="s2">&quot;superc&quot;</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="n">ed_mode</span> <span class="o">==</span> <span class="n">EDMode</span><span class="o">.</span><span class="n">SUPERC</span><span class="p">:</span>
                             <span class="n">bath</span><span class="o">.</span><span class="n">Delta</span><span class="p">[</span><span class="n">spin1</span><span class="p">,</span> <span class="n">orb</span><span class="p">,</span> <span class="n">nu</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">real_if_close</span><span class="p">(</span>
                                 <span class="n">Delta</span><span class="p">[</span><span class="n">b</span><span class="p">,</span> <span class="n">b</span><span class="p">]</span>
                             <span class="p">)</span>
                         <span class="n">bath</span><span class="o">.</span><span class="n">V</span><span class="p">[</span><span class="n">spin1</span><span class="p">,</span> <span class="n">orb</span><span class="p">,</span> <span class="n">nu</span><span class="p">]</span> <span class="o">=</span> <span class="n">V</span><span class="p">[</span><span class="n">spin1</span><span class="p">,</span> <span class="n">spin2</span><span class="p">,</span> <span class="n">orb</span><span class="p">,</span> <span class="n">b</span><span class="p">]</span>
-                    <span class="k">elif</span> <span class="n">ed_mode</span> <span class="o">==</span> <span class="s2">&quot;nonsu2&quot;</span><span class="p">:</span>
+                    <span class="k">elif</span> <span class="n">ed_mode</span> <span class="o">==</span> <span class="n">EDMode</span><span class="o">.</span><span class="n">NONSU2</span><span class="p">:</span>
                         <span class="n">bath</span><span class="o">.</span><span class="n">U</span><span class="p">[</span><span class="n">spin1</span><span class="p">,</span> <span class="n">orb</span><span class="p">,</span> <span class="n">nu</span><span class="p">]</span> <span class="o">=</span> <span class="n">V</span><span class="p">[</span><span class="n">spin1</span><span class="p">,</span> <span class="n">spin2</span><span class="p">,</span> <span class="n">orb</span><span class="p">,</span> <span class="n">b</span><span class="p">]</span>
 
         <span class="k">return</span> <span class="n">bath</span></div>
@@ -509,7 +517,8 @@
     <span class="n">Delta</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Local super-conducting order parameters of the bath as an array</span>
-<span class="sd">    of the shape ``(nspin, nbath)``. Only present when ``ed_mode == &quot;superc&quot;``.</span>
+<span class="sd">    of the shape ``(nspin, nbath)``. Only present when</span>
+<span class="sd">    ``ed_mode == EDMode.SUPERC``.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">V</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
@@ -520,11 +529,11 @@
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Spin off-diagonal hopping amplitudes between the impurity and the bath</span>
 <span class="sd">    as an array of the shape ``(nspin, norb, nbath)``. Only present when</span>
-<span class="sd">    ``ed_mode == &quot;nonsu2&quot;``.</span>
+<span class="sd">    ``ed_mode == EDMode.NONSU2``.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
-                 <span class="n">ed_mode</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+                 <span class="n">ed_mode</span><span class="p">:</span> <span class="n">EDMode</span><span class="p">,</span>
                  <span class="n">nspin</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
                  <span class="n">norb</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
                  <span class="n">nbath</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
@@ -535,9 +544,9 @@
         <span class="n">size</span> <span class="o">=</span> <span class="n">eps_size</span> <span class="o">*</span> <span class="n">norb</span>
 
         <span class="c1"># EDIpack-compatible bath parameter array</span>
-        <span class="n">data_size</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;normal&quot;</span><span class="p">:</span> <span class="n">eps_size</span> <span class="o">+</span> <span class="n">size</span><span class="p">,</span>
-                     <span class="s2">&quot;superc&quot;</span><span class="p">:</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">eps_size</span> <span class="o">+</span> <span class="n">size</span><span class="p">,</span>
-                     <span class="s2">&quot;nonsu2&quot;</span><span class="p">:</span> <span class="n">eps_size</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">size</span><span class="p">}[</span><span class="n">ed_mode</span><span class="p">]</span>
+        <span class="n">data_size</span> <span class="o">=</span> <span class="p">{</span><span class="n">EDMode</span><span class="o">.</span><span class="n">NORMAL</span><span class="p">:</span> <span class="n">eps_size</span> <span class="o">+</span> <span class="n">size</span><span class="p">,</span>
+                     <span class="n">EDMode</span><span class="o">.</span><span class="n">SUPERC</span><span class="p">:</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">eps_size</span> <span class="o">+</span> <span class="n">size</span><span class="p">,</span>
+                     <span class="n">EDMode</span><span class="o">.</span><span class="n">NONSU2</span><span class="p">:</span> <span class="n">eps_size</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">size</span><span class="p">}[</span><span class="n">ed_mode</span><span class="p">]</span>
         <span class="k">if</span> <span class="n">data</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">data_size</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
@@ -552,21 +561,21 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">eps</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[:</span><span class="n">eps_size</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">eps_shape</span><span class="p">)</span>
         <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">eps</span><span class="o">.</span><span class="n">base</span> <span class="ow">is</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span>
 
-        <span class="k">if</span> <span class="n">ed_mode</span> <span class="o">==</span> <span class="s2">&quot;nonsu2&quot;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">ed_mode</span> <span class="o">==</span> <span class="n">EDMode</span><span class="o">.</span><span class="n">NONSU2</span><span class="p">:</span>
             <span class="c1"># View: Same-spin hopping amplitudes</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">V</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">eps_size</span><span class="p">:</span><span class="n">eps_size</span> <span class="o">+</span> <span class="n">size</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">shape</span><span class="p">)</span>
             <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">V</span><span class="o">.</span><span class="n">base</span> <span class="ow">is</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span>
             <span class="c1"># View: Spin-flip hopping amplitudes</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">U</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">eps_size</span> <span class="o">+</span> <span class="n">size</span><span class="p">:]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">shape</span><span class="p">)</span>
             <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">U</span><span class="o">.</span><span class="n">base</span> <span class="ow">is</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span>
-        <span class="k">elif</span> <span class="n">ed_mode</span> <span class="o">==</span> <span class="s2">&quot;superc&quot;</span><span class="p">:</span>
+        <span class="k">elif</span> <span class="n">ed_mode</span> <span class="o">==</span> <span class="n">EDMode</span><span class="o">.</span><span class="n">SUPERC</span><span class="p">:</span>
             <span class="c1"># View: Local SC order parameters of the bath</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">Delta</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">eps_size</span><span class="p">:</span><span class="mi">2</span> <span class="o">*</span> <span class="n">eps_size</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">eps_shape</span><span class="p">)</span>
             <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">Delta</span><span class="o">.</span><span class="n">base</span> <span class="ow">is</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span>
             <span class="c1"># View: Same-spin hopping amplitudes</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">V</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="mi">2</span> <span class="o">*</span> <span class="n">eps_size</span><span class="p">:]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">shape</span><span class="p">)</span>
             <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">V</span><span class="o">.</span><span class="n">base</span> <span class="ow">is</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span>
-        <span class="k">elif</span> <span class="n">ed_mode</span> <span class="o">==</span> <span class="s2">&quot;normal&quot;</span><span class="p">:</span>
+        <span class="k">elif</span> <span class="n">ed_mode</span> <span class="o">==</span> <span class="n">EDMode</span><span class="o">.</span><span class="n">NORMAL</span><span class="p">:</span>
             <span class="c1"># View: Same-spin hopping amplitudes</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">V</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">eps_size</span><span class="p">:]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">shape</span><span class="p">)</span>
             <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">V</span><span class="o">.</span><span class="n">base</span> <span class="ow">is</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span>
@@ -574,17 +583,16 @@
             <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Unknown ED mode&quot;</span><span class="p">)</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">ed_mode</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">ed_mode</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">EDMode</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        ED mode this bath object is usable with, one of *&quot;normal&quot;*, *&quot;nonsu2&quot;*</span>
-<span class="sd">        and *&quot;superc&quot;*.</span>
+<span class="sd">        ED mode this bath object is usable with.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;U&quot;</span><span class="p">):</span>
-            <span class="k">return</span> <span class="s2">&quot;nonsu2&quot;</span>
+            <span class="k">return</span> <span class="n">EDMode</span><span class="o">.</span><span class="n">NONSU2</span>
         <span class="k">elif</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;Delta&quot;</span><span class="p">):</span>
-            <span class="k">return</span> <span class="s2">&quot;superc&quot;</span>
+            <span class="k">return</span> <span class="n">EDMode</span><span class="o">.</span><span class="n">SUPERC</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">return</span> <span class="s2">&quot;normal&quot;</span>
+            <span class="k">return</span> <span class="n">EDMode</span><span class="o">.</span><span class="n">NORMAL</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">__deepcopy__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">memo</span><span class="p">):</span>
         <span class="n">nspin</span><span class="p">,</span> <span class="n">norb</span><span class="p">,</span> <span class="n">nbath</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">V</span><span class="o">.</span><span class="n">shape</span>
@@ -592,7 +600,7 @@
 
     <span class="k">def</span><span class="w"> </span><span class="nf">__reduce_to_dict__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="s2">&quot;HDFArchive serialization&quot;</span>
-        <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;ed_mode&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">ed_mode</span><span class="p">,</span>
+        <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;ed_mode&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">ed_mode</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
                 <span class="s2">&quot;nspin&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">V</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
                 <span class="s2">&quot;norb&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">V</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
                 <span class="s2">&quot;nbath&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">V</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span>
@@ -602,7 +610,7 @@
     <span class="k">def</span><span class="w"> </span><span class="nf">__factory_from_dict__</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">d</span><span class="p">):</span>
         <span class="s2">&quot;HDFArchive deserialization&quot;</span>
         <span class="k">return</span> <span class="n">BathHybrid</span><span class="p">(</span>
-            <span class="n">d</span><span class="p">[</span><span class="s2">&quot;ed_mode&quot;</span><span class="p">],</span> <span class="n">d</span><span class="p">[</span><span class="s2">&quot;nspin&quot;</span><span class="p">],</span> <span class="n">d</span><span class="p">[</span><span class="s2">&quot;norb&quot;</span><span class="p">],</span> <span class="n">d</span><span class="p">[</span><span class="s2">&quot;nbath&quot;</span><span class="p">],</span> <span class="n">d</span><span class="p">[</span><span class="s2">&quot;data&quot;</span><span class="p">]</span>
+            <span class="n">EDMode</span><span class="p">(</span><span class="n">d</span><span class="p">[</span><span class="s2">&quot;ed_mode&quot;</span><span class="p">]),</span> <span class="n">d</span><span class="p">[</span><span class="s2">&quot;nspin&quot;</span><span class="p">],</span> <span class="n">d</span><span class="p">[</span><span class="s2">&quot;norb&quot;</span><span class="p">],</span> <span class="n">d</span><span class="p">[</span><span class="s2">&quot;nbath&quot;</span><span class="p">],</span> <span class="n">d</span><span class="p">[</span><span class="s2">&quot;data&quot;</span><span class="p">]</span>
         <span class="p">)</span>
 
     <span class="nd">@classmethod</span>
@@ -616,7 +624,7 @@
 
     <span class="nd">@classmethod</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">from_hamiltonian</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span>
-                         <span class="n">ed_mode</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+                         <span class="n">ed_mode</span><span class="p">:</span> <span class="n">EDMode</span><span class="p">,</span>
                          <span class="n">nspin</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
                          <span class="n">Hloc</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
                          <span class="n">h</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
@@ -632,10 +640,10 @@
                                         <span class="nb">range</span><span class="p">(</span><span class="n">nbath</span><span class="p">)):</span>
             <span class="k">if</span> <span class="n">spin1</span> <span class="o">==</span> <span class="n">spin2</span><span class="p">:</span>
                 <span class="n">bath</span><span class="o">.</span><span class="n">eps</span><span class="p">[</span><span class="n">spin1</span><span class="p">,</span> <span class="n">nu</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">real_if_close</span><span class="p">(</span><span class="n">h</span><span class="p">[</span><span class="n">spin1</span><span class="p">,</span> <span class="n">spin2</span><span class="p">,</span> <span class="n">nu</span><span class="p">,</span> <span class="n">nu</span><span class="p">])</span>
-                <span class="k">if</span> <span class="n">ed_mode</span> <span class="o">==</span> <span class="s2">&quot;superc&quot;</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">ed_mode</span> <span class="o">==</span> <span class="n">EDMode</span><span class="o">.</span><span class="n">SUPERC</span><span class="p">:</span>
                     <span class="n">bath</span><span class="o">.</span><span class="n">Delta</span><span class="p">[</span><span class="n">spin1</span><span class="p">,</span> <span class="n">nu</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">real_if_close</span><span class="p">(</span><span class="n">Delta</span><span class="p">[</span><span class="n">nu</span><span class="p">,</span> <span class="n">nu</span><span class="p">])</span>
                 <span class="n">bath</span><span class="o">.</span><span class="n">V</span><span class="p">[</span><span class="n">spin1</span><span class="p">,</span> <span class="p">:,</span> <span class="n">nu</span><span class="p">]</span> <span class="o">=</span> <span class="n">V</span><span class="p">[</span><span class="n">spin1</span><span class="p">,</span> <span class="n">spin2</span><span class="p">,</span> <span class="p">:,</span> <span class="n">nu</span><span class="p">]</span>
-            <span class="k">elif</span> <span class="n">ed_mode</span> <span class="o">==</span> <span class="s2">&quot;nonsu2&quot;</span><span class="p">:</span>
+            <span class="k">elif</span> <span class="n">ed_mode</span> <span class="o">==</span> <span class="n">EDMode</span><span class="o">.</span><span class="n">NONSU2</span><span class="p">:</span>
                 <span class="n">bath</span><span class="o">.</span><span class="n">U</span><span class="p">[</span><span class="n">spin1</span><span class="p">,</span> <span class="p">:,</span> <span class="n">nu</span><span class="p">]</span> <span class="o">=</span> <span class="n">V</span><span class="p">[</span><span class="n">spin1</span><span class="p">,</span> <span class="n">spin2</span><span class="p">,</span> <span class="p">:,</span> <span class="n">nu</span><span class="p">]</span>
 
         <span class="k">return</span> <span class="n">bath</span></div>
@@ -1013,7 +1021,7 @@
 
     <span class="nd">@classmethod</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">from_hamiltonian</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span>
-                         <span class="n">ed_mode</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+                         <span class="n">ed_mode</span><span class="p">:</span> <span class="n">EDMode</span><span class="p">,</span>
                          <span class="n">nspin</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
                          <span class="n">Hloc</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
                          <span class="n">h</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>

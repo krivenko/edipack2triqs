@@ -50,6 +50,12 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../documentation.html">Documentation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../documentation.html#edipack2triqs.EDMode"><code class="docutils literal notranslate"><span class="pre">EDMode</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../documentation.html#edipack2triqs.EDMode.NORMAL"><code class="docutils literal notranslate"><span class="pre">EDMode.NORMAL</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../documentation.html#edipack2triqs.EDMode.SUPERC"><code class="docutils literal notranslate"><span class="pre">EDMode.SUPERC</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../documentation.html#edipack2triqs.EDMode.NONSU2"><code class="docutils literal notranslate"><span class="pre">EDMode.NONSU2</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="../../documentation.html#module-edipack2triqs.solver">Solver class</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../documentation.html#edipack2triqs.solver.EDIpackSolver"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver</span></code></a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../documentation.html#edipack2triqs.solver.EDIpackSolver.__init__"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.__init__()</span></code></a></li>
@@ -154,6 +160,7 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../issues.html">Reporting issues</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../ChangeLog.html">Changelog</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../ChangeLog.html#version-0-10-0">Version 0.10.0</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../ChangeLog.html#version-0-9-0">Version 0.9.0</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../ChangeLog.html#version-0-8-0">Version 0.8.0</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../ChangeLog.html#version-0-7-0">Version 0.7.0</a></li>
@@ -183,6 +190,7 @@
   <ul class="wy-breadcrumbs">
       <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
           <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+          <li class="breadcrumb-item"><a href="../edipack2triqs.html">edipack2triqs</a></li>
       <li class="breadcrumb-item active">edipack2triqs.solver</li>
       <li class="wy-breadcrumbs-aside">
       </li>
@@ -214,6 +222,7 @@
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">edipack2py</span><span class="w"> </span><span class="kn">import</span> <span class="n">global_env</span> <span class="k">as</span> <span class="n">ed</span>
 
+<span class="kn">from</span><span class="w"> </span><span class="nn">.</span><span class="w"> </span><span class="kn">import</span> <span class="n">EDMode</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">.util</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span><span class="n">IndicesType</span><span class="p">,</span>
                    <span class="n">validate_fops_up_dn</span><span class="p">,</span>
                    <span class="n">is_spin_diagonal</span><span class="p">,</span>
@@ -347,6 +356,14 @@
 <span class="sd">                         destruction of this :py:class:`EDIpackSolver` object.</span>
 <span class="sd">        :type keep_dir: bool, default=False</span>
 
+<span class="sd">        :param ed_mode: Force a specific EDIpack exact diagonalization mode.</span>
+<span class="sd">                        The requested mode still has to be compatible with the</span>
+<span class="sd">                        provided Hamiltonian. Using this parameter</span>
+<span class="sd">                        makes sense when :py:attr:`EDMode.NORMAL` is</span>
+<span class="sd">                        automatically selected, but :py:attr:`EDMode.SUPERC`</span>
+<span class="sd">                        or :py:attr:`EDMode.NONSU2` is desired instead.</span>
+<span class="sd">        :type ed_mode: EDMode, optional</span>
+
 <span class="sd">        :param zerotemp: Enable zero temperature calculations.</span>
 <span class="sd">        :type zerotemp: bool, default=False</span>
 
@@ -445,7 +462,8 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">h_params</span> <span class="o">=</span> <span class="n">parse_hamiltonian</span><span class="p">(</span>
             <span class="n">hamiltonian</span><span class="p">,</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">fops_imp_up</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">fops_imp_dn</span><span class="p">,</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">fops_bath_up</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">fops_bath_dn</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">fops_bath_up</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">fops_bath_dn</span><span class="p">,</span>
+            <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;ed_mode&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
         <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">nspin</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">h_params</span><span class="o">.</span><span class="n">Hloc</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 
@@ -482,7 +500,7 @@
             <span class="n">c</span><span class="p">[</span><span class="s2">&quot;LANC_DIM_THRESHOLD&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;lanc_dim_threshold&quot;</span><span class="p">,</span> <span class="mi">1024</span><span class="p">)</span>
 
             <span class="c1"># Impurity structure</span>
-            <span class="n">c</span><span class="p">[</span><span class="s2">&quot;ED_MODE&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">h_params</span><span class="o">.</span><span class="n">ed_mode</span>
+            <span class="n">c</span><span class="p">[</span><span class="s2">&quot;ED_MODE&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">h_params</span><span class="o">.</span><span class="n">ed_mode</span><span class="o">.</span><span class="n">value</span>
             <span class="n">c</span><span class="p">[</span><span class="s2">&quot;NSPIN&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">nspin</span>
             <span class="n">c</span><span class="p">[</span><span class="s2">&quot;NORB&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">norb</span>
 
@@ -497,7 +515,7 @@
             <span class="n">ed_total_ud</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;ed_total_ud&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">denden_int</span> <span class="o">=</span> <span class="n">_is_density_density</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">h_params</span><span class="o">.</span><span class="n">U</span><span class="p">)</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="p">((</span><span class="ow">not</span> <span class="n">ed_total_ud</span><span class="p">)</span>
-                    <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">h_params</span><span class="o">.</span><span class="n">ed_mode</span> <span class="o">==</span> <span class="s2">&quot;normal&quot;</span>
+                    <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">h_params</span><span class="o">.</span><span class="n">ed_mode</span> <span class="o">==</span> <span class="n">EDMode</span><span class="o">.</span><span class="n">NORMAL</span>
                     <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">h_params</span><span class="o">.</span><span class="n">bath</span><span class="p">,</span> <span class="p">(</span><span class="n">NoneType</span><span class="p">,</span> <span class="n">BathNormal</span><span class="p">))</span>
                     <span class="ow">and</span> <span class="n">_is_density</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">h_params</span><span class="o">.</span><span class="n">Hloc</span><span class="p">)</span>
                     <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">denden_int</span><span class="p">):</span>
@@ -587,12 +605,12 @@
             <span class="n">ed</span><span class="o">.</span><span class="n">init_solver</span><span class="p">(</span><span class="n">bath</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">((),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">))</span>
 
         <span class="c1"># GF block names</span>
-        <span class="k">if</span> <span class="n">ed</span><span class="o">.</span><span class="n">get_ed_mode</span><span class="p">()</span> <span class="ow">in</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">):</span>  <span class="c1"># normal or superc</span>
+        <span class="k">if</span> <span class="n">ed</span><span class="o">.</span><span class="n">get_ed_mode</span><span class="p">()</span> <span class="ow">in</span> <span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">EDMode</span><span class="o">.</span><span class="n">NORMAL</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">EDMode</span><span class="o">.</span><span class="n">SUPERC</span><span class="p">)):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">gf_block_names</span> <span class="o">=</span> <span class="p">(</span><span class="n">block_names_up</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">block_names_dn</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">gf_block_names</span> <span class="o">=</span> <span class="p">(</span><span class="n">block_names_up</span><span class="p">[</span><span class="mi">0</span><span class="p">],)</span>
 
-        <span class="k">if</span> <span class="n">ed</span><span class="o">.</span><span class="n">get_ed_mode</span><span class="p">()</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>  <span class="c1"># superc</span>
+        <span class="k">if</span> <span class="n">ed</span><span class="o">.</span><span class="n">get_ed_mode</span><span class="p">()</span> <span class="o">==</span> <span class="nb">int</span><span class="p">(</span><span class="n">EDMode</span><span class="o">.</span><span class="n">SUPERC</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">gf_an_block_names</span> <span class="o">=</span> <span class="p">(</span><span class="n">block_names_up</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
                                       <span class="o">+</span> <span class="s2">&quot;_&quot;</span> <span class="o">+</span> <span class="n">block_names_dn</span><span class="p">[</span><span class="mi">0</span><span class="p">],)</span>
 
@@ -723,7 +741,7 @@
         <span class="n">ed</span><span class="o">.</span><span class="n">eps</span> <span class="o">=</span> <span class="n">broadening</span>
         <span class="n">ed</span><span class="o">.</span><span class="n">Ltau</span> <span class="o">=</span> <span class="n">n_tau</span>
 
-        <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nspin</span> <span class="o">==</span> <span class="mi">2</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">h_params</span><span class="o">.</span><span class="n">ed_mode</span> <span class="o">==</span> <span class="s2">&quot;normal&quot;</span><span class="p">)</span> <span class="ow">and</span> \
+        <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nspin</span> <span class="o">==</span> <span class="mi">2</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">h_params</span><span class="o">.</span><span class="n">ed_mode</span> <span class="o">==</span> <span class="n">EDMode</span><span class="o">.</span><span class="n">NORMAL</span><span class="p">)</span> <span class="ow">and</span> \
                 <span class="p">(</span><span class="ow">not</span> <span class="n">is_spin_diagonal</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">h_params</span><span class="o">.</span><span class="n">Hloc</span><span class="p">)):</span>
             <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Local Hamiltonian must remain spin-diagonal&quot;</span><span class="p">)</span>
 
@@ -735,7 +753,7 @@
             <span class="p">)</span>
 
         <span class="k">if</span> <span class="p">(</span><span class="kc">True</span> <span class="ow">in</span> <span class="p">(</span><span class="n">chi_spin</span><span class="p">,</span> <span class="n">chi_dens</span><span class="p">,</span> <span class="n">chi_exct</span><span class="p">,</span> <span class="n">chi_pair</span><span class="p">))</span> <span class="ow">and</span> \
-                <span class="n">ed</span><span class="o">.</span><span class="n">get_ed_mode</span><span class="p">()</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>   <span class="c1"># normal</span>
+                <span class="n">ed</span><span class="o">.</span><span class="n">get_ed_mode</span><span class="p">()</span> <span class="o">!=</span> <span class="nb">int</span><span class="p">(</span><span class="n">EDMode</span><span class="o">.</span><span class="n">NORMAL</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
                 <span class="s2">&quot;Response functions are only available in the normal ED mode&quot;</span>
             <span class="p">)</span>
@@ -815,7 +833,7 @@
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_make_gf</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ed_func</span><span class="p">,</span> <span class="n">real_freq</span><span class="p">,</span> <span class="n">anomalous</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">BlockGf</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">anomalous</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">ed</span><span class="o">.</span><span class="n">get_ed_mode</span><span class="p">()</span> <span class="o">!=</span> <span class="mi">2</span><span class="p">:</span>  <span class="c1"># superc</span>
+            <span class="k">if</span> <span class="n">ed</span><span class="o">.</span><span class="n">get_ed_mode</span><span class="p">()</span> <span class="o">!=</span> <span class="nb">int</span><span class="p">(</span><span class="n">EDMode</span><span class="o">.</span><span class="n">SUPERC</span><span class="p">):</span>
                 <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;anomalous = True is only supported for &quot;</span>
                                    <span class="s2">&quot;superconducting bath&quot;</span><span class="p">)</span>
 
@@ -836,7 +854,8 @@
                            <span class="n">block_list</span><span class="o">=</span><span class="p">[</span><span class="n">F</span><span class="p">],</span>
                            <span class="n">make_copies</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="n">ed</span><span class="o">.</span><span class="n">get_ed_mode</span><span class="p">()</span> <span class="ow">in</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">):</span>  <span class="c1"># 2 spin blocks</span>
+        <span class="k">if</span> <span class="n">ed</span><span class="o">.</span><span class="n">get_ed_mode</span><span class="p">()</span> <span class="ow">in</span> <span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">EDMode</span><span class="o">.</span><span class="n">NORMAL</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">EDMode</span><span class="o">.</span><span class="n">SUPERC</span><span class="p">)):</span>
+            <span class="c1"># 2 spin blocks</span>
             <span class="n">blocks</span> <span class="o">=</span> <span class="p">[</span>
                 <span class="n">Gf</span><span class="p">(</span><span class="n">mesh</span><span class="o">=</span><span class="n">mesh</span><span class="p">,</span> <span class="n">target_shape</span><span class="o">=</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">norb</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">norb</span><span class="p">))</span>
                 <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
@@ -977,7 +996,7 @@
     <span class="c1">#</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_make_chi</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">chan</span><span class="p">,</span> <span class="n">axis</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Gf</span><span class="p">:</span>
-        <span class="k">if</span> <span class="n">ed</span><span class="o">.</span><span class="n">get_ed_mode</span><span class="p">()</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>  <span class="c1"># normal</span>
+        <span class="k">if</span> <span class="n">ed</span><span class="o">.</span><span class="n">get_ed_mode</span><span class="p">()</span> <span class="o">!=</span> <span class="nb">int</span><span class="p">(</span><span class="n">EDMode</span><span class="o">.</span><span class="n">NORMAL</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
                 <span class="s2">&quot;Response functions are only available in the normal ED mode&quot;</span>
             <span class="p">)</span>

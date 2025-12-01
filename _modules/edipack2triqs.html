@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Overview: module code &mdash; edipack2triqs  documentation</title>
+  <title>edipack2triqs &mdash; edipack2triqs  documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="../_static/css/custom.css?v=df4ffeb6" />
       <link rel="stylesheet" type="text/css" href="../_static/plot_directive.css" />
@@ -189,7 +189,8 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
-      <li class="breadcrumb-item active">Overview: module code</li>
+          <li class="breadcrumb-item"><a href="index.html">Module code</a></li>
+      <li class="breadcrumb-item active">edipack2triqs</li>
       <li class="wy-breadcrumbs-aside">
       </li>
   </ul>
@@ -198,12 +199,32 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <h1>All modules for which code is available</h1>
-<ul><li><a href="edipack2triqs.html">edipack2triqs</a></li>
-<ul><li><a href="edipack2triqs/bath.html">edipack2triqs.bath</a></li>
-<li><a href="edipack2triqs/fit.html">edipack2triqs.fit</a></li>
-<li><a href="edipack2triqs/solver.html">edipack2triqs.solver</a></li>
-</ul></ul>
+  <h1>Source code for edipack2triqs</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">enum</span><span class="w"> </span><span class="kn">import</span> <span class="n">Enum</span>
+
+
+<div class="viewcode-block" id="EDMode">
+<a class="viewcode-back" href="../documentation.html#edipack2triqs.EDMode">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">EDMode</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+    <span class="s2">&quot;EDIpack&#39;s :f:var:`exact diagonalization mode &lt;f/ed_input_vars/ed_mode&gt;`.&quot;</span>
+    <span class="n">NORMAL</span> <span class="o">=</span> <span class="s2">&quot;normal&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Normal</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">SUPERC</span> <span class="o">=</span> <span class="s2">&quot;superc&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    s-wave superconductive</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">NONSU2</span> <span class="o">=</span> <span class="s2">&quot;nonsu2&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Broken SU(2) symmetry</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__int__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="s2">&quot;Integer IDs used by EDIpack&quot;</span>
+        <span class="k">return</span> <span class="p">{</span><span class="bp">self</span><span class="o">.</span><span class="n">NORMAL</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">SUPERC</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">NONSU2</span><span class="p">:</span> <span class="mi">3</span><span class="p">}[</span><span class="bp">self</span><span class="p">]</span></div>
+
+</pre></div>
 
            </div>
           </div>
