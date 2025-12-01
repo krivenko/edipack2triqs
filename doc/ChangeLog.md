@@ -2,7 +2,7 @@
 
 # Changelog
 
-## Version 0.10.0
+## Version 1.0.0
 
 * Added an enumeration type `EDMode` that represents EDIpack's exact
   diagonalization mode.

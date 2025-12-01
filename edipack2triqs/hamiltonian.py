@@ -64,15 +64,41 @@ def _is_density_density(U: np.ndarray):
     return True
 
 
+def _parse_bath_basis(bath_basis: list[op.Operator],
+                      nspin: int,
+                      norb: int,
+                      fops_bath_up: list[IndicesType],
+                      fops_bath_dn: list[IndicesType],
+                      is_nambu: bool):
+    "Parse a list of bath basis operators and turn them into matrices"
+    nbath_total = len(fops_bath_up)
+    nsym = len(bath_basis)
+
+    fops_bath = fops_bath_up + fops_bath_dn
+
+    hvec_dim1 = (2 if is_nambu else 1) * nspin
+    # Basis matrices
+    # They can, in pr
+    hvec = np.zeros((hvec_dim1, hvec_dim1, norb, norb, nsym),
+                    dtype=complex, order='F')
+
+    # TODO
+
+
 def _make_bath(ed_mode: EDMode,
                nspin: int,
                Hloc: np.ndarray,
                h: np.ndarray,
                V: np.ndarray,
-               Delta: np.ndarray):
+               Delta: np.ndarray,
+               bath_basis_mats: Union[list[np.ndarray], NoneType]):
     """
     Make a bath parameters object.
     """
+
+    if bath_basis_mats is not None:
+        # TODO: Immediately try to construct BathGeneral
+        pass
 
     # Can we use bath_type = 'normal'?
     if BathNormal.is_usable(Hloc, h, V, Delta):
@@ -95,12 +121,16 @@ def _make_bath(ed_mode: EDMode,
             )
 
 
-def parse_hamiltonian(hamiltonian: op.Operator,  # noqa: C901
-                      fops_imp_up: list[IndicesType],
-                      fops_imp_dn: list[IndicesType],
-                      fops_bath_up: list[IndicesType],
-                      fops_bath_dn: list[IndicesType],
-                      f_ed_mode: Optional[EDMode] = None) -> HamiltonianParams:
+def parse_hamiltonian(  # noqa: C901
+        hamiltonian: op.Operator,
+        fops_imp_up: list[IndicesType],
+        fops_imp_dn: list[IndicesType],
+        fops_bath_up: list[IndicesType],
+        fops_bath_dn: list[IndicesType],
+        f_ed_mode: Optional[EDMode] = None,
+        *,
+        bath_basis: Optional[list[op.Operator]] = None) -> \
+        HamiltonianParams:
     """
     Parse a given Hamiltonian and extract parameters from it.
     """
@@ -231,17 +261,16 @@ def parse_hamiltonian(hamiltonian: op.Operator,  # noqa: C901
     )
     nspin = 1 if (hamiltonian_n_conj - hamiltonian_n).is_zero() else 2
 
+    # ed_mode selection
+    superc = (Delta != 0).any()
     if nspin == 1:
         # Internal consistency check: Hloc, h and V must be spin-degenerate
         assert is_spin_degenerate(Hloc)
         assert is_spin_degenerate(h)
         assert is_spin_degenerate(V)
-        if (Delta == 0).all():
-            ed_mode = EDMode.NORMAL
-        else:
-            ed_mode = EDMode.SUPERC
+        ed_mode = EDMode.SUPERC if superc else EDMode.NORMAL
     else:  # nspin == 2
-        if not (Delta == 0).all():
+        if superc:
             raise RuntimeError(
                 "Magnetism in presence of a superconducting bath "
                 "is not supported"
@@ -262,7 +291,11 @@ def parse_hamiltonian(hamiltonian: op.Operator,  # noqa: C901
                 f"is incompatible with the Hamiltonian (must be {ed_mode})"
             )
 
-    bath = _make_bath(ed_mode, nspin, Hloc, h, V, Delta) \
+    bath_basis_mats = _parse_bath_basis(
+        bath_basis, nspin, norb, fops_bath_up, fops_bath_dn, superc) \
+        if (bath_basis is not None) else None
+
+    bath = _make_bath(ed_mode, nspin, Hloc, h, V, Delta, bath_basis_mats) \
         if nbath_total > 0 else None
     params = HamiltonianParams(
         ed_mode,

@@ -112,6 +112,63 @@ def non_int_part(OP: op.Operator):
     return res
 
 
+def basis_op_to_matrix(OP: op.Operator,
+                       nspin: int,
+                       fops_bath_up: list[IndicesType],
+                       fops_bath_dn: list[IndicesType]):
+    """
+    Transform a quadratic operator into a basis matrix.
+
+    The two matrices returned by this function are the normal and anomalous
+    components of the basis matrix.
+    """
+    nbath_total = len(fops_bath_up)
+
+    fops_bath = fops_bath_up + fops_bath_dn
+
+    # Resulting matrices
+    mat_n = np.zeros((2, 2, nbath_total, nbath_total), dtype=complex, order='F')
+    mat_a = np.zeros((nbath_total, nbath_total), dtype=complex, order='F')
+
+    for mon, coeff in OP:
+        if len(mon) != 2:
+            raise RuntimeError(
+                "Only quadratic operators are allowed "
+                f"in the bath basis specification, got {OP}"
+            )
+        daggers = tuple(dag for dag, ind in mon)
+        indices = tuple(tuple(ind) for dag, ind in mon)
+
+        if (indices[0] not in fops_bath) or (indices[1] not in fops_bath):
+            raise RuntimeError(
+                f"Unexpected term {coeff * monomial2op(mon)} "
+                f"in {OP}"
+            )
+
+        spin1, b1 = divmod(fops_bath.index(indices[0]), nbath_total)
+        spin2, b2 = divmod(fops_bath.index(indices[1]), nbath_total)
+
+        # Normal matrix element
+        if daggers == (True, False):
+            mat_n[spin1, spin2, b1, b2] = coeff
+
+        # Anomalous matrix element
+        elif daggers[0] == daggers[1]:
+            if spin1 == spin2:  # Not representable in Nambu notation
+                raise RuntimeError(
+                    "Unexpected same-spin anomalous term "
+                    f"{coeff * monomial2op(mon)}"
+                )
+            # Fill mat_a from creation-creation terms,
+            # ignore annihilation-annihilation terms
+            if daggers == (True, True):
+                if spin1 == 0:
+                    mat_a[b1, b2] = coeff
+                else:
+                    mat_a[b2, b1] = -coeff
+
+    return mat_n, mat_a
+
 @contextmanager
 def chdircontext(path):
     """
