@@ -821,7 +821,7 @@ class BathGeneral(Bath):
 
         # In the superconducting case, reinterpret first two indices of h as
         # Nambu indices and fill the off-diagonal elements from Delta
-        is_nambu = not (Delta == 0).all()
+        is_nambu = (ed_mode == EDMode.SUPERC)
         nnambu = 1
         if is_nambu:
             nnambu = 2

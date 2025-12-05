@@ -33,6 +33,8 @@ class HamiltonianParams:
     bath: Union[BathNormal, BathHybrid, BathGeneral, NoneType]
     # Interaction matrix U_{ijkl}
     U: np.ndarray
+    # Pairing field
+    pair_field: np.ndarray
 
 
 def _is_density(hloc: np.ndarray):
@@ -95,6 +97,12 @@ def _make_bath(ed_mode: EDMode,
             )
 
 
+def _raise_term_error(msg, mon, coeff):
+    "Raise a runtime error about an unexpected Hamiltonian term"
+    term = coeff * monomial2op(mon)
+    raise RuntimeError(msg.format(term))
+
+
 def parse_hamiltonian(hamiltonian: op.Operator,  # noqa: C901
                       fops_imp_up: list[IndicesType],
                       fops_imp_dn: list[IndicesType],
@@ -117,6 +125,18 @@ def parse_hamiltonian(hamiltonian: op.Operator,  # noqa: C901
     norb = len(fops_imp_up)
     nbath_total = len(fops_bath_up)
 
+    def is_imp(index):
+        return index in fops_imp
+
+    def is_bath(index):
+        return index in fops_bath
+
+    def get_spin_orb(index):
+        return divmod(fops_imp.index(index), norb)
+
+    def get_spin_b(index):
+        return divmod(fops_bath.index(index), nbath_total)
+
     # Coefficients Hloc[spin1, spin2, orb1, orb2] in front of
     # d^+(spin1, orb1) d(spin2, orb2)
     Hloc = np.zeros((2, 2, norb, norb), dtype=complex)
@@ -132,6 +152,9 @@ def parse_hamiltonian(hamiltonian: op.Operator,  # noqa: C901
     # in front of
     # (1/2) c^+(spin1, orb1) c^+(spin2, orb2) c(spin4, orb4) c(spin3, orb3)
     U = np.zeros((norb, 2) * 4, dtype=float)
+    # Coefficients pair_field[orb]
+    # in front of (c^+(up, orb) c^+(dn, orb) + c(dn, orb) c(up, orb))
+    pair_field = np.zeros((norb,), dtype=float)
 
     for mon, coeff in hamiltonian:
         # Skipping an irrelevant constant term
@@ -144,45 +167,40 @@ def parse_hamiltonian(hamiltonian: op.Operator,  # noqa: C901
         # U(1)-symmetric quadratic term
         if daggers == [True, False]:
             # d^+ d
-            if (indices[0] in fops_imp) and (indices[1] in fops_imp):
-                spin1, orb1 = divmod(fops_imp.index(indices[0]), norb)
-                spin2, orb2 = divmod(fops_imp.index(indices[1]), norb)
+            if is_imp(indices[0]) and is_imp(indices[1]):
+                spin1, orb1 = get_spin_orb(indices[0])
+                spin2, orb2 = get_spin_orb(indices[1])
                 Hloc[spin1, spin2, orb1, orb2] = coeff
             # d^+ a
-            elif (indices[0] in fops_imp) and (indices[1] in fops_bath):
-                spin1, orb = divmod(fops_imp.index(indices[0]), norb)
-                spin2, b = divmod(fops_bath.index(indices[1]), nbath_total)
+            elif is_imp(indices[0]) and is_bath(indices[1]):
+                spin1, orb = get_spin_orb(indices[0])
+                spin2, b = get_spin_b(indices[1])
                 V[spin1, spin2, orb, b] = coeff
             # a^+ d
-            elif (indices[0] in fops_bath) and (indices[1] in fops_imp):
+            elif is_bath(indices[0]) and is_imp(indices[1]):
                 continue
             # a^+ a
-            elif (indices[0] in fops_bath) and (indices[1] in fops_bath):
-                spin1, b1 = divmod(fops_bath.index(indices[0]), nbath_total)
-                spin2, b2 = divmod(fops_bath.index(indices[1]), nbath_total)
+            elif is_bath(indices[0]) and is_bath(indices[1]):
+                spin1, b1 = get_spin_b(indices[0])
+                spin2, b2 = get_spin_b(indices[1])
                 h[spin1, spin2, b1, b2] = coeff
             else:
-                raise RuntimeError(
-                    f"Unexpected quadratic term {coeff * monomial2op(mon)}"
-                )
+                _raise_term_error("Unexpected quadratic term {}", mon, coeff)
 
         # U(1)-symmetric quartic term
         elif daggers == [True, True, False, False]:
             try:
-                spin1, orb1 = divmod(fops_imp.index(indices[0]), norb)
-                spin2, orb2 = divmod(fops_imp.index(indices[1]), norb)
-                spin3, orb3 = divmod(fops_imp.index(indices[2]), norb)
-                spin4, orb4 = divmod(fops_imp.index(indices[3]), norb)
+                spin1, orb1 = get_spin_orb(indices[0])
+                spin2, orb2 = get_spin_orb(indices[1])
+                spin3, orb3 = get_spin_orb(indices[2])
+                spin4, orb4 = get_spin_orb(indices[3])
             except ValueError:
-                raise RuntimeError(
-                    f"Unexpected interaction term {coeff * monomial2op(mon)}"
-                )
+                _raise_term_error("Unexpected interaction term {}", mon, coeff)
 
             if coeff.imag != 0:
-                raise RuntimeError(
-                    "Unsupported complex interaction term "
-                    f"{coeff * monomial2op(mon)}"
-                )
+                _raise_term_error("Unsupported complex interaction term {}",
+                                  mon,
+                                  coeff)
 
             U[orb1, spin1, orb2, spin2, orb4, spin4, orb3, spin3] = 0.5 * coeff
             U[orb1, spin1, orb2, spin2, orb3, spin3, orb4, spin4] = -0.5 * coeff
@@ -191,39 +209,66 @@ def parse_hamiltonian(hamiltonian: op.Operator,  # noqa: C901
 
         # Anomalous term creation-creation
         elif daggers == [True, True]:
-            if (indices[0] in fops_bath) and (indices[1] in fops_bath):
-                spin1, b1 = divmod(fops_bath.index(indices[0]), nbath_total)
-                spin2, b2 = divmod(fops_bath.index(indices[1]), nbath_total)
+            if is_bath(indices[0]) and is_bath(indices[1]):
+                spin1, b1 = get_spin_b(indices[0])
+                spin2, b2 = get_spin_b(indices[1])
                 if spin1 == spin2:  # Not representable in Nambu notation
-                    term = coeff * monomial2op(mon)
-                    raise RuntimeError(
-                        f"Unexpected same-spin anomalous term {term}"
-                    )
+                    _raise_term_error("Unexpected same-spin anomalous term {}",
+                                      mon,
+                                      coeff)
                 if spin1 == 0:
                     Delta[b1, b2] = coeff
                 else:
                     Delta[b2, b1] = -coeff
+            elif is_imp(indices[0]) and is_imp(indices[1]):
+                spin1, orb1 = get_spin_orb(indices[0])
+                spin2, orb2 = get_spin_orb(indices[1])
+                if spin1 == spin2:  # Not representable in Nambu notation
+                    _raise_term_error("Unexpected same-spin anomalous term {}",
+                                      mon,
+                                      coeff)
+                if orb1 != orb2:
+                    _raise_term_error(
+                        "Unexpected orbital off-diagonal "
+                        "impurity anomalous term {}",
+                        mon,
+                        coeff)
+                if spin1 == 0:
+                    pair_field[orb1] = coeff
+                else:
+                    pair_field[orb1] = -coeff
             else:
-                term = coeff * monomial2op(mon)
-                raise RuntimeError(f"Unexpected anomalous term {term}")
+                _raise_term_error("Unexpected anomalous term {}", mon, coeff)
 
         # Anomalous term annihilation-annihilation
         elif daggers == [False, False]:
-            if (indices[0] in fops_bath) and (indices[1] in fops_bath):
-                spin1, b1 = divmod(fops_bath.index(indices[0]), nbath_total)
-                spin2, b2 = divmod(fops_bath.index(indices[1]), nbath_total)
+            if is_bath(indices[0]) and is_bath(indices[1]):
+                spin1, b1 = get_spin_b(indices[0])
+                spin2, b2 = get_spin_b(indices[1])
                 if spin1 == spin2:  # Not representable in Nambu notation
-                    raise RuntimeError(
-                        f"Unexpected same-spin anomalous term {term}"
-                    )
+                    _raise_term_error("Unexpected same-spin anomalous term {}",
+                                      mon,
+                                      coeff)
+                continue
+            elif is_imp(indices[0]) and is_imp(indices[1]):
+                spin1, orb1 = get_spin_orb(indices[0])
+                spin2, orb2 = get_spin_orb(indices[1])
+                if spin1 == spin2:  # Not representable in Nambu notation
+                    _raise_term_error("Unexpected same-spin anomalous term {}",
+                                      mon,
+                                      coeff)
+                if orb1 != orb2:
+                    _raise_term_error(
+                        "Unexpected orbital off-diagonal "
+                        "impurity anomalous term {}",
+                        mon,
+                        coeff)
                 continue
             else:
-                raise RuntimeError(f"Unexpected anomalous term {term}")
+                _raise_term_error("Unexpected anomalous term {}", mon, coeff)
 
         else:
-            raise RuntimeError(
-                f"Unsupported Hamiltonian term {coeff * monomial2op(mon)}"
-            )
+            _raise_term_error("Unsupported Hamiltonian term {}", mon, coeff)
 
     hamiltonian_n = normal_part(hamiltonian)
     hamiltonian_n_conj = spin_conjugate(
@@ -231,20 +276,18 @@ def parse_hamiltonian(hamiltonian: op.Operator,  # noqa: C901
     )
     nspin = 1 if (hamiltonian_n_conj - hamiltonian_n).is_zero() else 2
 
+    # ed_mode selection
+    superc = (Delta != 0).any() or (pair_field != 0).any()
     if nspin == 1:
         # Internal consistency check: Hloc, h and V must be spin-degenerate
         assert is_spin_degenerate(Hloc)
         assert is_spin_degenerate(h)
         assert is_spin_degenerate(V)
-        if (Delta == 0).all():
-            ed_mode = EDMode.NORMAL
-        else:
-            ed_mode = EDMode.SUPERC
+        ed_mode = EDMode.SUPERC if superc else EDMode.NORMAL
     else:  # nspin == 2
-        if not (Delta == 0).all():
+        if superc:
             raise RuntimeError(
-                "Magnetism in presence of a superconducting bath "
-                "is not supported"
+                "Magnetism in presence of pairing terms is not supported"
             )
         if is_spin_diagonal(Hloc) and \
            is_spin_diagonal(h) and is_spin_diagonal(V):
@@ -268,7 +311,8 @@ def parse_hamiltonian(hamiltonian: op.Operator,  # noqa: C901
         ed_mode,
         Hloc=np.zeros((nspin, nspin, norb, norb), dtype=complex, order='F'),
         bath=bath,
-        U=U
+        U=U,
+        pair_field=pair_field
     )
 
     for spin1, spin2 in product(range(nspin), range(nspin)):

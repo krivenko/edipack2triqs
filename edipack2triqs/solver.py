@@ -429,6 +429,14 @@ class EDIpackSolver:
         return self.h_params.Hloc
 
     @property
+    def pair_field(self) -> np.ndarray:
+        r"""
+        Access to the vector of the pairing fields acting on
+        the impurity electrons.
+        """
+        return self.h_params.pair_field
+
+    @property
     def U(self) -> np.ndarray:
         r"""
         Access to the two-particle interaction tensor
@@ -566,6 +574,9 @@ class EDIpackSolver:
                 o1, o2, o3, o4 = ind[0:8:2]
                 s1, s2, s3, s4 = (('u' if s == 0 else 'd') for s in ind[1:8:2])
                 ed.add_twobody_operator(o1, s1, o2, s2, o3, s3, o4, s4, val)
+
+            # Set pair_field
+            ed.pair_field = self.h_params.pair_field
 
             # Solve!
             if self.h_params.bath is not None:
