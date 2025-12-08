@@ -159,6 +159,9 @@ def make_reference_results(*,
 
         hloc = _extract_hloc(h, gf_struct)[up_dn]
         hloc[norb:, norb:] *= -1
+        pair_field = _extract_pair_field(h, norb, up_dn)
+        hloc[:norb, norb:] = np.diag(pair_field)
+        hloc[norb:, :norb] = np.diag(pair_field)
 
         # Real frequency
         gf_args = [gf_struct, beta, energy_window, n_w]
@@ -403,6 +406,24 @@ def _extract_hloc(h, gf_struct):
             hloc_b[i, j] = h_dict.get(((bn, i), (bn, j)), .0)
         hloc[bn] = hloc_b
     return hloc
+
+
+def _extract_pair_field(h, norb, bn):
+    """
+    Extract pairing fields from a Hamiltonian expression.
+    """
+    pair_field = np.zeros(norb, dtype=float)
+    for mon, coeff in h:
+        if len(mon) != 2:
+            continue
+        dag1, ind1 = mon[0]
+        dag2, ind2 = mon[1]
+        if ((dag1, dag2) != (True, True)
+           or (ind1[0] != bn) or (ind2[0] != bn)
+           or (ind2[1] != ind1[1] + norb)):
+            continue
+        pair_field[ind1[1]] = coeff
+    return pair_field
 
 
 def _make_pomerol_ed(index_converter, h):
