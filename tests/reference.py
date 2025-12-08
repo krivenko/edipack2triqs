@@ -22,8 +22,9 @@ from h5 import HDFArchive
 from edipack2triqs.util import monomial2op, non_int_part
 
 
-# Write computed reference results into HDF5 archive
-write_h5 = False
+# Call pomerol2triqs to obtain reference data for unit tests and
+# write computed reference results into HDF5 archive.
+generate_ref_data = False
 
 
 def make_mkind(spins, orbs, spin_blocks):
@@ -39,7 +40,7 @@ def ref_results(h5_group_name, **params):
     "Either generate reference results or load them from an HDF5 archive"
 
     filename = inspect.stack()[1].filename[:-2] + "h5"
-    if write_h5:
+    if generate_ref_data:
         results = make_reference_results(**params)
         with HDFArchive(filename, 'a') as ar:
             ar.create_group(h5_group_name)

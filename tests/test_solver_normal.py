@@ -13,12 +13,23 @@ from triqs.utility.comparison_tests import (assert_gfs_are_close,
 from edipack2triqs.solver import EDIpackSolver
 
 from . import reference as ref
-ref.write_h5 = False
 
 
 s0 = np.eye(2)
 sx = np.array([[0, 1], [1, 0]])
 sz = np.array([[1, 0], [0, -1]])
+
+
+# If pytest is available, detect a use of --generate-ref-data
+try:
+    import pytest
+
+    @pytest.fixture(scope="session", autouse=True)
+    def generate_ref_data(request):
+        ref.generate_ref_data = request.config.getoption("generate_ref_data",
+                                                         default=False)
+except ImportError:
+    pass
 
 
 class TestEDIpackSolverBathNormal(unittest.TestCase):
