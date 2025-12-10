@@ -276,6 +276,14 @@ def parse_hamiltonian(hamiltonian: op.Operator,  # noqa: C901
     )
     nspin = 1 if (hamiltonian_n_conj - hamiltonian_n).is_zero() else 2
 
+    # EDIpack does not seem to reliably work when \Delta is asymmetric
+    # See https://github.com/EDIpack/EDIpack/issues/35#issuecomment-3637501715
+    if (Delta != Delta.T).any():
+        raise RuntimeError(
+            "All pairing terms between bath states b and b' must be symmetric "
+            "under the index swap b <-> b'"
+        )
+
     # ed_mode selection
     superc = (Delta != 0).any() or (pair_field != 0).any()
     if nspin == 1:
