@@ -429,6 +429,14 @@ class EDIpackSolver:
         return self.h_params.Hloc
 
     @property
+    def hloc_an(self) -> np.ndarray:
+        r"""
+        Access to the matrix of the anomalous local impurity Hamiltonian
+        :math:`\hat H_\text{loc, an}`.
+        """
+        return self.h_params.Hloc_an
+
+    @property
     def U(self) -> np.ndarray:
         r"""
         Access to the two-particle interaction tensor
@@ -554,8 +562,12 @@ class EDIpackSolver:
 
         self.comm.barrier()
         with chdircontext(self.wdname):
-            # Set H_{loc}
-            ed.set_hloc(hloc=self.h_params.Hloc)
+            # Set H_{loc} and H_{loc, an}
+            if self.h_params.ed_mode == EDMode.SUPERC:
+                ed.set_hloc(hloc=self.h_params.Hloc,
+                            hloc_anomalous=self.h_params.Hloc_an)
+            else:
+                ed.set_hloc(hloc=self.h_params.Hloc)
 
             # Add interaction terms
             ed.reset_umatrix()

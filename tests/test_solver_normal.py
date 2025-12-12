@@ -98,6 +98,12 @@ class TestEDIpackSolverBathNormal(unittest.TestCase):
         return h_bath
 
     @classmethod
+    def make_h_loc_an(cls, pair_field):
+        return sum(pair_field[o] * (op.c_dag('up', o) * op.c_dag('dn', o)
+                                    + op.c('dn', o) * op.c('up', o))
+                   for o in cls.orbs)
+
+    @classmethod
     def make_h_sc(cls, Delta):
         return sum(Delta[o, nu] * (
             op.c_dag('B_up', nu * 2 + o) * op.c_dag('B_dn', nu * 2 + o)
@@ -647,6 +653,110 @@ class TestEDIpackSolverBathNormal(unittest.TestCase):
                                   spin_blocks=False)
         h = h_loc + h_int + h_bath
         refs = ref.ref_results("nonsu2_bath_3", h=h, spin_blocks=False,
+                               **struct_params, **solve_params)
+        self.assert_all(solver, **refs)
+
+    def test_h_loc_an(self):
+        h_loc = self.make_h_loc(mul.outer(s0, np.diag([-0.5, -0.6])))
+        h_int = self.make_h_int(Uloc=np.array([0.1, 0.2]),
+                                Ust=0.4,
+                                Jh=0.2,
+                                Jx=0.1,
+                                Jp=0.15)
+
+        fops_imp_up, fops_imp_dn = self.make_fops_imp()
+        fops = fops_imp_up + fops_imp_dn + self.fops_bath_up + self.fops_bath_dn
+        struct_params = {"spins": self.spins, "orbs": self.orbs, "fops": fops}
+
+        eps = np.array([[-0.5, 0.5],
+                        [-0.7, 0.7]])
+        V = np.array([[0.1, 0.2],
+                      [0.3, 0.4]])
+        h_bath = self.make_h_bath(mul.outer([1, 1], eps), mul.outer(s0, V))
+
+        pair_field = np.array([0.1, 0.2])
+        h_loc_an = self.make_h_loc_an(pair_field)
+
+        h = h_loc + h_loc_an + h_int + h_bath
+        solver = EDIpackSolver(
+            h,
+            fops_imp_up, fops_imp_dn,
+            self.fops_bath_up, self.fops_bath_dn,
+            lanc_nstates_sector=4,
+            lanc_nstates_total=10,
+            verbose=0
+        )
+
+        self.assertEqual(solver.nspin, 1)
+        self.assertEqual(solver.norb, 2)
+        self.assertEqual(solver.bath.name, "normal")
+        self.assertEqual(solver.bath.nbath, 2)
+
+        # Part I: Initial solve()
+        solve_params = {
+            "beta": 60.0,
+            "n_iw": 10,
+            "energy_window": (-2.0, 2.0),
+            "n_w": 60,
+            "broadening": 0.05
+        }
+        solver.solve(**solve_params)
+
+        ## Reference solution
+        refs = ref.ref_results("h_loc_an_1", h=h, superc=True,
+                               **struct_params, **solve_params)
+        self.assert_all(solver, **refs)
+
+        # Part II: update interaction parameters and pairing field
+        new_int_params = {'Uloc': np.array([0.15, 0.25]),
+                          'Ust': 0.35,
+                          'Jh': 0.1,
+                          'Jx': 0.2,
+                          'Jp': 0.0}
+        self.change_int_params(solver.U, new_int_params)
+        pair_field = np.array([0.2, 0.3])
+        solver.hloc_an[0, 0, :, :] = np.diag(pair_field)
+        solver.comm.barrier()
+
+        solve_params = {
+            "beta": 70.0,
+            "n_iw": 20,
+            "energy_window": (-1.5, 1.5),
+            "n_w": 40,
+            "broadening": 0.03
+        }
+        solver.solve(**solve_params)
+
+        # Reference solution
+        h_int = self.make_h_int(**new_int_params)
+        h_loc_an = self.make_h_loc_an(pair_field)
+        h = h_loc + h_loc_an + h_int + h_bath
+        refs = ref.ref_results("h_loc_an_2", h=h, superc=True,
+                               **struct_params, **solve_params)
+        self.assert_all(solver, **refs)
+
+        # Part III: Updated bath parameters
+        eps = np.array([[-0.5, 0.5],
+                        [-0.7, 0.8]])
+        V = np.array([[0.1, 0.2],
+                      [0.5, 0.4]])
+
+        solver.bath.eps[0, ...] = eps
+        solver.bath.V[0, ...] = V
+
+        solve_params = {
+            "beta": 60.0,
+            "n_iw": 30,
+            "energy_window": (-1.5, 1.5),
+            "n_w": 80,
+            "broadening": 0.02
+        }
+        solver.solve(**solve_params)
+
+        # Reference solution
+        h_bath = self.make_h_bath(mul.outer([1, 1], eps), mul.outer(s0, V))
+        h = h_loc + h_loc_an + h_int + h_bath
+        refs = ref.ref_results("h_loc_an_3", h=h, superc=True,
                                **struct_params, **solve_params)
         self.assert_all(solver, **refs)
 
