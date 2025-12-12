@@ -41,9 +41,6 @@ class TestHamiltonian(unittest.TestCase):
     Jx = 0.01
     Jp = 0.03
 
-    # Impurity pairing fields
-    pair_field = np.array([0.1, 0.2, 0.3])
-
     @classmethod
     def make_H_loc(cls, h_loc):
         return sum(h_loc[s1, s2, o1, o2] * op.c_dag(spin1, o1) * op.c(spin2, o2)
@@ -71,10 +68,10 @@ class TestHamiltonian(unittest.TestCase):
         return h_int
 
     @classmethod
-    def make_H_pair_field(cls):
-        return sum(cls.pair_field[o] * (op.c_dag('up', o) * op.c_dag('dn', o)
-                                        + op.c('dn', o) * op.c('up', o))
-                   for o in cls.orbs)
+    def make_H_loc_an(cls, h_loc_an):
+        return sum(h_loc_an[o1, o2] * op.c_dag('up', o1) * op.c_dag('dn', o2)
+                   + np.conj(h_loc_an[o1, o2]) * op.c('dn', o2) * op.c('up', o1)
+                   for o1, o2 in product(cls.orbs, cls.orbs))
 
     def check_int_params(self, params, **ref):
         Uloc = ref.get("Uloc", self.Uloc)
@@ -372,11 +369,13 @@ class TestHamiltonianBathNormal(TestHamiltonian):
         self.check_bath_arithmetics(b, b2)
         self.check_bath_h5(b, "nonsu2_bath")
 
-    def test_parse_hamiltonian_superc_pair_field(self):
+    def test_parse_hamiltonian_superc_hloc_an(self):
         h = self.make_H_loc(mul.outer(s0, self.h_loc)) + self.make_H_int()
         h += self.make_H_bath(mul.outer([1, 1], self.eps),
                               mul.outer(s0, self.V))
-        h += self.make_H_pair_field()
+
+        h_loc_an = np.diag([0.1, 0.2, 0.3])
+        h += self.make_H_loc_an(h_loc_an)
 
         params = parse_hamiltonian(
             h,
@@ -386,7 +385,7 @@ class TestHamiltonianBathNormal(TestHamiltonian):
 
         self.assertEqual(params.ed_mode, EDMode.SUPERC)
         assert_allclose(params.Hloc, self.h_loc.reshape(1, 1, 3, 3))
-        assert_allclose(params.pair_field, self.pair_field)
+        assert_allclose(params.Hloc_an, h_loc_an.reshape(1, 1, 3, 3))
         b = params.bath
         self.assertTrue(isinstance(b, BathNormal))
         self.assertEqual(b.nbath, 2)
@@ -668,11 +667,15 @@ class TestHamiltonianBathHybrid(TestHamiltonian):
         self.check_bath_arithmetics(params.bath, b2)
         self.check_bath_h5(b2, "nonsu2_bath")
 
-    def test_parse_hamiltonian_superc_pair_field(self):
+    def test_parse_hamiltonian_superc_hloc_an(self):
         h = self.make_H_loc(mul.outer(s0, self.h_loc)) + self.make_H_int()
         h += self.make_H_bath(mul.outer([1, 1], self.eps),
                               mul.outer(s0, self.V))
-        h += self.make_H_pair_field()
+
+        h_loc_an = np.array([[0.1, 0.04, 0.05j],
+                             [0.04, 0.2, 0.06],
+                             [0.05j, 0.06, 0.3]])
+        h += self.make_H_loc_an(h_loc_an)
 
         params = parse_hamiltonian(
             h,
@@ -682,7 +685,7 @@ class TestHamiltonianBathHybrid(TestHamiltonian):
 
         self.assertEqual(params.ed_mode, EDMode.SUPERC)
         assert_allclose(params.Hloc, self.h_loc.reshape(1, 1, 3, 3))
-        assert_allclose(params.pair_field, self.pair_field)
+        assert_allclose(params.Hloc_an, h_loc_an.reshape(1, 1, 3, 3))
         self.assertTrue(isinstance(params.bath, BathHybrid))
         self.assertEqual(params.bath.nbath, 4)
         assert_allclose(params.bath.eps, self.eps.reshape(1, 4))
@@ -1040,10 +1043,14 @@ class TestHamiltonianBathGeneral(TestHamiltonian):
         self.check_bath_arithmetics(params.bath, b2)
         self.check_bath_h5(params.bath, "nonsu2_bath")
 
-    def test_parse_hamiltonian_superc_pair_field(self):
+    def test_parse_hamiltonian_superc_hloc_an(self):
         h = self.make_H_loc(mul.outer(s0, self.h_loc)) + self.make_H_int()
         h += self.make_H_bath(mul.outer(s0, self.h), mul.outer([1, 1], self.V))
-        h += self.make_H_pair_field()
+
+        h_loc_an = np.array([[0.1, 0.04, 0.05j],
+                             [0.04, 0.2, 0.06],
+                             [0.05j, 0.06, 0.3]])
+        h += self.make_H_loc_an(h_loc_an)
 
         params = parse_hamiltonian(
             h,
@@ -1053,7 +1060,7 @@ class TestHamiltonianBathGeneral(TestHamiltonian):
 
         self.assertEqual(params.ed_mode, EDMode.SUPERC)
         assert_allclose(params.Hloc, self.h_loc.reshape(1, 1, 3, 3))
-        assert_allclose(params.pair_field, self.pair_field)
+        assert_allclose(params.Hloc_an, h_loc_an.reshape(1, 1, 3, 3))
         self.assertTrue(isinstance(params.bath, BathGeneral))
         self.assertEqual(params.bath.nbath, 4)
         self.assertEqual(params.bath.nsym, 6)

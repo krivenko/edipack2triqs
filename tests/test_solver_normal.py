@@ -98,7 +98,7 @@ class TestEDIpackSolverBathNormal(unittest.TestCase):
         return h_bath
 
     @classmethod
-    def make_h_pair_field(cls, pair_field):
+    def make_h_loc_an(cls, pair_field):
         return sum(pair_field[o] * (op.c_dag('up', o) * op.c_dag('dn', o)
                                     + op.c('dn', o) * op.c('up', o))
                    for o in cls.orbs)
@@ -656,7 +656,7 @@ class TestEDIpackSolverBathNormal(unittest.TestCase):
                                **struct_params, **solve_params)
         self.assert_all(solver, **refs)
 
-    def test_pair_field(self):
+    def test_h_loc_an(self):
         h_loc = self.make_h_loc(mul.outer(s0, np.diag([-0.5, -0.6])))
         h_int = self.make_h_int(Uloc=np.array([0.1, 0.2]),
                                 Ust=0.4,
@@ -675,9 +675,9 @@ class TestEDIpackSolverBathNormal(unittest.TestCase):
         h_bath = self.make_h_bath(mul.outer([1, 1], eps), mul.outer(s0, V))
 
         pair_field = np.array([0.1, 0.2])
-        h_pair_field = self.make_h_pair_field(pair_field)
+        h_loc_an = self.make_h_loc_an(pair_field)
 
-        h = h_loc + h_pair_field + h_int + h_bath
+        h = h_loc + h_loc_an + h_int + h_bath
         solver = EDIpackSolver(
             h,
             fops_imp_up, fops_imp_dn,
@@ -703,7 +703,7 @@ class TestEDIpackSolverBathNormal(unittest.TestCase):
         solver.solve(**solve_params)
 
         ## Reference solution
-        refs = ref.ref_results("pair_field_1", h=h, superc=True,
+        refs = ref.ref_results("h_loc_an_1", h=h, superc=True,
                                **struct_params, **solve_params)
         self.assert_all(solver, **refs)
 
@@ -715,7 +715,7 @@ class TestEDIpackSolverBathNormal(unittest.TestCase):
                           'Jp': 0.0}
         self.change_int_params(solver.U, new_int_params)
         pair_field = np.array([0.2, 0.3])
-        solver.pair_field[:] = pair_field
+        solver.hloc_an[0, 0, :, :] = np.diag(pair_field)
         solver.comm.barrier()
 
         solve_params = {
@@ -729,9 +729,9 @@ class TestEDIpackSolverBathNormal(unittest.TestCase):
 
         # Reference solution
         h_int = self.make_h_int(**new_int_params)
-        h_pair_field = self.make_h_pair_field(pair_field)
-        h = h_loc + h_pair_field + h_int + h_bath
-        refs = ref.ref_results("pair_field_2", h=h, superc=True,
+        h_loc_an = self.make_h_loc_an(pair_field)
+        h = h_loc + h_loc_an + h_int + h_bath
+        refs = ref.ref_results("h_loc_an_2", h=h, superc=True,
                                **struct_params, **solve_params)
         self.assert_all(solver, **refs)
 
@@ -755,8 +755,8 @@ class TestEDIpackSolverBathNormal(unittest.TestCase):
 
         # Reference solution
         h_bath = self.make_h_bath(mul.outer([1, 1], eps), mul.outer(s0, V))
-        h = h_loc + h_pair_field + h_int + h_bath
-        refs = ref.ref_results("pair_field_3", h=h, superc=True,
+        h = h_loc + h_loc_an + h_int + h_bath
+        refs = ref.ref_results("h_loc_an_3", h=h, superc=True,
                                **struct_params, **solve_params)
         self.assert_all(solver, **refs)
 

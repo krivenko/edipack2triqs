@@ -29,12 +29,12 @@ class HamiltonianParams:
     ed_mode: EDMode
     # Non-interacting part of the impurity Hamiltonian
     Hloc: np.ndarray
+    # Anomalous part of the impurity Hamiltonian
+    Hloc_an: np.ndarray
     # Bath object (None if no bath is present)
     bath: Union[BathNormal, BathHybrid, BathGeneral, NoneType]
     # Interaction matrix U_{ijkl}
     U: np.ndarray
-    # Pairing field
-    pair_field: np.ndarray
 
 
 def _is_density(hloc: np.ndarray):
@@ -69,6 +69,7 @@ def _is_density_density(U: np.ndarray):
 def _make_bath(ed_mode: EDMode,
                nspin: int,
                Hloc: np.ndarray,
+               Hloc_an: np.ndarray,
                h: np.ndarray,
                V: np.ndarray,
                Delta: np.ndarray):
@@ -77,7 +78,7 @@ def _make_bath(ed_mode: EDMode,
     """
 
     # Can we use bath_type = 'normal'?
-    if BathNormal.is_usable(Hloc, h, V, Delta):
+    if BathNormal.is_usable(Hloc, Hloc_an, h, V, Delta):
         return BathNormal.from_hamiltonian(ed_mode, nspin, Hloc, h, V, Delta)
     # Can we use bath_type = 'hybrid'?
     elif BathHybrid.is_usable(h, Delta):
@@ -140,6 +141,9 @@ def parse_hamiltonian(hamiltonian: op.Operator,  # noqa: C901
     # Coefficients Hloc[spin1, spin2, orb1, orb2] in front of
     # d^+(spin1, orb1) d(spin2, orb2)
     Hloc = np.zeros((2, 2, norb, norb), dtype=complex)
+    # Coefficients Hloc_anomalous[orb1, orb2]
+    # in front of (c^+(up, orb1) c^+(dn, orb2) + c(dn, orb2) c(up, orb1))
+    Hloc_an = np.zeros((1, 1, norb, norb), dtype=complex)
     # Coefficients h[spin1, spin2, b1, b2] in front of
     # a^+(spin1, b1) a(spin2, b2)
     h = np.zeros((2, 2, nbath_total, nbath_total), dtype=complex)
@@ -152,9 +156,6 @@ def parse_hamiltonian(hamiltonian: op.Operator,  # noqa: C901
     # in front of
     # (1/2) c^+(spin1, orb1) c^+(spin2, orb2) c(spin4, orb4) c(spin3, orb3)
     U = np.zeros((norb, 2) * 4, dtype=float)
-    # Coefficients pair_field[orb]
-    # in front of (c^+(up, orb) c^+(dn, orb) + c(dn, orb) c(up, orb))
-    pair_field = np.zeros((norb,), dtype=float)
 
     for mon, coeff in hamiltonian:
         # Skipping an irrelevant constant term
@@ -227,16 +228,10 @@ def parse_hamiltonian(hamiltonian: op.Operator,  # noqa: C901
                     _raise_term_error("Unexpected same-spin anomalous term {}",
                                       mon,
                                       coeff)
-                if orb1 != orb2:
-                    _raise_term_error(
-                        "Unexpected orbital off-diagonal "
-                        "impurity anomalous term {}",
-                        mon,
-                        coeff)
                 if spin1 == 0:
-                    pair_field[orb1] = coeff
+                    Hloc_an[0, 0, orb1, orb2] = coeff
                 else:
-                    pair_field[orb1] = -coeff
+                    Hloc_an[0, 0, orb2, orb1] = -coeff
             else:
                 _raise_term_error("Unexpected anomalous term {}", mon, coeff)
 
@@ -257,12 +252,6 @@ def parse_hamiltonian(hamiltonian: op.Operator,  # noqa: C901
                     _raise_term_error("Unexpected same-spin anomalous term {}",
                                       mon,
                                       coeff)
-                if orb1 != orb2:
-                    _raise_term_error(
-                        "Unexpected orbital off-diagonal "
-                        "impurity anomalous term {}",
-                        mon,
-                        coeff)
                 continue
             else:
                 _raise_term_error("Unexpected anomalous term {}", mon, coeff)
@@ -283,9 +272,15 @@ def parse_hamiltonian(hamiltonian: op.Operator,  # noqa: C901
             "All pairing terms between bath states b and b' must be symmetric "
             "under the index swap b <-> b'"
         )
+    # Same for the anomalous local Hamiltonian
+    if (Hloc_an[0, 0] != Hloc_an[0, 0].T).any():
+        raise RuntimeError(
+            "All pairing terms between impurity orbitals o and o' must be "
+            "symmetric under the index swap o <-> o'"
+        )
 
     # ed_mode selection
-    superc = (Delta != 0).any() or (pair_field != 0).any()
+    superc = (Delta != 0).any() or (Hloc_an != 0).any()
     if nspin == 1:
         # Internal consistency check: Hloc, h and V must be spin-degenerate
         assert is_spin_degenerate(Hloc)
@@ -313,14 +308,14 @@ def parse_hamiltonian(hamiltonian: op.Operator,  # noqa: C901
                 f"is incompatible with the Hamiltonian (must be {ed_mode})"
             )
 
-    bath = _make_bath(ed_mode, nspin, Hloc, h, V, Delta) \
+    bath = _make_bath(ed_mode, nspin, Hloc, Hloc_an, h, V, Delta) \
         if nbath_total > 0 else None
     params = HamiltonianParams(
         ed_mode,
         Hloc=np.zeros((nspin, nspin, norb, norb), dtype=complex, order='F'),
+        Hloc_an=Hloc_an,
         bath=bath,
-        U=U,
-        pair_field=pair_field
+        U=U
     )
 
     for spin1, spin2 in product(range(nspin), range(nspin)):
