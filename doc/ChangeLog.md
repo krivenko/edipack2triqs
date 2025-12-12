@@ -10,10 +10,9 @@
   as the requested mode is compatible with the one deduced from the Hamiltonian.
   The corresponding keyword argument of `EDIpackSolver`'s constructor is called
   `ed_mode`.
-* Enable support for orbital-diagonal s-wave pairing terms in the impurity
-  Hamiltonian.
-* Impurity pairing fields are accessible via the attribute
-  `EDIpackSolver.pair_field`.
+* Enable support for s-wave pairing terms in the impurity Hamiltonian.
+* Matrix of impurity pairing fields is accessible via the attribute
+  `EDIpackSolver.hloc_an`.
 
 ## Version 0.9.0
 
