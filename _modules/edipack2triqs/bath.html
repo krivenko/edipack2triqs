@@ -60,6 +60,7 @@
 <li class="toctree-l3"><a class="reference internal" href="../../documentation.html#edipack2triqs.solver.EDIpackSolver"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver</span></code></a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../documentation.html#edipack2triqs.solver.EDIpackSolver.__init__"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.__init__()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../documentation.html#edipack2triqs.solver.EDIpackSolver.hloc"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.hloc</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../documentation.html#edipack2triqs.solver.EDIpackSolver.hloc_an"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.hloc_an</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../documentation.html#edipack2triqs.solver.EDIpackSolver.U"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.U</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../documentation.html#edipack2triqs.solver.EDIpackSolver.bath"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.bath</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../documentation.html#edipack2triqs.solver.EDIpackSolver.solve"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.solve()</span></code></a></li>
@@ -418,6 +419,7 @@
     <span class="nd">@classmethod</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">is_usable</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span>
                   <span class="n">Hloc</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+                  <span class="n">Hloc_an</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
                   <span class="n">h</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
                   <span class="n">V</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
                   <span class="n">Delta</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
@@ -426,6 +428,7 @@
 
         <span class="c1"># - The total number of bath states must be a multiple of norb</span>
         <span class="c1"># - All spin components of Hloc must be diagonal</span>
+        <span class="c1"># - Hloc_an must be diagonal</span>
         <span class="c1"># - h must be spin-diagonal</span>
         <span class="c1"># - Delta must be diagonal</span>
         <span class="c1"># - All spin components of h must be diagonal</span>
@@ -435,6 +438,7 @@
         <span class="k">return</span> <span class="p">(</span><span class="n">nbath_total</span> <span class="o">%</span> <span class="n">norb</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="ow">and</span> \
             <span class="nb">all</span><span class="p">(</span><span class="n">is_diagonal</span><span class="p">(</span><span class="n">Hloc</span><span class="p">[</span><span class="n">spin1</span><span class="p">,</span> <span class="n">spin2</span><span class="p">,</span> <span class="o">...</span><span class="p">])</span>
                 <span class="k">for</span> <span class="n">spin1</span><span class="p">,</span> <span class="n">spin2</span> <span class="ow">in</span> <span class="n">product</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span> <span class="n">repeat</span><span class="o">=</span><span class="mi">2</span><span class="p">))</span> <span class="ow">and</span> \
+            <span class="n">is_diagonal</span><span class="p">(</span><span class="n">Hloc_an</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">...</span><span class="p">])</span> <span class="ow">and</span> \
             <span class="n">is_spin_diagonal</span><span class="p">(</span><span class="n">h</span><span class="p">)</span> <span class="ow">and</span> \
             <span class="n">is_diagonal</span><span class="p">(</span><span class="n">Delta</span><span class="p">)</span> <span class="ow">and</span> \
             <span class="nb">all</span><span class="p">(</span><span class="n">is_diagonal</span><span class="p">(</span><span class="n">h</span><span class="p">[</span><span class="n">spin</span><span class="p">,</span> <span class="n">spin</span><span class="p">,</span> <span class="o">...</span><span class="p">])</span> <span class="k">for</span> <span class="n">spin</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">))</span> <span class="ow">and</span> \
@@ -1035,7 +1039,7 @@
 
         <span class="c1"># In the superconducting case, reinterpret first two indices of h as</span>
         <span class="c1"># Nambu indices and fill the off-diagonal elements from Delta</span>
-        <span class="n">is_nambu</span> <span class="o">=</span> <span class="ow">not</span> <span class="p">(</span><span class="n">Delta</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+        <span class="n">is_nambu</span> <span class="o">=</span> <span class="p">(</span><span class="n">ed_mode</span> <span class="o">==</span> <span class="n">EDMode</span><span class="o">.</span><span class="n">SUPERC</span><span class="p">)</span>
         <span class="n">nnambu</span> <span class="o">=</span> <span class="mi">1</span>
         <span class="k">if</span> <span class="n">is_nambu</span><span class="p">:</span>
             <span class="n">nnambu</span> <span class="o">=</span> <span class="mi">2</span>
