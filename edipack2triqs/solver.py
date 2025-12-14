@@ -303,6 +303,7 @@ class EDIpackSolver:
                 c["NBATH"] = self.h_params.bath.nbath
             else:
                 c["NBATH"] = 0
+                c["BATH_TYPE"] = "hybrid"
 
             # ed_total_ud
             ed_total_ud = kwargs.get("ed_total_ud", False)
