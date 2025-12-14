@@ -159,6 +159,9 @@ def make_reference_results(*,
 
         hloc = _extract_hloc(h, gf_struct)[up_dn]
         hloc[norb:, norb:] *= -1
+        hloc_an = _extract_hloc_an(h, norb, up_dn)
+        hloc[:norb, norb:] = hloc_an
+        hloc[norb:, :norb] = np.conj(hloc_an)
 
         # Real frequency
         gf_args = [gf_struct, beta, energy_window, n_w]
@@ -403,6 +406,28 @@ def _extract_hloc(h, gf_struct):
             hloc_b[i, j] = h_dict.get(((bn, i), (bn, j)), .0)
         hloc[bn] = hloc_b
     return hloc
+
+
+def _extract_hloc_an(h, norb, bn):
+    """
+    Extract anomalous impurity terms from a Hamiltonian expression.
+    """
+    h_loc_an = np.zeros((norb, norb), dtype=complex)
+    for mon, coeff in h:
+        if len(mon) != 2:
+            continue
+        dag1, ind1 = mon[0]
+        dag2, ind2 = mon[1]
+        if ((dag1, dag2) != (True, True)
+           or (ind1[0] != bn) or (ind2[0] != bn)):
+            continue
+        spin1, orb1 = divmod(ind1[1], norb)
+        spin2, orb2 = divmod(ind2[1], norb)
+        if (spin1 == 0) and (spin2 == 1):
+            h_loc_an[orb1, orb2] = coeff
+        elif (spin1 == 1) and (spin2 == 0):
+            h_loc_an[orb2, orb1] = -coeff
+    return h_loc_an
 
 
 def _make_pomerol_ed(index_converter, h):

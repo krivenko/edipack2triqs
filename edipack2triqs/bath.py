@@ -210,6 +210,7 @@ class BathNormal(Bath):
     @classmethod
     def is_usable(cls,
                   Hloc: np.ndarray,
+                  Hloc_an: np.ndarray,
                   h: np.ndarray,
                   V: np.ndarray,
                   Delta: np.ndarray):
@@ -218,6 +219,7 @@ class BathNormal(Bath):
 
         # - The total number of bath states must be a multiple of norb
         # - All spin components of Hloc must be diagonal
+        # - Hloc_an must be diagonal
         # - h must be spin-diagonal
         # - Delta must be diagonal
         # - All spin components of h must be diagonal
@@ -227,6 +229,7 @@ class BathNormal(Bath):
         return (nbath_total % norb == 0) and \
             all(is_diagonal(Hloc[spin1, spin2, ...])
                 for spin1, spin2 in product(range(2), repeat=2)) and \
+            is_diagonal(Hloc_an[0, 0, ...]) and \
             is_spin_diagonal(h) and \
             is_diagonal(Delta) and \
             all(is_diagonal(h[spin, spin, ...]) for spin in range(2)) and \
@@ -821,7 +824,7 @@ class BathGeneral(Bath):
 
         # In the superconducting case, reinterpret first two indices of h as
         # Nambu indices and fill the off-diagonal elements from Delta
-        is_nambu = not (Delta == 0).all()
+        is_nambu = (ed_mode == EDMode.SUPERC)
         nnambu = 1
         if is_nambu:
             nnambu = 2
