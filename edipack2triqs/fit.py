@@ -163,6 +163,13 @@ def _chi2_fit_bath(self, g: BlockGf, f: Optional[BlockGf] = None):
         ed.beta = g.mesh.beta
         ed.Lmats = len(g.mesh) // 2
 
+        # Set H_{loc} and H_{loc, an}
+        if ed.get_ed_mode() == int(EDMode.SUPERC):
+            ed.set_hloc(hloc=self.h_params.Hloc,
+                        hloc_anomalous=self.h_params.Hloc_an)
+        else:
+            ed.set_hloc(hloc=self.h_params.Hloc)
+
         if ed.get_ed_mode() == int(EDMode.NORMAL):  # Here nspin is important
             assert set(g.indices) == set(self.gf_block_names), \
                 "Unexpected block structure of 'g'"
