@@ -6,7 +6,7 @@ import numpy as np
 from numpy import multiply as mul
 
 import triqs.operators as op
-from triqs.gf import BlockGf, MeshImFreq
+from triqs.gf import Gf, BlockGf, MeshImFreq, conjugate, transpose
 from triqs.gf.descriptors import SemiCircular, iOmega_n
 from triqs.gf.tools import inverse
 from triqs.utility.comparison_tests import assert_block_gfs_are_close
@@ -59,6 +59,12 @@ class TestFitBath(unittest.TestCase):
                               range(cls.norb), range(cls.norb)))
 
     @classmethod
+    def make_h_loc_an(cls, h_loc_an):
+        return sum(h_loc_an[o1, o2] * op.c_dag('up', o1) * op.c_dag('dn', o2)
+                   + np.conj(h_loc_an[o1, o2]) * op.c('dn', o2) * op.c('up', o1)
+                   for o1, o2 in product(range(cls.norb), repeat=2))
+
+    @classmethod
     def make_h_bath(cls, eps, V, spin_blocks=True):
         nbath = eps.shape[-1]
         mki = cls.make_mkind(spin_blocks)
@@ -87,13 +93,14 @@ class TestFitBath(unittest.TestCase):
         nbath = 20
         fops_imp_up, fops_imp_dn = self.make_fops_imp()
         fops_bath_up, fops_bath_dn = self.make_fops_bath(nbath)
-        h_loc = self.make_h_loc(mul.outer(s0, np.diag([-1.0, 1.0])))
+        h_loc_mat = mul.outer(s0, np.diag([-1.0, 1.0]))
+        h_loc = self.make_h_loc(h_loc_mat)
         h_bath = self.make_h_bath(
             mul.outer([1, 1], np.ones(nbath)),
             mul.outer(s0, np.ones((self.norb, nbath)))
         )
 
-        fit_params = BathFittingParams(scheme="delta", n_iw=100, niter=1000)
+        fit_params = BathFittingParams(scheme="weiss", n_iw=100, niter=1000)
         solver = EDIpackSolver(h_loc + h_bath,
                                fops_imp_up,
                                fops_imp_dn,
@@ -106,27 +113,30 @@ class TestFitBath(unittest.TestCase):
 
         mesh = MeshImFreq(beta=50.0, S="Fermion", n_iw=200)
         Delta = BlockGf(gf_struct=[("up", 2), ("dn", 2)], mesh=mesh)
+        G0 = BlockGf(gf_struct=[("up", 2), ("dn", 2)], mesh=mesh)
         V = 2.0 * s0 + 0.5 * sx
-        for bn, d in Delta:
+        for s, (bn, d) in enumerate(Delta):
             d[0, 0] << SemiCircular(1.8, 0.5)
             d[1, 1] << SemiCircular(2.2, -0.5)
             d << V @ d @ V.T
+            G0[bn] << inverse(iOmega_n - h_loc_mat[s, s] - d)
 
-        fitted_bath, Delta_fit = solver.chi2_fit_bath(Delta)
+        fitted_bath, G0_fit = solver.chi2_fit_bath(G0)
         self.assertIsInstance(fitted_bath, BathHybrid)
-        assert_block_gfs_are_close(Delta_fit, Delta, precision=0.005)
+        assert_block_gfs_are_close(G0_fit, G0, precision=0.005)
 
     def test_nspin2(self):
         nbath = 20
         fops_imp_up, fops_imp_dn = self.make_fops_imp()
         fops_bath_up, fops_bath_dn = self.make_fops_bath(nbath)
-        h_loc = self.make_h_loc(mul.outer(s0 + 0.1 * sz, np.diag([-1.0, 1.0])))
+        h_loc_mat = mul.outer(s0 + 0.1 * sz, np.diag([-1.0, 1.0]))
+        h_loc = self.make_h_loc(h_loc_mat)
         h_bath = self.make_h_bath(
             mul.outer([1, 1], np.ones(nbath)),
             mul.outer(s0, np.ones((self.norb, nbath)))
         )
 
-        fit_params = BathFittingParams(scheme="delta", n_iw=100, niter=1000)
+        fit_params = BathFittingParams(scheme="weiss", n_iw=100, niter=1000)
         solver = EDIpackSolver(h_loc + h_bath,
                                fops_imp_up,
                                fops_imp_dn,
@@ -139,29 +149,31 @@ class TestFitBath(unittest.TestCase):
 
         mesh = MeshImFreq(beta=50.0, S="Fermion", n_iw=200)
         Delta = BlockGf(gf_struct=[("up", 2), ("dn", 2)], mesh=mesh)
+        G0 = BlockGf(gf_struct=[("up", 2), ("dn", 2)], mesh=mesh)
         V = 2.0 * s0 + 0.5 * sx
-        for bn, d in Delta:
+        for s, (bn, d) in enumerate(Delta):
             s_coeff = 1.2 if bn == "up" else 0.8
             d[0, 0] << s_coeff * SemiCircular(1.8, 0.5)
             d[1, 1] << s_coeff * SemiCircular(2.2, -0.5)
             d << V @ d @ V.T
+            G0[bn] << inverse(iOmega_n - h_loc_mat[s, s] - d)
 
-        fitted_bath, Delta_fit = solver.chi2_fit_bath(Delta)
+        fitted_bath, G0_fit = solver.chi2_fit_bath(G0)
         self.assertIsInstance(fitted_bath, BathHybrid)
-        assert_block_gfs_are_close(Delta_fit, Delta, precision=0.005)
+        assert_block_gfs_are_close(G0_fit, G0, precision=0.005)
 
     def test_nonsu2(self):
         nbath = 8
         fops_imp_up, fops_imp_dn = self.make_fops_imp(spin_blocks=False)
         fops_bath_up, fops_bath_dn = self.make_fops_bath(nbath)
-        h_loc = self.make_h_loc(mul.outer(s0, np.diag([-1.0, 1.0])),
-                                spin_blocks=False)
+        h_loc_mat = mul.outer(s0, np.diag([-1.0, 1.0]))
+        h_loc = self.make_h_loc(h_loc_mat, spin_blocks=False)
         h_bath = self.make_h_bath(
             mul.outer([1, -1], np.ones(nbath)),
             mul.outer(s0 + 0.1 * sx, np.ones((self.norb, nbath))),
             spin_blocks=False
         )
-        fit_params = BathFittingParams(scheme="delta", n_iw=100, niter=1000)
+        fit_params = BathFittingParams(scheme="weiss", n_iw=100, niter=1000)
         solver = EDIpackSolver(h_loc + h_bath,
                                fops_imp_up,
                                fops_imp_dn,
@@ -173,6 +185,7 @@ class TestFitBath(unittest.TestCase):
 
         mesh = MeshImFreq(beta=50.0, S="Fermion", n_iw=200)
         Delta = BlockGf(gf_struct=[("up_dn", 4)], mesh=mesh)
+        G0 = BlockGf(gf_struct=[("up_dn", 4)], mesh=mesh)
         d1 = inverse(iOmega_n + 0.4) + inverse(iOmega_n - 1.4)
         d2 = inverse(iOmega_n + 1.6) + inverse(iOmega_n - 0.6)
         Delta["up_dn"][0, 0] << 1.1 * d1
@@ -184,23 +197,30 @@ class TestFitBath(unittest.TestCase):
                       [0.4, 0.1, 2.0, 0.5],
                       [0.1, 0.4, 0.5, 2.0]])
         Delta["up_dn"] << V @ Delta["up_dn"] @ V.T
+        G0["up_dn"] << inverse(
+            iOmega_n - np.reshape(np.swapaxes(h_loc_mat, 1, 2), (4, 4))
+            - Delta["up_dn"]
+        )
 
-        fitted_bath, Delta_fit = solver.chi2_fit_bath(Delta)
+        fitted_bath, G0_fit = solver.chi2_fit_bath(G0)
         self.assertIsInstance(fitted_bath, BathHybrid)
-        assert_block_gfs_are_close(Delta_fit, Delta, precision=1e-3)
+        assert_block_gfs_are_close(G0_fit, G0, precision=1e-3)
 
     def test_superc(self):
         nbath = 20
         fops_imp_up, fops_imp_dn = self.make_fops_imp()
         fops_bath_up, fops_bath_dn = self.make_fops_bath(nbath)
-        h_loc = self.make_h_loc(mul.outer(s0, np.diag([-1.0, 1.0])))
+        h_loc_mat = mul.outer(s0, np.diag([-1.0, 1.0]))
+        h_loc = self.make_h_loc(h_loc_mat)
+        h_loc_an_mat = 0.1 * sx
+        h_loc_an = self.make_h_loc_an(h_loc_an_mat)
         h_bath = self.make_h_bath(
             mul.outer([1, 1], np.linspace(-1.0, 1.0, nbath)),
             mul.outer(s0, np.outer([1, 1], np.linspace(0.1, 1.0, nbath)))
         )
         h_sc = self.make_h_sc(np.ones(nbath))
-        fit_params = BathFittingParams(scheme="delta", n_iw=100, niter=1000)
-        solver = EDIpackSolver(h_loc + h_bath + h_sc,
+        fit_params = BathFittingParams(scheme="weiss", n_iw=100, niter=1000)
+        solver = EDIpackSolver(h_loc + h_loc_an + h_bath + h_sc,
                                fops_imp_up,
                                fops_imp_dn,
                                fops_bath_up,
@@ -229,12 +249,33 @@ class TestFitBath(unittest.TestCase):
                            -d2coeff * (iOmega_n + eps[1]) * d2
             Delta_an["up_dn"][i, j] << D[0] * d1coeff * d1 + D[1] * d2coeff * d2
 
-        fitted_bath, Delta_fit, Delta_an_fit = \
-            solver.chi2_fit_bath(Delta, Delta_an)
+        Delta_an_bar = Delta_an.copy()
+        Delta_an_bar["up_dn"].data[:] = np.flip(Delta_an["up_dn"].data, axis=0)
+
+        # Build G0 out of h_loc_mat, h_loc_an_mat and \Delta by doing matrix
+        # inversion in Nambu representation.
+        invG0_nam = Gf(mesh=mesh, target_shape=(4, 4))
+        invG0_nam[:2, :2] << iOmega_n - h_loc_mat[0, 0] - Delta["up"]
+        invG0_nam[:2, 2:] << -h_loc_an_mat - Delta_an["up_dn"]
+        invG0_nam[2:, :2] << -np.conj(h_loc_an_mat) \
+            - conjugate(transpose(Delta_an_bar["up_dn"]))
+        invG0_nam[2:, 2:] << iOmega_n \
+            + np.conj(h_loc_mat[1, 1]) + conjugate(Delta["dn"])
+
+        G0_nam = Gf(mesh=mesh, target_shape=(4, 4))
+        G0_nam << inverse(invG0_nam)
+
+        # Extract normal and anomalous components from the Nambu form of G0
+        G0 = BlockGf(gf_struct=[("up", 2), ("dn", 2)], mesh=mesh)
+        G0["up"] << G0_nam[:2, :2]
+        G0["dn"] << -conjugate(G0_nam[2:, 2:])
+        G0_an = BlockGf(block_list=[G0_nam[:2, 2:]], name_list=["up_dn"])
+
+        fitted_bath, G0_fit, G0_an_fit = solver.chi2_fit_bath(G0, G0_an)
         self.assertIsInstance(fitted_bath, BathHybrid)
 
-        assert_block_gfs_are_close(Delta_fit, Delta, precision=1e-3)
-        assert_block_gfs_are_close(Delta_an_fit, Delta_an, precision=1e-3)
+        assert_block_gfs_are_close(G0_fit, G0, precision=1e-3)
+        assert_block_gfs_are_close(G0_an_fit, G0_an, precision=1e-3)
 
     def tearDown(self):
         # Make sure EDIpackSolver.__del__() is called
