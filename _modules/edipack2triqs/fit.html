@@ -370,6 +370,13 @@
         <span class="n">ed</span><span class="o">.</span><span class="n">beta</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">mesh</span><span class="o">.</span><span class="n">beta</span>
         <span class="n">ed</span><span class="o">.</span><span class="n">Lmats</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">g</span><span class="o">.</span><span class="n">mesh</span><span class="p">)</span> <span class="o">//</span> <span class="mi">2</span>
 
+        <span class="c1"># Set H_{loc} and H_{loc, an}</span>
+        <span class="k">if</span> <span class="n">ed</span><span class="o">.</span><span class="n">get_ed_mode</span><span class="p">()</span> <span class="o">==</span> <span class="nb">int</span><span class="p">(</span><span class="n">EDMode</span><span class="o">.</span><span class="n">SUPERC</span><span class="p">):</span>
+            <span class="n">ed</span><span class="o">.</span><span class="n">set_hloc</span><span class="p">(</span><span class="n">hloc</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">h_params</span><span class="o">.</span><span class="n">Hloc</span><span class="p">,</span>
+                        <span class="n">hloc_anomalous</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">h_params</span><span class="o">.</span><span class="n">Hloc_an</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">ed</span><span class="o">.</span><span class="n">set_hloc</span><span class="p">(</span><span class="n">hloc</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">h_params</span><span class="o">.</span><span class="n">Hloc</span><span class="p">)</span>
+
         <span class="k">if</span> <span class="n">ed</span><span class="o">.</span><span class="n">get_ed_mode</span><span class="p">()</span> <span class="o">==</span> <span class="nb">int</span><span class="p">(</span><span class="n">EDMode</span><span class="o">.</span><span class="n">NORMAL</span><span class="p">):</span>  <span class="c1"># Here nspin is important</span>
             <span class="k">assert</span> <span class="nb">set</span><span class="p">(</span><span class="n">g</span><span class="o">.</span><span class="n">indices</span><span class="p">)</span> <span class="o">==</span> <span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">gf_block_names</span><span class="p">),</span> \
                 <span class="s2">&quot;Unexpected block structure of &#39;g&#39;&quot;</span>
