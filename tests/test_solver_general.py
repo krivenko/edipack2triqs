@@ -1,5 +1,3 @@
-import unittest
-import gc
 from itertools import product
 
 import numpy as np
@@ -13,6 +11,7 @@ from triqs.utility.comparison_tests import (assert_gfs_are_close,
 from edipack2triqs.solver import EDIpackSolver
 
 from . import reference as ref
+from .test_solver import TestSolver
 
 
 s0 = np.eye(2)
@@ -32,52 +31,12 @@ except ImportError:
     pass
 
 
-class TestEDIpackSolverBathGeneral(unittest.TestCase):
+class TestEDIpackSolverBathGeneral(TestSolver):
 
-    spins = ('up', 'dn')
-    orbs = range(2)
-
-    fops_bath_up = [('B_up', nu * 2 + o) for nu, o in product(range(2), orbs)]
-    fops_bath_dn = [('B_dn', nu * 2 + o) for nu, o in product(range(2), orbs)]
-
-    @classmethod
-    def make_fops_imp(cls, spin_blocks=True):
-        if spin_blocks:
-            return ([('up', o) for o in cls.orbs],
-                    [('dn', o) for o in cls.orbs])
-        else:
-            return ([('up_dn', so) for so in cls.orbs],
-                    [('up_dn', so + len(cls.orbs)) for so in cls.orbs])
-
-    @classmethod
-    def make_h_loc(cls, h_loc, spin_blocks=True):
-        mki = ref.make_mkind(cls.spins, cls.orbs, spin_blocks)
-        return sum(h_loc[s1, s2, o1, o2]
-                   * op.c_dag(*mki(spin1, o1)) * op.c(*mki(spin2, o2))
-                   for (s1, spin1), (s2, spin2), o1, o2
-                   in product(enumerate(cls.spins), enumerate(cls.spins),
-                              cls.orbs, cls.orbs))
-
-    @classmethod
-    def make_h_int(cls, *, Uloc, Ust, Jh, Jx, Jp, spin_blocks=True):
-        mki = ref.make_mkind(cls.spins, cls.orbs, spin_blocks)
-        h_int = sum(Uloc[o] * op.n(*mki('up', o)) * op.n(*mki('dn', o))
-                    for o in cls.orbs)
-        h_int += Ust * sum(int(o1 != o2)
-                           * op.n(*mki('up', o1)) * op.n(*mki('dn', o2))
-                           for o1, o2 in product(cls.orbs, cls.orbs))
-        h_int += (Ust - Jh) * \
-            sum(int(o1 < o2) * op.n(*mki(s, o1)) * op.n(*mki(s, o2))
-                for s, o1, o2 in product(cls.spins, cls.orbs, cls.orbs))
-        h_int -= Jx * sum(int(o1 != o2)
-                          * op.c_dag(*mki('up', o1)) * op.c(*mki('dn', o1))
-                          * op.c_dag(*mki('dn', o2)) * op.c(*mki('up', o2))
-                          for o1, o2 in product(cls.orbs, cls.orbs))
-        h_int += Jp * sum(int(o1 != o2)
-                          * op.c_dag(*mki('up', o1)) * op.c_dag(*mki('dn', o1))
-                          * op.c(*mki('dn', o2)) * op.c(*mki('up', o2))
-                          for o1, o2 in product(cls.orbs, cls.orbs))
-        return h_int
+    fops_bath_up = [('B_up', nu * 2 + o)
+                    for nu, o in product(range(2), TestSolver.orbs)]
+    fops_bath_dn = [('B_dn', nu * 2 + o)
+                    for nu, o in product(range(2), TestSolver.orbs)]
 
     @classmethod
     def make_h_bath(cls, h, V, spin_blocks=True):
@@ -98,45 +57,12 @@ class TestEDIpackSolverBathGeneral(unittest.TestCase):
         return h_bath
 
     @classmethod
-    def make_h_loc_an(cls, h_loc_an):
-        return sum(h_loc_an[o1, o2] * op.c_dag('up', o1) * op.c_dag('dn', o2)
-                   + np.conj(h_loc_an[o1, o2]) * op.c('dn', o2) * op.c('up', o1)
-                   for o1, o2 in product(cls.orbs, cls.orbs))
-
-    @classmethod
     def make_h_sc(cls, Delta):
         h_sc = sum(Delta[o1, o2, nu]
                    * op.c_dag('B_up', nu * 2 + o1)
                    * op.c_dag('B_dn', nu * 2 + o2)
                    for o1, o2, nu in product(cls.orbs, cls.orbs, range(2)))
         return h_sc + op.dagger(h_sc)
-
-    @classmethod
-    def change_int_params(cls, U, new_int_params):
-        Uloc = new_int_params["Uloc"]
-        Ust = new_int_params["Ust"]
-        Jh = new_int_params["Jh"]
-        Jx = new_int_params["Jx"]
-        Jp = new_int_params["Jp"]
-        # Uloc
-        for s, o in product(range(2), cls.orbs):
-            U[o, s, o, 1 - s, o, s, o, 1 - s] = 0.5 * Uloc[o]
-            U[o, s, o, 1 - s, o, 1 - s, o, s] = -0.5 * Uloc[o]
-        for s, o1, o2 in product(range(2), cls.orbs, cls.orbs):
-            if o1 == o2:
-                continue
-            # Ust
-            U[o1, s, o2, 1 - s, o1, s, o2, 1 - s] = 0.5 * Ust
-            U[o1, s, o2, 1 - s, o2, 1 - s, o1, s] = -0.5 * Ust
-            # Ust - Jh
-            U[o1, s, o2, s, o1, s, o2, s] = 0.5 * (Ust - Jh)
-            U[o1, s, o2, s, o2, s, o1, s] = -0.5 * (Ust - Jh)
-            # Jx
-            U[o1, s, o2, 1 - s, o2, s, o1, 1 - s] = 0.5 * Jx
-            U[o1, s, o2, 1 - s, o1, 1 - s, o2, s] = -0.5 * Jx
-            # Jp
-            U[o1, s, o1, 1 - s, o2, s, o2, 1 - s] = 0.5 * Jp
-            U[o1, s, o1, 1 - s, o2, 1 - s, o2, s] = -0.5 * Jp
 
     @classmethod
     def assert_all(cls, s, **refs):
@@ -268,10 +194,7 @@ class TestEDIpackSolverBathGeneral(unittest.TestCase):
             "n_w": 40,
             "broadening": 0.05,
             "n_tau": 10,
-            "chi_spin": True,
-            "chi_dens": True,
-            "chi_pair": True,
-            "chi_exct": True
+            **self.chi_params
         }
         solver.solve(**solve_params)
 
@@ -295,10 +218,7 @@ class TestEDIpackSolverBathGeneral(unittest.TestCase):
             "n_w": 40,
             "broadening": 0.03,
             "n_tau": 11,
-            "chi_spin": True,
-            "chi_dens": True,
-            "chi_pair": True,
-            "chi_exct": True
+            **self.chi_params
         }
         solver.solve(**solve_params)
 
@@ -331,10 +251,7 @@ class TestEDIpackSolverBathGeneral(unittest.TestCase):
             "n_w": 40,
             "broadening": 0.02,
             "n_tau": 12,
-            "chi_spin": True,
-            "chi_dens": True,
-            "chi_pair": True,
-            "chi_exct": True
+            **self.chi_params
         }
         solver.solve(**solve_params)
 
@@ -389,10 +306,7 @@ class TestEDIpackSolverBathGeneral(unittest.TestCase):
             "n_w": 40,
             "broadening": 0.05,
             "n_tau": 10,
-            "chi_spin": True,
-            "chi_dens": True,
-            "chi_pair": True,
-            "chi_exct": True
+            **self.chi_params
         }
         solver.solve(**solve_params)
 
@@ -416,10 +330,7 @@ class TestEDIpackSolverBathGeneral(unittest.TestCase):
             "n_w": 40,
             "broadening": 0.03,
             "n_tau": 11,
-            "chi_spin": True,
-            "chi_dens": True,
-            "chi_pair": True,
-            "chi_exct": True
+            **self.chi_params
         }
         solver.solve(**solve_params)
 
@@ -455,10 +366,7 @@ class TestEDIpackSolverBathGeneral(unittest.TestCase):
             "n_w": 40,
             "n_tau": 12,
             "broadening": 0.02,
-            "chi_spin": True,
-            "chi_dens": True,
-            "chi_pair": True,
-            "chi_exct": True
+            **self.chi_params
         }
         solver.solve(**solve_params)
 
@@ -952,10 +860,8 @@ class TestEDIpackSolverBathGeneral(unittest.TestCase):
                                **struct_params, **solve_params)
         self.assert_all(solver, **refs)
 
-    def tearDown(self):
-        # Make sure EDIpackSolver.__del__() is called
-        gc.collect()
-
 
 if __name__ == '__main__':
+    # TODO: Test direct invocation of this file
+    import unittest
     unittest.main()
