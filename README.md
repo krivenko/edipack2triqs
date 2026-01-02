@@ -13,7 +13,7 @@ edipack2triqs: Compatibility layer between EDIpack and TRIQS
 Quantum Impurity problems) and **TRIQS** (Toolbox for Research on Interacting
 Quantum Systems).
 
-Copyright (c) 2024-2025, Igor Krivenko, Lorenzo Crippa
+Copyright (c) 2024-2026, Igor Krivenko, Lorenzo Crippa
 
 Dependencies
 ------------
