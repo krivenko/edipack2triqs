@@ -2,8 +2,8 @@
 https://krivenko.github.io/edipack2triqs)
 [![Anaconda-Server Badge](https://anaconda.org/edipack/edipack2triqs/badges/version.svg)](
 https://anaconda.org/edipack/edipack2triqs)
-[![Test (Ubuntu)](https://github.com/krivenko/edipack2triqs/actions/workflows/test-ubuntu.yml/badge.svg)](
-https://github.com/krivenko/edipack2triqs/actions/workflows/test-ubuntu.yml)
+[![Test](https://github.com/krivenko/edipack2triqs/actions/workflows/test.yml/badge.svg)](
+https://github.com/krivenko/edipack2triqs/actions/workflows/test.yml)
 
 edipack2triqs: Compatibility layer between EDIpack and TRIQS
 ============================================================
