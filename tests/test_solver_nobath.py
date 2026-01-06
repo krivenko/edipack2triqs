@@ -38,6 +38,7 @@ class TestEDIpackSolverNoBath(TestSolver):
             verbose=0,
         )
 
+        self.assertEqual(solver.h_params.ed_mode, EDMode.NORMAL)
         self.assertEqual(solver.nspin, 1)
         self.assertEqual(solver.norb, 2)
         self.assertIsNone(solver.bath)
@@ -72,6 +73,7 @@ class TestEDIpackSolverNoBath(TestSolver):
             verbose=0
         )
 
+        self.assertEqual(solver.h_params.ed_mode, EDMode.NORMAL)
         self.assertEqual(solver.nspin, 1)
         self.assertEqual(solver.norb, 2)
         self.assertIsNone(solver.bath)
@@ -134,6 +136,7 @@ class TestEDIpackSolverNoBath(TestSolver):
             verbose=0
         )
 
+        self.assertEqual(solver.h_params.ed_mode, EDMode.NORMAL)
         self.assertEqual(solver.nspin, 2)
         self.assertEqual(solver.norb, 2)
         self.assertIsNone(solver.bath)
@@ -198,6 +201,7 @@ class TestEDIpackSolverNoBath(TestSolver):
             verbose=0,
         )
 
+        self.assertEqual(solver.h_params.ed_mode, EDMode.NONSU2)
         self.assertEqual(solver.nspin, 2)
         self.assertEqual(solver.norb, 2)
         self.assertIsNone(solver.bath)

@@ -5,6 +5,7 @@ from numpy import multiply as mul
 
 import triqs.operators as op
 
+from edipack2triqs import EDMode
 from edipack2triqs.solver import EDIpackSolver
 
 from .test_solver import TestSolver
@@ -81,6 +82,7 @@ class TestEDIpackSolverBathHybrid(TestSolver):
                                zerotemp=True,
                                verbose=0)
 
+        self.assertEqual(solver.h_params.ed_mode, EDMode.NORMAL)
         self.assertEqual(solver.nspin, 1)
         self.assertEqual(solver.norb, 2)
         self.assertEqual(solver.bath.name, "hybrid")
@@ -123,6 +125,7 @@ class TestEDIpackSolverBathHybrid(TestSolver):
                                lanc_nstates_total=10,
                                verbose=0)
 
+        self.assertEqual(solver.h_params.ed_mode, EDMode.NORMAL)
         self.assertEqual(solver.nspin, 1)
         self.assertEqual(solver.norb, 2)
         self.assertEqual(solver.bath.name, "hybrid")
@@ -219,6 +222,7 @@ class TestEDIpackSolverBathHybrid(TestSolver):
                                lanc_nstates_total=10,
                                verbose=0)
 
+        self.assertEqual(solver.h_params.ed_mode, EDMode.NORMAL)
         self.assertEqual(solver.nspin, 2)
         self.assertEqual(solver.norb, 2)
         self.assertEqual(solver.bath.name, "hybrid")
@@ -319,6 +323,7 @@ class TestEDIpackSolverBathHybrid(TestSolver):
                                lanc_nstates_total=10,
                                verbose=0)
 
+        self.assertEqual(solver.h_params.ed_mode, EDMode.NONSU2)
         self.assertEqual(solver.nspin, 2)
         self.assertEqual(solver.norb, 2)
         self.assertEqual(solver.bath.name, "hybrid")
@@ -416,6 +421,7 @@ class TestEDIpackSolverBathHybrid(TestSolver):
                                lanc_nstates_total=10,
                                verbose=0)
 
+        self.assertEqual(solver.h_params.ed_mode, EDMode.NONSU2)
         self.assertEqual(solver.nspin, 2)
         self.assertEqual(solver.norb, 2)
         self.assertEqual(solver.bath.name, "hybrid")
@@ -514,6 +520,7 @@ class TestEDIpackSolverBathHybrid(TestSolver):
                                lanc_nstates_total=10,
                                verbose=0)
 
+        self.assertEqual(solver.h_params.ed_mode, EDMode.SUPERC)
         self.assertEqual(solver.nspin, 1)
         self.assertEqual(solver.norb, 2)
         self.assertEqual(solver.bath.name, "hybrid")
@@ -611,6 +618,7 @@ class TestEDIpackSolverBathHybrid(TestSolver):
                                lanc_nstates_total=10,
                                verbose=0)
 
+        self.assertEqual(solver.h_params.ed_mode, EDMode.SUPERC)
         self.assertEqual(solver.nspin, 1)
         self.assertEqual(solver.norb, 2)
         self.assertEqual(solver.bath.name, "hybrid")
