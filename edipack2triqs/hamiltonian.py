@@ -36,6 +36,38 @@ class HamiltonianParams:
     # Interaction matrix U_{ijkl}
     U: np.ndarray
 
+    def Hloc_op(self,
+                fops_imp_up: list[IndicesType],
+                fops_imp_dn: list[IndicesType]) -> op.Operator:
+        "Hloc as a TRIQS many-body operator object"
+        fops = (fops_imp_up, fops_imp_dn)
+        h = op.Operator()
+        hloc_it = np.nditer(self.Hloc, flags=['multi_index'])
+        if self.Hloc.shape[0] == 1:  # nspin == 1
+            for coeff in hloc_it:
+                orb1, orb2 = hloc_it.multi_index[2:]
+                h += coeff * op.c_dag(*fops[0][orb1]) * op.c(*fops[0][orb2])
+                h += coeff * op.c_dag(*fops[1][orb1]) * op.c(*fops[1][orb2])
+        else:  # nspin == 2
+            for coeff in hloc_it:
+                s1, s2, orb1, orb2 = hloc_it.multi_index
+                h += coeff * op.c_dag(*fops[s1][orb1]) * op.c(*fops[s2][orb2])
+        return h
+
+    def Hloc_an_op(self,
+                   fops_imp_up: list[IndicesType],
+                   fops_imp_dn: list[IndicesType]) -> op.Operator:
+        "Hloc_an as a TRIQS many-body operator object"
+        h = op.Operator()
+        hloc_an_it = np.nditer(self.Hloc_an, flags=['multi_index'])
+        for coeff in hloc_an_it:
+            orb1, orb2 = hloc_an_it.multi_index[2:]
+            h += coeff * \
+                op.c_dag(*fops_imp_up[orb1]) * op.c_dag(*fops_imp_dn[orb2])
+            h += np.conj(coeff) * \
+                op.c(*fops_imp_dn[orb2]) * op.c(*fops_imp_up[orb1])
+        return h
+
 
 def _is_density(hloc: np.ndarray):
     "Check if a given local Hamiltonian is diagonal in both spin and orbital"
@@ -142,7 +174,9 @@ def parse_hamiltonian(hamiltonian: op.Operator,  # noqa: C901
     # d^+(spin1, orb1) d(spin2, orb2)
     Hloc = np.zeros((2, 2, norb, norb), dtype=complex)
     # Coefficients Hloc_anomalous[orb1, orb2]
-    # in front of (c^+(up, orb1) c^+(dn, orb2) + c(dn, orb2) c(up, orb1))
+    # in front of c^+(up, orb1) c^+(dn, orb2)
+    # Hloc_anomalous[orb1, orb2]* is the coefficient in front of
+    # c(dn, orb2) c(up, orb1)
     Hloc_an = np.zeros((1, 1, norb, norb), dtype=complex)
     # Coefficients h[spin1, spin2, b1, b2] in front of
     # a^+(spin1, b1) a(spin2, b2)
