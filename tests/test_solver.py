@@ -7,7 +7,6 @@ import numpy as np
 from numpy.testing import assert_allclose
 
 import triqs.operators as op
-from triqs.operators.util.extractors import extract_h_dict
 from triqs.gf import (BlockGf,
                       Gf,
                       MeshReFreq,
@@ -22,6 +21,7 @@ from triqs.utility.comparison_tests import (assert_gfs_are_close,
 
 from h5 import HDFArchive
 
+from edipack2triqs.hamiltonian import extract_quadratic
 from edipack2triqs.util import monomial2op, non_int_part
 
 
@@ -34,42 +34,6 @@ def make_pomerol_ed(index_converter, h):
     ed.rho_threshold = 0
     ed.diagonalize(h)
     return ed
-
-
-def extract_hloc(h, gf_struct):
-    """
-    Extract local quadratic part from a Hamiltonian expression.
-    """
-    h_dict = extract_h_dict(h, True)
-    hloc = {}
-    for bn, bs in gf_struct:
-        hloc_b = np.zeros((bs, bs), dtype=complex)
-        for i, j in product(range(bs), repeat=2):
-            hloc_b[i, j] = h_dict.get(((bn, i), (bn, j)), .0)
-        hloc[bn] = hloc_b
-    return hloc
-
-
-def extract_hloc_an(h, norb, bn):
-    """
-    Extract anomalous impurity terms from a Hamiltonian expression.
-    """
-    h_loc_an = np.zeros((norb, norb), dtype=complex)
-    for mon, coeff in h:
-        if len(mon) != 2:
-            continue
-        dag1, ind1 = mon[0]
-        dag2, ind2 = mon[1]
-        if ((dag1, dag2) != (True, True)
-           or (ind1[0] != bn) or (ind2[0] != bn)):
-            continue
-        spin1, orb1 = divmod(ind1[1], norb)
-        spin2, orb2 = divmod(ind2[1], norb)
-        if (spin1 == 0) and (spin2 == 1):
-            h_loc_an[orb1, orb2] = coeff
-        elif (spin1 == 1) and (spin2 == 0):
-            h_loc_an[orb2, orb1] = -coeff
-    return h_loc_an
 
 
 def make_op(o: op.Operator, mkind):
@@ -469,12 +433,14 @@ class TestSolver(unittest.TestCase):
         Generate reference results for GFs and related quantities in the normal
         (non-superconducting) case using pomerol2triqs.
         """
+        hloc, _ = extract_quadratic(h, *cls.make_fops_imp(spin_blocks))
         if spin_blocks:
             gf_struct = [(spin, cls.norb) for spin in cls.spins]
+            hloc = {spin: hloc[s, s, ...] for s, spin in enumerate(cls.spins)}
         else:
-            gf_struct = [(cls.up_dn, 2 * cls.norb)]
-
-        hloc = extract_hloc(h, gf_struct)
+            bs = 2 * cls.norb
+            gf_struct = [(cls.up_dn, bs)]
+            hloc = {cls.up_dn: np.reshape(np.swapaxes(hloc, 1, 2), (bs, bs))}
 
         # Real frequency
         g_w = ed.G_w(gf_struct, beta, energy_window, n_w, broadening, **tols)
@@ -554,11 +520,13 @@ class TestSolver(unittest.TestCase):
             f = BlockGf(block_list=[g_nambu[nam12]], name_list=[cls.up_dn])
             return G, f
 
-        hloc = extract_hloc(h, gf_struct)[cls.up_dn]
-        hloc[nam22] *= -1
-        hloc_an = extract_hloc_an(h, cls.norb, cls.up_dn)
-        hloc[nam12] = hloc_an
-        hloc[nam21] = np.conj(hloc_an)
+        hloc, hloc_an = extract_quadratic(h, *cls.make_fops_imp(False))
+
+        hloc_nambu = np.zeros((2 * cls.norb, 2 * cls.norb), dtype=complex)
+        hloc_nambu[nam11] = hloc[0, 0, ...]
+        hloc_nambu[nam12] = hloc_an[0, 0, ...]
+        hloc_nambu[nam21] = np.conj(hloc_an[0, 0, ...])
+        hloc_nambu[nam22] = -hloc[1, 1, ...]
 
         # Real frequency
         gf_args = [gf_struct, beta, energy_window, n_w]
@@ -593,7 +561,8 @@ class TestSolver(unittest.TestCase):
 
         # Hybridization functions
         Delta_nambu_w = G0_nambu_w.copy()
-        Delta_nambu_w << Omega + 1j * broadening - hloc - inverse(G0_nambu_w)
+        Delta_nambu_w << \
+            Omega + 1j * broadening - hloc_nambu - inverse(G0_nambu_w)
         Delta_w, Delta_an_w = unpack_nambu_gf(Delta_nambu_w)
         results['Delta_w'] = Delta_w
         results['Delta_an_w'] = Delta_an_w
@@ -632,7 +601,7 @@ class TestSolver(unittest.TestCase):
 
         # Hybridization functions
         Delta_nambu_iw = G0_nambu_iw.copy()
-        Delta_nambu_iw << iOmega_n - hloc - inverse(G0_nambu_iw)
+        Delta_nambu_iw << iOmega_n - hloc_nambu - inverse(G0_nambu_iw)
         Delta_iw, Delta_an_iw = unpack_nambu_gf(Delta_nambu_iw)
         results['Delta_iw'] = Delta_iw
         results['Delta_an_iw'] = Delta_an_iw

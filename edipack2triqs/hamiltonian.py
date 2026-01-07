@@ -136,6 +136,64 @@ def _raise_term_error(msg, mon, coeff):
     raise RuntimeError(msg.format(term))
 
 
+def extract_quadratic(h: op.Operator,
+                      fops_up: list[IndicesType],
+                      fops_dn: list[IndicesType],
+                      ignore_unexpected: bool = True) \
+        -> tuple[np.ndarray, np.ndarray]:
+    """
+    Extract matrices of the normal and anomalous quadratic contributions to a
+    given Hamiltonian 'h'. An unexpected term in 'h' results in an exception if
+    `ignore_unexpected=False`.
+    """
+    fops = fops_up + fops_dn
+    dim = len(fops_up)
+
+    M = np.zeros((2, 2, dim, dim), dtype=complex)
+    M_an = np.zeros((1, 1, dim, dim), dtype=complex)
+
+    for mon, coeff in h:
+        if len(mon) != 2:
+            if ignore_unexpected:
+                continue
+            else:
+                _raise_term_error("Unexpected non-quadratic term {}",
+                                  mon,
+                                  coeff)
+
+        daggers = [dag for dag, ind in mon]
+        indices = [tuple(ind) for dag, ind in mon]
+        if not ((indices[0] in fops) and (indices[1] in fops)):
+            if ignore_unexpected:
+                continue
+            else:
+                _raise_term_error("Unexpected quadratic term {}", mon, coeff)
+
+        spin1, orb1 = divmod(fops.index(indices[0]), dim)
+        spin2, orb2 = divmod(fops.index(indices[1]), dim)
+
+        # Normal quadratic term
+        if daggers == [True, False]:
+            M[spin1, spin2, orb1, orb2] = coeff
+        # Anomalous term
+        elif daggers[0] == daggers[1]:
+            if spin1 == spin2:  # Not representable in Nambu notation
+                if ignore_unexpected:
+                    continue
+                else:
+                    _raise_term_error("Unexpected same-spin anomalous term {}",
+                                      mon,
+                                      coeff)
+            # Creation-creation term
+            if daggers[0]:
+                if spin1 == 0:
+                    M_an[0, 0, orb1, orb2] = coeff
+                else:
+                    M_an[0, 0, orb2, orb1] = -coeff
+
+    return M, M_an
+
+
 def parse_hamiltonian(hamiltonian: op.Operator,  # noqa: C901
                       fops_imp_up: list[IndicesType],
                       fops_imp_dn: list[IndicesType],
