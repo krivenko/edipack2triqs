@@ -1,5 +1,6 @@
 import numpy as np
 from numpy import multiply as mul
+from numpy.testing import assert_equal
 
 from edipack2triqs import EDMode
 from edipack2triqs.solver import EDIpackSolver
@@ -21,7 +22,8 @@ class TestEDIpackSolverNoBath(TestSolver):
         cls.assert_chi(s, **refs)
 
     def test_zerotemp(self):
-        h_loc = self.make_h_loc(mul.outer(s0, np.diag([-0.5, -0.6])))
+        h_loc_mat = mul.outer(s0, np.diag([-0.5, -0.6]))
+        h_loc = self.make_h_loc(h_loc_mat)
         h_int = self.make_h_int(
             Uloc=[0.1, 0.2], Ust=0.4, Jh=0.2, Jx=0.1, Jp=0.15
         )
@@ -41,6 +43,9 @@ class TestEDIpackSolverNoBath(TestSolver):
         self.assertEqual(solver.h_params.ed_mode, EDMode.NORMAL)
         self.assertEqual(solver.nspin, 1)
         self.assertEqual(solver.norb, 2)
+        self.assertEqual(solver.hloc, h_loc)
+        assert_equal(solver.hloc_mat, h_loc_mat[:1, :1, ...])
+        assert_equal(solver.hloc_an_mat, np.zeros((1, 1, 2, 2)))
         self.assertIsNone(solver.bath)
 
         solve_params = {
@@ -57,7 +62,8 @@ class TestEDIpackSolverNoBath(TestSolver):
         self.assert_all(solver, **refs)
 
     def test_nspin1(self):
-        h_loc = self.make_h_loc(mul.outer(s0, np.diag([-0.5, -0.6])))
+        h_loc_mat = mul.outer(s0, np.diag([-0.5, -0.6]))
+        h_loc = self.make_h_loc(h_loc_mat)
         h_int = self.make_h_int(
             Uloc=[0.1, 0.2], Ust=0.4, Jh=0.2, Jx=0.1, Jp=0.15
         )
@@ -76,6 +82,9 @@ class TestEDIpackSolverNoBath(TestSolver):
         self.assertEqual(solver.h_params.ed_mode, EDMode.NORMAL)
         self.assertEqual(solver.nspin, 1)
         self.assertEqual(solver.norb, 2)
+        self.assertEqual(solver.hloc, h_loc)
+        assert_equal(solver.hloc_mat, h_loc_mat[:1, :1, ...])
+        assert_equal(solver.hloc_an_mat, np.zeros((1, 1, 2, 2)))
         self.assertIsNone(solver.bath)
 
         # Part I: Initial solve()
@@ -99,6 +108,7 @@ class TestEDIpackSolverNoBath(TestSolver):
             'Uloc': [0.15, 0.25], 'Ust': 0.35, 'Jh': 0.1, 'Jx': 0.2, 'Jp': 0.0
         }
         self.change_int_params(solver.U, **new_int_params)
+        solver.hloc = h_loc
         solver.comm.barrier()
 
         solve_params = {
@@ -119,8 +129,8 @@ class TestEDIpackSolverNoBath(TestSolver):
         self.assert_all(solver, **refs)
 
     def test_nspin2(self):
-        h_loc = self.make_h_loc(mul.outer(np.diag([0.8, 1.2]),
-                                          np.diag([-0.5, -0.6])))
+        h_loc_mat = mul.outer(np.diag([0.8, 1.2]), np.diag([-0.5, -0.6]))
+        h_loc = self.make_h_loc(h_loc_mat)
         h_int = self.make_h_int(
             Uloc=[0.1, 0.2], Ust=0.4, Jh=0.2, Jx=0.1, Jp=0.15
         )
@@ -139,6 +149,9 @@ class TestEDIpackSolverNoBath(TestSolver):
         self.assertEqual(solver.h_params.ed_mode, EDMode.NORMAL)
         self.assertEqual(solver.nspin, 2)
         self.assertEqual(solver.norb, 2)
+        self.assertEqual(solver.hloc, h_loc)
+        assert_equal(solver.hloc_mat, h_loc_mat)
+        assert_equal(solver.hloc_an_mat, np.zeros((1, 1, 2, 2)))
         self.assertIsNone(solver.bath)
 
         # Part I: Initial solve()
@@ -162,6 +175,7 @@ class TestEDIpackSolverNoBath(TestSolver):
             'Uloc': [0.15, 0.25], 'Ust': 0.35, 'Jh': 0.1, 'Jx': 0.2, 'Jp': 0.0
         }
         self.change_int_params(solver.U, **new_int_params)
+        solver.hloc = h_loc
         solver.comm.barrier()
 
         solve_params = {
@@ -182,10 +196,10 @@ class TestEDIpackSolverNoBath(TestSolver):
         self.assert_all(solver, **refs)
 
     def test_nonsu2(self):
-        h_loc = self.make_h_loc(mul.outer(np.array([[0.8, 0.2],
-                                                    [0.2, 1.2]]),
-                                          np.diag([-0.5, -0.6])),
-                                spin_blocks=False)
+        h_loc_mat = mul.outer(np.array([[0.8, 0.2],
+                                        [0.2, 1.2]]),
+                              np.diag([-0.5, -0.6]))
+        h_loc = self.make_h_loc(h_loc_mat, spin_blocks=False)
         h_int = self.make_h_int(
             Uloc=[0.1, 0.2], Ust=0.4, Jh=0.2, Jx=0.1, Jp=0.15, spin_blocks=False
         )
@@ -204,6 +218,9 @@ class TestEDIpackSolverNoBath(TestSolver):
         self.assertEqual(solver.h_params.ed_mode, EDMode.NONSU2)
         self.assertEqual(solver.nspin, 2)
         self.assertEqual(solver.norb, 2)
+        self.assertEqual(solver.hloc, h_loc)
+        assert_equal(solver.hloc_mat, h_loc_mat)
+        assert_equal(solver.hloc_an_mat, np.zeros((1, 1, 2, 2)))
         self.assertIsNone(solver.bath)
 
         # Part I: Initial solve()
@@ -226,6 +243,7 @@ class TestEDIpackSolverNoBath(TestSolver):
             'Uloc': [0.15, 0.25], 'Ust': 0.35, 'Jh': 0.1, 'Jx': 0.2, 'Jp': 0.0
         }
         self.change_int_params(solver.U, **new_int_params)
+        solver.hloc = h_loc
         solver.comm.barrier()
 
         solve_params = {
@@ -245,8 +263,9 @@ class TestEDIpackSolverNoBath(TestSolver):
         self.assert_all(solver, **refs)
 
     def test_h_loc_an(self):
-        h_loc = self.make_h_loc(mul.outer(s0, np.array([[-0.5, 0.1],
-                                                        [0.1, -0.6]])))
+        h_loc_mat = mul.outer(s0, np.array([[-0.5, 0.1],
+                                            [0.1, -0.6]]))
+        h_loc = self.make_h_loc(h_loc_mat)
         h_int = self.make_h_int(
             Uloc=[0.1, 0.2], Ust=0.4, Jh=0.2, Jx=0.1, Jp=0.15
         )
@@ -270,6 +289,9 @@ class TestEDIpackSolverNoBath(TestSolver):
         self.assertEqual(solver.h_params.ed_mode, EDMode.SUPERC)
         self.assertEqual(solver.nspin, 1)
         self.assertEqual(solver.norb, 2)
+        self.assertEqual(solver.hloc, h_loc + h_loc_an)
+        assert_equal(solver.hloc_mat, h_loc_mat[:1, :1, ...])
+        assert_equal(solver.hloc_an_mat, h_loc_an_mat.reshape((1, 1, 2, 2)))
         self.assertIsNone(solver.bath)
 
         # Part I: Initial solve()
@@ -294,7 +316,8 @@ class TestEDIpackSolverNoBath(TestSolver):
         self.change_int_params(solver.U, **new_int_params)
         h_loc_an_mat = np.array([[0.2, 0.4j],
                                  [0.4j, 0.3]])
-        solver.hloc_an[0, 0, :, :] = h_loc_an_mat
+        h_loc_an = self.make_h_loc_an(h_loc_an_mat)
+        solver.hloc = h_loc + h_loc_an
         solver.comm.barrier()
 
         solve_params = {
@@ -308,7 +331,6 @@ class TestEDIpackSolverNoBath(TestSolver):
 
         # Reference solution
         h_int = self.make_h_int(**new_int_params)
-        h_loc_an = self.make_h_loc_an(h_loc_an_mat)
         h = h_loc + h_loc_an + h_int
         refs = self.ref_results("h_loc_an_2", h=h, fops=fops, superc=True,
                                 **solve_params)
