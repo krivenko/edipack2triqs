@@ -418,7 +418,7 @@ class EDIpackSolver:
             self.instance_count[0] -= 1
         # ed.finalize_solver() can fail if this __del__() method is called as
         # part of interpreter destruction procedure.
-        except TypeError:
+        except (AttributeError, TypeError):
             pass
 
     @property
