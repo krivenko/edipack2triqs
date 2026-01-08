@@ -627,7 +627,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">instance_count</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-=</span> <span class="mi">1</span>
         <span class="c1"># ed.finalize_solver() can fail if this __del__() method is called as</span>
         <span class="c1"># part of interpreter destruction procedure.</span>
-        <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
+        <span class="k">except</span> <span class="p">(</span><span class="ne">AttributeError</span><span class="p">,</span> <span class="ne">TypeError</span><span class="p">):</span>
             <span class="k">pass</span>
 
     <span class="nd">@property</span>
