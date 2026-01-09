@@ -18,7 +18,7 @@ jobs:
           activate-environment: conda-env
           auto-update-conda: true
           channels: conda-forge, edipack, defaults
-          python-version: 3.14
+          python-version: 3.13
           miniforge-version: "latest"
 
       - name: Detect version of edipack2triqs
