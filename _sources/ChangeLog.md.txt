@@ -11,8 +11,13 @@
   The corresponding keyword argument of `EDIpackSolver`'s constructor is called
   `ed_mode`.
 * Enable support for s-wave pairing terms in the impurity Hamiltonian.
-* Matrix of impurity pairing fields is accessible via the attribute
-  `EDIpackSolver.hloc_an`.
+* Semantics of `EDIpackSolver.hloc` has been changed. This attribute now gives
+  access to the local impurity Hamiltonian in the form of a TRIQS many-body
+  operator object. The object contains terms corresponding to both normal and
+  anomalous pairing contributions.
+* Alternatively, matrices of the normal local Hamiltonian and of the impurity
+  pairing fields are now read-write accessible via new attributes
+  `EDIpackSolver.hloc_mat` and `EDIpackSolver.hloc_an_mat`.
 
 ## Version 0.9.0
 
