@@ -23,10 +23,14 @@ from . import EDMode
 from .util import (IndicesType,
                    validate_fops_up_dn,
                    is_spin_diagonal,
+                   is_spin_degenerate,
                    write_config,
                    chdircontext)
 from .bath import Bath, BathNormal, BathHybrid, BathGeneral
-from .hamiltonian import parse_hamiltonian, _is_density, _is_density_density
+from .hamiltonian import (parse_hamiltonian,
+                          extract_quadratic,
+                          _is_density,
+                          _is_density_density)
 from .fit import BathFittingParams, _chi2_fit_bath
 
 
@@ -111,7 +115,7 @@ class EDIpackSolver:
             :f:var:`ED mode <f/ed_input_vars/ed_mode>` and
             :f:mod:`bath geometry <f/ed_bath>`. This choice
             remains unchangeable throughout object's lifetime.
-        :type triqs.operators.operators.Operator:
+        :type hamiltonian: triqs.operators.operators.Operator
 
         :param fops_imp_up: Fundamental operator set for spin-up impurity
             degrees of freedom.
@@ -422,7 +426,7 @@ class EDIpackSolver:
             pass
 
     @property
-    def hloc(self) -> np.ndarray:
+    def hloc_mat(self) -> np.ndarray:
         r"""
         Access to the matrix of the local impurity Hamiltonian
         :math:`\hat H_\text{loc}`.
@@ -430,12 +434,45 @@ class EDIpackSolver:
         return self.h_params.Hloc
 
     @property
-    def hloc_an(self) -> np.ndarray:
+    def hloc_an_mat(self) -> np.ndarray:
         r"""
         Access to the matrix of the anomalous local impurity Hamiltonian
         :math:`\hat H_\text{loc, an}`.
         """
         return self.h_params.Hloc_an
+
+    @property
+    def hloc(self) -> op.Operator:
+        r"""
+        Access to the local impurity Hamiltonian :math:`\hat H_\text{loc}`
+        in the form of a TRIQS many-body operator. The operator object contains
+        both normal and anomalous contributions.
+        """
+        if self.h_params.ed_mode == EDMode.SUPERC:
+            return self.h_params.Hloc_op(self.fops_imp_up, self.fops_imp_dn) + \
+                self.h_params.Hloc_an_op(self.fops_imp_up, self.fops_imp_dn)
+        else:
+            return self.h_params.Hloc_op(self.fops_imp_up, self.fops_imp_dn)
+
+    @hloc.setter
+    def hloc(self, h: op.Operator):
+        """
+        Set the local impurity Hamiltonian given in the form of a TRIQS
+        many-body operator containing both normal and anomalous contributions.
+        """
+        new_hloc, new_hloc_an = extract_quadratic(h,
+                                                  self.fops_imp_up,
+                                                  self.fops_imp_dn,
+                                                  ignore_unexpected=False)
+        if self.nspin == 1:
+            if not is_spin_degenerate(new_hloc):
+                raise RuntimeError(
+                    "Local Hamiltonian must remain spin-degenerate"
+                )
+            self.h_params.Hloc[:] = new_hloc[:1, :1, :, :]
+        else:
+            self.h_params.Hloc[:] = new_hloc
+        self.h_params.Hloc_an[:] = new_hloc_an
 
     @property
     def U(self) -> np.ndarray:

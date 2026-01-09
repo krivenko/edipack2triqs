@@ -181,10 +181,12 @@ class TestHamiltonianBathNormal(TestHamiltonian):
                 self.assertIs(b2.Delta.base, b2.data)
 
     def test_parse_hamiltonian_nspin1(self):
-        h = self.make_H_loc(mul.outer(s0, self.h_loc)) + self.make_H_int()
-        h += self.make_H_bath(mul.outer([1, 1], self.eps),
-                              mul.outer(s0, self.V))
+        h_loc = self.make_H_loc(mul.outer(s0, self.h_loc))
+        h_int = self.make_H_int()
+        h_bath = self.make_H_bath(mul.outer([1, 1], self.eps),
+                                  mul.outer(s0, self.V))
 
+        h = h_loc + h_int + h_bath
         params = parse_hamiltonian(
             h,
             self.fops_imp_up, self.fops_imp_dn,
@@ -193,6 +195,11 @@ class TestHamiltonianBathNormal(TestHamiltonian):
 
         self.assertEqual(params.ed_mode, EDMode.NORMAL)
         assert_allclose(params.Hloc, self.h_loc.reshape((1, 1, 3, 3)))
+        assert_allclose(params.Hloc_an, np.zeros((1, 1, 3, 3)))
+        self.assertEqual(params.Hloc_op(self.fops_imp_up, self.fops_imp_dn),
+                         h_loc)
+        self.assertEqual(params.Hloc_an_op(self.fops_imp_up, self.fops_imp_dn),
+                         op.Operator())
         b = params.bath
         self.assertTrue(isinstance(b, BathNormal))
         self.assertEqual(b.nbath, 2)
@@ -224,10 +231,12 @@ class TestHamiltonianBathNormal(TestHamiltonian):
         self.check_bath_h5(b, "nspin1")
 
     def test_parse_hamiltonian_nspin2(self):
-        h = self.make_H_loc(mul.outer(sz, self.h_loc)) + self.make_H_int()
-        h += self.make_H_bath(mul.outer([1, -1], self.eps),
-                              mul.outer(sz, self.V))
+        h_loc = self.make_H_loc(mul.outer(sz, self.h_loc))
+        h_int = self.make_H_int()
+        h_bath = self.make_H_bath(mul.outer([1, -1], self.eps),
+                                  mul.outer(sz, self.V))
 
+        h = h_loc + h_int + h_bath
         params = parse_hamiltonian(
             h,
             self.fops_imp_up, self.fops_imp_dn,
@@ -236,6 +245,11 @@ class TestHamiltonianBathNormal(TestHamiltonian):
 
         self.assertEqual(params.ed_mode, EDMode.NORMAL)
         assert_allclose(params.Hloc, mul.outer(sz, self.h_loc))
+        assert_allclose(params.Hloc_an, np.zeros((1, 1, 3, 3)))
+        self.assertEqual(params.Hloc_op(self.fops_imp_up, self.fops_imp_dn),
+                         h_loc)
+        self.assertEqual(params.Hloc_an_op(self.fops_imp_up, self.fops_imp_dn),
+                         op.Operator())
         b = params.bath
         self.assertTrue(isinstance(b, BathNormal))
         self.assertEqual(b.nbath, 2)
@@ -271,11 +285,12 @@ class TestHamiltonianBathNormal(TestHamiltonian):
         self.check_bath_h5(b, "nspin2")
 
     def test_parse_hamiltonian_nonsu2_hloc(self):
-        h = self.make_H_loc(mul.outer(sz + 0.2 * sx, self.h_loc)) \
-            + self.make_H_int()
-        h += self.make_H_bath(mul.outer([1, 1], self.eps),
-                              mul.outer(s0, self.V))
+        h_loc = self.make_H_loc(mul.outer(sz + 0.2 * sx, self.h_loc))
+        h_int = self.make_H_int()
+        h_bath = self.make_H_bath(mul.outer([1, 1], self.eps),
+                                  mul.outer(s0, self.V))
 
+        h = h_loc + h_int + h_bath
         params = parse_hamiltonian(
             h,
             self.fops_imp_up, self.fops_imp_dn,
@@ -284,6 +299,11 @@ class TestHamiltonianBathNormal(TestHamiltonian):
 
         self.assertEqual(params.ed_mode, EDMode.NONSU2)
         assert_allclose(params.Hloc, mul.outer(sz + 0.2 * sx, self.h_loc))
+        assert_allclose(params.Hloc_an, np.zeros((1, 1, 3, 3)))
+        self.assertEqual(params.Hloc_op(self.fops_imp_up, self.fops_imp_dn),
+                         h_loc)
+        self.assertEqual(params.Hloc_an_op(self.fops_imp_up, self.fops_imp_dn),
+                         op.Operator())
         b = params.bath
         self.assertTrue(isinstance(b, BathNormal))
         self.assertEqual(b.nbath, 2)
@@ -320,10 +340,12 @@ class TestHamiltonianBathNormal(TestHamiltonian):
         self.check_bath_h5(b, "nonsu2_hloc")
 
     def test_parse_hamiltonian_nonsu2_bath(self):
-        h = self.make_H_loc(mul.outer(s0, self.h_loc)) + self.make_H_int()
-        h += self.make_H_bath(mul.outer([1, -1], self.eps),
-                              mul.outer(sz + 0.2 * sx, self.V))
+        h_loc = self.make_H_loc(mul.outer(s0, self.h_loc))
+        h_int = self.make_H_int()
+        h_bath = self.make_H_bath(mul.outer([1, -1], self.eps),
+                                  mul.outer(sz + 0.2 * sx, self.V))
 
+        h = h_loc + h_int + h_bath
         params = parse_hamiltonian(
             h,
             self.fops_imp_up, self.fops_imp_dn,
@@ -332,6 +354,11 @@ class TestHamiltonianBathNormal(TestHamiltonian):
 
         self.assertEqual(params.ed_mode, EDMode.NONSU2)
         assert_allclose(params.Hloc, mul.outer(s0, self.h_loc))
+        assert_allclose(params.Hloc_an, np.zeros((1, 1, 3, 3)))
+        self.assertEqual(params.Hloc_op(self.fops_imp_up, self.fops_imp_dn),
+                         h_loc)
+        self.assertEqual(params.Hloc_an_op(self.fops_imp_up, self.fops_imp_dn),
+                         op.Operator())
         b = params.bath
         self.assertTrue(isinstance(b, BathNormal))
         self.assertEqual(b.nbath, 2)
@@ -370,13 +397,15 @@ class TestHamiltonianBathNormal(TestHamiltonian):
         self.check_bath_h5(b, "nonsu2_bath")
 
     def test_parse_hamiltonian_superc_hloc_an(self):
-        h = self.make_H_loc(mul.outer(s0, self.h_loc)) + self.make_H_int()
-        h += self.make_H_bath(mul.outer([1, 1], self.eps),
-                              mul.outer(s0, self.V))
+        h_loc = self.make_H_loc(mul.outer(s0, self.h_loc))
+        h_int = self.make_H_int()
+        h_bath = self.make_H_bath(mul.outer([1, 1], self.eps),
+                                  mul.outer(s0, self.V))
 
-        h_loc_an = np.diag([0.1, 0.2, 0.3])
-        h += self.make_H_loc_an(h_loc_an)
+        Delta = np.diag([0.1, 0.2, 0.3])
+        h_loc_an = self.make_H_loc_an(Delta)
 
+        h = h_loc + h_loc_an + h_int + h_bath
         params = parse_hamiltonian(
             h,
             self.fops_imp_up, self.fops_imp_dn,
@@ -385,7 +414,11 @@ class TestHamiltonianBathNormal(TestHamiltonian):
 
         self.assertEqual(params.ed_mode, EDMode.SUPERC)
         assert_allclose(params.Hloc, self.h_loc.reshape(1, 1, 3, 3))
-        assert_allclose(params.Hloc_an, h_loc_an.reshape(1, 1, 3, 3))
+        assert_allclose(params.Hloc_an, Delta.reshape(1, 1, 3, 3))
+        self.assertEqual(params.Hloc_op(self.fops_imp_up, self.fops_imp_dn),
+                         h_loc)
+        self.assertEqual(params.Hloc_an_op(self.fops_imp_up, self.fops_imp_dn),
+                         h_loc_an)
         b = params.bath
         self.assertTrue(isinstance(b, BathNormal))
         self.assertEqual(b.nbath, 2)
@@ -419,19 +452,21 @@ class TestHamiltonianBathNormal(TestHamiltonian):
         self.check_bath_h5(b, "superc")
 
     def test_parse_hamiltonian_superc_bath(self):
-        h = self.make_H_loc(mul.outer(s0, self.h_loc)) + self.make_H_int()
-        h += self.make_H_bath(mul.outer([1, 1], self.eps),
-                              mul.outer(s0, self.V))
+        h_loc = self.make_H_loc(mul.outer(s0, self.h_loc))
+        h_int = self.make_H_int()
+        h_bath = self.make_H_bath(mul.outer([1, 1], self.eps),
+                                  mul.outer(s0, self.V))
 
         Delta = np.array([[0.6, 0.7],
                           [0.8, 0.6],
                           [0.9, 0.7]])
-        h += sum(Delta[o, nu] * (op.c_dag('B_up', nu * 3 + o)
-                                 * op.c_dag('B_dn', nu * 3 + o)
-                                 + op.c('B_dn', nu * 3 + o)
-                                 * op.c('B_up', nu * 3 + o))
-                 for o, nu in product(self.orbs, range(2)))
+        h_sc = sum(Delta[o, nu] * (op.c_dag('B_up', nu * 3 + o)
+                                   * op.c_dag('B_dn', nu * 3 + o)
+                                   + op.c('B_dn', nu * 3 + o)
+                                   * op.c('B_up', nu * 3 + o))
+                   for o, nu in product(self.orbs, range(2)))
 
+        h = h_loc + h_int + h_bath + h_sc
         params = parse_hamiltonian(
             h,
             self.fops_imp_up, self.fops_imp_dn,
@@ -440,6 +475,11 @@ class TestHamiltonianBathNormal(TestHamiltonian):
 
         self.assertEqual(params.ed_mode, EDMode.SUPERC)
         assert_allclose(params.Hloc, self.h_loc.reshape(1, 1, 3, 3))
+        assert_allclose(params.Hloc_an, np.zeros((1, 1, 3, 3)))
+        self.assertEqual(params.Hloc_op(self.fops_imp_up, self.fops_imp_dn),
+                         h_loc)
+        self.assertEqual(params.Hloc_an_op(self.fops_imp_up, self.fops_imp_dn),
+                         op.Operator())
         b = params.bath
         self.assertTrue(isinstance(b, BathNormal))
         self.assertEqual(b.nbath, 2)
@@ -535,10 +575,12 @@ class TestHamiltonianBathHybrid(TestHamiltonian):
                 self.assertIs(b2.Delta.base, b2.data)
 
     def test_parse_hamiltonian_nspin1(self):
-        h = self.make_H_loc(mul.outer(s0, self.h_loc)) + self.make_H_int()
-        h += self.make_H_bath(mul.outer([1, 1], self.eps),
-                              mul.outer(s0, self.V))
+        h_loc = self.make_H_loc(mul.outer(s0, self.h_loc))
+        h_int = self.make_H_int()
+        h_bath = self.make_H_bath(mul.outer([1, 1], self.eps),
+                                  mul.outer(s0, self.V))
 
+        h = h_loc + h_int + h_bath
         params = parse_hamiltonian(
             h,
             self.fops_imp_up, self.fops_imp_dn,
@@ -547,6 +589,11 @@ class TestHamiltonianBathHybrid(TestHamiltonian):
 
         self.assertEqual(params.ed_mode, EDMode.NORMAL)
         assert_allclose(params.Hloc, self.h_loc.reshape((1, 1, 3, 3)))
+        assert_allclose(params.Hloc_an, np.zeros((1, 1, 3, 3)))
+        self.assertEqual(params.Hloc_op(self.fops_imp_up, self.fops_imp_dn),
+                         h_loc)
+        self.assertEqual(params.Hloc_an_op(self.fops_imp_up, self.fops_imp_dn),
+                         op.Operator())
         self.assertTrue(isinstance(params.bath, BathHybrid))
         self.assertEqual(params.bath.nbath, 4)
         assert_allclose(params.bath.eps, self.eps.reshape(1, 4))
@@ -567,10 +614,12 @@ class TestHamiltonianBathHybrid(TestHamiltonian):
         self.check_bath_h5(b2, "nspin1")
 
     def test_parse_hamiltonian_nspin2(self):
-        h = self.make_H_loc(mul.outer(sz, self.h_loc)) + self.make_H_int()
-        h += self.make_H_bath(mul.outer([1, -1], self.eps),
-                              mul.outer(sz, self.V))
+        h_loc = self.make_H_loc(mul.outer(sz, self.h_loc))
+        h_int = self.make_H_int()
+        h_bath = self.make_H_bath(mul.outer([1, -1], self.eps),
+                                  mul.outer(sz, self.V))
 
+        h = h_loc + h_int + h_bath
         params = parse_hamiltonian(
             h,
             self.fops_imp_up, self.fops_imp_dn,
@@ -579,6 +628,11 @@ class TestHamiltonianBathHybrid(TestHamiltonian):
 
         self.assertEqual(params.ed_mode, EDMode.NORMAL)
         assert_allclose(params.Hloc, mul.outer(sz, self.h_loc))
+        assert_allclose(params.Hloc_an, np.zeros((1, 1, 3, 3)))
+        self.assertEqual(params.Hloc_op(self.fops_imp_up, self.fops_imp_dn),
+                         h_loc)
+        self.assertEqual(params.Hloc_an_op(self.fops_imp_up, self.fops_imp_dn),
+                         op.Operator())
         self.assertTrue(isinstance(params.bath, BathHybrid))
         self.assertEqual(params.bath.nbath, 4)
         assert_allclose(params.bath.eps,
@@ -600,11 +654,12 @@ class TestHamiltonianBathHybrid(TestHamiltonian):
         self.check_bath_h5(b2, "nspin2")
 
     def test_parse_hamiltonian_nonsu2_hloc(self):
-        h = self.make_H_loc(mul.outer(sz + 0.2 * sx, self.h_loc)) \
-            + self.make_H_int()
-        h += self.make_H_bath(mul.outer([1, 1], self.eps),
-                              mul.outer(s0, self.V))
+        h_loc = self.make_H_loc(mul.outer(sz + 0.2 * sx, self.h_loc))
+        h_int = self.make_H_int()
+        h_bath = self.make_H_bath(mul.outer([1, 1], self.eps),
+                                  mul.outer(s0, self.V))
 
+        h = h_loc + h_int + h_bath
         params = parse_hamiltonian(
             h,
             self.fops_imp_up, self.fops_imp_dn,
@@ -613,6 +668,11 @@ class TestHamiltonianBathHybrid(TestHamiltonian):
 
         self.assertEqual(params.ed_mode, EDMode.NONSU2)
         assert_allclose(params.Hloc, mul.outer(sz + 0.2 * sx, self.h_loc))
+        assert_allclose(params.Hloc_an, np.zeros((1, 1, 3, 3)))
+        self.assertEqual(params.Hloc_op(self.fops_imp_up, self.fops_imp_dn),
+                         h_loc)
+        self.assertEqual(params.Hloc_an_op(self.fops_imp_up, self.fops_imp_dn),
+                         op.Operator())
         self.assertTrue(isinstance(params.bath, BathHybrid))
         self.assertEqual(params.bath.nbath, 4)
         assert_allclose(params.bath.eps, mul.outer([1, 1], self.eps))
@@ -635,10 +695,12 @@ class TestHamiltonianBathHybrid(TestHamiltonian):
         self.check_bath_h5(b2, "nonsu2_hloc")
 
     def test_parse_hamiltonian_nonsu2_bath(self):
-        h = self.make_H_loc(mul.outer(s0, self.h_loc)) + self.make_H_int()
-        h += self.make_H_bath(mul.outer([1, -1], self.eps),
-                              mul.outer(sz + 0.2 * sx, self.V))
+        h_loc = self.make_H_loc(mul.outer(s0, self.h_loc))
+        h_int = self.make_H_int()
+        h_bath = self.make_H_bath(mul.outer([1, -1], self.eps),
+                                  mul.outer(sz + 0.2 * sx, self.V))
 
+        h = h_loc + h_int + h_bath
         params = parse_hamiltonian(
             h,
             self.fops_imp_up, self.fops_imp_dn,
@@ -647,6 +709,11 @@ class TestHamiltonianBathHybrid(TestHamiltonian):
 
         self.assertEqual(params.ed_mode, EDMode.NONSU2)
         assert_allclose(params.Hloc, mul.outer(s0, self.h_loc))
+        assert_allclose(params.Hloc_an, np.zeros((1, 1, 3, 3)))
+        self.assertEqual(params.Hloc_op(self.fops_imp_up, self.fops_imp_dn),
+                         h_loc)
+        self.assertEqual(params.Hloc_an_op(self.fops_imp_up, self.fops_imp_dn),
+                         op.Operator())
         self.assertTrue(isinstance(params.bath, BathHybrid))
         self.assertEqual(params.bath.nbath, 4)
         assert_allclose(params.bath.eps, mul.outer([1, -1], self.eps))
@@ -668,15 +735,17 @@ class TestHamiltonianBathHybrid(TestHamiltonian):
         self.check_bath_h5(b2, "nonsu2_bath")
 
     def test_parse_hamiltonian_superc_hloc_an(self):
-        h = self.make_H_loc(mul.outer(s0, self.h_loc)) + self.make_H_int()
-        h += self.make_H_bath(mul.outer([1, 1], self.eps),
-                              mul.outer(s0, self.V))
+        h_loc = self.make_H_loc(mul.outer(s0, self.h_loc))
+        h_int = self.make_H_int()
+        h_bath = self.make_H_bath(mul.outer([1, 1], self.eps),
+                                  mul.outer(s0, self.V))
 
-        h_loc_an = np.array([[0.1, 0.04, 0.05j],
-                             [0.04, 0.2, 0.06],
-                             [0.05j, 0.06, 0.3]])
-        h += self.make_H_loc_an(h_loc_an)
+        Delta = np.array([[0.1, 0.04, 0.05j],
+                          [0.04, 0.2, 0.06],
+                          [0.05j, 0.06, 0.3]])
+        h_loc_an = self.make_H_loc_an(Delta)
 
+        h = h_loc + h_loc_an + h_int + h_bath
         params = parse_hamiltonian(
             h,
             self.fops_imp_up, self.fops_imp_dn,
@@ -685,7 +754,11 @@ class TestHamiltonianBathHybrid(TestHamiltonian):
 
         self.assertEqual(params.ed_mode, EDMode.SUPERC)
         assert_allclose(params.Hloc, self.h_loc.reshape(1, 1, 3, 3))
-        assert_allclose(params.Hloc_an, h_loc_an.reshape(1, 1, 3, 3))
+        assert_allclose(params.Hloc_an, Delta.reshape(1, 1, 3, 3))
+        self.assertEqual(params.Hloc_op(self.fops_imp_up, self.fops_imp_dn),
+                         h_loc)
+        self.assertEqual(params.Hloc_an_op(self.fops_imp_up, self.fops_imp_dn),
+                         h_loc_an)
         self.assertTrue(isinstance(params.bath, BathHybrid))
         self.assertEqual(params.bath.nbath, 4)
         assert_allclose(params.bath.eps, self.eps.reshape(1, 4))
@@ -708,15 +781,17 @@ class TestHamiltonianBathHybrid(TestHamiltonian):
         self.check_bath_h5(b2, "superc")
 
     def test_parse_hamiltonian_superc_bath(self):
-        h = self.make_H_loc(mul.outer(s0, self.h_loc)) + self.make_H_int()
-        h += self.make_H_bath(mul.outer([1, 1], self.eps),
-                              mul.outer(s0, self.V))
+        h_loc = self.make_H_loc(mul.outer(s0, self.h_loc))
+        h_int = self.make_H_int()
+        h_bath = self.make_H_bath(mul.outer([1, 1], self.eps),
+                                  mul.outer(s0, self.V))
 
         Delta = np.array([0.6, 0.7, 0.8, 0.9])
-        h += sum(Delta[nu] * (op.c_dag('B_up', nu) * op.c_dag('B_dn', nu)
-                              + op.c('B_dn', nu) * op.c('B_up', nu))
-                 for nu in range(4))
+        h_sc = sum(Delta[nu] * (op.c_dag('B_up', nu) * op.c_dag('B_dn', nu)
+                                + op.c('B_dn', nu) * op.c('B_up', nu))
+                   for nu in range(4))
 
+        h = h_loc + h_int + h_bath + h_sc
         params = parse_hamiltonian(
             h,
             self.fops_imp_up, self.fops_imp_dn,
@@ -725,6 +800,11 @@ class TestHamiltonianBathHybrid(TestHamiltonian):
 
         self.assertEqual(params.ed_mode, EDMode.SUPERC)
         assert_allclose(params.Hloc, self.h_loc.reshape(1, 1, 3, 3))
+        assert_allclose(params.Hloc_an, np.zeros((1, 1, 3, 3)))
+        self.assertEqual(params.Hloc_op(self.fops_imp_up, self.fops_imp_dn),
+                         h_loc)
+        self.assertEqual(params.Hloc_an_op(self.fops_imp_up, self.fops_imp_dn),
+                         op.Operator())
         self.assertTrue(isinstance(params.bath, BathHybrid))
         self.assertEqual(params.bath.nbath, 4)
         assert_allclose(params.bath.eps, self.eps.reshape(1, 4))
@@ -893,9 +973,12 @@ class TestHamiltonianBathGeneral(TestHamiltonian):
                 self.assertIs(V_nu.base, b2.data)
 
     def test_parse_hamiltonian_nspin1(self):
-        h = self.make_H_loc(mul.outer(s0, self.h_loc)) + self.make_H_int()
-        h += self.make_H_bath(mul.outer(s0, self.h), mul.outer([1, 1], self.V))
+        h_loc = self.make_H_loc(mul.outer(s0, self.h_loc))
+        h_int = self.make_H_int()
+        h_bath = self.make_H_bath(mul.outer(s0, self.h),
+                                  mul.outer([1, 1], self.V))
 
+        h = h_loc + h_int + h_bath
         params = parse_hamiltonian(
             h,
             self.fops_imp_up, self.fops_imp_dn,
@@ -904,6 +987,11 @@ class TestHamiltonianBathGeneral(TestHamiltonian):
 
         self.assertEqual(params.ed_mode, EDMode.NORMAL)
         assert_allclose(params.Hloc, self.h_loc.reshape((1, 1, 3, 3)))
+        assert_allclose(params.Hloc_an, np.zeros((1, 1, 3, 3)))
+        self.assertEqual(params.Hloc_op(self.fops_imp_up, self.fops_imp_dn),
+                         h_loc)
+        self.assertEqual(params.Hloc_an_op(self.fops_imp_up, self.fops_imp_dn),
+                         op.Operator())
         self.assertTrue(isinstance(params.bath, BathGeneral))
         self.assertEqual(params.bath.nbath, 4)
         self.assertFalse(hasattr(params.bath, 'Delta'))
@@ -930,9 +1018,12 @@ class TestHamiltonianBathGeneral(TestHamiltonian):
         self.check_bath_h5(params.bath, "nspin1")
 
     def test_parse_hamiltonian_nspin2(self):
-        h = self.make_H_loc(mul.outer(sz, self.h_loc)) + self.make_H_int()
-        h += self.make_H_bath(mul.outer(sz, self.h), mul.outer([1, -1], self.V))
+        h_loc = self.make_H_loc(mul.outer(sz, self.h_loc))
+        h_int = self.make_H_int()
+        h_bath = self.make_H_bath(mul.outer(sz, self.h),
+                                  mul.outer([1, -1], self.V))
 
+        h = h_loc + h_int + h_bath
         params = parse_hamiltonian(
             h,
             self.fops_imp_up, self.fops_imp_dn,
@@ -941,6 +1032,11 @@ class TestHamiltonianBathGeneral(TestHamiltonian):
 
         self.assertEqual(params.ed_mode, EDMode.NORMAL)
         assert_allclose(params.Hloc, mul.outer(sz, self.h_loc))
+        assert_allclose(params.Hloc_an, np.zeros((1, 1, 3, 3)))
+        self.assertEqual(params.Hloc_op(self.fops_imp_up, self.fops_imp_dn),
+                         h_loc)
+        self.assertEqual(params.Hloc_an_op(self.fops_imp_up, self.fops_imp_dn),
+                         op.Operator())
         self.assertTrue(isinstance(params.bath, BathGeneral))
         self.assertEqual(params.bath.nbath, 4)
         self.assertFalse(hasattr(params.bath, 'Delta'))
@@ -967,10 +1063,12 @@ class TestHamiltonianBathGeneral(TestHamiltonian):
         self.check_bath_h5(params.bath, "nspin2")
 
     def test_parse_hamiltonian_nonsu2_hloc(self):
-        h = self.make_H_loc(mul.outer(sz + 0.2 * sx, self.h_loc)) \
-            + self.make_H_int()
-        h += self.make_H_bath(mul.outer(s0, self.h), mul.outer([1, 1], self.V))
+        h_loc = self.make_H_loc(mul.outer(sz + 0.2 * sx, self.h_loc))
+        h_int = self.make_H_int()
+        h_bath = self.make_H_bath(mul.outer(s0, self.h),
+                                  mul.outer([1, 1], self.V))
 
+        h = h_loc + h_int + h_bath
         params = parse_hamiltonian(
             h,
             self.fops_imp_up, self.fops_imp_dn,
@@ -979,6 +1077,11 @@ class TestHamiltonianBathGeneral(TestHamiltonian):
 
         self.assertEqual(params.ed_mode, EDMode.NONSU2)
         assert_allclose(params.Hloc, mul.outer(sz + 0.2 * sx, self.h_loc))
+        assert_allclose(params.Hloc_an, np.zeros((1, 1, 3, 3)))
+        self.assertEqual(params.Hloc_op(self.fops_imp_up, self.fops_imp_dn),
+                         h_loc)
+        self.assertEqual(params.Hloc_an_op(self.fops_imp_up, self.fops_imp_dn),
+                         op.Operator())
         self.assertTrue(isinstance(params.bath, BathGeneral))
         self.assertEqual(params.bath.nbath, 4)
         self.assertFalse(hasattr(params.bath, 'Delta'))
@@ -1005,10 +1108,12 @@ class TestHamiltonianBathGeneral(TestHamiltonian):
         self.check_bath_h5(params.bath, "nonsu2_hloc")
 
     def test_parse_hamiltonian_nonsu2_bath(self):
-        h = self.make_H_loc(mul.outer(s0, self.h_loc)) + self.make_H_int()
-        h += self.make_H_bath(mul.outer(sz + 0.2 * sx, self.h),
-                              mul.outer([1, -1], self.V))
+        h_loc = self.make_H_loc(mul.outer(s0, self.h_loc))
+        h_int = self.make_H_int()
+        h_bath = self.make_H_bath(mul.outer(sz + 0.2 * sx, self.h),
+                                  mul.outer([1, -1], self.V))
 
+        h = h_loc + h_int + h_bath
         params = parse_hamiltonian(
             h,
             self.fops_imp_up, self.fops_imp_dn,
@@ -1017,6 +1122,11 @@ class TestHamiltonianBathGeneral(TestHamiltonian):
 
         self.assertEqual(params.ed_mode, EDMode.NONSU2)
         assert_allclose(params.Hloc, mul.outer(s0, self.h_loc))
+        assert_allclose(params.Hloc_an, np.zeros((1, 1, 3, 3)))
+        self.assertEqual(params.Hloc_op(self.fops_imp_up, self.fops_imp_dn),
+                         h_loc)
+        self.assertEqual(params.Hloc_an_op(self.fops_imp_up, self.fops_imp_dn),
+                         op.Operator())
         self.assertTrue(isinstance(params.bath, BathGeneral))
         self.assertEqual(params.bath.nbath, 4)
         self.assertFalse(hasattr(params.bath, 'Delta'))
@@ -1044,14 +1154,17 @@ class TestHamiltonianBathGeneral(TestHamiltonian):
         self.check_bath_h5(params.bath, "nonsu2_bath")
 
     def test_parse_hamiltonian_superc_hloc_an(self):
-        h = self.make_H_loc(mul.outer(s0, self.h_loc)) + self.make_H_int()
-        h += self.make_H_bath(mul.outer(s0, self.h), mul.outer([1, 1], self.V))
+        h_loc = self.make_H_loc(mul.outer(s0, self.h_loc))
+        h_int = self.make_H_int()
+        h_bath = self.make_H_bath(mul.outer(s0, self.h),
+                                  mul.outer([1, 1], self.V))
 
-        h_loc_an = np.array([[0.1, 0.04, 0.05j],
-                             [0.04, 0.2, 0.06],
-                             [0.05j, 0.06, 0.3]])
-        h += self.make_H_loc_an(h_loc_an)
+        Delta = np.array([[0.1, 0.04, 0.05j],
+                          [0.04, 0.2, 0.06],
+                          [0.05j, 0.06, 0.3]])
+        h_loc_an = self.make_H_loc_an(Delta)
 
+        h = h_loc + h_loc_an + h_int + h_bath
         params = parse_hamiltonian(
             h,
             self.fops_imp_up, self.fops_imp_dn,
@@ -1060,7 +1173,11 @@ class TestHamiltonianBathGeneral(TestHamiltonian):
 
         self.assertEqual(params.ed_mode, EDMode.SUPERC)
         assert_allclose(params.Hloc, self.h_loc.reshape(1, 1, 3, 3))
-        assert_allclose(params.Hloc_an, h_loc_an.reshape(1, 1, 3, 3))
+        assert_allclose(params.Hloc_an, Delta.reshape(1, 1, 3, 3))
+        self.assertEqual(params.Hloc_op(self.fops_imp_up, self.fops_imp_dn),
+                         h_loc)
+        self.assertEqual(params.Hloc_an_op(self.fops_imp_up, self.fops_imp_dn),
+                         h_loc_an)
         self.assertTrue(isinstance(params.bath, BathGeneral))
         self.assertEqual(params.bath.nbath, 4)
         self.assertEqual(params.bath.nsym, 6)
@@ -1092,8 +1209,10 @@ class TestHamiltonianBathGeneral(TestHamiltonian):
         self.check_bath_h5(params.bath, "superc")
 
     def test_parse_hamiltonian_superc_bath(self):
-        h = self.make_H_loc(mul.outer(s0, self.h_loc)) + self.make_H_int()
-        h += self.make_H_bath(mul.outer(s0, self.h), mul.outer([1, 1], self.V))
+        h_loc = self.make_H_loc(mul.outer(s0, self.h_loc))
+        h_int = self.make_H_int()
+        h_bath = self.make_H_bath(mul.outer(s0, self.h),
+                                  mul.outer([1, 1], self.V))
 
         h_sc = sum(self.Delta[o1, o2, nu]
                    * op.c_dag('B_up', nu * 3 + o1)
@@ -1101,8 +1220,9 @@ class TestHamiltonianBathGeneral(TestHamiltonian):
                    for o1, o2, nu in product(TestHamiltonian.orbs,
                                              TestHamiltonian.orbs,
                                              range(4)))
-        h += h_sc + op.dagger(h_sc)
+        h_sc = h_sc + op.dagger(h_sc)
 
+        h = h_loc + h_int + h_bath + h_sc
         params = parse_hamiltonian(
             h,
             self.fops_imp_up, self.fops_imp_dn,
@@ -1111,6 +1231,11 @@ class TestHamiltonianBathGeneral(TestHamiltonian):
 
         self.assertEqual(params.ed_mode, EDMode.SUPERC)
         assert_allclose(params.Hloc, self.h_loc.reshape(1, 1, 3, 3))
+        assert_allclose(params.Hloc_an, np.zeros((1, 1, 3, 3)))
+        self.assertEqual(params.Hloc_op(self.fops_imp_up, self.fops_imp_dn),
+                         h_loc)
+        self.assertEqual(params.Hloc_an_op(self.fops_imp_up, self.fops_imp_dn),
+                         op.Operator())
         self.assertTrue(isinstance(params.bath, BathGeneral))
         self.assertEqual(params.bath.nbath, 4)
         self.assertEqual(params.bath.nsym, 15)

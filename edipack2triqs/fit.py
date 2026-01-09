@@ -13,7 +13,7 @@ from triqs.gf import BlockGf, MeshImFreq
 from edipack2py import global_env as ed
 
 from . import EDMode
-from .util import chdircontext
+from .util import is_spin_diagonal, chdircontext
 
 
 @dataclass(frozen=True, kw_only=True)
@@ -150,6 +150,10 @@ def _chi2_fit_bath(self, g: BlockGf, f: Optional[BlockGf] = None):
         raise RuntimeError(
             "The anomalous GF is required iff the bath is superconducting"
         )
+
+    if (self.nspin == 2) and (self.h_params.ed_mode == EDMode.NORMAL) and \
+            (not is_spin_diagonal(self.h_params.Hloc)):
+        raise RuntimeError("Local Hamiltonian must remain spin-diagonal")
 
     bath_fit = deepcopy(self.h_params.bath)
 

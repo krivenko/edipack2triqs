@@ -27,9 +27,9 @@ fops_bath_dn = [('B_dn', i) for i in range(3 * 2)]
 orbs = range(3)
 
 ## Non-interacting part of the impurity Hamiltonian
-h_loc = np.diag([-0.7, -0.5, -0.7])
-H = sum(h_loc[o1, o2] * c_dag(spin, o1) * c(spin, o2)
-        for spin, o1, o2 in product(('up', 'dn'), orbs, orbs))
+h_loc_mat = np.diag([-0.7, -0.5, -0.7])
+H_loc = sum(h_loc_mat[o1, o2] * c_dag(spin, o1) * c(spin, o2)
+            for spin, o1, o2 in product(('up', 'dn'), orbs, orbs))
 
 ## Interaction part
 U = 3.0     # Local intra-orbital interactions U
@@ -38,17 +38,19 @@ Jh = 0.2    # Hund's coupling
 Jx = 0.15   # Spin-exchange coupling constant
 Jp = 0.1    # Pair-hopping coupling constant
 
-H += U * sum(n('up', o) * n('dn', o) for o in orbs)
-H += Ust * sum(int(o1 != o2) * n('up', o1) * n('dn', o2)
-               for o1, o2 in product(orbs, orbs))
-H += (Ust - Jh) * sum(int(o1 < o2) * n(s, o1) * n(s, o2)
-                      for s, o1, o2 in product(('up', 'dn'), orbs, orbs))
-H -= Jx * sum(int(o1 != o2)
-              * c_dag('up', o1) * c('dn', o1) * c_dag('dn', o2) * c('up', o2)
-              for o1, o2 in product(orbs, orbs))
-H += Jp * sum(int(o1 != o2)
-              * c_dag('up', o1) * c_dag('dn', o1) * c('dn', o2) * c('up', o2)
-              for o1, o2 in product(orbs, orbs))
+H_int = U * sum(n('up', o) * n('dn', o) for o in orbs)
+H_int += Ust * sum(int(o1 != o2) * n('up', o1) * n('dn', o2)
+                   for o1, o2 in product(orbs, orbs))
+H_int += (Ust - Jh) * sum(int(o1 < o2) * n(s, o1) * n(s, o2)
+                          for s, o1, o2 in product(('up', 'dn'), orbs, orbs))
+H_int -= Jx * sum(int(o1 != o2)
+                  * c_dag('up', o1) * c('dn', o1)
+                  * c_dag('dn', o2) * c('up', o2)
+                  for o1, o2 in product(orbs, orbs))
+H_int += Jp * sum(int(o1 != o2)
+                  * c_dag('up', o1) * c_dag('dn', o1)
+                  * c('dn', o2) * c('up', o2)
+                  for o1, o2 in product(orbs, orbs))
 
 ## Bath part
 
@@ -60,15 +62,16 @@ V = np.array([[0.1, 0.2],
               [0.1, 0.2],
               [0.1, 0.2]])
 
-H += sum(eps[o, nu] * c_dag("B_" + s, nu * 3 + o) * c("B_" + s, nu * 3 + o)
-         for s, o, nu in product(('up', 'dn'), orbs, range(2)))
-H += sum(V[o, nu] * (c_dag(s, o) * c("B_" + s, nu * 3 + o)
-                     + c_dag("B_" + s, nu * 3 + o) * c(s, o))
-         for s, o, nu in product(('up', 'dn'), orbs, range(2)))
+
+H_bath = sum(eps[o, nu] * c_dag("B_" + s, nu * 3 + o) * c("B_" + s, nu * 3 + o)
+             for s, o, nu in product(('up', 'dn'), orbs, range(2)))
+H_bath += sum(V[o, nu] * (c_dag(s, o) * c("B_" + s, nu * 3 + o)
+                          + c_dag("B_" + s, nu * 3 + o) * c(s, o))
+              for s, o, nu in product(('up', 'dn'), orbs, range(2)))
 
 # Create a solver object that wraps EDIpack functionality
 # See help(EDIpackSolver) for a complete list of parameters
-solver = EDIpackSolver(H,
+solver = EDIpackSolver(H_loc + H_int + H_bath,
                        fops_imp_up, fops_imp_dn, fops_bath_up, fops_bath_dn,
                        lanc_dim_threshold=16)
 
@@ -151,9 +154,12 @@ if MPI.COMM_WORLD.Get_rank() == 0:
 
 # Change a matrix element of h_loc
 # Since the non-interacting part of the original Hamiltonian is spin-symmetric,
-# solver.hloc() returns an array of shape (1, 1, 3, 3). In presence of a spin
-# energy splitting the shape would be (2, 2, 3, 3).
-solver.hloc[0, 0, 1, 1] = -0.6  # spin1 = spin2 = up and down, orb1 = orb2 = 1
+# solver.hloc_mat() returns an array of shape (1, 1, 3, 3). In presence of
+# a spin energy splitting the shape would be (2, 2, 3, 3).
+# Here, spin1 = spin2 = up and down, orb1 = orb2 = 1
+solver.hloc_mat[0, 0, 1, 1] = -0.6
+# Another way to change the local Hamiltonian is to construct a new TRIQS
+# many-body operator object H_loc and to assign it to the attribute solver.hloc.
 
 # Change elements of the interaction matrix corresponding to Jp
 # The order of indices of solver.U is
