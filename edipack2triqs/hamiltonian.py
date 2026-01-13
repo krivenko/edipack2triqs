@@ -394,6 +394,14 @@ def parse_hamiltonian(hamiltonian: op.Operator,  # noqa: C901
     if (f_ed_mode is not None) and (ed_mode != f_ed_mode):
         if ed_mode == EDMode.NORMAL:
             ed_mode = f_ed_mode
+            if f_ed_mode == EDMode.NONSU2:
+                nspin = 2
+            elif (f_ed_mode == EDMode.SUPERC and nspin != 1):
+                raise RuntimeError(
+                    "Requested exact diagonalization mode EDMode.SUPERC "
+                    "requires a spin-degenerate Hamiltonian"
+                )
+
         else:
             raise RuntimeError(
                 f"Requested exact diagonalization mode {f_ed_mode} "
