@@ -98,6 +98,56 @@ def _is_density_density(U: np.ndarray):
     return True
 
 
+def _select_ed_mode(nspin: int,
+                    Hloc: np.ndarray,
+                    Hloc_an: np.ndarray,
+                    h: np.ndarray,
+                    V: np.ndarray,
+                    Delta: np.ndarray,
+                    f_ed_mode: EDMode) -> tuple[EDMode, int]:
+    """
+    Analyse parameters of a Hamiltonian and select
+    the fitting ed_mode and nspin.
+    """
+    superc = (Delta != 0).any() or (Hloc_an != 0).any()
+    if nspin == 1:
+        # Internal consistency check: Hloc, h and V must be spin-degenerate
+        assert is_spin_degenerate(Hloc)
+        assert is_spin_degenerate(h)
+        assert is_spin_degenerate(V)
+        ed_mode = EDMode.SUPERC if superc else EDMode.NORMAL
+    else:  # nspin == 2
+        if superc:
+            raise RuntimeError(
+                "Magnetism in presence of pairing terms is not supported"
+            )
+        if is_spin_diagonal(Hloc) and \
+           is_spin_diagonal(h) and is_spin_diagonal(V):
+            ed_mode = EDMode.NORMAL
+        else:
+            ed_mode = EDMode.NONSU2
+
+    # Check if the forced ED mode is compatible with the deduced one
+    if (f_ed_mode is not None) and (ed_mode != f_ed_mode):
+        if ed_mode == EDMode.NORMAL:
+            ed_mode = f_ed_mode
+            if f_ed_mode == EDMode.NONSU2:
+                nspin = 2
+            elif (f_ed_mode == EDMode.SUPERC and nspin != 1):
+                raise RuntimeError(
+                    "Requested exact diagonalization mode EDMode.SUPERC "
+                    "requires a spin-degenerate Hamiltonian"
+                )
+
+        else:
+            raise RuntimeError(
+                f"Requested exact diagonalization mode {f_ed_mode} "
+                f"is incompatible with the Hamiltonian (must be {ed_mode})"
+            )
+
+    return ed_mode, nspin
+
+
 def _make_bath(ed_mode: EDMode,
                nspin: int,
                Hloc: np.ndarray,
@@ -371,42 +421,10 @@ def parse_hamiltonian(hamiltonian: op.Operator,  # noqa: C901
             "symmetric under the index swap o <-> o'"
         )
 
-    # ed_mode selection
-    superc = (Delta != 0).any() or (Hloc_an != 0).any()
-    if nspin == 1:
-        # Internal consistency check: Hloc, h and V must be spin-degenerate
-        assert is_spin_degenerate(Hloc)
-        assert is_spin_degenerate(h)
-        assert is_spin_degenerate(V)
-        ed_mode = EDMode.SUPERC if superc else EDMode.NORMAL
-    else:  # nspin == 2
-        if superc:
-            raise RuntimeError(
-                "Magnetism in presence of pairing terms is not supported"
-            )
-        if is_spin_diagonal(Hloc) and \
-           is_spin_diagonal(h) and is_spin_diagonal(V):
-            ed_mode = EDMode.NORMAL
-        else:
-            ed_mode = EDMode.NONSU2
-
-    # Check if the forced ED mode is compatible with the deduced one
-    if (f_ed_mode is not None) and (ed_mode != f_ed_mode):
-        if ed_mode == EDMode.NORMAL:
-            ed_mode = f_ed_mode
-            if f_ed_mode == EDMode.NONSU2:
-                nspin = 2
-            elif (f_ed_mode == EDMode.SUPERC and nspin != 1):
-                raise RuntimeError(
-                    "Requested exact diagonalization mode EDMode.SUPERC "
-                    "requires a spin-degenerate Hamiltonian"
-                )
-
-        else:
-            raise RuntimeError(
-                f"Requested exact diagonalization mode {f_ed_mode} "
-                f"is incompatible with the Hamiltonian (must be {ed_mode})"
-            )
+    ed_mode, nspin = _select_ed_mode(nspin,
+                                     Hloc, Hloc_an,
+                                     h, V, Delta,
+                                     f_ed_mode)
 
     bath = _make_bath(ed_mode, nspin, Hloc, Hloc_an, h, V, Delta) \
         if nbath_total > 0 else None
