@@ -33,6 +33,18 @@ def is_spin_degenerate(h: np.ndarray):
         np.allclose(h[0, 0, ...], h[1, 1, ...], atol=1e-10)
 
 
+def make_nambu(h: np.ndarray, Delta: np.ndarray):
+    """
+    Reinterpret first two indices of h as Nambu indices and fill the
+    off-diagonal elements from Delta.
+    """
+    h_nambu = h.copy()
+    h_nambu[1, 1, :, :] *= -1
+    h_nambu[0, 1, :, :] = Delta
+    h_nambu[1, 0, :, :] = np.conj(Delta.T)
+    return h_nambu
+
+
 def canonical2op(dag: bool, ind: IndicesType):
     """
     Return a many-body operator made out of one canonical operator

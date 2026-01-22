@@ -12,7 +12,7 @@ import networkx as nx
 from h5.formats import register_class
 
 from . import EDMode
-from .util import is_diagonal, is_spin_diagonal
+from .util import is_diagonal, is_spin_diagonal, make_nambu
 
 
 def _bath_states_to_orbs(V: np.ndarray):
@@ -822,16 +822,11 @@ class BathGeneral(Bath):
         # Number of replicas
         nbath = nbath_total // norb
 
-        # In the superconducting case, reinterpret first two indices of h as
-        # Nambu indices and fill the off-diagonal elements from Delta
-        is_nambu = (ed_mode == EDMode.SUPERC)
-        nnambu = 1
+        is_nambu = ed_mode == EDMode.SUPERC
+        nnambu = 2 if is_nambu else 1
         if is_nambu:
-            nnambu = 2
-            h = h.copy()
-            h[1, 1, :, :] *= -1
-            h[0, 1, :, :] = Delta
-            h[1, 0, :, :] = np.conj(Delta.T)
+            # Combine 'h' and 'Delta' to form a Nambu Hamiltonian
+            h = make_nambu(h, Delta)
 
         replicas = cls._build_replica_bases(norb, h, V)
 
