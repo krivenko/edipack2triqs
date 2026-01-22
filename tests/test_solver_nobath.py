@@ -42,10 +42,10 @@ class TestEDIpackSolverNoBath(TestSolver):
 
         self.assertEqual(solver.h_params.ed_mode, EDMode.NORMAL)
         self.assertEqual(solver.nspin, 1)
-        self.assertEqual(solver.norb, 2)
+        self.assertEqual(solver.norb, self.norb)
         self.assertEqual(solver.hloc, h_loc)
         assert_equal(solver.hloc_mat, h_loc_mat[:1, :1, ...])
-        assert_equal(solver.hloc_an_mat, np.zeros((1, 1, 2, 2)))
+        assert_equal(solver.hloc_an_mat, np.zeros((1, 1, self.norb, self.norb)))
         self.assertIsNone(solver.bath)
 
         solve_params = {
@@ -81,10 +81,10 @@ class TestEDIpackSolverNoBath(TestSolver):
 
         self.assertEqual(solver.h_params.ed_mode, EDMode.NORMAL)
         self.assertEqual(solver.nspin, 1)
-        self.assertEqual(solver.norb, 2)
+        self.assertEqual(solver.norb, self.norb)
         self.assertEqual(solver.hloc, h_loc)
         assert_equal(solver.hloc_mat, h_loc_mat[:1, :1, ...])
-        assert_equal(solver.hloc_an_mat, np.zeros((1, 1, 2, 2)))
+        assert_equal(solver.hloc_an_mat, np.zeros((1, 1, self.norb, self.norb)))
         self.assertIsNone(solver.bath)
 
         # Part I: Initial solve()
@@ -148,10 +148,10 @@ class TestEDIpackSolverNoBath(TestSolver):
 
         self.assertEqual(solver.h_params.ed_mode, EDMode.NORMAL)
         self.assertEqual(solver.nspin, 2)
-        self.assertEqual(solver.norb, 2)
+        self.assertEqual(solver.norb, self.norb)
         self.assertEqual(solver.hloc, h_loc)
         assert_equal(solver.hloc_mat, h_loc_mat)
-        assert_equal(solver.hloc_an_mat, np.zeros((1, 1, 2, 2)))
+        assert_equal(solver.hloc_an_mat, np.zeros((1, 1, self.norb, self.norb)))
         self.assertIsNone(solver.bath)
 
         # Part I: Initial solve()
@@ -217,10 +217,10 @@ class TestEDIpackSolverNoBath(TestSolver):
 
         self.assertEqual(solver.h_params.ed_mode, EDMode.NONSU2)
         self.assertEqual(solver.nspin, 2)
-        self.assertEqual(solver.norb, 2)
+        self.assertEqual(solver.norb, self.norb)
         self.assertEqual(solver.hloc, h_loc)
         assert_equal(solver.hloc_mat, h_loc_mat)
-        assert_equal(solver.hloc_an_mat, np.zeros((1, 1, 2, 2)))
+        assert_equal(solver.hloc_an_mat, np.zeros((1, 1, self.norb, self.norb)))
         self.assertIsNone(solver.bath)
 
         # Part I: Initial solve()
@@ -288,10 +288,11 @@ class TestEDIpackSolverNoBath(TestSolver):
 
         self.assertEqual(solver.h_params.ed_mode, EDMode.SUPERC)
         self.assertEqual(solver.nspin, 1)
-        self.assertEqual(solver.norb, 2)
+        self.assertEqual(solver.norb, self.norb)
         self.assertEqual(solver.hloc, h_loc + h_loc_an)
         assert_equal(solver.hloc_mat, h_loc_mat[:1, :1, ...])
-        assert_equal(solver.hloc_an_mat, h_loc_an_mat.reshape((1, 1, 2, 2)))
+        assert_equal(solver.hloc_an_mat,
+                     h_loc_an_mat.reshape((1, 1, self.norb, self.norb)))
         self.assertIsNone(solver.bath)
 
         # Part I: Initial solve()

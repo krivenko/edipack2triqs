@@ -20,7 +20,7 @@ sz = np.array([[1, 0], [0, -1]])
 class TestEDIpackSolverBathGeneral(TestSolver):
 
     nbath = 2
-    bsites = range(nbath)
+    bsites = list(range(nbath))
 
     @classmethod
     @TestSolver.bath_index_ranges(bsites, TestSolver.orbs)
@@ -36,19 +36,19 @@ class TestEDIpackSolverBathGeneral(TestSolver):
                      * a_dag(spin1, nu, o1) * a(spin2, nu, o2)
                      for (s1, spin1), (s2, spin2), o1, o2, nu
                      in product(enumerate(cls.spins), enumerate(cls.spins),
-                                cls.orbs, cls.orbs, range(2)))
+                                cls.orbs, cls.orbs, cls.bsites))
         h_bath += sum(V[s, o, nu] * (
                       d_dag(spin, o) * a(spin, nu, o)
                       + a_dag(spin, nu, o) * d(spin, o))
                       for (s, spin), o, nu
-                      in product(enumerate(cls.spins), cls.orbs, range(2)))
+                      in product(enumerate(cls.spins), cls.orbs, cls.bsites))
         return h_bath
 
     @classmethod
     def make_h_sc(cls, Delta):
         a_dag, a = [cls.make_bath_op(o) for o in (op.c_dag, op.c)]
         h_sc = sum(Delta[o1, o2, nu] * a_dag('up', nu, o1) * a_dag('dn', nu, o2)
-                   for o1, o2, nu in product(cls.orbs, cls.orbs, range(2)))
+                   for o1, o2, nu in product(cls.orbs, cls.orbs, cls.bsites))
         return h_sc + op.dagger(h_sc)
 
     @classmethod
@@ -93,12 +93,12 @@ class TestEDIpackSolverBathGeneral(TestSolver):
 
         self.assertEqual(solver.h_params.ed_mode, EDMode.NORMAL)
         self.assertEqual(solver.nspin, 1)
-        self.assertEqual(solver.norb, 2)
+        self.assertEqual(solver.norb, self.norb)
         self.assertEqual(solver.hloc, h_loc)
         assert_equal(solver.hloc_mat, h_loc_mat[:1, :1, ...])
-        assert_equal(solver.hloc_an_mat, np.zeros((1, 1, 2, 2)))
+        assert_equal(solver.hloc_an_mat, np.zeros((1, 1, self.norb, self.norb)))
         self.assertEqual(solver.bath.name, "general")
-        self.assertEqual(solver.bath.nbath, 2)
+        self.assertEqual(solver.bath.nbath, self.nbath)
 
         solve_params = {
             "n_iw": 10,
@@ -143,12 +143,12 @@ class TestEDIpackSolverBathGeneral(TestSolver):
 
         self.assertEqual(solver.h_params.ed_mode, EDMode.NORMAL)
         self.assertEqual(solver.nspin, 1)
-        self.assertEqual(solver.norb, 2)
+        self.assertEqual(solver.norb, self.norb)
         self.assertEqual(solver.hloc, h_loc)
         assert_equal(solver.hloc_mat, h_loc_mat[:1, :1, ...])
-        assert_equal(solver.hloc_an_mat, np.zeros((1, 1, 2, 2)))
+        assert_equal(solver.hloc_an_mat, np.zeros((1, 1, self.norb, self.norb)))
         self.assertEqual(solver.bath.name, "general")
-        self.assertEqual(solver.bath.nbath, 2)
+        self.assertEqual(solver.bath.nbath, self.nbath)
 
         # Part I: Initial solve()
         solve_params = {
@@ -199,7 +199,7 @@ class TestEDIpackSolverBathGeneral(TestSolver):
         V = np.array([[0.1, 0.2],
                       [0.5, 0.4]])
 
-        mat = np.zeros((1, 1, 2, 2), dtype=complex)
+        mat = np.zeros((1, 1, self.norb, self.norb), dtype=complex)
         mat[0, 0, 0, 1] = mat[0, 0, 1, 0] = 1
 
         bath = solver.bath
@@ -256,12 +256,12 @@ class TestEDIpackSolverBathGeneral(TestSolver):
 
         self.assertEqual(solver.h_params.ed_mode, EDMode.NORMAL)
         self.assertEqual(solver.nspin, 2)
-        self.assertEqual(solver.norb, 2)
+        self.assertEqual(solver.norb, self.norb)
         self.assertEqual(solver.hloc, h_loc)
         assert_equal(solver.hloc_mat, h_loc_mat)
-        assert_equal(solver.hloc_an_mat, np.zeros((1, 1, 2, 2)))
+        assert_equal(solver.hloc_an_mat, np.zeros((1, 1, self.norb, self.norb)))
         self.assertEqual(solver.bath.name, "general")
-        self.assertEqual(solver.bath.nbath, 2)
+        self.assertEqual(solver.bath.nbath, self.nbath)
 
         # Part I: Initial solve()
         solve_params = {
@@ -312,8 +312,8 @@ class TestEDIpackSolverBathGeneral(TestSolver):
         V = np.array([[0.1, 0.2],
                       [0.5, 0.4]])
 
-        mat_up = np.zeros((2, 2, 2, 2), dtype=complex)
-        mat_dn = np.zeros((2, 2, 2, 2), dtype=complex)
+        mat_up = np.zeros((2, 2, self.norb, self.norb), dtype=complex)
+        mat_dn = np.zeros((2, 2, self.norb, self.norb), dtype=complex)
         mat_up[0, 0, 0, 1] = mat_up[0, 0, 1, 0] = 1
         mat_dn[1, 1, 0, 1] = mat_dn[1, 1, 1, 0] = 1
 
@@ -374,12 +374,12 @@ class TestEDIpackSolverBathGeneral(TestSolver):
 
         self.assertEqual(solver.h_params.ed_mode, EDMode.NONSU2)
         self.assertEqual(solver.nspin, 2)
-        self.assertEqual(solver.norb, 2)
+        self.assertEqual(solver.norb, self.norb)
         self.assertEqual(solver.hloc, h_loc)
         assert_equal(solver.hloc_mat, h_loc_mat)
-        assert_equal(solver.hloc_an_mat, np.zeros((1, 1, 2, 2)))
+        assert_equal(solver.hloc_an_mat, np.zeros((1, 1, self.norb, self.norb)))
         self.assertEqual(solver.bath.name, "general")
-        self.assertEqual(solver.bath.nbath, 2)
+        self.assertEqual(solver.bath.nbath, self.nbath)
 
         # Part I: Initial solve()
         solve_params = {
@@ -428,8 +428,8 @@ class TestEDIpackSolverBathGeneral(TestSolver):
         V = np.array([[0.1, 0.2],
                       [0.35, 0.4]])
 
-        mat_up = np.zeros((2, 2, 2, 2), dtype=complex)
-        mat_dn = np.zeros((2, 2, 2, 2), dtype=complex)
+        mat_up = np.zeros((2, 2, self.norb, self.norb), dtype=complex)
+        mat_dn = np.zeros((2, 2, self.norb, self.norb), dtype=complex)
         mat_up[0, 0, 0, 1] = mat_up[0, 0, 1, 0] = 1
         mat_dn[1, 1, 0, 1] = mat_dn[1, 1, 1, 0] = 1
 
@@ -490,12 +490,12 @@ class TestEDIpackSolverBathGeneral(TestSolver):
 
         self.assertEqual(solver.h_params.ed_mode, EDMode.NONSU2)
         self.assertEqual(solver.nspin, 2)
-        self.assertEqual(solver.norb, 2)
+        self.assertEqual(solver.norb, self.norb)
         self.assertEqual(solver.hloc, h_loc)
         assert_equal(solver.hloc_mat, h_loc_mat)
-        assert_equal(solver.hloc_an_mat, np.zeros((1, 1, 2, 2)))
+        assert_equal(solver.hloc_an_mat, np.zeros((1, 1, self.norb, self.norb)))
         self.assertEqual(solver.bath.name, "general")
-        self.assertEqual(solver.bath.nbath, 2)
+        self.assertEqual(solver.bath.nbath, self.nbath)
 
         # Part I: Initial solve()
         solve_params = {
@@ -544,12 +544,12 @@ class TestEDIpackSolverBathGeneral(TestSolver):
         V = np.array([[0.1, 0.2],
                       [0.35, 0.4]])
 
-        mat_up = np.zeros((2, 2, 2, 2), dtype=complex)
-        mat_dn = np.zeros((2, 2, 2, 2), dtype=complex)
+        mat_up = np.zeros((2, 2, self.norb, self.norb), dtype=complex)
+        mat_dn = np.zeros((2, 2, self.norb, self.norb), dtype=complex)
         mat_up[0, 0, 0, 1] = mat_up[0, 0, 1, 0] = 1
         mat_dn[1, 1, 0, 1] = mat_dn[1, 1, 1, 0] = 1
-        mat_updn1 = np.zeros((2, 2, 2, 2), dtype=complex)
-        mat_updn2 = np.zeros((2, 2, 2, 2), dtype=complex)
+        mat_updn1 = np.zeros((2, 2, self.norb, self.norb), dtype=complex)
+        mat_updn2 = np.zeros((2, 2, self.norb, self.norb), dtype=complex)
         mat_updn1[0, 1, 0, 1] = mat_updn1[1, 0, 1, 0] = 1
         mat_updn2[0, 1, 1, 0] = mat_updn2[1, 0, 0, 1] = 1
 
@@ -613,12 +613,13 @@ class TestEDIpackSolverBathGeneral(TestSolver):
 
         self.assertEqual(solver.h_params.ed_mode, EDMode.SUPERC)
         self.assertEqual(solver.nspin, 1)
-        self.assertEqual(solver.norb, 2)
+        self.assertEqual(solver.norb, self.norb)
         self.assertEqual(solver.hloc, h_loc + h_loc_an)
         assert_equal(solver.hloc_mat, h_loc_mat[:1, :1, ...])
-        assert_equal(solver.hloc_an_mat, h_loc_an_mat.reshape((1, 1, 2, 2)))
+        assert_equal(solver.hloc_an_mat,
+                     h_loc_an_mat.reshape((1, 1, self.norb, self.norb)))
         self.assertEqual(solver.bath.name, "general")
-        self.assertEqual(solver.bath.nbath, 2)
+        self.assertEqual(solver.bath.nbath, self.nbath)
 
         # Part I: Initial solve()
         solve_params = {
@@ -671,7 +672,7 @@ class TestEDIpackSolverBathGeneral(TestSolver):
         V = np.array([[0.1, 0.2],
                       [0.5, 0.4]])
 
-        mat = np.zeros((2, 2, 2, 2), dtype=complex)
+        mat = np.zeros((2, 2, self.norb, self.norb), dtype=complex)
         mat[0, 0, 0, 1] = mat[0, 0, 1, 0] = 1
         mat[1, 1, 0, 1] = mat[1, 1, 1, 0] = -1
 
@@ -731,12 +732,12 @@ class TestEDIpackSolverBathGeneral(TestSolver):
 
         self.assertEqual(solver.h_params.ed_mode, EDMode.SUPERC)
         self.assertEqual(solver.nspin, 1)
-        self.assertEqual(solver.norb, 2)
+        self.assertEqual(solver.norb, self.norb)
         self.assertEqual(solver.hloc, h_loc)
         assert_equal(solver.hloc_mat, h_loc_mat[:1, :1, ...])
-        assert_equal(solver.hloc_an_mat, np.zeros((1, 1, 2, 2)))
+        assert_equal(solver.hloc_an_mat, np.zeros((1, 1, self.norb, self.norb)))
         self.assertEqual(solver.bath.name, "general")
-        self.assertEqual(solver.bath.nbath, 2)
+        self.assertEqual(solver.bath.nbath, self.nbath)
 
         # Part I: Initial solve()
         solve_params = {
@@ -790,13 +791,13 @@ class TestEDIpackSolverBathGeneral(TestSolver):
                                       [[0.3, 0.0],
                                        [0.0, 0.5]]]), 0, 2)
 
-        mat = np.zeros((2, 2, 2, 2), dtype=complex)
+        mat = np.zeros((2, 2, self.norb, self.norb), dtype=complex)
         mat[0, 0, 0, 1] = mat[0, 0, 1, 0] = 1
         mat[1, 1, 0, 1] = mat[1, 1, 1, 0] = -1
-        mat_sc1 = np.zeros((2, 2, 2, 2), dtype=complex)
+        mat_sc1 = np.zeros((2, 2, self.norb, self.norb), dtype=complex)
         mat_sc1[0, 1, 0, 1] = -1j
         mat_sc1[1, 0, 1, 0] = 1j
-        mat_sc2 = np.zeros((2, 2, 2, 2), dtype=complex)
+        mat_sc2 = np.zeros((2, 2, self.norb, self.norb), dtype=complex)
         mat_sc2[0, 1, 1, 0] = -1j
         mat_sc2[1, 0, 0, 1] = 1j
 

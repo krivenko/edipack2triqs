@@ -20,7 +20,7 @@ sz = np.array([[1, 0], [0, -1]])
 class TestEDIpackSolverBathNormal(TestSolver):
 
     nbath = 2
-    bsites = range(nbath)
+    bsites = list(range(nbath))
 
     @classmethod
     @TestSolver.bath_index_ranges(bsites, TestSolver.orbs)
@@ -85,12 +85,12 @@ class TestEDIpackSolverBathNormal(TestSolver):
 
         self.assertEqual(solver.h_params.ed_mode, EDMode.NORMAL)
         self.assertEqual(solver.nspin, 1)
-        self.assertEqual(solver.norb, 2)
+        self.assertEqual(solver.norb, self.norb)
         self.assertEqual(solver.hloc, h_loc)
         assert_equal(solver.hloc_mat, h_loc_mat[:1, :1, ...])
-        assert_equal(solver.hloc_an_mat, np.zeros((1, 1, 2, 2)))
+        assert_equal(solver.hloc_an_mat, np.zeros((1, 1, self.norb, self.norb)))
         self.assertEqual(solver.bath.name, "normal")
-        self.assertEqual(solver.bath.nbath, 2)
+        self.assertEqual(solver.bath.nbath, self.nbath)
 
         solve_params = {
             "n_iw": 10,
@@ -133,12 +133,12 @@ class TestEDIpackSolverBathNormal(TestSolver):
 
         self.assertEqual(solver.h_params.ed_mode, EDMode.NORMAL)
         self.assertEqual(solver.nspin, 1)
-        self.assertEqual(solver.norb, 2)
+        self.assertEqual(solver.norb, self.norb)
         self.assertEqual(solver.hloc, h_loc)
         assert_equal(solver.hloc_mat, h_loc_mat[:1, :1, ...])
-        assert_equal(solver.hloc_an_mat, np.zeros((1, 1, 2, 2)))
+        assert_equal(solver.hloc_an_mat, np.zeros((1, 1, self.norb, self.norb)))
         self.assertEqual(solver.bath.name, "normal")
-        self.assertEqual(solver.bath.nbath, 2)
+        self.assertEqual(solver.bath.nbath, self.nbath)
 
         # Part I: Initial solve()
         solve_params = {
@@ -237,12 +237,12 @@ class TestEDIpackSolverBathNormal(TestSolver):
 
         self.assertEqual(solver.h_params.ed_mode, EDMode.NORMAL)
         self.assertEqual(solver.nspin, 2)
-        self.assertEqual(solver.norb, 2)
+        self.assertEqual(solver.norb, self.norb)
         self.assertEqual(solver.hloc, h_loc)
         assert_equal(solver.hloc_mat, h_loc_mat)
-        assert_equal(solver.hloc_an_mat, np.zeros((1, 1, 2, 2)))
+        assert_equal(solver.hloc_an_mat, np.zeros((1, 1, self.norb, self.norb)))
         self.assertEqual(solver.bath.name, "normal")
-        self.assertEqual(solver.bath.nbath, 2)
+        self.assertEqual(solver.bath.nbath, self.nbath)
 
         # Part I: Initial solve()
         solve_params = {
@@ -344,12 +344,12 @@ class TestEDIpackSolverBathNormal(TestSolver):
 
         self.assertEqual(solver.h_params.ed_mode, EDMode.NONSU2)
         self.assertEqual(solver.nspin, 2)
-        self.assertEqual(solver.norb, 2)
+        self.assertEqual(solver.norb, self.norb)
         self.assertEqual(solver.hloc, h_loc)
         assert_equal(solver.hloc_mat, h_loc_mat)
-        assert_equal(solver.hloc_an_mat, np.zeros((1, 1, 2, 2)))
+        assert_equal(solver.hloc_an_mat, np.zeros((1, 1, self.norb, self.norb)))
         self.assertEqual(solver.bath.name, "normal")
-        self.assertEqual(solver.bath.nbath, 2)
+        self.assertEqual(solver.bath.nbath, self.nbath)
 
         # Part I: Initial solve()
         solve_params = {
@@ -448,12 +448,12 @@ class TestEDIpackSolverBathNormal(TestSolver):
 
         self.assertEqual(solver.h_params.ed_mode, EDMode.NONSU2)
         self.assertEqual(solver.nspin, 2)
-        self.assertEqual(solver.norb, 2)
+        self.assertEqual(solver.norb, self.norb)
         self.assertEqual(solver.hloc, h_loc)
         assert_equal(solver.hloc_mat, h_loc_mat)
-        assert_equal(solver.hloc_an_mat, np.zeros((1, 1, 2, 2)))
+        assert_equal(solver.hloc_an_mat, np.zeros((1, 1, self.norb, self.norb)))
         self.assertEqual(solver.bath.name, "normal")
-        self.assertEqual(solver.bath.nbath, 2)
+        self.assertEqual(solver.bath.nbath, self.nbath)
 
         # Part I: Initial solve()
         solve_params = {
@@ -553,12 +553,13 @@ class TestEDIpackSolverBathNormal(TestSolver):
 
         self.assertEqual(solver.h_params.ed_mode, EDMode.SUPERC)
         self.assertEqual(solver.nspin, 1)
-        self.assertEqual(solver.norb, 2)
+        self.assertEqual(solver.norb, self.norb)
         self.assertEqual(solver.hloc, h_loc + h_loc_an)
         assert_equal(solver.hloc_mat, h_loc_mat[:1, :1, ...])
-        assert_equal(solver.hloc_an_mat, h_loc_an_mat.reshape((1, 1, 2, 2)))
+        assert_equal(solver.hloc_an_mat,
+                     h_loc_an_mat.reshape((1, 1, self.norb, self.norb)))
         self.assertEqual(solver.bath.name, "normal")
-        self.assertEqual(solver.bath.nbath, 2)
+        self.assertEqual(solver.bath.nbath, self.nbath)
 
         # Part I: Initial solve()
         solve_params = {
@@ -659,12 +660,12 @@ class TestEDIpackSolverBathNormal(TestSolver):
 
         self.assertEqual(solver.h_params.ed_mode, EDMode.SUPERC)
         self.assertEqual(solver.nspin, 1)
-        self.assertEqual(solver.norb, 2)
+        self.assertEqual(solver.norb, self.norb)
         self.assertEqual(solver.hloc, h_loc)
         assert_equal(solver.hloc_mat, h_loc_mat[:1, :1, ...])
-        assert_equal(solver.hloc_an_mat, np.zeros((1, 1, 2, 2)))
+        assert_equal(solver.hloc_an_mat, np.zeros((1, 1, self.norb, self.norb)))
         self.assertEqual(solver.bath.name, "normal")
-        self.assertEqual(solver.bath.nbath, 2)
+        self.assertEqual(solver.bath.nbath, self.nbath)
 
         # Part I: Initial solve()
         solve_params = {

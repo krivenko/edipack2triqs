@@ -26,6 +26,7 @@ class TestFitBath(unittest.TestCase):
 
     spins = ('up', 'dn')
     norb = 2
+    orbs = list(range(norb))
 
     @classmethod
     def make_fops_bath(cls, nbath):
@@ -35,11 +36,11 @@ class TestFitBath(unittest.TestCase):
     @classmethod
     def make_fops_imp(cls, spin_blocks=True):
         if spin_blocks:
-            return ([('up', o) for o in range(cls.norb)],
-                    [('dn', o) for o in range(cls.norb)])
+            return ([('up', o) for o in cls.orbs],
+                    [('dn', o) for o in cls.orbs])
         else:
-            return ([('up_dn', so) for so in range(cls.norb)],
-                    [('up_dn', so + cls.norb) for so in range(cls.norb)])
+            return ([('up_dn', so) for so in cls.orbs],
+                    [('up_dn', so + cls.norb) for so in cls.orbs])
 
     @classmethod
     def make_mkind(cls, spin_blocks):
@@ -56,13 +57,13 @@ class TestFitBath(unittest.TestCase):
                    * op.c_dag(*mki(spin1, o1)) * op.c(*mki(spin2, o2))
                    for (s1, spin1), (s2, spin2), o1, o2
                    in product(enumerate(cls.spins), enumerate(cls.spins),
-                              range(cls.norb), range(cls.norb)))
+                              cls.orbs, cls.orbs))
 
     @classmethod
     def make_h_loc_an(cls, h_loc_an):
         return sum(h_loc_an[o1, o2] * op.c_dag('up', o1) * op.c_dag('dn', o2)
                    + np.conj(h_loc_an[o1, o2]) * op.c('dn', o2) * op.c('up', o1)
-                   for o1, o2 in product(range(cls.norb), repeat=2))
+                   for o1, o2 in product(cls.orbs, repeat=2))
 
     @classmethod
     def make_h_bath(cls, eps, V, spin_blocks=True):
@@ -77,7 +78,7 @@ class TestFitBath(unittest.TestCase):
                       + op.c_dag("B_" + spin2, nu) * op.c(*mki(spin1, o)))
                       for (s1, spin1), (s2, spin2), o, nu
                       in product(enumerate(cls.spins), enumerate(cls.spins),
-                                 range(cls.norb), range(nbath)))
+                                 cls.orbs, range(nbath)))
         return h_bath
 
     @classmethod
@@ -112,8 +113,10 @@ class TestFitBath(unittest.TestCase):
         self.assertEqual(solver.nspin, 1)
 
         mesh = MeshImFreq(beta=50.0, S="Fermion", n_iw=200)
-        Delta = BlockGf(gf_struct=[("up", 2), ("dn", 2)], mesh=mesh)
-        G0 = BlockGf(gf_struct=[("up", 2), ("dn", 2)], mesh=mesh)
+        Delta = BlockGf(gf_struct=[("up", self.norb), ("dn", self.norb)],
+                        mesh=mesh)
+        G0 = BlockGf(gf_struct=[("up", self.norb), ("dn", self.norb)],
+                     mesh=mesh)
         V = 2.0 * s0 + 0.5 * sx
         for s, (bn, d) in enumerate(Delta):
             d[0, 0] << SemiCircular(1.8, 0.5)
@@ -148,8 +151,10 @@ class TestFitBath(unittest.TestCase):
         self.assertEqual(solver.nspin, 2)
 
         mesh = MeshImFreq(beta=50.0, S="Fermion", n_iw=200)
-        Delta = BlockGf(gf_struct=[("up", 2), ("dn", 2)], mesh=mesh)
-        G0 = BlockGf(gf_struct=[("up", 2), ("dn", 2)], mesh=mesh)
+        Delta = BlockGf(gf_struct=[("up", self.norb), ("dn", self.norb)],
+                        mesh=mesh)
+        G0 = BlockGf(gf_struct=[("up", self.norb), ("dn", self.norb)],
+                     mesh=mesh)
         V = 2.0 * s0 + 0.5 * sx
         for s, (bn, d) in enumerate(Delta):
             s_coeff = 1.2 if bn == "up" else 0.8
@@ -184,8 +189,8 @@ class TestFitBath(unittest.TestCase):
         self.assertEqual(solver.h_params.ed_mode, EDMode.NONSU2)
 
         mesh = MeshImFreq(beta=50.0, S="Fermion", n_iw=200)
-        Delta = BlockGf(gf_struct=[("up_dn", 4)], mesh=mesh)
-        G0 = BlockGf(gf_struct=[("up_dn", 4)], mesh=mesh)
+        Delta = BlockGf(gf_struct=[("up_dn", 2 * self.norb)], mesh=mesh)
+        G0 = BlockGf(gf_struct=[("up_dn", 2 * self.norb)], mesh=mesh)
         d1 = inverse(iOmega_n + 0.4) + inverse(iOmega_n - 1.4)
         d2 = inverse(iOmega_n + 1.6) + inverse(iOmega_n - 0.6)
         Delta["up_dn"][0, 0] << 1.1 * d1
@@ -198,7 +203,8 @@ class TestFitBath(unittest.TestCase):
                       [0.1, 0.4, 0.5, 2.0]])
         Delta["up_dn"] << V @ Delta["up_dn"] @ V.T
         G0["up_dn"] << inverse(
-            iOmega_n - np.reshape(np.swapaxes(h_loc_mat, 1, 2), (4, 4))
+            iOmega_n - np.reshape(np.swapaxes(h_loc_mat, 1, 2),
+                                  (2 * self.norb, 2 * self.norb))
             - Delta["up_dn"]
         )
 
@@ -207,6 +213,7 @@ class TestFitBath(unittest.TestCase):
         assert_block_gfs_are_close(G0_fit, G0, precision=1e-3)
 
     def test_superc(self):
+        norb = self.norb
         nbath = 20
         fops_imp_up, fops_imp_dn = self.make_fops_imp()
         fops_bath_up, fops_bath_dn = self.make_fops_bath(nbath)
@@ -230,8 +237,8 @@ class TestFitBath(unittest.TestCase):
         self.assertEqual(solver.h_params.ed_mode, EDMode.SUPERC)
 
         mesh = MeshImFreq(beta=50.0, S="Fermion", n_iw=200)
-        Delta = BlockGf(gf_struct=[("up", 2), ("dn", 2)], mesh=mesh)
-        Delta_an = BlockGf(gf_struct=[("up_dn", 2)], mesh=mesh)
+        Delta = BlockGf(gf_struct=[("up", norb), ("dn", norb)], mesh=mesh)
+        Delta_an = BlockGf(gf_struct=[("up_dn", norb)], mesh=mesh)
 
         eps = np.array([-1.0, 0.5])
         D = np.array([0.2, 0.3])
@@ -241,7 +248,7 @@ class TestFitBath(unittest.TestCase):
         d1 = (inverse(iOmega_n + E[0]) - inverse(iOmega_n - E[0])) / (2 * E[0])
         d2 = (inverse(iOmega_n + E[1]) - inverse(iOmega_n - E[1])) / (2 * E[1])
 
-        for i, j in product(range(2), repeat=2):
+        for i, j in product(self.orbs, repeat=2):
             d1coeff = V[0, i] * V[0, j]
             d2coeff = V[1, i] * V[1, j]
             for bn, d in Delta:
@@ -254,22 +261,22 @@ class TestFitBath(unittest.TestCase):
 
         # Build G0 out of h_loc_mat, h_loc_an_mat and \Delta by doing matrix
         # inversion in Nambu representation.
-        invG0_nam = Gf(mesh=mesh, target_shape=(4, 4))
-        invG0_nam[:2, :2] << iOmega_n - h_loc_mat[0, 0] - Delta["up"]
-        invG0_nam[:2, 2:] << -h_loc_an_mat - Delta_an["up_dn"]
-        invG0_nam[2:, :2] << -np.conj(h_loc_an_mat) \
+        invG0_nam = Gf(mesh=mesh, target_shape=(2 * norb, 2 * norb))
+        invG0_nam[:norb, :norb] << iOmega_n - h_loc_mat[0, 0] - Delta["up"]
+        invG0_nam[:norb, norb:] << -h_loc_an_mat - Delta_an["up_dn"]
+        invG0_nam[norb:, :norb] << -np.conj(h_loc_an_mat) \
             - conjugate(transpose(Delta_an_bar["up_dn"]))
-        invG0_nam[2:, 2:] << iOmega_n \
+        invG0_nam[norb:, norb:] << iOmega_n \
             + np.conj(h_loc_mat[1, 1]) + conjugate(Delta["dn"])
 
-        G0_nam = Gf(mesh=mesh, target_shape=(4, 4))
+        G0_nam = Gf(mesh=mesh, target_shape=(2 * norb, 2 * norb))
         G0_nam << inverse(invG0_nam)
 
         # Extract normal and anomalous components from the Nambu form of G0
-        G0 = BlockGf(gf_struct=[("up", 2), ("dn", 2)], mesh=mesh)
-        G0["up"] << G0_nam[:2, :2]
-        G0["dn"] << -conjugate(G0_nam[2:, 2:])
-        G0_an = BlockGf(block_list=[G0_nam[:2, 2:]], name_list=["up_dn"])
+        G0 = BlockGf(gf_struct=[("up", norb), ("dn", norb)], mesh=mesh)
+        G0["up"] << G0_nam[:norb, :norb]
+        G0["dn"] << -conjugate(G0_nam[norb:, norb:])
+        G0_an = BlockGf(block_list=[G0_nam[:norb, norb:]], name_list=["up_dn"])
 
         fitted_bath, G0_fit, G0_an_fit = solver.chi2_fit_bath(G0, G0_an)
         self.assertIsInstance(fitted_bath, BathHybrid)
