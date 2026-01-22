@@ -183,10 +183,10 @@ class TestSolver(unittest.TestCase):
     @classmethod
     def change_int_params(cls, U, *, Uloc, Ust, Jh, Jx, Jp):
         # Uloc
-        for s, o in product(cls.orbs, cls.orbs):
+        for s, o in product(range(2), cls.orbs):
             U[o, s, o, 1 - s, o, s, o, 1 - s] = 0.5 * Uloc[o]
             U[o, s, o, 1 - s, o, 1 - s, o, s] = -0.5 * Uloc[o]
-        for s, o1, o2 in product(cls.orbs, cls.orbs, cls.orbs):
+        for s, o1, o2 in product(range(2), cls.orbs, cls.orbs):
             if o1 == o2:
                 continue
             # Ust
