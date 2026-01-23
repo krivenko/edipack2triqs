@@ -227,6 +227,12 @@ class EDIpackSolver:
             exact diagonalization.
         :type lanc_dim_threshold: int, default=1024
 
+        :param bath_basis: List of quadratic fermionic operators defining the
+                           basis of the bath. If present, this option forces
+                           the use of :py:class:`BathGeneral` and overrides
+                           the automatic construction of the bath basis.
+        :type bath_basis: list[triqs.operators.operators.Operator]
+
         :param bath_fitting_params: Parameters used to perform bath fitting.
         :type bath_fitting_params: BathFittingParams, optional
         """
@@ -256,11 +262,19 @@ class EDIpackSolver:
         if any(bn != block_names_dn[0] for bn in block_names_dn):
             warn(f"Inconsistent block names in {block_names_dn}")
 
+        bath_basis = kwargs.pop("bath_basis", None)
+
+        if (bath_basis is not None) and len(self.fops_bath_up) == 0:
+            bath_basis = None
+            warn("User-supplied bath_basis is ignored "
+                 "as there are no bath degrees of freedom")
+
         self.h_params = parse_hamiltonian(
             hamiltonian,
             self.fops_imp_up, self.fops_imp_dn,
             self.fops_bath_up, self.fops_bath_dn,
-            kwargs.get("ed_mode", None)
+            kwargs.get("ed_mode", None),
+            bath_basis=bath_basis,
         )
         self.nspin = self.h_params.Hloc.shape[0]
 

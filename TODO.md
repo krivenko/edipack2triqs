@@ -1,7 +1,6 @@
 TODO list
 =========
 
-* User-provided bath basis matrices
 * Sector selection
 * Impurity density matrix
 * Phonons

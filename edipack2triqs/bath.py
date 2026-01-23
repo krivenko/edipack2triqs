@@ -15,6 +15,10 @@ from . import EDMode
 from .util import is_diagonal, is_spin_diagonal, make_nambu
 
 
+BasisMatNAn = tuple[np.ndarray, np.ndarray]
+"Bath basis matrix as a pair of normal and anomalous components"
+
+
 def _bath_states_to_orbs(V: np.ndarray):
     """
     For each bath state, find all impurity orbitals it is connected to by
@@ -37,6 +41,36 @@ def _orbs_to_bath_states(V: np.ndarray):
     norb = V.shape[2]
     return [list(np.unique(np.nonzero(V[:, :, orb, :])[2]))
             for orb in range(norb)]
+
+
+def bath_coeffs(h: np.ndarray, basis: list[np.ndarray]):
+    """
+    Compute expansion coefficients of 'h' over a given bath basis.
+    """
+
+    # Compute the overlap matrix of the basis matrices
+    n_mats = len(basis)
+    overlap = np.zeros((n_mats, n_mats), dtype=complex)
+    for i, j in product(range(n_mats), repeat=2):
+        overlap[i, j] = np.vdot(basis[i], basis[j])
+    if np.allclose(np.linalg.det(overlap), 0, atol=1e-10):
+        raise RuntimeError("Bath basis matrices are linearly dependent")
+
+    # Extract the coefficients
+    coeffs = np.linalg.solve(
+        overlap,
+        np.array([np.vdot(mat, h) for mat in basis])
+    )
+
+    # Check that the Hamiltonian is representable in the given basis
+    if not np.allclose(h,
+                       sum(c * mat for c, mat in zip(coeffs, basis)),
+                       atol=1e-10):
+        raise RuntimeError(
+            "Provided bath basis is insufficient to represent the Hamiltonian"
+        )
+
+    return coeffs
 
 
 class Bath:
@@ -632,20 +666,27 @@ class BathGeneral(Bath):
     @classmethod
     def _build_replica_bases(cls,
                              norb: int,
-                             h: np.ndarray,
-                             V: np.ndarray):
+                             V: np.ndarray,
+                             h: Optional[np.ndarray] = None,
+                             basis_mats: Optional[list[np.ndarray]] = None):
         """
         Distribute nbath_total bath basis states between a few replicas, each
         of size norb. The replica bases being built are subject to three
-        conditions.
+        conditions. Exactly one of 'h' and 'basis_mats' must be specified.
 
-        - Basis states connected by a nonzero matrix element of h must belong
-          to the same replica.
+        - If 'h' is specified, then basis states connected by nonzero matrix
+          elements of 'h' must belong to the same replica.
+        - If 'basis_mats' is specified, then all basis states encountered as
+          a left or right index of a nonzero matrix element of the same basis
+          matrix must belong to the same replica.
         - Each bath basis state is connected to at most one impurity orbital.
         - If two bath states are connected to the same impurity orbital,
           then they cannot belong to the same replica.
         """
-        nbath_total = h.shape[2]
+        assert (h is None) ^ (basis_mats is None), \
+            "Arguments 'h' and 'basis_mats' are mutually exclusive"
+
+        nbath_total = h.shape[2] if (h is not None) else basis_mats[0].shape[2]
 
         if nbath_total % norb != 0:
             raise RuntimeError(
@@ -664,11 +705,27 @@ class BathGeneral(Bath):
             )
 
         # Graph representation of the bath Hamiltonian
-        # Basis states are vertices and nonzero matrix elements are edges
-        h_graph = nx.Graph()
-        h_graph.add_nodes_from(bath_states)
-        for spin1, spin2, b1, b2 in zip(*np.nonzero(h)):
-            h_graph.add_edge(int(b1), int(b2))
+        # Basis states are vertices
+        bath_graph = nx.Graph()
+        bath_graph.add_nodes_from(bath_states)
+
+        if h is not None:
+            # Nonzero matrix elements h_{b1, b2} are edges between b1 and b2
+            for spin1, spin2, b1, b2 in zip(*np.nonzero(h)):
+                if b1 != b2:
+                    bath_graph.add_edge(int(b1), int(b2))
+        else:
+            for mat in basis_mats:
+                # Collect all (right and left) indices corresponding to
+                # nonzero matrix elements of mat
+                mat_nonzero_b = set()
+                for spin1, spin2, b1, b2 in zip(*np.nonzero(mat)):
+                    mat_nonzero_b.add(b1)
+                    mat_nonzero_b.add(b2)
+                # Add edges between all collected indices
+                for b1, b2 in product(mat_nonzero_b, repeat=2):
+                    if b1 != b2:
+                        bath_graph.add_edge(int(b1), int(b2))
 
         # Replica bases
         replicas = []
@@ -677,7 +734,7 @@ class BathGeneral(Bath):
         inc_replicas = []
 
         # Connected components of the graph are candidates for the replica bases
-        for replica in list(nx.connected_components(h_graph)):
+        for replica in list(nx.connected_components(bath_graph)):
             if len(replica) > norb:
                 raise RuntimeError(
                     f"One of replicas has more than norb = {norb} states"
@@ -809,6 +866,81 @@ class BathGeneral(Bath):
         return hvec, lambdavec
 
     @classmethod
+    def _classify_basis_matrices(cls,
+                                 replicas: list[list[int]],
+                                 nspin: int,
+                                 bath_basis_mats: list[np.ndarray],
+                                 is_nambu: bool):
+        """
+        Given a list of basis matrices in the full space of bath states and
+        a list of replicas, return
+
+        - A list of pairs (nu, isym) corresponding to the given matrices.
+        - A list of nsym matrices defined within one replica (hvec).
+        """
+        nbath = len(replicas)
+        norb = len(replicas[0])
+
+        # As of EDIpack 5.4.2, all replicas must have the same set of nsym basis
+        # matrices
+        if len(bath_basis_mats) % nbath != 0:
+            raise RuntimeError(
+                "Total number of basis matrices is not a multiple of "
+                f"the number of replicas ({nbath})"
+            )
+        nsym = len(bath_basis_mats) // nbath
+
+        mat2replica = []
+        replica_basis_mats = [[] for _ in range(nbath)]
+
+        # Fill mat2replica
+        mat_nonzero_b = set()
+        for mi, mat in enumerate(bath_basis_mats):
+            mat_nonzero_b.clear()
+            for spin1, spin2, b1, b2 in zip(*np.nonzero(mat)):
+                mat_nonzero_b.add(b1)
+                mat_nonzero_b.add(b2)
+
+            # Find the replica mat belongs to
+            for nu, replica in enumerate(replicas):
+                if mat_nonzero_b.issubset(replica):
+                    mat2replica.append(nu)
+                    break
+            else:
+                raise AssertionError(
+                    f"Cannot find which replica basis matrix #{mi} belongs to"
+                )
+
+            # Translate mat into replica coordinates and store the results
+            replica = replicas[mat2replica[mi]]
+            replica_idx = np.ix_(range(nspin), range(nspin), replica, replica)
+            replica_basis_mats[nu].append(mat[replica_idx])
+
+        mat2isym = []
+        # Fill mat2isym
+        for mi, mat in enumerate(bath_basis_mats):
+            replica = replicas[mat2replica[mi]]
+            replica_idx = np.ix_(range(nspin), range(nspin), replica, replica)
+            replica_mat = mat[replica_idx]
+            # The order of matrices in nu=0 determines how isym are assigned
+            for isym, nu0_mat in enumerate(replica_basis_mats[0]):
+                if (replica_mat == nu0_mat).all():
+                    mat2isym.append(isym)
+                    break
+            else:
+                raise RuntimeError(
+                    f"Basis matrix #{mi} has no equivalent in another replica"
+                )
+
+        # Finally, collect nsym basis matrices from nu=0 into hvec
+        hvec = np.zeros((nspin, nspin, norb, norb, nsym),
+                        dtype=complex, order='F')
+        for isym in range(nsym):
+            hvec[:, :, :, :, isym] = replica_basis_mats[0][isym]
+
+        return list(zip(mat2replica, mat2isym)), hvec
+
+    @classmethod
     def from_hamiltonian(cls,
                          ed_mode: EDMode,
                          nspin: int,
@@ -828,7 +960,7 @@ class BathGeneral(Bath):
             # Combine 'h' and 'Delta' to form a Nambu Hamiltonian
             h = make_nambu(h, Delta)
 
-        replicas = cls._build_replica_bases(norb, h, V)
+        replicas = cls._build_replica_bases(norb, V, h=h)
 
         hvec, lambdavec = \
             cls._build_linear_combination(replicas, nnambu * nspin, h, is_nambu)
@@ -839,6 +971,59 @@ class BathGeneral(Bath):
         for nu in range(bath.nbath):
             for isym in range(bath.nsym):
                 bath.l[nu][isym] = lambdavec[nu, isym]
+
+        # Fill V
+        for nu in range(bath.nbath):
+            replica = replicas[nu]
+            for spin in range(nspin):
+                for orb, b in enumerate(replica):
+                    bath.V[nu][spin, orb] = V[spin, spin, orb, b]
+
+        return bath
+
+    @classmethod
+    def from_hamiltonian_and_basis(
+            cls,
+            ed_mode: EDMode,
+            nspin: int,
+            Hloc: np.ndarray,
+            h: np.ndarray,
+            V: np.ndarray,
+            Delta: np.ndarray,
+            basis_mats_n_an: Optional[list[BasisMatNAn]]):
+        norb = Hloc.shape[2]
+        nbath_total = h.shape[2]
+        # Number of replicas
+        nbath = nbath_total // norb
+
+        is_nambu = ed_mode == EDMode.SUPERC
+        nnambu = 2 if is_nambu else 1
+        if is_nambu:
+            # Convert 'h' and 'bath_basis_mats_n_an' into Nambu basis
+            h = make_nambu(h, Delta)
+            basis_mats = [make_nambu(*MNA) for MNA in basis_mats_n_an]
+        else:
+            basis_mats = [M for M, _ in basis_mats_n_an]
+
+        replicas = cls._build_replica_bases(norb, V, basis_mats=basis_mats)
+
+        coeffs = bath_coeffs(h, basis_mats)
+        if not np.isreal(coeffs).all():
+            raise RuntimeError(
+                "Complex bath expansion coefficients are not supported"
+            )
+
+        classification, hvec = \
+            cls._classify_basis_matrices(replicas,
+                                         nnambu * nspin,
+                                         basis_mats,
+                                         is_nambu)
+
+        bath = cls(nspin, norb, nbath, hvec)
+
+        # Fill l
+        for coeff, (nu, isym) in zip(coeffs, classification):
+            bath.l[nu][isym] = coeff.real
 
         # Fill V
         for nu in range(bath.nbath):

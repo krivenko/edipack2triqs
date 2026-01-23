@@ -2,6 +2,17 @@
 
 # Changelog
 
+## Version 0.11.0
+
+* A matrix basis for the bath Hamiltonian in the general bath topology mode can
+  now be explicitly specified. The basis is passed via the `bath_basis` keyword
+  argument of `EDIpackSolver`'s constructor as a list of TRIQS many-body
+  operator objects. Each operator is expected to be quadratic in bath electron
+  creation/annihilation operators (both normal and anomalous terms are allowed).
+  The list must include all basis operators for all replicas in no specific
+  order, although - due to a limitation of EDIpack - subsets of operators for
+  all replicas must be equivalent.
+
 ## Version 0.10.0
 
 * Added an enumeration type `EDMode` that represents EDIpack's exact
