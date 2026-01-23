@@ -524,8 +524,8 @@ class TestSolver(unittest.TestCase):
 
         hloc_nambu = np.zeros((2 * cls.norb, 2 * cls.norb), dtype=complex)
         hloc_nambu[nam11] = hloc[0, 0, ...]
-        hloc_nambu[nam12] = hloc_an[0, 0, ...]
-        hloc_nambu[nam21] = np.conj(hloc_an[0, 0, ...])
+        hloc_nambu[nam12] = hloc_an
+        hloc_nambu[nam21] = np.conj(hloc_an)
         hloc_nambu[nam22] = -hloc[1, 1, ...]
 
         # Real frequency

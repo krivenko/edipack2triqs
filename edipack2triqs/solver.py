@@ -472,7 +472,7 @@ class EDIpackSolver:
             self.h_params.Hloc[:] = new_hloc[:1, :1, :, :]
         else:
             self.h_params.Hloc[:] = new_hloc
-        self.h_params.Hloc_an[:] = new_hloc_an
+        self.h_params.Hloc_an[0, 0, :, :] = new_hloc_an
 
     @property
     def U(self) -> np.ndarray:

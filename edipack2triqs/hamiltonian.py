@@ -200,7 +200,7 @@ def extract_quadratic(h: op.Operator,
     dim = len(fops_up)
 
     M = np.zeros((2, 2, dim, dim), dtype=complex)
-    M_an = np.zeros((1, 1, dim, dim), dtype=complex)
+    M_an = np.zeros((dim, dim), dtype=complex)
 
     for mon, coeff in h:
         if len(mon) != 2:
@@ -237,9 +237,9 @@ def extract_quadratic(h: op.Operator,
             # Creation-creation term
             if daggers[0]:
                 if spin1 == 0:
-                    M_an[0, 0, orb1, orb2] = coeff
+                    M_an[orb1, orb2] = coeff
                 else:
-                    M_an[0, 0, orb2, orb1] = -coeff
+                    M_an[orb2, orb1] = -coeff
 
     return M, M_an
 
