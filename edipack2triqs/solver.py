@@ -2,6 +2,7 @@
 TRIQS interface to **EDIpack** exact diagonalization solver.
 """
 
+from dataclasses import dataclass
 from pathlib import Path
 from tempfile import TemporaryDirectory
 from types import NoneType
@@ -32,6 +33,81 @@ from .hamiltonian import (parse_hamiltonian,
                           _is_density,
                           _is_density_density)
 from .fit import BathFittingParams, _chi2_fit_bath
+
+
+@dataclass(frozen=True, kw_only=True)
+class LanczosParams:
+    """Parameters of Lanczos algorithm."""
+
+    method: str = "arpack"
+    """
+    Select the method to be used in the determination of the spectrum,
+    one of *"arpack"*, *"lanczos"* (simple Lanczos method, only works at zero
+    temperature, can be useful in some rare cases, when ARPACK fails) and
+    *"dvdson"* (no-MPI mode only).
+    """
+
+    nstates_sector: int = 2
+    "Initial number of states per sector to be determined."
+
+    nstates_total: int = 2
+    "Initial total number of states to be determined."
+
+    nstates_step: int = 2
+    "Number of states added to the spectrum at each step."
+
+    ncv_factor: int = 10
+    """
+    Set the size of the block used in Lanczos-ARPACK by multiplying the
+    required ``Neigen`` (``NCV = ncv_factor * Neigen + ncv_add``).
+    """
+
+    ncv_add: int = 0
+    """
+    Adds up to the size of the block to prevent it from becoming too small
+    (``NCV = ncv_factor * Neigen + ncv_add``).
+    """
+
+    niter: int = 512
+    "Number of Lanczos iterations in spectrum determination."
+
+    ngfiter: int = 200
+    "Number of Lanczos iterations in GF determination (number of momenta)."
+
+    tolerance: float = 1e-18
+    "Tolerance for the Lanczos iterations as used in ARPACK."
+
+    dim_threshold: int = 1024
+    """
+    Minimal dimension threshold to use Lanczos determination of the spectrum
+    rather than LAPACK-based exact diagonalization.
+    """
+
+    def __dict__(self):
+        assert self.method in ("arpack", "lanczos", "dvdson"), \
+            "Invalid value of 'method'"
+        assert self.nstates_sector > 0, "'nstates_sector' must be positive"
+        assert self.nstates_total > 0, "'nstates_total' must be positive"
+        assert self.nstates_step > 0, "'nstates_step' must be positive"
+        assert self.ncv_factor > 0, "'ncv_factor' must be positive"
+        assert self.ncv_add >= 0, "'ncv_add' cannot be negative"
+        assert self.niter > 0, "'niter' must be positive"
+        assert self.ngfiter > 0, "'ngfiter' must be positive"
+        assert self.tolerance >= 0, "'tolerance' cannot be negative"
+        assert self.dim_threshold > 0, "'dim_threshold' must be positive"
+
+        return {
+            "LANC_METHOD": self.method,
+            "LANC_NSTATES_SECTOR": self.nstates_sector,
+            "LANC_NSTATES_TOTAL": self.nstates_total,
+            "LANC_NSTATES_STEP": self.nstates_step,
+            "LANC_NCV_FACTOR": self.ncv_factor,
+            "LANC_NCV_ADD": self.ncv_add,
+            "LANC_NITER": self.niter,
+            "LANC_NGFITER": self.ngfiter,
+            "LANC_TOLERANCE": self.tolerance,
+            "LANC_DIM_THRESHOLD": self.dim_threshold
+        }
 
 
 class EDIpackSolver:
@@ -181,57 +257,14 @@ class EDIpackSolver:
             occupancies.
         :type ed_total_ud: bool, default=False
 
-        :param lanc_method: Select the method to be used in
-            the determination of the spectrum, one of *"arpack"*, *"lanczos"*
-            (simple Lanczos method, only works at zero temperature, can be
-            useful in some rare cases, when ARPACK fails) and *"dvdson"*
-            (no-MPI mode only).
-        :type lanc_method: str, default="arpack"
-
-        :param lanc_nstates_sector: Initial number of states per sector
-            to be determined.
-        :type lanc_nstates_sector: int, default=2
-
-        :param lanc_nstates_total: Initial total number of states
-            to be determined.
-        :type lanc_nstates_total: int, default=2
-
-        :param lanc_nstates_step: Number of states added to the spectrum
-            at each step.
-        :type lanc_nstates_step: int, default=2
-
-        :param lanc_ncv_factor: Set the size of the block used in
-            Lanczos-ARPACK by multiplying the required Neigen
-            (``NCV = lanc_ncv_factor * Neigen + lanc_ncv_add``).
-        :type lanc_ncv_factor: int, default=10
-
-        :param lanc_ncv_add: Adds up to the size of the block to prevent it
-            from becoming too small
-            (``NCV = lanc_ncv_factor * Neigen + lanc_ncv_add``).
-        :type lanc_ncv_add: int, default=0
-
-        :param lanc_niter: Number of Lanczos iterations in spectrum
-            determination.
-        :type lanc_niter: int, default=512
-
-        :param lanc_ngfiter: Number of Lanczos iterations in GF determination
-            (number of momenta).
-        :type lanc_ngfiter: int, default=200
-
-        :param lanc_tolerance: Tolerance for the Lanczos iterations as used
-            in ARPACK.
-        :type lanc_tolerance: float, default=1e-18
-
-        :param lanc_dim_threshold: Minimal dimension threshold to use Lanczos
-            determination of the spectrum rather than LAPACK-based
-            exact diagonalization.
-        :type lanc_dim_threshold: int, default=1024
-
         :param bath_basis: List of quadratic fermionic operators defining the
                            basis of the bath. If present, this option forces
                            the use of :py:class:`BathGeneral` and overrides
                            the automatic construction of the bath basis.
         :type bath_basis: list[triqs.operators.operators.Operator]
+
+        :param lanczos_params: Parameters of Lanczos algorithm.
+        :type lanczos_params: LanczosParams, optional
 
         :param bath_fitting_params: Parameters used to perform bath fitting.
         :type bath_fitting_params: BathFittingParams, optional
@@ -301,14 +334,6 @@ class EDIpackSolver:
             c["CUTOFF"] = kwargs.get("cutoff", 1e-9)
             c["GS_THRESHOLD"] = kwargs.get("gs_threshold", 1e-9)
             c["ED_SPARSE_H"] = kwargs.get("ed_sparse_h", True)
-            c["LANC_METHOD"] = kwargs.get("lanc_method", "arpack")
-            c["LANC_NSTATES_STEP"] = kwargs.get("lanc_nstates_step", 2)
-            c["LANC_NCV_FACTOR"] = kwargs.get("lanc_ncv_factor", 10)
-            c["LANC_NCV_ADD"] = kwargs.get("lanc_ncv_add", 0)
-            c["LANC_NITER"] = kwargs.get("lanc_niter", 512)
-            c["LANC_NGFITER"] = kwargs.get("lanc_ngfiter", 200)
-            c["LANC_TOLERANCE"] = kwargs.get("lanc_tolerance", 1e-18)
-            c["LANC_DIM_THRESHOLD"] = kwargs.get("lanc_dim_threshold", 1024)
 
             # Impurity structure
             c["ED_MODE"] = self.h_params.ed_mode.value
@@ -334,14 +359,15 @@ class EDIpackSolver:
                 ed_total_ud = True
             c["ED_TOTAL_UD"] = ed_total_ud
 
+            # Lanczos parameters
+            lp = kwargs.get("lanczos_params", LanczosParams())
+            c.update(lp.__dict__())
+
             # Zero temperature calculations
             self.zerotemp = kwargs.get("zerotemp", False)
             c["ED_FINITE_TEMP"] = not self.zerotemp
             if self.zerotemp:
                 c["LANC_NSTATES_TOTAL"] = 1
-            else:
-                c["LANC_NSTATES_TOTAL"] = kwargs.get("lanc_nstates_total", 2)
-            c["LANC_NSTATES_SECTOR"] = kwargs.get("lanc_nstates_sector", 2)
 
             # Bath fitting
             bfp = kwargs.get("bath_fitting_params", BathFittingParams())

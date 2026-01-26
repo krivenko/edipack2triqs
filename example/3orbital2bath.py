@@ -13,7 +13,7 @@ from mpi4py import MPI
 from triqs.operators import c, c_dag, n
 
 # Compatibility layer between EDIpack and TRIQS
-from edipack2triqs.solver import EDIpackSolver
+from edipack2triqs.solver import EDIpackSolver, LanczosParams
 
 # Fundamental sets for impurity degrees of freedom
 fops_imp_up = [('up', 0), ('up', 1), ('up', 2)]
@@ -73,7 +73,7 @@ H_bath += sum(V[o, nu] * (c_dag(s, o) * c("B_" + s, nu * 3 + o)
 # See help(EDIpackSolver) for a complete list of parameters
 solver = EDIpackSolver(H_loc + H_int + H_bath,
                        fops_imp_up, fops_imp_dn, fops_bath_up, fops_bath_dn,
-                       lanc_dim_threshold=16)
+                       lanczos_params=LanczosParams(dim_threshold=16))
 
 # Solve the impurity model
 beta = 100.0  # Inverse temperature

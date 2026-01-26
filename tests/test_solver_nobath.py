@@ -3,7 +3,7 @@ from numpy import multiply as mul
 from numpy.testing import assert_equal
 
 from edipack2triqs import EDMode
-from edipack2triqs.solver import EDIpackSolver
+from edipack2triqs.solver import EDIpackSolver, LanczosParams
 
 from .test_solver import TestSolver
 
@@ -36,7 +36,7 @@ class TestEDIpackSolverNoBath(TestSolver):
             h,
             fops_imp_up, fops_imp_dn,
             zerotemp=True,
-            lanc_nstates_total=17,
+            lanczos_params=LanczosParams(nstates_total=17),
             verbose=0,
         )
 
@@ -75,7 +75,7 @@ class TestEDIpackSolverNoBath(TestSolver):
         solver = EDIpackSolver(
             h,
             fops_imp_up, fops_imp_dn,
-            lanc_nstates_total=8,
+            lanczos_params=LanczosParams(nstates_total=8),
             verbose=0
         )
 
@@ -142,7 +142,7 @@ class TestEDIpackSolverNoBath(TestSolver):
         solver = EDIpackSolver(
             h,
             fops_imp_up, fops_imp_dn,
-            lanc_nstates_total=8,
+            lanczos_params=LanczosParams(nstates_total=8),
             verbose=0
         )
 
@@ -211,7 +211,7 @@ class TestEDIpackSolverNoBath(TestSolver):
         solver = EDIpackSolver(
             h,
             fops_imp_up, fops_imp_dn,
-            lanc_nstates_total=8,
+            lanczos_params=LanczosParams(nstates_total=8),
             verbose=0,
         )
 
@@ -281,8 +281,7 @@ class TestEDIpackSolverNoBath(TestSolver):
         solver = EDIpackSolver(
             h,
             fops_imp_up, fops_imp_dn,
-            lanc_nstates_sector=4,
-            lanc_nstates_total=10,
+            lanczos_params=LanczosParams(nstates_sector=4, nstates_total=10),
             verbose=0
         )
 

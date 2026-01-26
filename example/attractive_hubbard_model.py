@@ -16,7 +16,7 @@ from triqs.lattice.tight_binding import TBLattice
 from h5 import HDFArchive
 
 # edipack2triqs modules
-from edipack2triqs.solver import EDIpackSolver
+from edipack2triqs.solver import EDIpackSolver, LanczosParams
 from edipack2triqs.fit import BathFittingParams
 
 
@@ -116,7 +116,7 @@ H += sum(D[o, q] * (c('B_up', o) * c('B_dn', q))
 fit_params = BathFittingParams(method="minimize", grad="numeric")
 solver = EDIpackSolver(H,
                        fops_imp_up, fops_imp_dn, fops_bath_up, fops_bath_dn,
-                       lanc_dim_threshold=1024,
+                       lanczos_params=LanczosParams(dim_threshold=1024),
                        verbose=1,
                        bath_fitting_params=fit_params)
 
