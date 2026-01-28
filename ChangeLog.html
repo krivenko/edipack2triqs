@@ -165,6 +165,7 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="issues.html">Reporting issues</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Changelog</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#version-0-11-0">Version 0.11.0</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#version-0-10-0">Version 0.10.0</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#version-0-9-0">Version 0.9.0</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#version-0-8-0">Version 0.8.0</a></li>
@@ -206,6 +207,19 @@
              
   <section class="tex2jax_ignore mathjax_ignore" id="changelog">
 <span id="id1"></span><h1>Changelog<a class="headerlink" href="#changelog" title="Link to this heading"></a></h1>
+<section id="version-0-11-0">
+<h2>Version 0.11.0<a class="headerlink" href="#version-0-11-0" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p>A matrix basis for the bath Hamiltonian in the general bath topology mode can
+now be explicitly specified. The basis is passed via the <code class="docutils literal notranslate"><span class="pre">bath_basis</span></code> keyword
+argument of <code class="docutils literal notranslate"><span class="pre">EDIpackSolver</span></code>’s constructor as a list of TRIQS many-body
+operator objects. Each operator is expected to be quadratic in bath electron
+creation/annihilation operators (both normal and anomalous terms are allowed).
+The list must include all basis operators for all replicas in no specific
+order, although - due to a limitation of EDIpack - subsets of operators for
+all replicas must be equivalent.</p></li>
+</ul>
+</section>
 <section id="version-0-10-0">
 <h2>Version 0.10.0<a class="headerlink" href="#version-0-10-0" title="Link to this heading"></a></h2>
 <ul class="simple">

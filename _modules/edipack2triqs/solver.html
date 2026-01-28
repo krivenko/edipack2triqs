@@ -162,6 +162,7 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../issues.html">Reporting issues</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../ChangeLog.html">Changelog</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../ChangeLog.html#version-0-11-0">Version 0.11.0</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../ChangeLog.html#version-0-10-0">Version 0.10.0</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../ChangeLog.html#version-0-9-0">Version 0.9.0</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../ChangeLog.html#version-0-8-0">Version 0.8.0</a></li>
@@ -436,6 +437,12 @@
 <span class="sd">            exact diagonalization.</span>
 <span class="sd">        :type lanc_dim_threshold: int, default=1024</span>
 
+<span class="sd">        :param bath_basis: List of quadratic fermionic operators defining the</span>
+<span class="sd">                           basis of the bath. If present, this option forces</span>
+<span class="sd">                           the use of :py:class:`BathGeneral` and overrides</span>
+<span class="sd">                           the automatic construction of the bath basis.</span>
+<span class="sd">        :type bath_basis: list[triqs.operators.operators.Operator]</span>
+
 <span class="sd">        :param bath_fitting_params: Parameters used to perform bath fitting.</span>
 <span class="sd">        :type bath_fitting_params: BathFittingParams, optional</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -465,11 +472,19 @@
         <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">bn</span> <span class="o">!=</span> <span class="n">block_names_dn</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">bn</span> <span class="ow">in</span> <span class="n">block_names_dn</span><span class="p">):</span>
             <span class="n">warn</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Inconsistent block names in </span><span class="si">{</span><span class="n">block_names_dn</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
+        <span class="n">bath_basis</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;bath_basis&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="p">(</span><span class="n">bath_basis</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fops_bath_up</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">bath_basis</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="n">warn</span><span class="p">(</span><span class="s2">&quot;User-supplied bath_basis is ignored &quot;</span>
+                 <span class="s2">&quot;as there are no bath degrees of freedom&quot;</span><span class="p">)</span>
+
         <span class="bp">self</span><span class="o">.</span><span class="n">h_params</span> <span class="o">=</span> <span class="n">parse_hamiltonian</span><span class="p">(</span>
             <span class="n">hamiltonian</span><span class="p">,</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">fops_imp_up</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">fops_imp_dn</span><span class="p">,</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">fops_bath_up</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">fops_bath_dn</span><span class="p">,</span>
-            <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;ed_mode&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;ed_mode&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
+            <span class="n">bath_basis</span><span class="o">=</span><span class="n">bath_basis</span><span class="p">,</span>
         <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">nspin</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">h_params</span><span class="o">.</span><span class="n">Hloc</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 
@@ -682,7 +697,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">h_params</span><span class="o">.</span><span class="n">Hloc</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">new_hloc</span><span class="p">[:</span><span class="mi">1</span><span class="p">,</span> <span class="p">:</span><span class="mi">1</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:]</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">h_params</span><span class="o">.</span><span class="n">Hloc</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">new_hloc</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">h_params</span><span class="o">.</span><span class="n">Hloc_an</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">new_hloc_an</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">h_params</span><span class="o">.</span><span class="n">Hloc_an</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">new_hloc_an</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">U</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>

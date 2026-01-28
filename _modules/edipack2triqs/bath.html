@@ -162,6 +162,7 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../issues.html">Reporting issues</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../ChangeLog.html">Changelog</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../ChangeLog.html#version-0-11-0">Version 0.11.0</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../ChangeLog.html#version-0-10-0">Version 0.10.0</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../ChangeLog.html#version-0-9-0">Version 0.9.0</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../ChangeLog.html#version-0-8-0">Version 0.8.0</a></li>
@@ -217,7 +218,11 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">h5.formats</span><span class="w"> </span><span class="kn">import</span> <span class="n">register_class</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">.</span><span class="w"> </span><span class="kn">import</span> <span class="n">EDMode</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">.util</span><span class="w"> </span><span class="kn">import</span> <span class="n">is_diagonal</span><span class="p">,</span> <span class="n">is_spin_diagonal</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.util</span><span class="w"> </span><span class="kn">import</span> <span class="n">is_diagonal</span><span class="p">,</span> <span class="n">is_spin_diagonal</span><span class="p">,</span> <span class="n">make_nambu</span>
+
+
+<span class="n">BasisMatNAn</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]</span>
+<span class="s2">&quot;Bath basis matrix as a pair of normal and anomalous components&quot;</span>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_bath_states_to_orbs</span><span class="p">(</span><span class="n">V</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
@@ -242,6 +247,36 @@
     <span class="n">norb</span> <span class="o">=</span> <span class="n">V</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
     <span class="k">return</span> <span class="p">[</span><span class="nb">list</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nonzero</span><span class="p">(</span><span class="n">V</span><span class="p">[:,</span> <span class="p">:,</span> <span class="n">orb</span><span class="p">,</span> <span class="p">:])[</span><span class="mi">2</span><span class="p">]))</span>
             <span class="k">for</span> <span class="n">orb</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">norb</span><span class="p">)]</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">bath_coeffs</span><span class="p">(</span><span class="n">h</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">basis</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Compute expansion coefficients of &#39;h&#39; over a given bath basis.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Compute the overlap matrix of the basis matrices</span>
+    <span class="n">n_mats</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">basis</span><span class="p">)</span>
+    <span class="n">overlap</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">n_mats</span><span class="p">,</span> <span class="n">n_mats</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">complex</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">product</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">n_mats</span><span class="p">),</span> <span class="n">repeat</span><span class="o">=</span><span class="mi">2</span><span class="p">):</span>
+        <span class="n">overlap</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vdot</span><span class="p">(</span><span class="n">basis</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">basis</span><span class="p">[</span><span class="n">j</span><span class="p">])</span>
+    <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">det</span><span class="p">(</span><span class="n">overlap</span><span class="p">),</span> <span class="mi">0</span><span class="p">,</span> <span class="n">atol</span><span class="o">=</span><span class="mf">1e-10</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Bath basis matrices are linearly dependent&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Extract the coefficients</span>
+    <span class="n">coeffs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span>
+        <span class="n">overlap</span><span class="p">,</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">vdot</span><span class="p">(</span><span class="n">mat</span><span class="p">,</span> <span class="n">h</span><span class="p">)</span> <span class="k">for</span> <span class="n">mat</span> <span class="ow">in</span> <span class="n">basis</span><span class="p">])</span>
+    <span class="p">)</span>
+
+    <span class="c1"># Check that the Hamiltonian is representable in the given basis</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">h</span><span class="p">,</span>
+                       <span class="nb">sum</span><span class="p">(</span><span class="n">c</span> <span class="o">*</span> <span class="n">mat</span> <span class="k">for</span> <span class="n">c</span><span class="p">,</span> <span class="n">mat</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">coeffs</span><span class="p">,</span> <span class="n">basis</span><span class="p">)),</span>
+                       <span class="n">atol</span><span class="o">=</span><span class="mf">1e-10</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+            <span class="s2">&quot;Provided bath basis is insufficient to represent the Hamiltonian&quot;</span>
+        <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">coeffs</span>
 
 
 <div class="viewcode-block" id="Bath">
@@ -848,20 +883,27 @@
     <span class="nd">@classmethod</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">_build_replica_bases</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span>
                              <span class="n">norb</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-                             <span class="n">h</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
-                             <span class="n">V</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+                             <span class="n">V</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+                             <span class="n">h</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                             <span class="n">basis_mats</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Distribute nbath_total bath basis states between a few replicas, each</span>
 <span class="sd">        of size norb. The replica bases being built are subject to three</span>
-<span class="sd">        conditions.</span>
+<span class="sd">        conditions. Exactly one of &#39;h&#39; and &#39;basis_mats&#39; must be specified.</span>
 
-<span class="sd">        - Basis states connected by a nonzero matrix element of h must belong</span>
-<span class="sd">          to the same replica.</span>
+<span class="sd">        - If &#39;h&#39; is specified, then basis states connected by nonzero matrix</span>
+<span class="sd">          elements of &#39;h&#39; must belong to the same replica.</span>
+<span class="sd">        - If &#39;basis_mats&#39; is specified, then all basis states encountered as</span>
+<span class="sd">          a left or right index of a nonzero matrix element of the same basis</span>
+<span class="sd">          matrix must belong to the same replica.</span>
 <span class="sd">        - Each bath basis state is connected to at most one impurity orbital.</span>
 <span class="sd">        - If two bath states are connected to the same impurity orbital,</span>
 <span class="sd">          then they cannot belong to the same replica.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">nbath_total</span> <span class="o">=</span> <span class="n">h</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+        <span class="k">assert</span> <span class="p">(</span><span class="n">h</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="o">^</span> <span class="p">(</span><span class="n">basis_mats</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">),</span> \
+            <span class="s2">&quot;Arguments &#39;h&#39; and &#39;basis_mats&#39; are mutually exclusive&quot;</span>
+
+        <span class="n">nbath_total</span> <span class="o">=</span> <span class="n">h</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="k">if</span> <span class="p">(</span><span class="n">h</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="k">else</span> <span class="n">basis_mats</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
 
         <span class="k">if</span> <span class="n">nbath_total</span> <span class="o">%</span> <span class="n">norb</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
@@ -880,11 +922,27 @@
             <span class="p">)</span>
 
         <span class="c1"># Graph representation of the bath Hamiltonian</span>
-        <span class="c1"># Basis states are vertices and nonzero matrix elements are edges</span>
-        <span class="n">h_graph</span> <span class="o">=</span> <span class="n">nx</span><span class="o">.</span><span class="n">Graph</span><span class="p">()</span>
-        <span class="n">h_graph</span><span class="o">.</span><span class="n">add_nodes_from</span><span class="p">(</span><span class="n">bath_states</span><span class="p">)</span>
-        <span class="k">for</span> <span class="n">spin1</span><span class="p">,</span> <span class="n">spin2</span><span class="p">,</span> <span class="n">b1</span><span class="p">,</span> <span class="n">b2</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">nonzero</span><span class="p">(</span><span class="n">h</span><span class="p">)):</span>
-            <span class="n">h_graph</span><span class="o">.</span><span class="n">add_edge</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">b1</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">b2</span><span class="p">))</span>
+        <span class="c1"># Basis states are vertices</span>
+        <span class="n">bath_graph</span> <span class="o">=</span> <span class="n">nx</span><span class="o">.</span><span class="n">Graph</span><span class="p">()</span>
+        <span class="n">bath_graph</span><span class="o">.</span><span class="n">add_nodes_from</span><span class="p">(</span><span class="n">bath_states</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">h</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># Nonzero matrix elements h_{b1, b2} are edges between b1 and b2</span>
+            <span class="k">for</span> <span class="n">spin1</span><span class="p">,</span> <span class="n">spin2</span><span class="p">,</span> <span class="n">b1</span><span class="p">,</span> <span class="n">b2</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">nonzero</span><span class="p">(</span><span class="n">h</span><span class="p">)):</span>
+                <span class="k">if</span> <span class="n">b1</span> <span class="o">!=</span> <span class="n">b2</span><span class="p">:</span>
+                    <span class="n">bath_graph</span><span class="o">.</span><span class="n">add_edge</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">b1</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">b2</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">mat</span> <span class="ow">in</span> <span class="n">basis_mats</span><span class="p">:</span>
+                <span class="c1"># Collect all (right and left) indices corresponding to</span>
+                <span class="c1"># nonzero matrix elements of mat</span>
+                <span class="n">mat_nonzero_b</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+                <span class="k">for</span> <span class="n">spin1</span><span class="p">,</span> <span class="n">spin2</span><span class="p">,</span> <span class="n">b1</span><span class="p">,</span> <span class="n">b2</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">nonzero</span><span class="p">(</span><span class="n">mat</span><span class="p">)):</span>
+                    <span class="n">mat_nonzero_b</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">b1</span><span class="p">)</span>
+                    <span class="n">mat_nonzero_b</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">b2</span><span class="p">)</span>
+                <span class="c1"># Add edges between all collected indices</span>
+                <span class="k">for</span> <span class="n">b1</span><span class="p">,</span> <span class="n">b2</span> <span class="ow">in</span> <span class="n">product</span><span class="p">(</span><span class="n">mat_nonzero_b</span><span class="p">,</span> <span class="n">repeat</span><span class="o">=</span><span class="mi">2</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="n">b1</span> <span class="o">!=</span> <span class="n">b2</span><span class="p">:</span>
+                        <span class="n">bath_graph</span><span class="o">.</span><span class="n">add_edge</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">b1</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">b2</span><span class="p">))</span>
 
         <span class="c1"># Replica bases</span>
         <span class="n">replicas</span> <span class="o">=</span> <span class="p">[]</span>
@@ -893,7 +951,7 @@
         <span class="n">inc_replicas</span> <span class="o">=</span> <span class="p">[]</span>
 
         <span class="c1"># Connected components of the graph are candidates for the replica bases</span>
-        <span class="k">for</span> <span class="n">replica</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">nx</span><span class="o">.</span><span class="n">connected_components</span><span class="p">(</span><span class="n">h_graph</span><span class="p">)):</span>
+        <span class="k">for</span> <span class="n">replica</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">nx</span><span class="o">.</span><span class="n">connected_components</span><span class="p">(</span><span class="n">bath_graph</span><span class="p">)):</span>
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">replica</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">norb</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
                     <span class="sa">f</span><span class="s2">&quot;One of replicas has more than norb = </span><span class="si">{</span><span class="n">norb</span><span class="si">}</span><span class="s2"> states&quot;</span>
@@ -1025,6 +1083,81 @@
         <span class="k">return</span> <span class="n">hvec</span><span class="p">,</span> <span class="n">lambdavec</span>
 
     <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_classify_basis_matrices</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span>
+                                 <span class="n">replicas</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">]],</span>
+                                 <span class="n">nspin</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+                                 <span class="n">bath_basis_mats</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">],</span>
+                                 <span class="n">is_nambu</span><span class="p">:</span> <span class="nb">bool</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Given a list of basis matrices in the full space of bath states and</span>
+<span class="sd">        a list of replicas, return</span>
+
+<span class="sd">        - A list of pairs (nu, isym) corresponding to the given matrices.</span>
+<span class="sd">        - A list of nsym matrices defined within one replica (hvec).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">nbath</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">replicas</span><span class="p">)</span>
+        <span class="n">norb</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">replicas</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+
+        <span class="c1"># As of EDIpack 5.4.2, all replicas must have the same set of nsym basis</span>
+        <span class="c1"># matrices</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">bath_basis_mats</span><span class="p">)</span> <span class="o">%</span> <span class="n">nbath</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+                <span class="s2">&quot;Total number of basis matrices is not a multiple of &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;the number of replicas (</span><span class="si">{</span><span class="n">nbath</span><span class="si">}</span><span class="s2">)&quot;</span>
+            <span class="p">)</span>
+        <span class="n">nsym</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">bath_basis_mats</span><span class="p">)</span> <span class="o">//</span> <span class="n">nbath</span>
+
+        <span class="n">mat2replica</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">replica_basis_mats</span> <span class="o">=</span> <span class="p">[[]</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nbath</span><span class="p">)]</span>
+
+        <span class="c1"># Fill mat2replica</span>
+        <span class="n">mat_nonzero_b</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">mi</span><span class="p">,</span> <span class="n">mat</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">bath_basis_mats</span><span class="p">):</span>
+            <span class="n">mat_nonzero_b</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+            <span class="k">for</span> <span class="n">spin1</span><span class="p">,</span> <span class="n">spin2</span><span class="p">,</span> <span class="n">b1</span><span class="p">,</span> <span class="n">b2</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">nonzero</span><span class="p">(</span><span class="n">mat</span><span class="p">)):</span>
+                <span class="n">mat_nonzero_b</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">b1</span><span class="p">)</span>
+                <span class="n">mat_nonzero_b</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">b2</span><span class="p">)</span>
+
+            <span class="c1"># Find the replica mat belongs to</span>
+            <span class="k">for</span> <span class="n">nu</span><span class="p">,</span> <span class="n">replica</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">replicas</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">mat_nonzero_b</span><span class="o">.</span><span class="n">issubset</span><span class="p">(</span><span class="n">replica</span><span class="p">):</span>
+                    <span class="n">mat2replica</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">nu</span><span class="p">)</span>
+                    <span class="k">break</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">AssertionError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;Cannot find which replica basis matrix #</span><span class="si">{</span><span class="n">mi</span><span class="si">}</span><span class="s2"> belongs to&quot;</span>
+                <span class="p">)</span>
+
+            <span class="c1"># Translate mat into replica coordinates and store the results</span>
+            <span class="n">replica</span> <span class="o">=</span> <span class="n">replicas</span><span class="p">[</span><span class="n">mat2replica</span><span class="p">[</span><span class="n">mi</span><span class="p">]]</span>
+            <span class="n">replica_idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ix_</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">nspin</span><span class="p">),</span> <span class="nb">range</span><span class="p">(</span><span class="n">nspin</span><span class="p">),</span> <span class="n">replica</span><span class="p">,</span> <span class="n">replica</span><span class="p">)</span>
+            <span class="n">replica_basis_mats</span><span class="p">[</span><span class="n">nu</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">mat</span><span class="p">[</span><span class="n">replica_idx</span><span class="p">])</span>
+
+        <span class="n">mat2isym</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="c1"># Fill mat2isym</span>
+        <span class="k">for</span> <span class="n">mi</span><span class="p">,</span> <span class="n">mat</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">bath_basis_mats</span><span class="p">):</span>
+            <span class="n">replica</span> <span class="o">=</span> <span class="n">replicas</span><span class="p">[</span><span class="n">mat2replica</span><span class="p">[</span><span class="n">mi</span><span class="p">]]</span>
+            <span class="n">replica_idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ix_</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">nspin</span><span class="p">),</span> <span class="nb">range</span><span class="p">(</span><span class="n">nspin</span><span class="p">),</span> <span class="n">replica</span><span class="p">,</span> <span class="n">replica</span><span class="p">)</span>
+            <span class="n">replica_mat</span> <span class="o">=</span> <span class="n">mat</span><span class="p">[</span><span class="n">replica_idx</span><span class="p">]</span>
+            <span class="c1"># The order of matrices in nu=0 determines how isym are assigned</span>
+            <span class="k">for</span> <span class="n">isym</span><span class="p">,</span> <span class="n">nu0_mat</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">replica_basis_mats</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+                <span class="k">if</span> <span class="p">(</span><span class="n">replica_mat</span> <span class="o">==</span> <span class="n">nu0_mat</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">():</span>
+                    <span class="n">mat2isym</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">isym</span><span class="p">)</span>
+                    <span class="k">break</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;Basis matrix #</span><span class="si">{</span><span class="n">mi</span><span class="si">}</span><span class="s2"> has no equivalent in another replica&quot;</span>
+                <span class="p">)</span>
+
+        <span class="c1"># Finally, collect nsym basis matrices from nu=0 into hvec</span>
+        <span class="n">hvec</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">nspin</span><span class="p">,</span> <span class="n">nspin</span><span class="p">,</span> <span class="n">norb</span><span class="p">,</span> <span class="n">norb</span><span class="p">,</span> <span class="n">nsym</span><span class="p">),</span>
+                        <span class="n">dtype</span><span class="o">=</span><span class="nb">complex</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="s1">&#39;F&#39;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">isym</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nsym</span><span class="p">):</span>
+            <span class="n">hvec</span><span class="p">[:,</span> <span class="p">:,</span> <span class="p">:,</span> <span class="p">:,</span> <span class="n">isym</span><span class="p">]</span> <span class="o">=</span> <span class="n">replica_basis_mats</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="n">isym</span><span class="p">]</span>
+
+        <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">mat2replica</span><span class="p">,</span> <span class="n">mat2isym</span><span class="p">)),</span> <span class="n">hvec</span>
+
+    <span class="nd">@classmethod</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">from_hamiltonian</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span>
                          <span class="n">ed_mode</span><span class="p">:</span> <span class="n">EDMode</span><span class="p">,</span>
                          <span class="n">nspin</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
@@ -1038,18 +1171,13 @@
         <span class="c1"># Number of replicas</span>
         <span class="n">nbath</span> <span class="o">=</span> <span class="n">nbath_total</span> <span class="o">//</span> <span class="n">norb</span>
 
-        <span class="c1"># In the superconducting case, reinterpret first two indices of h as</span>
-        <span class="c1"># Nambu indices and fill the off-diagonal elements from Delta</span>
-        <span class="n">is_nambu</span> <span class="o">=</span> <span class="p">(</span><span class="n">ed_mode</span> <span class="o">==</span> <span class="n">EDMode</span><span class="o">.</span><span class="n">SUPERC</span><span class="p">)</span>
-        <span class="n">nnambu</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="n">is_nambu</span> <span class="o">=</span> <span class="n">ed_mode</span> <span class="o">==</span> <span class="n">EDMode</span><span class="o">.</span><span class="n">SUPERC</span>
+        <span class="n">nnambu</span> <span class="o">=</span> <span class="mi">2</span> <span class="k">if</span> <span class="n">is_nambu</span> <span class="k">else</span> <span class="mi">1</span>
         <span class="k">if</span> <span class="n">is_nambu</span><span class="p">:</span>
-            <span class="n">nnambu</span> <span class="o">=</span> <span class="mi">2</span>
-            <span class="n">h</span> <span class="o">=</span> <span class="n">h</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-            <span class="n">h</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:]</span> <span class="o">*=</span> <span class="o">-</span><span class="mi">1</span>
-            <span class="n">h</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">Delta</span>
-            <span class="n">h</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">conj</span><span class="p">(</span><span class="n">Delta</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
+            <span class="c1"># Combine &#39;h&#39; and &#39;Delta&#39; to form a Nambu Hamiltonian</span>
+            <span class="n">h</span> <span class="o">=</span> <span class="n">make_nambu</span><span class="p">(</span><span class="n">h</span><span class="p">,</span> <span class="n">Delta</span><span class="p">)</span>
 
-        <span class="n">replicas</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_build_replica_bases</span><span class="p">(</span><span class="n">norb</span><span class="p">,</span> <span class="n">h</span><span class="p">,</span> <span class="n">V</span><span class="p">)</span>
+        <span class="n">replicas</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_build_replica_bases</span><span class="p">(</span><span class="n">norb</span><span class="p">,</span> <span class="n">V</span><span class="p">,</span> <span class="n">h</span><span class="o">=</span><span class="n">h</span><span class="p">)</span>
 
         <span class="n">hvec</span><span class="p">,</span> <span class="n">lambdavec</span> <span class="o">=</span> \
             <span class="bp">cls</span><span class="o">.</span><span class="n">_build_linear_combination</span><span class="p">(</span><span class="n">replicas</span><span class="p">,</span> <span class="n">nnambu</span> <span class="o">*</span> <span class="n">nspin</span><span class="p">,</span> <span class="n">h</span><span class="p">,</span> <span class="n">is_nambu</span><span class="p">)</span>
@@ -1060,6 +1188,59 @@
         <span class="k">for</span> <span class="n">nu</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">bath</span><span class="o">.</span><span class="n">nbath</span><span class="p">):</span>
             <span class="k">for</span> <span class="n">isym</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">bath</span><span class="o">.</span><span class="n">nsym</span><span class="p">):</span>
                 <span class="n">bath</span><span class="o">.</span><span class="n">l</span><span class="p">[</span><span class="n">nu</span><span class="p">][</span><span class="n">isym</span><span class="p">]</span> <span class="o">=</span> <span class="n">lambdavec</span><span class="p">[</span><span class="n">nu</span><span class="p">,</span> <span class="n">isym</span><span class="p">]</span>
+
+        <span class="c1"># Fill V</span>
+        <span class="k">for</span> <span class="n">nu</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">bath</span><span class="o">.</span><span class="n">nbath</span><span class="p">):</span>
+            <span class="n">replica</span> <span class="o">=</span> <span class="n">replicas</span><span class="p">[</span><span class="n">nu</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">spin</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nspin</span><span class="p">):</span>
+                <span class="k">for</span> <span class="n">orb</span><span class="p">,</span> <span class="n">b</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">replica</span><span class="p">):</span>
+                    <span class="n">bath</span><span class="o">.</span><span class="n">V</span><span class="p">[</span><span class="n">nu</span><span class="p">][</span><span class="n">spin</span><span class="p">,</span> <span class="n">orb</span><span class="p">]</span> <span class="o">=</span> <span class="n">V</span><span class="p">[</span><span class="n">spin</span><span class="p">,</span> <span class="n">spin</span><span class="p">,</span> <span class="n">orb</span><span class="p">,</span> <span class="n">b</span><span class="p">]</span>
+
+        <span class="k">return</span> <span class="n">bath</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">from_hamiltonian_and_basis</span><span class="p">(</span>
+            <span class="bp">cls</span><span class="p">,</span>
+            <span class="n">ed_mode</span><span class="p">:</span> <span class="n">EDMode</span><span class="p">,</span>
+            <span class="n">nspin</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+            <span class="n">Hloc</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+            <span class="n">h</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+            <span class="n">V</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+            <span class="n">Delta</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+            <span class="n">basis_mats_n_an</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="n">BasisMatNAn</span><span class="p">]]):</span>
+        <span class="n">norb</span> <span class="o">=</span> <span class="n">Hloc</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+        <span class="n">nbath_total</span> <span class="o">=</span> <span class="n">h</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+        <span class="c1"># Number of replicas</span>
+        <span class="n">nbath</span> <span class="o">=</span> <span class="n">nbath_total</span> <span class="o">//</span> <span class="n">norb</span>
+
+        <span class="n">is_nambu</span> <span class="o">=</span> <span class="n">ed_mode</span> <span class="o">==</span> <span class="n">EDMode</span><span class="o">.</span><span class="n">SUPERC</span>
+        <span class="n">nnambu</span> <span class="o">=</span> <span class="mi">2</span> <span class="k">if</span> <span class="n">is_nambu</span> <span class="k">else</span> <span class="mi">1</span>
+        <span class="k">if</span> <span class="n">is_nambu</span><span class="p">:</span>
+            <span class="c1"># Convert &#39;h&#39; and &#39;bath_basis_mats_n_an&#39; into Nambu basis</span>
+            <span class="n">h</span> <span class="o">=</span> <span class="n">make_nambu</span><span class="p">(</span><span class="n">h</span><span class="p">,</span> <span class="n">Delta</span><span class="p">)</span>
+            <span class="n">basis_mats</span> <span class="o">=</span> <span class="p">[</span><span class="n">make_nambu</span><span class="p">(</span><span class="o">*</span><span class="n">MNA</span><span class="p">)</span> <span class="k">for</span> <span class="n">MNA</span> <span class="ow">in</span> <span class="n">basis_mats_n_an</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">basis_mats</span> <span class="o">=</span> <span class="p">[</span><span class="n">M</span> <span class="k">for</span> <span class="n">M</span><span class="p">,</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">basis_mats_n_an</span><span class="p">]</span>
+
+        <span class="n">replicas</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_build_replica_bases</span><span class="p">(</span><span class="n">norb</span><span class="p">,</span> <span class="n">V</span><span class="p">,</span> <span class="n">basis_mats</span><span class="o">=</span><span class="n">basis_mats</span><span class="p">)</span>
+
+        <span class="n">coeffs</span> <span class="o">=</span> <span class="n">bath_coeffs</span><span class="p">(</span><span class="n">h</span><span class="p">,</span> <span class="n">basis_mats</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">isreal</span><span class="p">(</span><span class="n">coeffs</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">():</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+                <span class="s2">&quot;Complex bath expansion coefficients are not supported&quot;</span>
+            <span class="p">)</span>
+
+        <span class="n">classification</span><span class="p">,</span> <span class="n">hvec</span> <span class="o">=</span> \
+            <span class="bp">cls</span><span class="o">.</span><span class="n">_classify_basis_matrices</span><span class="p">(</span><span class="n">replicas</span><span class="p">,</span>
+                                         <span class="n">nnambu</span> <span class="o">*</span> <span class="n">nspin</span><span class="p">,</span>
+                                         <span class="n">basis_mats</span><span class="p">,</span>
+                                         <span class="n">is_nambu</span><span class="p">)</span>
+
+        <span class="n">bath</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">(</span><span class="n">nspin</span><span class="p">,</span> <span class="n">norb</span><span class="p">,</span> <span class="n">nbath</span><span class="p">,</span> <span class="n">hvec</span><span class="p">)</span>
+
+        <span class="c1"># Fill l</span>
+        <span class="k">for</span> <span class="n">coeff</span><span class="p">,</span> <span class="p">(</span><span class="n">nu</span><span class="p">,</span> <span class="n">isym</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">coeffs</span><span class="p">,</span> <span class="n">classification</span><span class="p">):</span>
+            <span class="n">bath</span><span class="o">.</span><span class="n">l</span><span class="p">[</span><span class="n">nu</span><span class="p">][</span><span class="n">isym</span><span class="p">]</span> <span class="o">=</span> <span class="n">coeff</span><span class="o">.</span><span class="n">real</span>
 
         <span class="c1"># Fill V</span>
         <span class="k">for</span> <span class="n">nu</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">bath</span><span class="o">.</span><span class="n">nbath</span><span class="p">):</span>

@@ -167,6 +167,7 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="issues.html">Reporting issues</a></li>
 <li class="toctree-l1"><a class="reference internal" href="ChangeLog.html">Changelog</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="ChangeLog.html#version-0-11-0">Version 0.11.0</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ChangeLog.html#version-0-10-0">Version 0.10.0</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ChangeLog.html#version-0-9-0">Version 0.9.0</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ChangeLog.html#version-0-8-0">Version 0.8.0</a></li>
@@ -326,6 +327,10 @@ in ARPACK.</p></li>
 <li><p><strong>lanc_dim_threshold</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" rel="noopener noreferrer" target="_blank" title="(in Python v3.14)"><em>int</em></a><em>, </em><em>default=1024</em>) – Minimal dimension threshold to use Lanczos
 determination of the spectrum rather than LAPACK-based
 exact diagonalization.</p></li>
+<li><p><strong>bath_basis</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" rel="noopener noreferrer" target="_blank" title="(in Python v3.14)"><em>list</em></a><em>[</em><a class="reference external" href="https://triqs.github.io/triqs/latest/documentation/python_api/triqs.operators.operators.Operator.html#triqs.operators.operators.Operator" rel="noopener noreferrer" target="_blank" title="(in TRIQS v3.3.2)"><em>triqs.operators.operators.Operator</em></a><em>]</em>) – List of quadratic fermionic operators defining the
+basis of the bath. If present, this option forces
+the use of <code class="xref py py-class docutils literal notranslate"><span class="pre">BathGeneral</span></code> and overrides
+the automatic construction of the bath basis.</p></li>
 <li><p><strong>bath_fitting_params</strong> (<a class="reference internal" href="#edipack2triqs.fit.BathFittingParams" title="edipack2triqs.fit.BathFittingParams"><em>BathFittingParams</em></a><em>, </em><em>optional</em>) – Parameters used to perform bath fitting.</p></li>
 </ul>
 </dd>
