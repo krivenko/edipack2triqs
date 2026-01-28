@@ -18,7 +18,7 @@ from .util import (is_spin_diagonal,
                    monomial2op,
                    normal_part,
                    spin_conjugate)
-from .bath import BathNormal, BathHybrid, BathGeneral
+from .bath import BathNormal, BathHybrid, BathGeneral, BasisMatNAn
 
 
 @dataclass
@@ -98,36 +98,100 @@ def _is_density_density(U: np.ndarray):
     return True
 
 
-def _make_bath(ed_mode: EDMode,
-               nspin: int,
-               Hloc: np.ndarray,
-               Hloc_an: np.ndarray,
-               h: np.ndarray,
-               V: np.ndarray,
-               Delta: np.ndarray):
+def _select_ed_mode(nspin: int,
+                    Hloc: np.ndarray,
+                    Hloc_an: np.ndarray,
+                    h: np.ndarray,
+                    V: np.ndarray,
+                    Delta: np.ndarray,
+                    bath_basis_mats_n_an: Optional[list[BasisMatNAn]],
+                    f_ed_mode: EDMode) -> tuple[EDMode, int]:
     """
-    Make a bath parameters object.
+    Analyse parameters of a Hamiltonian, bath basis matrices and select
+    the fitting ed_mode and nspin.
     """
 
-    # Can we use bath_type = 'normal'?
-    if BathNormal.is_usable(Hloc, Hloc_an, h, V, Delta):
-        return BathNormal.from_hamiltonian(ed_mode, nspin, Hloc, h, V, Delta)
-    # Can we use bath_type = 'hybrid'?
-    elif BathHybrid.is_usable(h, Delta):
-        return BathHybrid.from_hamiltonian(ed_mode, nspin, Hloc, h, V, Delta)
-    # Can we use bath_type = 'general'?
-    else:
-        try:
-            return BathGeneral.from_hamiltonian(ed_mode,
-                                                nspin,
-                                                Hloc,
-                                                h,
-                                                V,
-                                                Delta)
-        except RuntimeError:
+    # Step 1: Deduce ed_mode from the Hamiltonian
+    superc = np.any(Delta) or np.any(Hloc_an)
+    if nspin == 1:
+        # Internal consistency check: Hloc, h and V must be spin-degenerate
+        assert is_spin_degenerate(Hloc)
+        assert is_spin_degenerate(h)
+        assert is_spin_degenerate(V)
+        ed_mode = EDMode.SUPERC if superc else EDMode.NORMAL
+    else:  # nspin == 2
+        if superc:
             raise RuntimeError(
-                "Cannot find a suitable bath mode for the given Hamiltonian"
+                "Magnetism in presence of pairing terms is not supported"
             )
+        if is_spin_diagonal(Hloc) and \
+           is_spin_diagonal(h) and is_spin_diagonal(V):
+            ed_mode = EDMode.NORMAL
+        else:
+            ed_mode = EDMode.NONSU2
+
+    # Step 2: Deduce bb_nspin and bb_ed_mode from bath_basis_mats_n_an
+    if bath_basis_mats_n_an is not None:
+        bb_nspin = 1 if all(
+            is_spin_degenerate(M) for M, _ in bath_basis_mats_n_an
+        ) else 2
+        bb_superc = any(np.any(M_an) for _, M_an in bath_basis_mats_n_an)
+        if bb_nspin == 1:
+            bb_ed_mode = EDMode.SUPERC if bb_superc else EDMode.NORMAL
+        else:  # bb_nspin == 2
+            if bb_superc:
+                raise RuntimeError(
+                    "Bath basis matrices cannot describe "
+                    "a simultaneously magnetic and superconducting bath"
+                )
+            if all(is_spin_diagonal(M) for M, _ in bath_basis_mats_n_an):
+                bb_ed_mode = EDMode.NORMAL
+            else:
+                bb_ed_mode = EDMode.NONSU2
+
+    # Step 3: Compare (bb_ed_mode, bb_nspin) with (ed_mode, nspin) and update
+    # the latter as necessary.
+    if (bath_basis_mats_n_an is not None) and \
+       (ed_mode != bb_ed_mode or nspin != bb_nspin):
+        ed_modes = (ed_mode, bb_ed_mode)
+        nspins = (nspin, bb_nspin)
+        if ed_modes == (EDMode.NORMAL, EDMode.NORMAL):
+            nspin = max(nspins)
+        elif (EDMode.NONSU2 in ed_modes) and (EDMode.SUPERC not in ed_modes):
+            ed_mode = EDMode.NONSU2
+            nspin = 2
+        elif ((EDMode.SUPERC in ed_modes) and (EDMode.NORMAL in ed_modes)
+              and nspins == (1, 1)):
+            ed_mode = EDMode.SUPERC
+        else:
+            err_msg = "Given Hamiltonian and bath basis matrices require " \
+                      "incompatible exact diagonalization modes and values " \
+                      f"of nspin: ({ed_mode}, {nspin}) vs " \
+                      f"({bb_ed_mode}, {bb_nspin})"
+            raise RuntimeError(err_msg)
+
+    # Step 4: Optionally set ed_mode = f_ed_mode is f_ed_mode is compatible
+    # with the mode deduced so far
+    if (f_ed_mode is not None) and (ed_mode != f_ed_mode):
+        if ed_mode == EDMode.NORMAL:
+            ed_mode = f_ed_mode
+            if f_ed_mode == EDMode.NONSU2:
+                nspin = 2
+            elif (f_ed_mode == EDMode.SUPERC and nspin != 1):
+                err_msg = f"Requested exact diagonalization mode {f_ed_mode} " \
+                          "requires a spin-degenerate Hamiltonian"
+                if bath_basis_mats_n_an is not None:
+                    err_msg += " and bath basis matrices"
+                raise RuntimeError(err_msg)
+        else:
+            err_msg = f"Requested exact diagonalization mode {f_ed_mode} " \
+                      "is incompatible with the Hamiltonian"
+            if bath_basis_mats_n_an is not None:
+                err_msg += " or with the bath basis matrices"
+            err_msg += f" (must be {ed_mode})"
+            raise RuntimeError(err_msg)
+
+    return ed_mode, nspin
 
 
 def _raise_term_error(msg, mon, coeff):
@@ -150,7 +214,7 @@ def extract_quadratic(h: op.Operator,
     dim = len(fops_up)
 
     M = np.zeros((2, 2, dim, dim), dtype=complex)
-    M_an = np.zeros((1, 1, dim, dim), dtype=complex)
+    M_an = np.zeros((dim, dim), dtype=complex)
 
     for mon, coeff in h:
         if len(mon) != 2:
@@ -187,19 +251,60 @@ def extract_quadratic(h: op.Operator,
             # Creation-creation term
             if daggers[0]:
                 if spin1 == 0:
-                    M_an[0, 0, orb1, orb2] = coeff
+                    M_an[orb1, orb2] = coeff
                 else:
-                    M_an[0, 0, orb2, orb1] = -coeff
+                    M_an[orb2, orb1] = -coeff
 
     return M, M_an
 
 
-def parse_hamiltonian(hamiltonian: op.Operator,  # noqa: C901
-                      fops_imp_up: list[IndicesType],
-                      fops_imp_dn: list[IndicesType],
-                      fops_bath_up: list[IndicesType],
-                      fops_bath_dn: list[IndicesType],
-                      f_ed_mode: Optional[EDMode] = None) -> HamiltonianParams:
+def _make_bath(ed_mode: EDMode,
+               nspin: int,
+               Hloc: np.ndarray,
+               Hloc_an: np.ndarray,
+               h: np.ndarray,
+               V: np.ndarray,
+               Delta: np.ndarray,
+               bath_basis_mats_n_an: Optional[list[BasisMatNAn]]):
+    """
+    Make a bath parameters object.
+    """
+
+    # Immediately try to construct BathGeneral if bath_basis_mats_n_an
+    # is provided
+    if bath_basis_mats_n_an is not None:
+        return BathGeneral.from_hamiltonian_and_basis(
+            ed_mode, nspin, Hloc, h, V, Delta, bath_basis_mats_n_an
+        )
+
+    # Can we use bath_type = 'normal'?
+    if BathNormal.is_usable(Hloc, Hloc_an, h, V, Delta):
+        return BathNormal.from_hamiltonian(ed_mode, nspin, Hloc, h, V, Delta)
+    # Can we use bath_type = 'hybrid'?
+    elif BathHybrid.is_usable(h, Delta):
+        return BathHybrid.from_hamiltonian(ed_mode, nspin, Hloc, h, V, Delta)
+    # Can we use bath_type = 'general'?
+    else:
+        try:
+            return BathGeneral.from_hamiltonian(
+                ed_mode, nspin, Hloc, h, V, Delta
+            )
+        except RuntimeError:
+            raise RuntimeError(
+                "Cannot find a suitable bath mode for the given Hamiltonian"
+            )
+
+
+def parse_hamiltonian(  # noqa: C901
+        hamiltonian: op.Operator,
+        fops_imp_up: list[IndicesType],
+        fops_imp_dn: list[IndicesType],
+        fops_bath_up: list[IndicesType],
+        fops_bath_dn: list[IndicesType],
+        f_ed_mode: Optional[EDMode] = None,
+        *,
+        bath_basis: Optional[list[op.Operator]] = None) -> \
+        HamiltonianParams:
     """
     Parse a given Hamiltonian and extract parameters from it.
     """
@@ -355,7 +460,7 @@ def parse_hamiltonian(hamiltonian: op.Operator,  # noqa: C901
     hamiltonian_n_conj = spin_conjugate(
         hamiltonian_n, fops_imp_up + fops_bath_up, fops_imp_dn + fops_bath_dn
     )
-    nspin = 1 if (hamiltonian_n_conj - hamiltonian_n).is_zero() else 2
+    h_nspin = 1 if (hamiltonian_n_conj - hamiltonian_n).is_zero() else 2
 
     # EDIpack does not seem to reliably work when \Delta is asymmetric
     # See https://github.com/EDIpack/EDIpack/issues/35#issuecomment-3637501715
@@ -371,45 +476,28 @@ def parse_hamiltonian(hamiltonian: op.Operator,  # noqa: C901
             "symmetric under the index swap o <-> o'"
         )
 
-    # ed_mode selection
-    superc = (Delta != 0).any() or (Hloc_an != 0).any()
-    if nspin == 1:
-        # Internal consistency check: Hloc, h and V must be spin-degenerate
-        assert is_spin_degenerate(Hloc)
-        assert is_spin_degenerate(h)
-        assert is_spin_degenerate(V)
-        ed_mode = EDMode.SUPERC if superc else EDMode.NORMAL
-    else:  # nspin == 2
-        if superc:
-            raise RuntimeError(
-                "Magnetism in presence of pairing terms is not supported"
-            )
-        if is_spin_diagonal(Hloc) and \
-           is_spin_diagonal(h) and is_spin_diagonal(V):
-            ed_mode = EDMode.NORMAL
-        else:
-            ed_mode = EDMode.NONSU2
+    if bath_basis is not None:
+        bath_basis_mats_n_an = [extract_quadratic(o,
+                                                  fops_bath_up,
+                                                  fops_bath_dn,
+                                                  ignore_unexpected=False)
+                                for o in bath_basis]
+    else:
+        bath_basis_mats_n_an = None
 
-    # Check if the forced ED mode is compatible with the deduced one
-    if (f_ed_mode is not None) and (ed_mode != f_ed_mode):
-        if ed_mode == EDMode.NORMAL:
-            ed_mode = f_ed_mode
-            if f_ed_mode == EDMode.NONSU2:
-                nspin = 2
-            elif (f_ed_mode == EDMode.SUPERC and nspin != 1):
-                raise RuntimeError(
-                    "Requested exact diagonalization mode EDMode.SUPERC "
-                    "requires a spin-degenerate Hamiltonian"
-                )
+    ed_mode, nspin = _select_ed_mode(h_nspin,
+                                     Hloc, Hloc_an,
+                                     h, V, Delta,
+                                     bath_basis_mats_n_an,
+                                     f_ed_mode)
 
-        else:
-            raise RuntimeError(
-                f"Requested exact diagonalization mode {f_ed_mode} "
-                f"is incompatible with the Hamiltonian (must be {ed_mode})"
-            )
+    bath = _make_bath(
+        ed_mode, nspin,
+        Hloc, Hloc_an,
+        h, V, Delta,
+        bath_basis_mats_n_an
+    ) if (nbath_total > 0) else None
 
-    bath = _make_bath(ed_mode, nspin, Hloc, Hloc_an, h, V, Delta) \
-        if nbath_total > 0 else None
     params = HamiltonianParams(
         ed_mode,
         Hloc=np.zeros((nspin, nspin, norb, norb), dtype=complex, order='F'),
