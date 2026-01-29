@@ -7,7 +7,7 @@ from numpy.testing import assert_equal
 import triqs.operators as op
 
 from edipack2triqs import EDMode
-from edipack2triqs.solver import EDIpackSolver
+from edipack2triqs.solver import EDIpackSolver, LanczosParams
 
 from .test_solver import TestSolver
 
@@ -119,14 +119,13 @@ class TestEDIpackSolverBathHybrid(TestSolver):
         h_bath = self.make_h_bath(mul.outer([1, 1], eps), mul.outer(s0, V))
 
         h = h_loc + h_int + h_bath
-        solver = EDIpackSolver(h,
-                               fops_imp_up,
-                               fops_imp_dn,
-                               self.fops_bath_up,
-                               self.fops_bath_dn,
-                               lanc_nstates_sector=4,
-                               lanc_nstates_total=10,
-                               verbose=0)
+        solver = EDIpackSolver(
+            h,
+            fops_imp_up, fops_imp_dn,
+            self.fops_bath_up, self.fops_bath_dn,
+            lanczos_params=LanczosParams(nstates_sector=4, nstates_total=10),
+            verbose=0
+        )
 
         self.assertEqual(solver.h_params.ed_mode, EDMode.NORMAL)
         self.assertEqual(solver.nspin, 1)
@@ -221,14 +220,13 @@ class TestEDIpackSolverBathHybrid(TestSolver):
                                   mul.outer(np.diag([1, 0.9]), V))
 
         h = h_loc + h_int + h_bath
-        solver = EDIpackSolver(h,
-                               fops_imp_up,
-                               fops_imp_dn,
-                               self.fops_bath_up,
-                               self.fops_bath_dn,
-                               lanc_nstates_sector=4,
-                               lanc_nstates_total=10,
-                               verbose=0)
+        solver = EDIpackSolver(
+            h,
+            fops_imp_up, fops_imp_dn,
+            self.fops_bath_up, self.fops_bath_dn,
+            lanczos_params=LanczosParams(nstates_sector=4, nstates_total=10),
+            verbose=0
+        )
 
         self.assertEqual(solver.h_params.ed_mode, EDMode.NORMAL)
         self.assertEqual(solver.nspin, 2)
@@ -326,14 +324,13 @@ class TestEDIpackSolverBathHybrid(TestSolver):
                                   spin_blocks=False)
 
         h = h_loc + h_int + h_bath
-        solver = EDIpackSolver(h,
-                               fops_imp_up,
-                               fops_imp_dn,
-                               self.fops_bath_up,
-                               self.fops_bath_dn,
-                               lanc_nstates_sector=4,
-                               lanc_nstates_total=10,
-                               verbose=0)
+        solver = EDIpackSolver(
+            h,
+            fops_imp_up, fops_imp_dn,
+            self.fops_bath_up, self.fops_bath_dn,
+            lanczos_params=LanczosParams(nstates_sector=4, nstates_total=10),
+            verbose=0
+        )
 
         self.assertEqual(solver.h_params.ed_mode, EDMode.NONSU2)
         self.assertEqual(solver.nspin, 2)
@@ -428,14 +425,13 @@ class TestEDIpackSolverBathHybrid(TestSolver):
                                   spin_blocks=False)
 
         h = h_loc + h_int + h_bath
-        solver = EDIpackSolver(h,
-                               fops_imp_up,
-                               fops_imp_dn,
-                               self.fops_bath_up,
-                               self.fops_bath_dn,
-                               lanc_nstates_sector=4,
-                               lanc_nstates_total=10,
-                               verbose=0)
+        solver = EDIpackSolver(
+            h,
+            fops_imp_up, fops_imp_dn,
+            self.fops_bath_up, self.fops_bath_dn,
+            lanczos_params=LanczosParams(nstates_sector=4, nstates_total=10),
+            verbose=0
+        )
 
         self.assertEqual(solver.h_params.ed_mode, EDMode.NONSU2)
         self.assertEqual(solver.nspin, 2)
@@ -532,14 +528,13 @@ class TestEDIpackSolverBathHybrid(TestSolver):
         h_loc_an = self.make_h_loc_an(h_loc_an_mat)
 
         h = h_loc + h_loc_an + h_int + h_bath
-        solver = EDIpackSolver(h,
-                               fops_imp_up,
-                               fops_imp_dn,
-                               self.fops_bath_up,
-                               self.fops_bath_dn,
-                               lanc_nstates_sector=4,
-                               lanc_nstates_total=10,
-                               verbose=0)
+        solver = EDIpackSolver(
+            h,
+            fops_imp_up, fops_imp_dn,
+            self.fops_bath_up, self.fops_bath_dn,
+            lanczos_params=LanczosParams(nstates_sector=4, nstates_total=10),
+            verbose=0
+        )
 
         self.assertEqual(solver.h_params.ed_mode, EDMode.SUPERC)
         self.assertEqual(solver.nspin, 1)
@@ -636,14 +631,13 @@ class TestEDIpackSolverBathHybrid(TestSolver):
         h_sc = self.make_h_sc(Delta)
 
         h = h_loc + h_int + h_bath + h_sc
-        solver = EDIpackSolver(h,
-                               fops_imp_up,
-                               fops_imp_dn,
-                               self.fops_bath_up,
-                               self.fops_bath_dn,
-                               lanc_nstates_sector=4,
-                               lanc_nstates_total=10,
-                               verbose=0)
+        solver = EDIpackSolver(
+            h,
+            fops_imp_up, fops_imp_dn,
+            self.fops_bath_up, self.fops_bath_dn,
+            lanczos_params=LanczosParams(nstates_sector=4, nstates_total=10),
+            verbose=0
+        )
 
         self.assertEqual(solver.h_params.ed_mode, EDMode.SUPERC)
         self.assertEqual(solver.nspin, 1)

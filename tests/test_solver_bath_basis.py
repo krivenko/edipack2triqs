@@ -7,7 +7,7 @@ from numpy.testing import assert_equal, assert_allclose
 import triqs.operators as op
 
 from edipack2triqs import EDMode
-from edipack2triqs.solver import EDIpackSolver
+from edipack2triqs.solver import EDIpackSolver, LanczosParams
 
 from .test_solver import TestSolver
 
@@ -110,8 +110,7 @@ class TestEDIpackSolverBathBasis(TestSolver):
             fops_imp_up, fops_imp_dn,
             self.fops_bath_up, self.fops_bath_dn,
             bath_basis=bath_basis,
-            lanc_nstates_sector=4,
-            lanc_nstates_total=14,
+            lanczos_params=LanczosParams(nstates_sector=4, nstates_total=14),
             verbose=0
         )
 
@@ -184,8 +183,7 @@ class TestEDIpackSolverBathBasis(TestSolver):
             fops_imp_up, fops_imp_dn,
             self.fops_bath_up, self.fops_bath_dn,
             bath_basis=bath_basis,
-            lanc_nstates_sector=4,
-            lanc_nstates_total=14,
+            lanczos_params=LanczosParams(nstates_sector=4, nstates_total=14),
             verbose=0
         )
 
@@ -261,8 +259,7 @@ class TestEDIpackSolverBathBasis(TestSolver):
             fops_imp_up, fops_imp_dn,
             self.fops_bath_up, self.fops_bath_dn,
             bath_basis=bath_basis,
-            lanc_nstates_sector=4,
-            lanc_nstates_total=14,
+            lanczos_params=LanczosParams(nstates_sector=4, nstates_total=14),
             verbose=0
         )
 
@@ -335,8 +332,7 @@ class TestEDIpackSolverBathBasis(TestSolver):
             fops_imp_up, fops_imp_dn,
             self.fops_bath_up, self.fops_bath_dn,
             bath_basis=bath_basis,
-            lanc_nstates_sector=4,
-            lanc_nstates_total=14,
+            lanczos_params=LanczosParams(nstates_sector=4, nstates_total=14),
             verbose=0
         )
 
@@ -406,8 +402,7 @@ class TestEDIpackSolverBathBasis(TestSolver):
             fops_imp_up, fops_imp_dn,
             self.fops_bath_up, self.fops_bath_dn,
             bath_basis=bath_basis,
-            lanc_nstates_sector=4,
-            lanc_nstates_total=14,
+            lanczos_params=LanczosParams(nstates_sector=4, nstates_total=14),
             verbose=0
         )
 
@@ -484,8 +479,7 @@ class TestEDIpackSolverBathBasis(TestSolver):
             fops_imp_up, fops_imp_dn,
             self.fops_bath_up, self.fops_bath_dn,
             bath_basis=bath_basis,
-            lanc_nstates_sector=4,
-            lanc_nstates_total=14,
+            lanczos_params=LanczosParams(nstates_sector=4, nstates_total=14),
             verbose=0
         )
 

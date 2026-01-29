@@ -13,6 +13,10 @@
   order, although - due to a limitation of EDIpack - subsets of operators for
   all replicas must be equivalent.
 
+* In order to reduce the number of keyword arguments of
+  `EDIpackSolver.__init__()`, those of them related to the Lanczos algorithm
+  (name prefix `lanc_`) have been grouped into a dataclass `LanczosParams`.
+
 ## Version 0.10.0
 
 * Added an enumeration type `EDMode` that represents EDIpack's exact
