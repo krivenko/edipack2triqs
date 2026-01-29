@@ -17,6 +17,9 @@ Solver class
    :members:
    :exclude-members: chi2_fit_bath
 
+.. autoclass:: LanczosParams
+   :members:
+
 Objects representing sets of bath parameters
 --------------------------------------------
 
