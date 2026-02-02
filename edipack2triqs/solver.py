@@ -617,8 +617,9 @@ class EDIpackSolver:
                 assert all(Sz.is_integer() for Sz in sectors), \
                        "'sectors' must be a list of integer total " \
                        "spin projections S_z"
-        with chdircontext(self.wdname):
-            np.savetxt("sectors.restart", sectors, fmt="%i")
+        if self.comm.Get_rank() == 0:
+            with chdircontext(self.wdname):
+                np.savetxt("sectors.restart", sectors, fmt="%i")
 
     def solve(self,
               beta: float = 1000,
