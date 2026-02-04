@@ -13,6 +13,17 @@
   order, although - due to a limitation of EDIpack - subsets of operators for
   all replicas must be equivalent.
 
+* Enable selection of symmetry sectors of the Hamiltonian considered for
+  diagonalization. This feature is activated by a new boolean flag `ed_sectors`
+  passed as a keyword argument to `EDIpackSolver.__init__()`. Selected sectors
+  can be specified via a new read/write attribute `EDIpackSolver.sectors`.
+  The attribute is a list of pairs `(N_{up}, N_{dn})` for `EDMode.NORMAL`,
+  of non-negative integers `N_{tot}` for `EDMode.NONSU2`, or of integers `S_z`
+  for `EDMode.SUPERC`. By default, it is set to `None` and all sectors of the
+  Hamiltonian are considered for diagonalization. Apart from that, 
+  `EDIpackSolver.__init__()` now accepts another integer parameter
+  `ed_sectors_shift` if `ed_sectors=True`.
+  
 * In order to reduce the number of keyword arguments of
   `EDIpackSolver.__init__()`, those of them related to the Lanczos algorithm
   (name prefix `lanc_`) have been grouped into a dataclass `LanczosParams`.

@@ -153,8 +153,6 @@ class EDIpackSolver:
         "ED_PRINT_G0": False,
         "RDM_FLAG": False,
         "ED_TWIN": False,
-        "ED_SECTORS": False,
-        "ED_SECTORS_SHIFT": 0,
         "ED_SOLVE_OFFDIAG_GF": False,   # TODO
         "ED_ALL_G": True,
         "ED_OFFSET_BATH": 0.0,
@@ -257,6 +255,16 @@ class EDIpackSolver:
             occupancies.
         :type ed_total_ud: bool, default=False
 
+        :param ed_sectors: Enable selection of individual sectors of
+                           the Hamiltonian in exact diagonalization.
+        :type ed_sectors: bool, default=False
+
+        :param ed_sectors_shift: In addition to the sectors set in the
+                                 :py:attr:`EDIpackSolver.sectors` attribute,
+                                 also select those with quantum numbers
+                                 deviating from them by at most this value.
+        :type ed_sectors_shift: int, default=1
+
         :param bath_basis: List of quadratic fermionic operators defining the
                            basis of the bath. If present, this option forces
                            the use of :py:class:`BathGeneral` and overrides
@@ -358,6 +366,18 @@ class EDIpackSolver:
                     and self.denden_int):
                 ed_total_ud = True
             c["ED_TOTAL_UD"] = ed_total_ud
+
+            # ed_sectors and ed_sectors_shift
+            self.ed_sectors = kwargs.get("ed_sectors", False)
+            if self.ed_sectors:
+                c["ED_SECTORS"] = True
+                c["ED_SECTORS_SHIFT"] = kwargs.get("ed_sectors_shift", 1)
+            else:
+                c["ED_SECTORS"] = False
+                if "ed_sectors_shift" in kwargs:
+                    raise RuntimeError(
+                        "'ed_sectors_shift' is only valid for 'ed_sectors=True'"
+                    )
 
             # Lanczos parameters
             lp = kwargs.get("lanczos_params", LanczosParams())
@@ -552,6 +572,54 @@ class EDIpackSolver:
         else:
             self.h_params.bath.assert_compatible(new_bath)
             self.h_params.bath = new_bath
+
+    @property
+    def sectors(self) -> Union[list[int], list[tuple[int, int]], NoneType]:
+        r"""
+        The list of quantum numbers corresponding to the sectors selected for
+        diagonalization. Depending on ``ed_mode``, each element of the list is
+
+        * A pair of non-negative integers `(N_{up}, N_{dn})`
+          for :py:data:`edipack2triqs.EDMode.NORMAL`.
+        * A non-negative integer `N_{tot}`
+          for :py:data:`edipack2triqs.EDMode.NONSU2`.
+        * An integer `S_z` for :py:data:`edipack2triqs.EDMode.SUPERC`.
+
+        By default, this attribute equals :py:data:`None` and all sectors of the
+        Hamiltonian are considered for diagonalization.
+        """
+        with chdircontext(self.wdname):
+            if not Path("sectors.restart").is_file():
+                return None
+            sectors = np.loadtxt("sectors.restart", dtype=int)
+        if self.h_params.ed_mode == EDMode.NORMAL:
+            if sectors.ndim == 1:
+                sectors = sectors.reshape((1, sectors.size))
+            return [(*n,) for n in sectors.tolist()]
+        else:  # EDMode.NONSU2 and EDMode.SUPERC
+            return sectors.tolist()
+
+    @sectors.setter
+    def sectors(self, sectors: Union[list[int], list[tuple[int, int]]]):
+        match self.h_params.ed_mode:
+            case EDMode.NORMAL:
+                assert all((len(nn) == 2)
+                           and nn[0].is_integer() and nn[0] >= 0
+                           and nn[1].is_integer() and nn[1] >= 0
+                           for nn in sectors), \
+                       "'sectors' must be a list of pairs of non-negative " \
+                       "integer occupation numbers (N_{up}, N_{dn})"
+            case EDMode.NONSU2:
+                assert all(n.is_integer() and n >= 0 for n in sectors), \
+                       "'sectors' must be a list of non-negative integer " \
+                       "occupation numbers N_{tot}"
+            case EDMode.SUPERC:
+                assert all(Sz.is_integer() for Sz in sectors), \
+                       "'sectors' must be a list of integer total " \
+                       "spin projections S_z"
+        if self.comm.Get_rank() == 0:
+            with chdircontext(self.wdname):
+                np.savetxt("sectors.restart", sectors, fmt="%i")
 
     def solve(self,
               beta: float = 1000,
