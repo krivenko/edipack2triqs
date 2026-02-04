@@ -67,12 +67,12 @@
 <li class="toctree-l4"><a class="reference internal" href="documentation.html#edipack2triqs.solver.EDIpackSolver.hloc"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.hloc</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="documentation.html#edipack2triqs.solver.EDIpackSolver.U"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.U</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="documentation.html#edipack2triqs.solver.EDIpackSolver.bath"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.bath</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="documentation.html#edipack2triqs.solver.EDIpackSolver.sectors"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.sectors</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="documentation.html#edipack2triqs.solver.EDIpackSolver.solve"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.solve()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="documentation.html#edipack2triqs.solver.EDIpackSolver.e_pot"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.e_pot</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="documentation.html#edipack2triqs.solver.EDIpackSolver.e_kin"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.e_kin</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="documentation.html#edipack2triqs.solver.EDIpackSolver.densities"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.densities</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="documentation.html#edipack2triqs.solver.EDIpackSolver.double_occ"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.double_occ</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="documentation.html#edipack2triqs.solver.EDIpackSolver.superconductive_phi"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.superconductive_phi</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="documentation.html#edipack2triqs.solver.EDIpackSolver.chi_dens_iw"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.chi_dens_iw</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="documentation.html#edipack2triqs.solver.EDIpackSolver.chi_dens_tau"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.chi_dens_tau</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="documentation.html#edipack2triqs.solver.EDIpackSolver.chi_dens_w"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.chi_dens_w</span></code></a></li>
@@ -85,6 +85,7 @@
 <li class="toctree-l4"><a class="reference internal" href="documentation.html#edipack2triqs.solver.EDIpackSolver.chi_spin_iw"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.chi_spin_iw</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="documentation.html#edipack2triqs.solver.EDIpackSolver.chi_spin_tau"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.chi_spin_tau</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="documentation.html#edipack2triqs.solver.EDIpackSolver.chi_spin_w"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.chi_spin_w</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="documentation.html#edipack2triqs.solver.EDIpackSolver.superconductive_phi"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.superconductive_phi</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="documentation.html#edipack2triqs.solver.EDIpackSolver.superconductive_phi_arg"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.superconductive_phi_arg</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="documentation.html#edipack2triqs.solver.EDIpackSolver.magnetization"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.magnetization</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="documentation.html#edipack2triqs.solver.EDIpackSolver.g_iw"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.g_iw</span></code></a></li>
@@ -231,6 +232,16 @@ creation/annihilation operators (both normal and anomalous terms are allowed).
 The list must include all basis operators for all replicas in no specific
 order, although - due to a limitation of EDIpack - subsets of operators for
 all replicas must be equivalent.</p></li>
+<li><p>Enable selection of symmetry sectors of the Hamiltonian considered for
+diagonalization. This feature is activated by a new boolean flag <code class="docutils literal notranslate"><span class="pre">ed_sectors</span></code>
+passed as a keyword argument to <code class="docutils literal notranslate"><span class="pre">EDIpackSolver.__init__()</span></code>. Selected sectors
+can be specified via a new read/write attribute <code class="docutils literal notranslate"><span class="pre">EDIpackSolver.sectors</span></code>.
+The attribute is a list of pairs <code class="docutils literal notranslate"><span class="pre">(N_{up},</span> <span class="pre">N_{dn})</span></code> for <code class="docutils literal notranslate"><span class="pre">EDMode.NORMAL</span></code>,
+of non-negative integers <code class="docutils literal notranslate"><span class="pre">N_{tot}</span></code> for <code class="docutils literal notranslate"><span class="pre">EDMode.NONSU2</span></code>, or of integers <code class="docutils literal notranslate"><span class="pre">S_z</span></code>
+for <code class="docutils literal notranslate"><span class="pre">EDMode.SUPERC</span></code>. By default, it is set to <code class="docutils literal notranslate"><span class="pre">None</span></code> and all sectors of the
+Hamiltonian are considered for diagonalization. Apart from that,
+<code class="docutils literal notranslate"><span class="pre">EDIpackSolver.__init__()</span></code> now accepts another integer parameter
+<code class="docutils literal notranslate"><span class="pre">ed_sectors_shift</span></code> if <code class="docutils literal notranslate"><span class="pre">ed_sectors=True</span></code>.</p></li>
 <li><p>In order to reduce the number of keyword arguments of
 <code class="docutils literal notranslate"><span class="pre">EDIpackSolver.__init__()</span></code>, those of them related to the Lanczos algorithm
 (name prefix <code class="docutils literal notranslate"><span class="pre">lanc_</span></code>) have been grouped into a dataclass <code class="docutils literal notranslate"><span class="pre">LanczosParams</span></code>.</p></li>

@@ -64,12 +64,12 @@
 <li class="toctree-l4"><a class="reference internal" href="../../documentation.html#edipack2triqs.solver.EDIpackSolver.hloc"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.hloc</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../documentation.html#edipack2triqs.solver.EDIpackSolver.U"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.U</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../documentation.html#edipack2triqs.solver.EDIpackSolver.bath"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.bath</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../documentation.html#edipack2triqs.solver.EDIpackSolver.sectors"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.sectors</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../documentation.html#edipack2triqs.solver.EDIpackSolver.solve"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.solve()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../documentation.html#edipack2triqs.solver.EDIpackSolver.e_pot"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.e_pot</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../documentation.html#edipack2triqs.solver.EDIpackSolver.e_kin"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.e_kin</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../documentation.html#edipack2triqs.solver.EDIpackSolver.densities"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.densities</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../documentation.html#edipack2triqs.solver.EDIpackSolver.double_occ"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.double_occ</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../documentation.html#edipack2triqs.solver.EDIpackSolver.superconductive_phi"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.superconductive_phi</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../documentation.html#edipack2triqs.solver.EDIpackSolver.chi_dens_iw"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.chi_dens_iw</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../documentation.html#edipack2triqs.solver.EDIpackSolver.chi_dens_tau"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.chi_dens_tau</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../documentation.html#edipack2triqs.solver.EDIpackSolver.chi_dens_w"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.chi_dens_w</span></code></a></li>
@@ -82,6 +82,7 @@
 <li class="toctree-l4"><a class="reference internal" href="../../documentation.html#edipack2triqs.solver.EDIpackSolver.chi_spin_iw"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.chi_spin_iw</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../documentation.html#edipack2triqs.solver.EDIpackSolver.chi_spin_tau"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.chi_spin_tau</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../documentation.html#edipack2triqs.solver.EDIpackSolver.chi_spin_w"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.chi_spin_w</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../documentation.html#edipack2triqs.solver.EDIpackSolver.superconductive_phi"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.superconductive_phi</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../documentation.html#edipack2triqs.solver.EDIpackSolver.superconductive_phi_arg"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.superconductive_phi_arg</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../documentation.html#edipack2triqs.solver.EDIpackSolver.magnetization"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.magnetization</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../documentation.html#edipack2triqs.solver.EDIpackSolver.g_iw"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.g_iw</span></code></a></li>
@@ -377,8 +378,6 @@
         <span class="s2">&quot;ED_PRINT_G0&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
         <span class="s2">&quot;RDM_FLAG&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
         <span class="s2">&quot;ED_TWIN&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
-        <span class="s2">&quot;ED_SECTORS&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
-        <span class="s2">&quot;ED_SECTORS_SHIFT&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
         <span class="s2">&quot;ED_SOLVE_OFFDIAG_GF&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>   <span class="c1"># TODO</span>
         <span class="s2">&quot;ED_ALL_G&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
         <span class="s2">&quot;ED_OFFSET_BATH&quot;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>
@@ -483,6 +482,16 @@
 <span class="sd">            occupancies.</span>
 <span class="sd">        :type ed_total_ud: bool, default=False</span>
 
+<span class="sd">        :param ed_sectors: Enable selection of individual sectors of</span>
+<span class="sd">                           the Hamiltonian in exact diagonalization.</span>
+<span class="sd">        :type ed_sectors: bool, default=False</span>
+
+<span class="sd">        :param ed_sectors_shift: In addition to the sectors set in the</span>
+<span class="sd">                                 :py:attr:`EDIpackSolver.sectors` attribute,</span>
+<span class="sd">                                 also select those with quantum numbers</span>
+<span class="sd">                                 deviating from them by at most this value.</span>
+<span class="sd">        :type ed_sectors_shift: int, default=1</span>
+
 <span class="sd">        :param bath_basis: List of quadratic fermionic operators defining the</span>
 <span class="sd">                           basis of the bath. If present, this option forces</span>
 <span class="sd">                           the use of :py:class:`BathGeneral` and overrides</span>
@@ -584,6 +593,18 @@
                     <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">denden_int</span><span class="p">):</span>
                 <span class="n">ed_total_ud</span> <span class="o">=</span> <span class="kc">True</span>
             <span class="n">c</span><span class="p">[</span><span class="s2">&quot;ED_TOTAL_UD&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ed_total_ud</span>
+
+            <span class="c1"># ed_sectors and ed_sectors_shift</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ed_sectors</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;ed_sectors&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">ed_sectors</span><span class="p">:</span>
+                <span class="n">c</span><span class="p">[</span><span class="s2">&quot;ED_SECTORS&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="n">c</span><span class="p">[</span><span class="s2">&quot;ED_SECTORS_SHIFT&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;ed_sectors_shift&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">c</span><span class="p">[</span><span class="s2">&quot;ED_SECTORS&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
+                <span class="k">if</span> <span class="s2">&quot;ed_sectors_shift&quot;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+                        <span class="s2">&quot;&#39;ed_sectors_shift&#39; is only valid for &#39;ed_sectors=True&#39;&quot;</span>
+                    <span class="p">)</span>
 
             <span class="c1"># Lanczos parameters</span>
             <span class="n">lp</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;lanczos_params&quot;</span><span class="p">,</span> <span class="n">LanczosParams</span><span class="p">())</span>
@@ -779,6 +800,54 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">h_params</span><span class="o">.</span><span class="n">bath</span><span class="o">.</span><span class="n">assert_compatible</span><span class="p">(</span><span class="n">new_bath</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">h_params</span><span class="o">.</span><span class="n">bath</span> <span class="o">=</span> <span class="n">new_bath</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">sectors</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="nb">list</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]],</span> <span class="n">NoneType</span><span class="p">]:</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        The list of quantum numbers corresponding to the sectors selected for</span>
+<span class="sd">        diagonalization. Depending on ``ed_mode``, each element of the list is</span>
+
+<span class="sd">        * A pair of non-negative integers `(N_{up}, N_{dn})`</span>
+<span class="sd">          for :py:data:`edipack2triqs.EDMode.NORMAL`.</span>
+<span class="sd">        * A non-negative integer `N_{tot}`</span>
+<span class="sd">          for :py:data:`edipack2triqs.EDMode.NONSU2`.</span>
+<span class="sd">        * An integer `S_z` for :py:data:`edipack2triqs.EDMode.SUPERC`.</span>
+
+<span class="sd">        By default, this attribute equals :py:data:`None` and all sectors of the</span>
+<span class="sd">        Hamiltonian are considered for diagonalization.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">with</span> <span class="n">chdircontext</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">wdname</span><span class="p">):</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;sectors.restart&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">is_file</span><span class="p">():</span>
+                <span class="k">return</span> <span class="kc">None</span>
+            <span class="n">sectors</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">loadtxt</span><span class="p">(</span><span class="s2">&quot;sectors.restart&quot;</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">h_params</span><span class="o">.</span><span class="n">ed_mode</span> <span class="o">==</span> <span class="n">EDMode</span><span class="o">.</span><span class="n">NORMAL</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">sectors</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">sectors</span> <span class="o">=</span> <span class="n">sectors</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="n">sectors</span><span class="o">.</span><span class="n">size</span><span class="p">))</span>
+            <span class="k">return</span> <span class="p">[(</span><span class="o">*</span><span class="n">n</span><span class="p">,)</span> <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">sectors</span><span class="o">.</span><span class="n">tolist</span><span class="p">()]</span>
+        <span class="k">else</span><span class="p">:</span>  <span class="c1"># EDMode.NONSU2 and EDMode.SUPERC</span>
+            <span class="k">return</span> <span class="n">sectors</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+
+    <span class="nd">@sectors</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">sectors</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sectors</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="nb">list</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]]):</span>
+        <span class="k">match</span> <span class="bp">self</span><span class="o">.</span><span class="n">h_params</span><span class="o">.</span><span class="n">ed_mode</span><span class="p">:</span>
+            <span class="k">case</span> <span class="n">EDMode</span><span class="o">.</span><span class="n">NORMAL</span><span class="p">:</span>
+                <span class="k">assert</span> <span class="nb">all</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">nn</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">)</span>
+                           <span class="ow">and</span> <span class="n">nn</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">is_integer</span><span class="p">()</span> <span class="ow">and</span> <span class="n">nn</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="mi">0</span>
+                           <span class="ow">and</span> <span class="n">nn</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">is_integer</span><span class="p">()</span> <span class="ow">and</span> <span class="n">nn</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="mi">0</span>
+                           <span class="k">for</span> <span class="n">nn</span> <span class="ow">in</span> <span class="n">sectors</span><span class="p">),</span> \
+                       <span class="s2">&quot;&#39;sectors&#39; must be a list of pairs of non-negative &quot;</span> \
+                       <span class="s2">&quot;integer occupation numbers (N_</span><span class="si">{up}</span><span class="s2">, N_</span><span class="si">{dn}</span><span class="s2">)&quot;</span>
+            <span class="k">case</span> <span class="n">EDMode</span><span class="o">.</span><span class="n">NONSU2</span><span class="p">:</span>
+                <span class="k">assert</span> <span class="nb">all</span><span class="p">(</span><span class="n">n</span><span class="o">.</span><span class="n">is_integer</span><span class="p">()</span> <span class="ow">and</span> <span class="n">n</span> <span class="o">&gt;=</span> <span class="mi">0</span> <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">sectors</span><span class="p">),</span> \
+                       <span class="s2">&quot;&#39;sectors&#39; must be a list of non-negative integer &quot;</span> \
+                       <span class="s2">&quot;occupation numbers N_</span><span class="si">{tot}</span><span class="s2">&quot;</span>
+            <span class="k">case</span> <span class="n">EDMode</span><span class="o">.</span><span class="n">SUPERC</span><span class="p">:</span>
+                <span class="k">assert</span> <span class="nb">all</span><span class="p">(</span><span class="n">Sz</span><span class="o">.</span><span class="n">is_integer</span><span class="p">()</span> <span class="k">for</span> <span class="n">Sz</span> <span class="ow">in</span> <span class="n">sectors</span><span class="p">),</span> \
+                       <span class="s2">&quot;&#39;sectors&#39; must be a list of integer total &quot;</span> \
+                       <span class="s2">&quot;spin projections S_z&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">comm</span><span class="o">.</span><span class="n">Get_rank</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">with</span> <span class="n">chdircontext</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">wdname</span><span class="p">):</span>
+                <span class="n">np</span><span class="o">.</span><span class="n">savetxt</span><span class="p">(</span><span class="s2">&quot;sectors.restart&quot;</span><span class="p">,</span> <span class="n">sectors</span><span class="p">,</span> <span class="n">fmt</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">%i</span><span class="s2">&quot;</span><span class="p">)</span>
 
 <div class="viewcode-block" id="EDIpackSolver.solve">
 <a class="viewcode-back" href="../../documentation.html#edipack2triqs.solver.EDIpackSolver.solve">[docs]</a>
