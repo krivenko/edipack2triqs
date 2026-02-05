@@ -604,17 +604,17 @@ class EDIpackSolver:
         match self.h_params.ed_mode:
             case EDMode.NORMAL:
                 assert all((len(nn) == 2)
-                           and nn[0].is_integer() and nn[0] >= 0
-                           and nn[1].is_integer() and nn[1] >= 0
+                           and isinstance(nn[0], int) and nn[0] >= 0
+                           and isinstance(nn[1], int) and nn[1] >= 0
                            for nn in sectors), \
                        "'sectors' must be a list of pairs of non-negative " \
                        "integer occupation numbers (N_{up}, N_{dn})"
             case EDMode.NONSU2:
-                assert all(n.is_integer() and n >= 0 for n in sectors), \
+                assert all(isinstance(n, int) and n >= 0 for n in sectors), \
                        "'sectors' must be a list of non-negative integer " \
                        "occupation numbers N_{tot}"
             case EDMode.SUPERC:
-                assert all(Sz.is_integer() for Sz in sectors), \
+                assert all(isinstance(Sz, int) for Sz in sectors), \
                        "'sectors' must be a list of integer total " \
                        "spin projections S_z"
         if self.comm.Get_rank() == 0:
