@@ -80,6 +80,7 @@ class TestEDIpackSolverBathBasis(TestSolver):
         cls.assert_static_obs(s, 1e-8, **refs)
         cls.assert_gfs(s, **refs)
         cls.assert_chi(s, **refs)
+        cls.assert_density_matrix(s, **refs)
 
     def test_nspin1(self):
         h_loc_mat = mul.outer(s0, np.diag([-0.5, -0.6]))
@@ -141,7 +142,8 @@ class TestEDIpackSolverBathBasis(TestSolver):
             "n_w": 40,
             "broadening": 0.05,
             "n_tau": 10,
-            **self.chi_params
+            **self.chi_params,
+            "rdm": True
         }
         solver.solve(**solve_params)
 
@@ -213,7 +215,8 @@ class TestEDIpackSolverBathBasis(TestSolver):
             "n_w": 40,
             "broadening": 0.05,
             "n_tau": 10,
-            **self.chi_params
+            **self.chi_params,
+            "rdm": True
         }
         solver.solve(**solve_params)
 
@@ -286,7 +289,8 @@ class TestEDIpackSolverBathBasis(TestSolver):
             "n_iw": 10,
             "energy_window": (-1.0, 1.0),
             "n_w": 40,
-            "broadening": 0.05
+            "broadening": 0.05,
+            "rdm": True
         }
         solver.solve(**solve_params)
 
@@ -360,7 +364,8 @@ class TestEDIpackSolverBathBasis(TestSolver):
             "n_iw": 10,
             "energy_window": (-1.0, 1.0),
             "n_w": 40,
-            "broadening": 0.05
+            "broadening": 0.05,
+            "rdm": True
         }
         solver.solve(**solve_params)
 
@@ -431,7 +436,8 @@ class TestEDIpackSolverBathBasis(TestSolver):
             "n_iw": 10,
             "energy_window": (-1.0, 1.0),
             "n_w": 40,
-            "broadening": 0.05
+            "broadening": 0.05,
+            "rdm": True
         }
         solver.solve(**solve_params)
 
@@ -510,7 +516,8 @@ class TestEDIpackSolverBathBasis(TestSolver):
             "n_iw": 10,
             "energy_window": (-1.0, 1.0),
             "n_w": 40,
-            "broadening": 0.05
+            "broadening": 0.05,
+            "rdm": True
         }
         solver.solve(**solve_params)
 

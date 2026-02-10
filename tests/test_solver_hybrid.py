@@ -56,6 +56,7 @@ class TestEDIpackSolverBathHybrid(TestSolver):
         cls.assert_static_obs(s, 1e-8, **refs)
         cls.assert_gfs(s, **refs)
         cls.assert_chi(s, atol=5e-5, **refs)
+        cls.assert_density_matrix(s, **refs)
 
     def test_zerotemp(self):
         h_loc_mat = mul.outer(s0, np.diag([-0.5, -0.6]))
@@ -94,7 +95,8 @@ class TestEDIpackSolverBathHybrid(TestSolver):
             "n_iw": 10,
             "energy_window": (-2.0, 2.0),
             "n_w": 60,
-            "broadening": 0.05
+            "broadening": 0.05,
+            "rdm": True
         }
         solver.solve(**solve_params)
 
@@ -144,7 +146,8 @@ class TestEDIpackSolverBathHybrid(TestSolver):
             "n_w": 60,
             "broadening": 0.05,
             "n_tau": 10,
-            **self.chi_params
+            **self.chi_params,
+            "rdm": True
         }
         solver.solve(**solve_params)
 
@@ -167,7 +170,8 @@ class TestEDIpackSolverBathHybrid(TestSolver):
             "n_w": 40,
             "broadening": 0.03,
             "n_tau": 11,
-            **self.chi_params
+            **self.chi_params,
+            "rdm": True
         }
         solver.solve(**solve_params)
 
@@ -192,7 +196,8 @@ class TestEDIpackSolverBathHybrid(TestSolver):
             "n_w": 80,
             "broadening": 0.04,
             "n_tau": 12,
-            **self.chi_params
+            **self.chi_params,
+            "rdm": True
         }
         solver.solve(**solve_params)
 
@@ -245,7 +250,8 @@ class TestEDIpackSolverBathHybrid(TestSolver):
             "n_w": 60,
             "broadening": 0.05,
             "n_tau": 10,
-            **self.chi_params
+            **self.chi_params,
+            "rdm": True
         }
         solver.solve(**solve_params)
 
@@ -268,7 +274,8 @@ class TestEDIpackSolverBathHybrid(TestSolver):
             "n_w": 40,
             "broadening": 0.03,
             "n_tau": 11,
-            **self.chi_params
+            **self.chi_params,
+            "rdm": True
         }
         solver.solve(**solve_params)
 
@@ -293,7 +300,8 @@ class TestEDIpackSolverBathHybrid(TestSolver):
             "n_w": 80,
             "broadening": 0.02,
             "n_tau": 12,
-            **self.chi_params
+            **self.chi_params,
+            "rdm": True
         }
         solver.solve(**solve_params)
 
@@ -347,7 +355,8 @@ class TestEDIpackSolverBathHybrid(TestSolver):
             "n_iw": 10,
             "energy_window": (-1.5, 1.5),
             "n_w": 60,
-            "broadening": 0.05
+            "broadening": 0.05,
+            "rdm": True
         }
         solver.solve(**solve_params)
 
@@ -369,7 +378,8 @@ class TestEDIpackSolverBathHybrid(TestSolver):
             "n_iw": 20,
             "energy_window": (-1.0, 1.0),
             "n_w": 40,
-            "broadening": 0.03
+            "broadening": 0.03,
+            "rdm": True
         }
         solver.solve(**solve_params)
 
@@ -393,7 +403,8 @@ class TestEDIpackSolverBathHybrid(TestSolver):
             "n_iw": 30,
             "energy_window": (-1.5, 1.5),
             "n_w": 80,
-            "broadening": 0.02
+            "broadening": 0.02,
+            "rdm": True
         }
         solver.solve(**solve_params)
 
@@ -448,7 +459,8 @@ class TestEDIpackSolverBathHybrid(TestSolver):
             "n_iw": 10,
             "energy_window": (-1.5, 1.5),
             "n_w": 60,
-            "broadening": 0.05
+            "broadening": 0.05,
+            "rdm": True
         }
         solver.solve(**solve_params)
 
@@ -470,7 +482,8 @@ class TestEDIpackSolverBathHybrid(TestSolver):
             "n_iw": 20,
             "energy_window": (-1.0, 1.0),
             "n_w": 40,
-            "broadening": 0.03
+            "broadening": 0.03,
+            "rdm": True
         }
         solver.solve(**solve_params)
 
@@ -495,7 +508,8 @@ class TestEDIpackSolverBathHybrid(TestSolver):
             "n_iw": 30,
             "energy_window": (-1.5, 1.5),
             "n_w": 80,
-            "broadening": 0.02
+            "broadening": 0.02,
+            "rdm": True
         }
         solver.solve(**solve_params)
 
@@ -552,7 +566,8 @@ class TestEDIpackSolverBathHybrid(TestSolver):
             "n_iw": 10,
             "energy_window": (-2.0, 2.0),
             "n_w": 60,
-            "broadening": 0.05
+            "broadening": 0.05,
+            "rdm": True
         }
         solver.solve(**solve_params)
 
@@ -577,7 +592,8 @@ class TestEDIpackSolverBathHybrid(TestSolver):
             "n_iw": 20,
             "energy_window": (-1.5, 1.5),
             "n_w": 40,
-            "broadening": 0.03
+            "broadening": 0.03,
+            "rdm": True
         }
         solver.solve(**solve_params)
 
@@ -602,7 +618,8 @@ class TestEDIpackSolverBathHybrid(TestSolver):
             "n_iw": 30,
             "energy_window": (-2.5, 2.5),
             "n_w": 80,
-            "broadening": 0.04
+            "broadening": 0.04,
+            "rdm": True
         }
         solver.solve(**solve_params)
 
@@ -654,7 +671,8 @@ class TestEDIpackSolverBathHybrid(TestSolver):
             "n_iw": 10,
             "energy_window": (-2.0, 2.0),
             "n_w": 60,
-            "broadening": 0.05
+            "broadening": 0.05,
+            "rdm": True
         }
         solver.solve(**solve_params)
 
@@ -676,7 +694,8 @@ class TestEDIpackSolverBathHybrid(TestSolver):
             "n_iw": 20,
             "energy_window": (-1.5, 1.5),
             "n_w": 40,
-            "broadening": 0.03
+            "broadening": 0.03,
+            "rdm": True
         }
         solver.solve(**solve_params)
 
@@ -702,7 +721,8 @@ class TestEDIpackSolverBathHybrid(TestSolver):
             "n_iw": 30,
             "energy_window": (-2.5, 2.5),
             "n_w": 80,
-            "broadening": 0.04
+            "broadening": 0.04,
+            "rdm": True
         }
         solver.solve(**solve_params)
 
