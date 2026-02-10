@@ -778,6 +778,17 @@ class EDIpackSolver:
         """
         return ed.get_mag().T
 
+    @property
+    def density_matrix(self) -> np.ndarray:
+        r"""
+        Reduced impurity density matrix, a complex matrix of size
+        :math:`4^{N_{orb}}\\times 4^{N_{orb}}`.
+
+        # TODO: Document the order of many-body states forming the basis of
+        this matrix.
+        """
+        return ed.get_impurity_rdm()
+
     def _make_gf(self, ed_func, real_freq, anomalous) -> BlockGf:
         if anomalous:
             if ed.get_ed_mode() != int(EDMode.SUPERC):
