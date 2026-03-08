@@ -151,7 +151,6 @@ class EDIpackSolver:
         "ED_PRINT_SIGMA": False,
         "ED_PRINT_G": False,
         "ED_PRINT_G0": False,
-        "RDM_FLAG": False,
         "ED_TWIN": False,
         "ED_SOLVE_OFFDIAG_GF": False,   # TODO
         "ED_ALL_G": True,
@@ -632,7 +631,8 @@ class EDIpackSolver:
               chi_spin: bool = False,
               chi_dens: bool = False,
               chi_exct: bool = False,
-              chi_pair: bool = False):
+              chi_pair: bool = False,
+              rdm: bool = False):
         r"""
         Solve the impurity problem and calculate the observables, Green's
         function and self-energy.
@@ -676,6 +676,9 @@ class EDIpackSolver:
 
         :param chi_exct: Compute exciton response functions.
         :type chi_exct:  bool, default=False
+
+        :param rdm: Compute impurity reduced density matrix.
+        :type rdm: bool, default=False
         """
 
         ed.beta = beta
@@ -696,7 +699,7 @@ class EDIpackSolver:
                 "Cannot add non-density-density terms to the interaction"
             )
 
-        if (True in (chi_spin, chi_dens, chi_exct, chi_pair)) and \
+        if any((chi_spin, chi_dens, chi_exct, chi_pair)) and \
                 ed.get_ed_mode() != int(EDMode.NORMAL):
             raise RuntimeError(
                 "Response functions are only available in the normal ED mode"
@@ -705,6 +708,8 @@ class EDIpackSolver:
         ed.chidens_flag = chi_dens
         ed.chipair_flag = chi_pair
         ed.chiexct_flag = chi_exct
+
+        ed.rdm_flag = rdm
 
         self.comm.barrier()
         with chdircontext(self.wdname):
@@ -777,6 +782,18 @@ class EDIpackSolver:
         one row per orbital.
         """
         return ed.get_mag().T
+
+    @property
+    def rdm(self) -> np.ndarray:
+        r"""
+        Reduced impurity density matrix, a complex matrix of size
+        :math:`4^{N_{orb}}\times 4^{N_{orb}}`.
+
+        The impurity Fock states forming the basis for this matrix are
+        :math:`|n_{1,\uparrow}, \ldots, n_{N_{orb},\uparrow}
+        n_{1,\downarrow}, \ldots, n_{N_{orb},\downarrow}\rangle`.
+        """
+        return ed.get_impurity_rdm()
 
     def _make_gf(self, ed_func, real_freq, anomalous) -> BlockGf:
         if anomalous:

@@ -53,6 +53,23 @@ def reflect_freq(g):
     return res
 
 
+def perm_parity(lst):
+    """
+    Given a permutation of the integers 0 ... N in order as a list,
+    returns its parity (or sign): +1 for even parity; -1 for odd.
+
+    https://code.activestate.com/recipes/
+    578227-generate-the-parity-or-sign-of-a-permutation/
+    """
+    parity = 1
+    for i in range(0, len(lst) - 1):
+        if lst[i] != i:
+            parity *= -1
+            mn = min(range(i, len(lst)), key=lst.__getitem__)
+            lst[i], lst[mn] = lst[mn], lst[i]
+    return parity
+
+
 class TestSolver(unittest.TestCase):
 
     @classmethod
@@ -255,6 +272,21 @@ class TestSolver(unittest.TestCase):
                     print(f"Failed check for {chi}:")
                     raise error
 
+    @classmethod
+    def assert_rdm(cls, solver, atol=1e-6, **refs):
+        "Assert correctness of computed reduced impurity density matrix."
+        rdm = solver.rdm
+        ref = refs['rdm']
+        l, v = np.linalg.eigh(rdm)
+        ref_lambda, ref_v = np.linalg.eigh(ref)
+        # Compare eigenvalues of ref and rdm
+        assert_allclose(ref_lambda, l, atol=atol)
+        # Check that eigenpairs of ref are also eigenpairs of rdm
+        for n in range(len(ref_lambda)):
+            assert_allclose(rdm @ ref_v[:, n],
+                            ref_lambda[n] * ref_v[:, n],
+                            atol=atol)
+
     #
     # Miscellaneous
     #
@@ -322,7 +354,8 @@ class TestSolver(unittest.TestCase):
                                chi_spin=False,
                                chi_dens=False,
                                chi_pair=False,
-                               chi_exct=False):
+                               chi_exct=False,
+                               rdm=False):
         "Generate reference results using pomerol2triqs"
 
         mki = cls.make_mkind_imp(spin_blocks)
@@ -384,6 +417,12 @@ class TestSolver(unittest.TestCase):
                                            chi_dens=chi_dens,
                                            chi_pair=chi_pair,
                                            chi_exct=chi_exct)
+
+        # Reduced impurity density matrix
+        if rdm:
+            cls.make_rdm_results(results, ed, mki,
+                                 beta=beta,
+                                 spin_blocks=spin_blocks)
 
         return results
 
@@ -681,3 +720,90 @@ class TestSolver(unittest.TestCase):
                         mki(cls.spins[0], o1), mki(cls.spins[0], o2),
                         channel='PP')
                 results[f"chi_pair_{axis}"] = chi_pair
+
+    @classmethod
+    def make_rdm_results(cls, results, ed, mki, *, beta, spin_blocks):
+        """
+        Generate reference results for reduced impurity density matrix
+        using pomerol2triqs.
+        """
+
+        # Find ground state energy
+        e0 = np.min(list(map(np.min, ed.energies)))
+
+        # Compute diagonal elements of the unnormalized full density matrix
+        # in the eigenbasis
+        rho_diag = [np.exp(-beta * (e - e0)) for e in ed.energies]
+        # Compute partition function
+        Z = np.sum(list(map(np.sum, rho_diag)))
+        # Normalize rho_diag and transform the density matrix into Fock basis
+        rho = [U @ np.diag(w / Z) @ np.conj(U.T)
+               for w, U in zip(rho_diag, ed.unitary_matrices)]
+
+        nbit = 2 * cls.norb
+        if hasattr(cls, 'mkind_bath'):
+            nbit += len(cls.fops_bath_up) + len(cls.fops_bath_dn)
+
+        # Translate positions of bits in binary representation of Fock states
+        # from Pomerol to EDIpack. On the EDIpack side, the first 2 * norb bits
+        # represent the impurity states, and the rest is bath.
+        fs_bit_map = [0 for _ in range(nbit)]
+
+        fops_imp_up, fops_imp_dn = cls.make_fops_imp(spin_blocks)
+        for bit, (ind_up, ind_dn) in enumerate(zip(fops_imp_up, fops_imp_dn)):
+            fs_bit_map[ed.pomerol_index(ind_up)] = bit
+            fs_bit_map[ed.pomerol_index(ind_dn)] = bit + cls.norb
+
+        if hasattr(cls, 'mkind_bath'):
+            for bit, (ind_up, ind_dn) in enumerate(zip(cls.fops_bath_up,
+                                                       cls.fops_bath_dn)):
+                bit += 2 * cls.norb
+                fs_bit_map[ed.pomerol_index(ind_up)] = bit
+                fs_bit_map[ed.pomerol_index(ind_dn)] = bit \
+                    + len(cls.fops_bath_up)
+
+        # Decompose a Pomerol Fock state into a direct product of
+        # an EDIpack impurity Fock state and an EDIpack bath Fock state.
+        # Also, compute the sign prefactor stemming from swapping occupied
+        # modes.
+        def translate_state(st):
+            # Collect positions of set bits in 'st' and translate them
+            pom_bit = 0
+            edi_set_bits = []
+            while st != 0:
+                if st & 1:
+                    edi_set_bits.append(fs_bit_map[pom_bit])
+                st = st >> 1
+                pom_bit += 1
+
+            # Compute sign of the permutation that brings edi_set_bits into
+            # the ascending order
+            edi_set_bits_sorted = sorted(edi_set_bits)
+            edi_set_bits_order = [edi_set_bits_sorted.index(bit)
+                                  for bit in edi_set_bits]
+            sign = perm_parity(edi_set_bits_order)
+
+            # Pack bits from edi_set_bits into st_imp and st_bath
+            st_imp, st_bath = 0, 0
+            for edi_bit in edi_set_bits:
+                if edi_bit < 2 * cls.norb:
+                    st_imp += 1 << edi_bit
+                else:
+                    st_bath += 1 << (edi_bit - 2 * cls.norb)
+
+            return st_imp, st_bath, sign
+
+        rdm = np.zeros((4**cls.norb, 4**cls.norb), dtype=complex)
+        # Trace out the bath, subspace by subspace
+        for states_sp, rho_sp in zip(ed.fock_states, rho):
+            for (i1, st1), (i2, st2) in product(enumerate(states_sp), repeat=2):
+                st_imp1, st_bath1, sign1 = translate_state(st1)
+                st_imp2, st_bath2, sign2 = translate_state(st2)
+                if st_bath1 == st_bath2:
+                    rdm[st_imp1, st_imp2] += rho_sp[i1, i2] * sign1 * sign2
+
+        # Basic sanity checks
+        np.allclose(rdm, np.conj(rdm.T), atol=1e-12)
+        np.isclose(np.trace(rdm), 1.0, atol=1e-12)
+
+        results["rdm"] = rdm
