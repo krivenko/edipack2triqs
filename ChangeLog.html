@@ -73,6 +73,7 @@
 <li class="toctree-l4"><a class="reference internal" href="documentation.html#edipack2triqs.solver.EDIpackSolver.e_kin"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.e_kin</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="documentation.html#edipack2triqs.solver.EDIpackSolver.densities"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.densities</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="documentation.html#edipack2triqs.solver.EDIpackSolver.double_occ"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.double_occ</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="documentation.html#edipack2triqs.solver.EDIpackSolver.superconductive_phi"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.superconductive_phi</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="documentation.html#edipack2triqs.solver.EDIpackSolver.chi_dens_iw"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.chi_dens_iw</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="documentation.html#edipack2triqs.solver.EDIpackSolver.chi_dens_tau"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.chi_dens_tau</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="documentation.html#edipack2triqs.solver.EDIpackSolver.chi_dens_w"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.chi_dens_w</span></code></a></li>
@@ -85,9 +86,9 @@
 <li class="toctree-l4"><a class="reference internal" href="documentation.html#edipack2triqs.solver.EDIpackSolver.chi_spin_iw"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.chi_spin_iw</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="documentation.html#edipack2triqs.solver.EDIpackSolver.chi_spin_tau"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.chi_spin_tau</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="documentation.html#edipack2triqs.solver.EDIpackSolver.chi_spin_w"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.chi_spin_w</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="documentation.html#edipack2triqs.solver.EDIpackSolver.superconductive_phi"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.superconductive_phi</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="documentation.html#edipack2triqs.solver.EDIpackSolver.superconductive_phi_arg"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.superconductive_phi_arg</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="documentation.html#edipack2triqs.solver.EDIpackSolver.magnetization"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.magnetization</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="documentation.html#edipack2triqs.solver.EDIpackSolver.rdm"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.rdm</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="documentation.html#edipack2triqs.solver.EDIpackSolver.g_iw"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.g_iw</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="documentation.html#edipack2triqs.solver.EDIpackSolver.g_an_iw"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.g_an_iw</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="documentation.html#edipack2triqs.solver.EDIpackSolver.g_w"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.g_w</span></code></a></li>
@@ -179,6 +180,7 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="issues.html">Reporting issues</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Changelog</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#version-1-0-0">Version 1.0.0</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#version-0-11-0">Version 0.11.0</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#version-0-10-0">Version 0.10.0</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#version-0-9-0">Version 0.9.0</a></li>
@@ -221,6 +223,14 @@
              
   <section class="tex2jax_ignore mathjax_ignore" id="changelog">
 <span id="id1"></span><h1>Changelog<a class="headerlink" href="#changelog" title="Link to this heading"></a></h1>
+<section id="version-1-0-0">
+<h2>Version 1.0.0<a class="headerlink" href="#version-1-0-0" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p>Expose impurity reduced density matrix via read-only property
+<code class="docutils literal notranslate"><span class="pre">EDIpackSolver.rdm</span></code>. Calculation of the reduced density matrix is enabled
+by passing <code class="docutils literal notranslate"><span class="pre">rdm=True</span></code> to <code class="docutils literal notranslate"><span class="pre">EDIpackSolver.solve()</span></code>.</p></li>
+</ul>
+</section>
 <section id="version-0-11-0">
 <h2>Version 0.11.0<a class="headerlink" href="#version-0-11-0" title="Link to this heading"></a></h2>
 <ul class="simple">

@@ -2,6 +2,12 @@
 
 # Changelog
 
+## Version 1.0.0
+
+* Expose impurity reduced density matrix via read-only property
+  `EDIpackSolver.rdm`. Calculation of the reduced density matrix is enabled
+  by passing `rdm=True` to `EDIpackSolver.solve()`.
+
 ## Version 0.11.0
 
 * A matrix basis for the bath Hamiltonian in the general bath topology mode can
