@@ -56,7 +56,7 @@ class TestEDIpackSolverBathGeneral(TestSolver):
         cls.assert_static_obs(s, 1e-8, **refs)
         cls.assert_gfs(s, **refs)
         cls.assert_chi(s, **refs)
-        cls.assert_density_matrix(s, **refs)
+        cls.assert_rdm(s, **refs)
 
     @classmethod
     def find_basis_mat(cls, hvec, mat):

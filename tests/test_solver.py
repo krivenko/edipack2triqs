@@ -273,10 +273,10 @@ class TestSolver(unittest.TestCase):
                     raise error
 
     @classmethod
-    def assert_density_matrix(cls, solver, atol=1e-6, **refs):
+    def assert_rdm(cls, solver, atol=1e-6, **refs):
         "Assert correctness of computed reduced impurity density matrix."
-        rdm = solver.density_matrix
-        ref = refs['density_matrix']
+        rdm = solver.rdm
+        ref = refs['rdm']
         l, v = np.linalg.eigh(rdm)
         ref_lambda, ref_v = np.linalg.eigh(ref)
         # Compare eigenvalues of ref and rdm
@@ -420,9 +420,9 @@ class TestSolver(unittest.TestCase):
 
         # Reduced impurity density matrix
         if rdm:
-            cls.make_reference_density_matrix(results, ed, mki,
-                                              beta=beta,
-                                              spin_blocks=spin_blocks)
+            cls.make_rdm_results(results, ed, mki,
+                                 beta=beta,
+                                 spin_blocks=spin_blocks)
 
         return results
 
@@ -722,8 +722,7 @@ class TestSolver(unittest.TestCase):
                 results[f"chi_pair_{axis}"] = chi_pair
 
     @classmethod
-    def make_reference_density_matrix(cls, results, ed, mki, *,
-                                      beta, spin_blocks):
+    def make_rdm_results(cls, results, ed, mki, *, beta, spin_blocks):
         """
         Generate reference results for reduced impurity density matrix
         using pomerol2triqs.
@@ -807,4 +806,4 @@ class TestSolver(unittest.TestCase):
         np.allclose(rdm, np.conj(rdm.T), atol=1e-12)
         np.isclose(np.trace(rdm), 1.0, atol=1e-12)
 
-        results["density_matrix"] = rdm
+        results["rdm"] = rdm

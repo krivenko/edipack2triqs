@@ -56,7 +56,7 @@ class TestEDIpackSolverBathHybrid(TestSolver):
         cls.assert_static_obs(s, 1e-8, **refs)
         cls.assert_gfs(s, **refs)
         cls.assert_chi(s, atol=5e-5, **refs)
-        cls.assert_density_matrix(s, **refs)
+        cls.assert_rdm(s, **refs)
 
     def test_zerotemp(self):
         h_loc_mat = mul.outer(s0, np.diag([-0.5, -0.6]))

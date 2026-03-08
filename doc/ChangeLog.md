@@ -5,8 +5,8 @@
 ## Version 1.0.0
 
 * Expose impurity reduced density matrix via read-only property
-  `EDIpackSolver.density_matrix`. Calculation of the reduced density matrix
-  is enabled by passing `rdm=True` to `EDIpackSolver.solve()`.
+  `EDIpackSolver.rdm`. Calculation of the reduced density matrix is enabled
+  by passing `rdm=True` to `EDIpackSolver.solve()`.
 
 ## Version 0.11.0
 

@@ -784,7 +784,7 @@ class EDIpackSolver:
         return ed.get_mag().T
 
     @property
-    def density_matrix(self) -> np.ndarray:
+    def rdm(self) -> np.ndarray:
         r"""
         Reduced impurity density matrix, a complex matrix of size
         :math:`4^{N_{orb}}\times 4^{N_{orb}}`.
