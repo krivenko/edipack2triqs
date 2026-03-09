@@ -36,6 +36,36 @@ from .fit import BathFittingParams, _chi2_fit_bath
 
 
 @dataclass(frozen=True, kw_only=True)
+class PhononsParams:
+    """Parameters of local phonon modes."""
+
+    frequencies: np.ndarray
+    "Frequencies of phonon modes."
+
+    coupling_operators: list[op.Operator]
+    "Bilinear fermionic operators coupled to phonon modes."
+
+    nphonons: int = 1
+    "Maximal number of phonons allowed per mode (cutoff)."
+
+    def __dict__(self):
+        assert len(self.frequencies) == len(self.coupling_operators), \
+            "Number of coupling operators must equal the number of phonon modes"
+        # TODO: Change to >= 1
+        assert len(self.frequencies) == 1, \
+            "Currently, only one phonon mode is supported by EDIpack"
+        assert self.nphonons >= 0, "'nphonons' cannot be negative"
+
+        return {
+            "NPH": self.nphonons,
+            "W0_PH": self.frequencies,
+            # TODO: Call function(s) from .hamiltonian to parse
+            # 'coupling_operators' and fill 'A_PH' as well as 'GPH',
+            # which will be written into GPHfile
+        }
+
+
+@dataclass(frozen=True, kw_only=True)
 class LanczosParams:
     """Parameters of Lanczos algorithm."""
 
@@ -269,6 +299,9 @@ class EDIpackSolver:
                            the use of :py:class:`BathGeneral` and overrides
                            the automatic construction of the bath basis.
         :type bath_basis: list[triqs.operators.operators.Operator]
+
+        :param phonons_params: Parameters of local phonon modes.
+        :type phonons_params: PhononsParams, optional
 
         :param lanczos_params: Parameters of Lanczos algorithm.
         :type lanczos_params: LanczosParams, optional
