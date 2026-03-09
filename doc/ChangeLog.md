@@ -4,6 +4,10 @@
 
 ## Version 1.0.0
 
+* Enable calculations with local electron-phonon coupling on the impurity site.
+  Parameters of the local phonons can be passed to `EDIpackSolver.__init__()`
+  via the keyword argument `phonons_params` of a special type `PhononsParams`.
+
 * Expose single-particle density matrix of the full system (impurity + bath)
   via read-only property `EDIpackSolver.denmat`.
 
