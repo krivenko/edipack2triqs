@@ -510,3 +510,10 @@ def parse_hamiltonian(  # noqa: C901
         params.Hloc[spin1, spin2, ...] = Hloc[spin1, spin2, ...]
 
     return params
+
+
+def parse_phonon_coupling(coupling: op.Operator):
+    """
+    TODO
+    """
+    pass

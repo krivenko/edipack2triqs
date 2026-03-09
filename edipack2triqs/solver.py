@@ -2,7 +2,7 @@
 TRIQS interface to **EDIpack** exact diagonalization solver.
 """
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field, InitVar
 from pathlib import Path
 from tempfile import TemporaryDirectory
 from types import NoneType
@@ -30,9 +30,61 @@ from .util import (IndicesType,
 from .bath import Bath, BathNormal, BathHybrid, BathGeneral
 from .hamiltonian import (parse_hamiltonian,
                           extract_quadratic,
+                          parse_phonon_coupling,
                           _is_density,
                           _is_density_density)
 from .fit import BathFittingParams, _chi2_fit_bath
+
+
+@dataclass(frozen=True, kw_only=True)
+class PhononsParams:
+    """Parameters of local phonon modes."""
+
+    frequencies: np.ndarray
+    "Frequencies of phonon modes."
+
+    coupling_operators: InitVar[list[op.Operator]]
+    "Bilinear fermionic operators coupled to phonon modes."
+
+    couplings: np.ndarray = field(init=False)
+    "Arrays of coupling constants g^m_{o1, o2}."
+
+    displacements: np.ndarray = field(init=False)
+    "Displacement fields A_m."
+
+    nphonons: int = 1
+    "Maximal number of phonons allowed per mode (cutoff)."
+
+    def __post_init__(self, coupling_operators):
+        """
+        Validate fields, parse coupling_operators and initialize couplings and
+        displacements.
+        """
+        assert len(self.frequencies) == len(self.coupling_operators), \
+            "Number of coupling operators must equal the number of phonon modes"
+        # TODO: Change to >= 1
+        assert len(self.frequencies) == 1, \
+            "Currently, only one phonon mode is supported by EDIpack"
+        assert self.nphonons >= 0, "'nphonons' cannot be negative"
+
+        # TODO: make these NumPy arrays
+        g_ph = []  # complex (len(coupling_operators), norb, norb)
+        a_ph = []  # float (len(coupling_operators))
+        for o in self.coupling_operators:
+            ph_coupling = parse_phonon_coupling(o)
+            g_ph.append(ph_coupling[0])
+            a_ph.append(ph_coupling[1])
+        object.__setattr__(self, "g_ph", g_ph)
+        object.__setattr__(self, "a_ph", a_ph)
+
+    def __dict__(self):
+        return {
+            "NPH": self.nphonons,
+            "W0_PH": self.frequencies,
+            "G_PH": self.g_ph,
+            "A_PH": self.a_ph,
+            "GPHfile": "GPHinput"
+        }
 
 
 @dataclass(frozen=True, kw_only=True)
@@ -270,6 +322,9 @@ class EDIpackSolver:
                            the automatic construction of the bath basis.
         :type bath_basis: list[triqs.operators.operators.Operator]
 
+        :param phonons_params: Parameters of local phonon modes.
+        :type phonons_params: PhononsParams, optional
+
         :param lanczos_params: Parameters of Lanczos algorithm.
         :type lanczos_params: LanczosParams, optional
 
@@ -388,6 +443,13 @@ class EDIpackSolver:
             if self.zerotemp:
                 c["LANC_NSTATES_TOTAL"] = 1
 
+            # Phonons
+            phonons_params = kwargs.get("phonons_params", None)
+            if phonons_params is not None:
+                pp = phonons_params.__dict__()
+                g_ph = pp.pop("G_PH")
+                c.update(phonons_params)
+
             # Bath fitting
             bfp = kwargs.get("bath_fitting_params", BathFittingParams())
             c.update(bfp.__dict__())
@@ -428,6 +490,10 @@ class EDIpackSolver:
 
                 else:
                     Path('input.conf').symlink_to(self.input_file)
+
+            if phonons_params is not None:
+                # TODO: Allow for multiple phonon modes
+                np.savetxt("GPHinput", g_ph[0, :, :])
 
             self.comm.barrier()
             ed.read_input('input.conf')
