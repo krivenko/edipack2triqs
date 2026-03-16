@@ -83,7 +83,8 @@ class LanczosParams:
     rather than LAPACK-based exact diagonalization.
     """
 
-    def __dict__(self):
+    def __post_init__(self):
+        "Validate parameters."
         assert self.method in ("arpack", "lanczos", "dvdson"), \
             "Invalid value of 'method'"
         assert self.nstates_sector > 0, "'nstates_sector' must be positive"
@@ -96,6 +97,7 @@ class LanczosParams:
         assert self.tolerance >= 0, "'tolerance' cannot be negative"
         assert self.dim_threshold > 0, "'dim_threshold' must be positive"
 
+    def __dict__(self):
         return {
             "LANC_METHOD": self.method,
             "LANC_NSTATES_SECTOR": self.nstates_sector,

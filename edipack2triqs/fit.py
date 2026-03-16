@@ -85,7 +85,8 @@ class BathFittingParams:
     An unknown parameter used in the conjugate gradient minimization procedure.
     """
 
-    def __dict__(self):
+    def __post_init__(self):
+        "Validate parameters."
         assert self.scheme in ("delta", "weiss"), "Invalid value of 'scheme'"
         assert self.method in ("CGnr", "minimize"), "Invalid value of 'method'"
         assert self.grad in ("analytic", "numeric"), "Invalid value of 'grad'"
@@ -99,6 +100,7 @@ class BathFittingParams:
             "Invalid value of 'norm'"
         assert self.pow > 0, "'pow' must be positive"
 
+    def __dict__(self):
         return {
             "CG_SCHEME": self.scheme,
             "CG_METHOD": {"CGnr": 0, "minimize": 1}[self.method],
