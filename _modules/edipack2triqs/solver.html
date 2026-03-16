@@ -307,7 +307,8 @@
 <span class="sd">    rather than LAPACK-based exact diagonalization.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">__dict__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="s2">&quot;Validate parameters.&quot;</span>
         <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">method</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;arpack&quot;</span><span class="p">,</span> <span class="s2">&quot;lanczos&quot;</span><span class="p">,</span> <span class="s2">&quot;dvdson&quot;</span><span class="p">),</span> \
             <span class="s2">&quot;Invalid value of &#39;method&#39;&quot;</span>
         <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">nstates_sector</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;&#39;nstates_sector&#39; must be positive&quot;</span>
@@ -320,6 +321,7 @@
         <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">tolerance</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;&#39;tolerance&#39; cannot be negative&quot;</span>
         <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">dim_threshold</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;&#39;dim_threshold&#39; must be positive&quot;</span>
 
+    <span class="k">def</span><span class="w"> </span><span class="nf">__dict__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="p">{</span>
             <span class="s2">&quot;LANC_METHOD&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">method</span><span class="p">,</span>
             <span class="s2">&quot;LANC_NSTATES_SECTOR&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">nstates_sector</span><span class="p">,</span>
