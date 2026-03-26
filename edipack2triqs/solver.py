@@ -419,17 +419,17 @@ class EDIpackSolver:
                 c["LANC_NSTATES_TOTAL"] = 1
 
             # Phonons
-            phonons = kwargs.get("phonons", None)
-            if phonons is not None:
-                c["NPH"] = phonons.nphonons
-                c["W0_PH"] = np.asarray(phonons.frequencies)
+            self.phonons = kwargs.get("phonons", None)
+            if self.phonons is not None:
+                c["NPH"] = self.phonons.nphonons
+                c["W0_PH"] = np.asarray(self.phonons.frequencies)
                 c["GPHfile"] = "GPHinput"
 
-                n_ph_modes = len(phonons.frequencies)
+                n_ph_modes = len(self.phonons.frequencies)
                 g_ph = np.zeros((n_ph_modes, self.norb, self.norb),
                                 dtype=complex)
                 a_ph = np.zeros((n_ph_modes,), dtype=float)
-                for m, o in enumerate(phonons.coupling_operators):
+                for m, o in enumerate(self.phonons.coupling_operators):
                     g_ph[m, :, :], a_ph[m] = parse_phonon_coupling(
                         o, fops_imp_up, fops_imp_dn
                     )
@@ -477,7 +477,7 @@ class EDIpackSolver:
                 else:
                     Path('input.conf').symlink_to(self.input_file)
 
-            if phonons is not None:
+            if self.phonons is not None:
                 # TODO: Allow for multiple phonon modes
                 np.savetxt("GPHinput", g_ph[0, :, :],
                            fmt="(%.18f, %.18f) " * g_ph.shape[2])
@@ -778,6 +778,12 @@ class EDIpackSolver:
         ed.chidens_flag = chi_dens
         ed.chipair_flag = chi_pair
         ed.chiexct_flag = chi_exct
+
+        if rdm and (self.phonons is not None):
+            raise RuntimeError(
+                "Impurity reduced density matrix is not available "
+                "in calculations with phonons"
+            )
 
         ed.rdm_flag = rdm
 

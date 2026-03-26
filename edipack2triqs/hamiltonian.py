@@ -546,7 +546,7 @@ def parse_phonon_coupling(
                                       ignore_unexpected=False)
     if np.any(g_ph_an):
         raise RuntimeError(
-            "Anomalous boson coupling operators are not supported"
+            "Anomalous phonon coupling operators are not supported"
         )
     if not is_spin_degenerate(g_ph):
         raise RuntimeError("Boson coupling operators must be spin-degenerate")
