@@ -25,14 +25,23 @@ from edipack2triqs.hamiltonian import extract_quadratic
 from edipack2triqs.util import monomial2op, non_int_part
 
 
-def make_pomerol_ed(index_converter, h):
+def make_pomerol_ed(index_converter, h, phonon=None):
     "Construct a PomerolED object"
-    from pomerol2triqs import PomerolED
+    from pomerol2triqs import PomerolED, BosonParams
 
     ed = PomerolED(index_converter, verbose=False)
     ed.ops_melem_tol = 0
     ed.rho_threshold = 0
-    ed.diagonalize(h)
+
+    if phonon is not None:
+        bosons = [
+            BosonParams(frequency=phonon.frequency,
+                        coupling=phonon.coupling,
+                        n_bits=int(np.log2(phonon.nphonons + 1)))
+        ]
+        ed.diagonalize(h, bosons=bosons)
+    else:
+        ed.diagonalize(h)
     return ed
 
 
@@ -350,6 +359,7 @@ class TestSolver(unittest.TestCase):
     @classmethod
     def make_reference_results(cls, *,
                                h,
+                               phonon=None,
                                fops,
                                beta, n_iw, energy_window, n_w, broadening,
                                n_tau=None,
@@ -366,7 +376,7 @@ class TestSolver(unittest.TestCase):
         mki = cls.make_mkind_imp(spin_blocks)
 
         index_converter = cls._make_index_converter(fops, spin_blocks)
-        ed = make_pomerol_ed(index_converter, h)
+        ed = make_pomerol_ed(index_converter, h, phonon)
 
         results = {}
 
@@ -385,7 +395,14 @@ class TestSolver(unittest.TestCase):
                 False
             )
             h_sb = cls._merge_spin_blocks_in_expr(h)
-            ed_sb = make_pomerol_ed(index_converter_sb, h_sb)
+            if phonon is not None:
+                phonon_sb = type(phonon)(
+                    frequency=phonon.frequency,
+                    coupling=cls._merge_spin_blocks_in_expr(phonon.coupling),
+                    nphonons=phonon.nphonons
+                )
+
+            ed_sb = make_pomerol_ed(index_converter_sb, h_sb, phonon_sb)
             ed0_sb = make_pomerol_ed(index_converter_sb, non_int_part(h_sb))
             cls.make_reference_gfs_superc_results(results, h_sb, ed_sb, ed0_sb,
                                                   beta=beta,
@@ -794,9 +811,9 @@ class TestSolver(unittest.TestCase):
         if hasattr(cls, 'mkind_bath'):
             nbit += len(cls.fops_bath_up) + len(cls.fops_bath_dn)
 
-        # Translate positions of bits in binary representation of Fock states
-        # from Pomerol to EDIpack. On the EDIpack side, the first 2 * norb bits
-        # represent the impurity states, and the rest is bath.
+        # Translate positions of bits in binary representation of fermionic
+        # Fock states from Pomerol to EDIpack. On the EDIpack side, the first
+        # 2 * norb bits represent the impurity states, and the rest is bath.
         fs_bit_map = [0 for _ in range(nbit)]
 
         fops_imp_up, fops_imp_dn = cls.make_fops_imp(spin_blocks)
@@ -813,18 +830,17 @@ class TestSolver(unittest.TestCase):
                     + len(cls.fops_bath_up)
 
         # Decompose a Pomerol Fock state into a direct product of
-        # an EDIpack impurity Fock state and an EDIpack bath Fock state.
-        # Also, compute the sign prefactor stemming from swapping occupied
-        # modes.
+        # an EDIpack impurity Fock state, an EDIpack bath Fock state and
+        # a phonon state. Also, compute the sign prefactor stemming from
+        # swapping occupied modes.
         def translate_state(st):
             # Collect positions of set bits in 'st' and translate them
-            pom_bit = 0
             edi_set_bits = []
-            while st != 0:
+            for pom_bit in range(nbit):
                 if st & 1:
                     edi_set_bits.append(fs_bit_map[pom_bit])
                 st = st >> 1
-                pom_bit += 1
+            st_ph = st
 
             # Compute sign of the permutation that brings edi_set_bits into
             # the ascending order
@@ -841,15 +857,15 @@ class TestSolver(unittest.TestCase):
                 else:
                     st_bath += 1 << (edi_bit - 2 * cls.norb)
 
-            return st_imp, st_bath, sign
+            return st_imp, st_bath, st_ph, sign
 
         rdm = np.zeros((4**cls.norb, 4**cls.norb), dtype=complex)
         # Trace out the bath, subspace by subspace
         for states_sp, rho_sp in zip(ed.fock_states, rho):
             for (i1, st1), (i2, st2) in product(enumerate(states_sp), repeat=2):
-                st_imp1, st_bath1, sign1 = translate_state(st1)
-                st_imp2, st_bath2, sign2 = translate_state(st2)
-                if st_bath1 == st_bath2:
+                st_imp1, st_bath1, st_ph1, sign1 = translate_state(st1)
+                st_imp2, st_bath2, st_ph2, sign2 = translate_state(st2)
+                if (st_bath1 == st_bath2) and (st_ph1 == st_ph2):
                     rdm[st_imp1, st_imp2] += rho_sp[i1, i2] * sign1 * sign2
 
         # Basic sanity checks
