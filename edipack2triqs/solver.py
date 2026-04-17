@@ -38,25 +38,20 @@ from .fit import BathFittingParams, _chi2_fit_bath
 
 
 @dataclass(frozen=True, kw_only=True)
-class PhononsParams:
-    """Parameters of local phonon modes."""
+class PhononParams:
+    """Parameters of local phonon mode."""
 
-    frequencies: np.ndarray
-    "Frequencies of phonon modes."
+    frequency: float
+    "Frequency of the phonon mode."
 
-    coupling_operators: list[op.Operator]
-    "Bilinear fermionic operators coupled to phonon modes."
+    coupling: op.Operator
+    "Bilinear fermionic operator coupled to the phonon mode."
 
     nphonons: int = 1
-    "Maximal number of phonons allowed per mode (cutoff)."
+    "Maximal number of phonons allowed in the phonon mode (cutoff)."
 
     def __post_init__(self):
-        "Validate fields."
-        assert len(self.frequencies) == len(self.coupling_operators), \
-            "Number of coupling operators must equal the number of phonon modes"
-        # TODO: Change to >= 1
-        assert len(self.frequencies) == 1, \
-            "Currently, only one phonon mode is supported by EDIpack"
+        "Validate 'nphonons'."
         assert self.nphonons >= 0, "'nphonons' cannot be negative"
 
 
@@ -297,8 +292,8 @@ class EDIpackSolver:
                            the automatic construction of the bath basis.
         :type bath_basis: list[triqs.operators.operators.Operator]
 
-        :param phonons: Parameters of local phonon modes.
-        :type phonons: PhononsParams, optional
+        :param phonon: Parameters of the local phonon mode.
+        :type phonon: PhononParams, optional
 
         :param lanczos_params: Parameters of Lanczos algorithm.
         :type lanczos_params: LanczosParams, optional
@@ -419,22 +414,15 @@ class EDIpackSolver:
                 c["LANC_NSTATES_TOTAL"] = 1
 
             # Phonons
-            self.phonons = kwargs.get("phonons", None)
-            if self.phonons is not None:
-                c["NPH"] = self.phonons.nphonons
-                c["W0_PH"] = np.asarray(self.phonons.frequencies)
-                c["GPHfile"] = "GPHinput"
-
-                n_ph_modes = len(self.phonons.frequencies)
-                g_ph = np.zeros((n_ph_modes, self.norb, self.norb),
-                                dtype=complex)
-                a_ph = np.zeros((n_ph_modes,), dtype=float)
-                for m, o in enumerate(self.phonons.coupling_operators):
-                    g_ph[m, :, :], a_ph[m] = parse_phonon_coupling(
-                        o, fops_imp_up, fops_imp_dn
-                    )
-
-                c["A_PH"] = np.asarray(a_ph)
+            self.phonon = kwargs.get("phonon", None)
+            if self.phonon is not None:
+                c["W0_PH"] = self.phonon.frequency
+                c["NPH"] = self.phonon.nphonons
+                self.g_ph, self.a_ph = parse_phonon_coupling(
+                    self.phonon.coupling,
+                    fops_imp_up,
+                    fops_imp_dn
+                )
 
             # Bath fitting
             bfp = kwargs.get("bath_fitting_params", BathFittingParams())
@@ -476,11 +464,6 @@ class EDIpackSolver:
 
                 else:
                     Path('input.conf').symlink_to(self.input_file)
-
-            if self.phonons is not None:
-                # TODO: Allow for multiple phonon modes
-                np.savetxt("GPHinput", g_ph[0, :, :],
-                           fmt="(%.18f, %.18f) " * g_ph.shape[2])
 
             self.comm.barrier()
             ed.read_input('input.conf')
@@ -643,6 +626,37 @@ class EDIpackSolver:
                                                   self.h_params.fops_bath_order)
 
     @property
+    def phonon_coupling(self) -> op.Operator:
+        "Access the fermionic operator coupled to the phonon mode"
+        if self.phonon is None:
+            raise RuntimeError(
+                "This solver object has not been constructed with phonon "
+                "support enabled"
+            )
+        coupling = op.Operator(self.a_ph)
+        coupling_it = np.nditer(self.g_ph, flags=['multi_index'])
+        for coeff in coupling_it:
+            orb1, orb2 = coupling_it.multi_index
+            coupling += coeff * op.c_dag(*self.fops_imp_up[orb1]) \
+                              * op.c(*self.fops_imp_up[orb2])
+            coupling += coeff * op.c_dag(*self.fops_imp_dn[orb1]) \
+                              * op.c(*self.fops_imp_dn[orb2])
+        return coupling
+
+    @phonon_coupling.setter
+    def phonon_coupling(self, new_coupling: op.Operator):
+        if self.phonon is None:
+            raise RuntimeError(
+                "This solver object has not been constructed with phonon "
+                "support enabled"
+            )
+        self.g_ph, self.a_ph = parse_phonon_coupling(
+            new_coupling,
+            self.fops_imp_up,
+            self.fops_imp_dn
+        )
+
+    @property
     def sectors(self) -> Union[list[int], list[tuple[int, int]], NoneType]:
         r"""
         The list of quantum numbers corresponding to the sectors selected for
@@ -779,7 +793,7 @@ class EDIpackSolver:
         ed.chipair_flag = chi_pair
         ed.chiexct_flag = chi_exct
 
-        if rdm and (self.phonons is not None):
+        if rdm and (self.phonon is not None):
             raise RuntimeError(
                 "Impurity reduced density matrix is not available "
                 "in calculations with phonons"
@@ -805,6 +819,11 @@ class EDIpackSolver:
                 o1, o2, o3, o4 = ind[0:8:2]
                 s1, s2, s3, s4 = (('u' if s == 0 else 'd') for s in ind[1:8:2])
                 ed.add_twobody_operator(o1, s1, o2, s2, o3, s3, o4, s4, val)
+
+            # Set phonon parameters, if any
+            if self.phonon is not None:
+                ed.set_phonon_coefficients(displacement=self.a_ph,
+                                           coupling=self.g_ph)
 
             # Solve!
             if self.h_params.bath is not None:

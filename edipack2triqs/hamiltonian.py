@@ -538,6 +538,8 @@ def parse_phonon_coupling(
         if len(mon) == 0:
             a_ph = coeff
             break
+    if not np.isreal(a_ph):
+        raise RuntimeError("Phonon displacement constant must be real")
 
     # Extract coupling constants
     g_ph, g_ph_an = extract_quadratic(coupling - a_ph,
@@ -549,10 +551,10 @@ def parse_phonon_coupling(
             "Anomalous phonon coupling operators are not supported"
         )
     if not is_spin_degenerate(g_ph):
-        raise RuntimeError("Boson coupling operators must be spin-degenerate")
+        raise RuntimeError("Phonon coupling operators must be spin-degenerate")
     if (g_ph[0, 0, :, :] != np.conj(g_ph[0, 0, :, :].T)).any():
         raise RuntimeError(
-            "Boson coupling constants must form a Hermitian matrix"
+            "Phonon coupling constants must form a Hermitian matrix"
         )
 
     return g_ph[0, 0, :, :], a_ph
