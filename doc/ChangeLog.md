@@ -4,6 +4,9 @@
 
 ## Version 1.0.0
 
+* Expose single-particle density matrix of the full system (impurity + bath)
+  via read-only property `EDIpackSolver.denmat`.
+
 * Expose impurity reduced density matrix via read-only property
   `EDIpackSolver.rdm`. Calculation of the reduced density matrix is enabled
   by passing `rdm=True` to `EDIpackSolver.solve()`.
