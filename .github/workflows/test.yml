@@ -55,7 +55,7 @@ jobs:
       env:
         FC: mpifort
       run: |
-           git clone https://github.com/edipack/EDIpack EDIpack.git
+           git clone -b phonons_and_1bdm https://github.com/edipack/EDIpack EDIpack.git
            mkdir EDIpack.build && pushd EDIpack.build
            export PKG_CONFIG_PATH="${HOME}/scifor/etc:${PKG_CONFIG_PATH}"
            cmake ../EDIpack.git                                                \
@@ -75,7 +75,15 @@ jobs:
       run: |
            python -m pip install --upgrade pip
            pip install --user \
-               numpy scipy matplotlib mpi4py mako pytest networkx edipack2py
+               numpy scipy matplotlib mpi4py mako pytest networkx
+
+    - name: Install edipack2py
+      shell: "bash -l {0}"
+      run: |
+           git clone -b phonons_and_1bdm https://github.com/EDIpack/EDIpack2py EDIpack2py.git
+           pushd EDIpack2py.git
+           pip install --user .
+           popd
 
     - name: Build & install TRIQS
       shell: "bash -l {0}"
