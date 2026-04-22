@@ -512,6 +512,7 @@
         <span class="n">nbath</span> <span class="o">=</span> <span class="n">nbath_total</span> <span class="o">//</span> <span class="n">norb</span>
 
         <span class="n">bath</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">(</span><span class="n">ed_mode</span><span class="p">,</span> <span class="n">nspin</span><span class="p">,</span> <span class="n">norb</span><span class="p">,</span> <span class="n">nbath</span><span class="p">)</span>
+        <span class="n">fops_bath_order</span> <span class="o">=</span> <span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">nbath_total</span>
 
         <span class="k">for</span> <span class="n">spin1</span><span class="p">,</span> <span class="n">spin2</span> <span class="ow">in</span> <span class="n">product</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">nspin</span><span class="p">),</span> <span class="n">repeat</span><span class="o">=</span><span class="mi">2</span><span class="p">):</span>
             <span class="c1"># Lists of bath states coupled to each impurity orbital</span>
@@ -537,10 +538,17 @@
                                 <span class="n">Delta</span><span class="p">[</span><span class="n">b</span><span class="p">,</span> <span class="n">b</span><span class="p">]</span>
                             <span class="p">)</span>
                         <span class="n">bath</span><span class="o">.</span><span class="n">V</span><span class="p">[</span><span class="n">spin1</span><span class="p">,</span> <span class="n">orb</span><span class="p">,</span> <span class="n">nu</span><span class="p">]</span> <span class="o">=</span> <span class="n">V</span><span class="p">[</span><span class="n">spin1</span><span class="p">,</span> <span class="n">spin2</span><span class="p">,</span> <span class="n">orb</span><span class="p">,</span> <span class="n">b</span><span class="p">]</span>
+
+                        <span class="c1"># Fill fops_bath_order</span>
+                        <span class="n">bath_state</span> <span class="o">=</span> <span class="n">orb</span> <span class="o">*</span> <span class="n">nbath</span> <span class="o">+</span> <span class="n">nu</span>
+                        <span class="k">if</span> <span class="n">fops_bath_order</span><span class="p">[</span><span class="n">bath_state</span><span class="p">]</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+                            <span class="n">fops_bath_order</span><span class="p">[</span><span class="n">bath_state</span><span class="p">]</span> <span class="o">=</span> <span class="n">b</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="k">assert</span> <span class="n">fops_bath_order</span><span class="p">[</span><span class="n">bath_state</span><span class="p">]</span> <span class="o">==</span> <span class="n">b</span>
                     <span class="k">elif</span> <span class="n">ed_mode</span> <span class="o">==</span> <span class="n">EDMode</span><span class="o">.</span><span class="n">NONSU2</span><span class="p">:</span>
                         <span class="n">bath</span><span class="o">.</span><span class="n">U</span><span class="p">[</span><span class="n">spin1</span><span class="p">,</span> <span class="n">orb</span><span class="p">,</span> <span class="n">nu</span><span class="p">]</span> <span class="o">=</span> <span class="n">V</span><span class="p">[</span><span class="n">spin1</span><span class="p">,</span> <span class="n">spin2</span><span class="p">,</span> <span class="n">orb</span><span class="p">,</span> <span class="n">b</span><span class="p">]</span>
 
-        <span class="k">return</span> <span class="n">bath</span></div>
+        <span class="k">return</span> <span class="n">bath</span><span class="p">,</span> <span class="n">fops_bath_order</span></div>
 
 
 
@@ -702,7 +710,7 @@
             <span class="k">elif</span> <span class="n">ed_mode</span> <span class="o">==</span> <span class="n">EDMode</span><span class="o">.</span><span class="n">NONSU2</span><span class="p">:</span>
                 <span class="n">bath</span><span class="o">.</span><span class="n">U</span><span class="p">[</span><span class="n">spin1</span><span class="p">,</span> <span class="p">:,</span> <span class="n">nu</span><span class="p">]</span> <span class="o">=</span> <span class="n">V</span><span class="p">[</span><span class="n">spin1</span><span class="p">,</span> <span class="n">spin2</span><span class="p">,</span> <span class="p">:,</span> <span class="n">nu</span><span class="p">]</span>
 
-        <span class="k">return</span> <span class="n">bath</span></div>
+        <span class="k">return</span> <span class="n">bath</span><span class="p">,</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">nbath</span><span class="p">))</span></div>
 
 
 
@@ -1212,7 +1220,13 @@
                 <span class="k">for</span> <span class="n">orb</span><span class="p">,</span> <span class="n">b</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">replica</span><span class="p">):</span>
                     <span class="n">bath</span><span class="o">.</span><span class="n">V</span><span class="p">[</span><span class="n">nu</span><span class="p">][</span><span class="n">spin</span><span class="p">,</span> <span class="n">orb</span><span class="p">]</span> <span class="o">=</span> <span class="n">V</span><span class="p">[</span><span class="n">spin</span><span class="p">,</span> <span class="n">spin</span><span class="p">,</span> <span class="n">orb</span><span class="p">,</span> <span class="n">b</span><span class="p">]</span>
 
-        <span class="k">return</span> <span class="n">bath</span>
+        <span class="c1"># Fill fops_bath_order</span>
+        <span class="n">fops_bath_order</span> <span class="o">=</span> <span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">nbath_total</span>
+        <span class="k">for</span> <span class="n">nu</span><span class="p">,</span> <span class="n">replica</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">replicas</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">orb</span><span class="p">,</span> <span class="n">b</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">replica</span><span class="p">):</span>
+                <span class="n">fops_bath_order</span><span class="p">[</span><span class="n">nu</span> <span class="o">*</span> <span class="n">norb</span> <span class="o">+</span> <span class="n">orb</span><span class="p">]</span> <span class="o">=</span> <span class="n">b</span>
+
+        <span class="k">return</span> <span class="n">bath</span><span class="p">,</span> <span class="n">fops_bath_order</span>
 
     <span class="nd">@classmethod</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">from_hamiltonian_and_basis</span><span class="p">(</span>
@@ -1265,7 +1279,13 @@
                 <span class="k">for</span> <span class="n">orb</span><span class="p">,</span> <span class="n">b</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">replica</span><span class="p">):</span>
                     <span class="n">bath</span><span class="o">.</span><span class="n">V</span><span class="p">[</span><span class="n">nu</span><span class="p">][</span><span class="n">spin</span><span class="p">,</span> <span class="n">orb</span><span class="p">]</span> <span class="o">=</span> <span class="n">V</span><span class="p">[</span><span class="n">spin</span><span class="p">,</span> <span class="n">spin</span><span class="p">,</span> <span class="n">orb</span><span class="p">,</span> <span class="n">b</span><span class="p">]</span>
 
-        <span class="k">return</span> <span class="n">bath</span>
+        <span class="c1"># Fill fops_bath_order</span>
+        <span class="n">fops_bath_order</span> <span class="o">=</span> <span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">nbath_total</span>
+        <span class="k">for</span> <span class="n">nu</span><span class="p">,</span> <span class="n">replica</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">replicas</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">orb</span><span class="p">,</span> <span class="n">b</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">replica</span><span class="p">):</span>
+                <span class="n">fops_bath_order</span><span class="p">[</span><span class="n">nu</span> <span class="o">*</span> <span class="n">norb</span> <span class="o">+</span> <span class="n">orb</span><span class="p">]</span> <span class="o">=</span> <span class="n">b</span>
+
+        <span class="k">return</span> <span class="n">bath</span><span class="p">,</span> <span class="n">fops_bath_order</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">lambdavec</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
