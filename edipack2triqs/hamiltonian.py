@@ -25,16 +25,26 @@ from .bath import BathNormal, BathHybrid, BathGeneral, BasisMatNAn
 class HamiltonianParams:
     """Parameters of the Hamiltonian"""
 
-    # Exact diagonalization mode
     ed_mode: EDMode
-    # Non-interacting part of the impurity Hamiltonian
+    "Exact diagonalization mode"
+
     Hloc: np.ndarray
-    # Anomalous part of the impurity Hamiltonian
+    "Non-interacting part of the impurity Hamiltonian"
+
     Hloc_an: np.ndarray
-    # Bath object (None if no bath is present)
+    "Anomalous part of the impurity Hamiltonian"
+
     bath: Union[BathNormal, BathHybrid, BathGeneral, NoneType]
-    # Interaction matrix U_{ijkl}
+    "Bath object (None if no bath is present)"
+
+    fops_bath_order: list[int]
+    """
+    List of positions within fops_bath_up/fops_bath_dn in the order
+    corresponding to EDIpack's bath state enumeration
+    """
+
     U: np.ndarray
+    "Interaction matrix U_{ijkl}"
 
     def Hloc_op(self,
                 fops_imp_up: list[IndicesType],
@@ -491,18 +501,19 @@ def parse_hamiltonian(  # noqa: C901
                                      bath_basis_mats_n_an,
                                      f_ed_mode)
 
-    bath = _make_bath(
+    bath, fops_bath_order = _make_bath(
         ed_mode, nspin,
         Hloc, Hloc_an,
         h, V, Delta,
         bath_basis_mats_n_an
-    ) if (nbath_total > 0) else None
+    ) if (nbath_total > 0) else (None, [])
 
     params = HamiltonianParams(
         ed_mode,
         Hloc=np.zeros((nspin, nspin, norb, norb), dtype=complex, order='F'),
         Hloc_an=Hloc_an,
         bath=bath,
+        fops_bath_order=fops_bath_order,
         U=U
     )
 

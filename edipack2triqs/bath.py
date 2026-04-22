@@ -285,6 +285,7 @@ class BathNormal(Bath):
         nbath = nbath_total // norb
 
         bath = cls(ed_mode, nspin, norb, nbath)
+        fops_bath_order = [-1] * nbath_total
 
         for spin1, spin2 in product(range(nspin), repeat=2):
             # Lists of bath states coupled to each impurity orbital
@@ -310,10 +311,17 @@ class BathNormal(Bath):
                                 Delta[b, b]
                             )
                         bath.V[spin1, orb, nu] = V[spin1, spin2, orb, b]
+
+                        # Fill fops_bath_order
+                        bath_state = orb * nbath + nu
+                        if fops_bath_order[bath_state] == -1:
+                            fops_bath_order[bath_state] = b
+                        else:
+                            assert fops_bath_order[bath_state] == b
                     elif ed_mode == EDMode.NONSU2:
                         bath.U[spin1, orb, nu] = V[spin1, spin2, orb, b]
 
-        return bath
+        return bath, fops_bath_order
 
 
 register_class(BathNormal)
@@ -472,7 +480,7 @@ class BathHybrid(Bath):
             elif ed_mode == EDMode.NONSU2:
                 bath.U[spin1, :, nu] = V[spin1, spin2, :, nu]
 
-        return bath
+        return bath, list(range(nbath))
 
 
 register_class(BathHybrid)
@@ -979,7 +987,13 @@ class BathGeneral(Bath):
                 for orb, b in enumerate(replica):
                     bath.V[nu][spin, orb] = V[spin, spin, orb, b]
 
-        return bath
+        # Fill fops_bath_order
+        fops_bath_order = [-1] * nbath_total
+        for nu, replica in enumerate(replicas):
+            for orb, b in enumerate(replica):
+                fops_bath_order[nu * norb + orb] = b
+
+        return bath, fops_bath_order
 
     @classmethod
     def from_hamiltonian_and_basis(
@@ -1032,7 +1046,13 @@ class BathGeneral(Bath):
                 for orb, b in enumerate(replica):
                     bath.V[nu][spin, orb] = V[spin, spin, orb, b]
 
-        return bath
+        # Fill fops_bath_order
+        fops_bath_order = [-1] * nbath_total
+        for nu, replica in enumerate(replicas):
+            for orb, b in enumerate(replica):
+                fops_bath_order[nu * norb + orb] = b
+
+        return bath, fops_bath_order
 
     @property
     def lambdavec(self):
