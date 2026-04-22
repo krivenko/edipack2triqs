@@ -107,7 +107,7 @@ jobs:
       shell: "bash -l {0}"
       run: >
            pip install
-           sphinx sphinx-rtd-theme sphinxfortran-ng
+           "sphinx<9" sphinx-rtd-theme sphinxfortran-ng
            myst-parser nbsphinx linkify-it-py enum-tools[sphinx]
 
     - name: Build documentation
