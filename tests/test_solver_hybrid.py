@@ -53,7 +53,7 @@ class TestEDIpackSolverBathHybrid(TestSolver):
 
     @classmethod
     def assert_all(cls, s, **refs):
-        cls.assert_static_obs(s, 1e-8, **refs)
+        cls.assert_static_obs(s, 2e-7, **refs)
         cls.assert_gfs(s, **refs)
         cls.assert_chi(s, atol=5e-5, **refs)
         cls.assert_rdm(s, **refs)

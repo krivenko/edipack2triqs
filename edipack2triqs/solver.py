@@ -2,6 +2,7 @@
 TRIQS interface to **EDIpack** exact diagonalization solver.
 """
 
+from itertools import product
 from dataclasses import dataclass
 from pathlib import Path
 from tempfile import TemporaryDirectory
@@ -784,6 +785,36 @@ class EDIpackSolver:
         one row per orbital.
         """
         return ed.get_mag().T
+
+    @property
+    def denmat(self) -> np.ndarray:
+        r"""
+        1-body density matrix of electrons.
+
+        The density matrix is returned as a 4-dimensional array
+        :math:`\hat\rho_{\sigma, \sigma', i, j}`, where :math:`\sigma,\sigma'`
+        are either spin indices or Nambu indices (in the superconducting
+        exact diagonalization mode). Each of the indices :math:`i, j` runs
+        over the combined range ``fops_imp_up + fops_bath_up`` or
+        ``fops_imp_dn + fops_bath_dn``, depending on the value of the respective
+        spin index.
+        """
+
+        state_map = list(range(self.norb)) + \
+            [self.norb + st for st in self.h_params.fops_bath_order]
+
+        denmat_edipack = ed.get_denmat(ishape=4)
+        denmat = np.zeros((2, 2, *denmat_edipack.shape[2:]), dtype=complex)
+
+        for (b1, fb1), (b2, fb2) in product(enumerate(state_map), repeat=2):
+            # Use the nspin=1 data to fill both spin-up and spin-down elements
+            if (ed.get_ed_mode() == int(EDMode.NORMAL)) and (self.nspin == 1):
+                denmat[0, 0, fb1, fb2] = denmat_edipack[0, 0, b1, b2]
+                denmat[1, 1, fb1, fb2] = denmat_edipack[0, 0, b1, b2]
+            else:
+                denmat[:, :, fb1, fb2] = denmat_edipack[:, :, b1, b2]
+
+        return denmat
 
     @property
     def rdm(self) -> np.ndarray:

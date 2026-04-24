@@ -231,6 +231,7 @@ class TestSolver(unittest.TestCase):
         assert_allclose(solver.magnetization[:, 0], refs['magn_x'], atol=atol)
         assert_allclose(solver.magnetization[:, 1], refs['magn_y'], atol=atol)
         assert_allclose(solver.magnetization[:, 2], refs['magn_z'], atol=atol)
+        assert_allclose(solver.denmat, refs['denmat'], atol=atol)
         if 'phi' in refs:
             assert_allclose(
                 solver.superconductive_phi
@@ -428,7 +429,8 @@ class TestSolver(unittest.TestCase):
 
     @classmethod
     def make_reference_static_obs_results(cls, results, ed, mki, *,
-                                          beta, superc):
+                                          beta,
+                                          superc):
         "Generate reference results for static observables using pomerol2triqs"
         def make_avg(spins):
             res = [
@@ -459,6 +461,50 @@ class TestSolver(unittest.TestCase):
                     mki('up', o1), mki('dn', o2), beta, (False, False)
                 )
             results['phi'] = phi
+
+        # 1-body density matrix
+        indices_up = [mki('up', o) for o in cls.orbs]
+        indices_dn = [mki('dn', o) for o in cls.orbs]
+        if hasattr(cls, 'mkind_bath'):
+            indices_up += cls.fops_bath_up
+            indices_dn += cls.fops_bath_dn
+
+        denmat = np.empty((2, 2, len(indices_up), len(indices_up)),
+                          dtype=complex)
+        if superc:
+            # The first two indices of 'denmat' are Nambu indices in this case
+            # <c^\dagger_{up, i1} c_{up, i2}>
+            for (i1, l1), (i2, l2) in product(enumerate(indices_up), repeat=2):
+                denmat[0, 0, i1, i2] = ed.ensemble_average(
+                    l1, l2, beta, (True, False)
+                )
+            # <c_{dn, i1} c^\dagger_{dn, i2}> =
+            # \delta(i1, i2) - <c^\dagger_{dn, i2} c_{dn, i1}>
+            for (i1, l1), (i2, l2) in product(enumerate(indices_dn), repeat=2):
+                denmat[1, 1, i1, i2] = int(i1 == i2) - ed.ensemble_average(
+                    l2, l1, beta, (True, False)
+                )
+            # <c^\dagger_{up, i1} c^dagger_{dn, i2}>
+            for (i1, l1), (i2, l2) in product(enumerate(indices_up),
+                                              enumerate(indices_dn)):
+                denmat[0, 1, i1, i2] = ed.ensemble_average(
+                    l1, l2, beta, (True, True)
+                )
+            # <c_{dn, i1} c_{dn, i2}>
+            for (i1, l1), (i2, l2) in product(enumerate(indices_dn),
+                                              enumerate(indices_up)):
+                denmat[1, 0, i1, i2] = ed.ensemble_average(
+                    l1, l2, beta, (False, False)
+                )
+        else:
+            indices = (indices_up, indices_dn)
+            for s1, s2 in product(range(2), repeat=2):
+                for (i1, l1), (i2, l2) in product(enumerate(indices[s1]),
+                                                  enumerate(indices[s2])):
+                    denmat[s1, s2, i1, i2] = ed.ensemble_average(
+                        l1, l2, beta, (True, False)
+                    )
+        results['denmat'] = denmat
 
     @classmethod
     def make_reference_gfs_normal_results(cls, results, h, ed, ed0, *,
