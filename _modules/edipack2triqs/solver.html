@@ -71,6 +71,7 @@
 <li class="toctree-l4"><a class="reference internal" href="../../documentation.html#edipack2triqs.solver.EDIpackSolver.densities"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.densities</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../documentation.html#edipack2triqs.solver.EDIpackSolver.double_occ"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.double_occ</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../documentation.html#edipack2triqs.solver.EDIpackSolver.superconductive_phi"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.superconductive_phi</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../documentation.html#edipack2triqs.solver.EDIpackSolver.superconductive_phi_arg"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.superconductive_phi_arg</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../documentation.html#edipack2triqs.solver.EDIpackSolver.chi_dens_iw"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.chi_dens_iw</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../documentation.html#edipack2triqs.solver.EDIpackSolver.chi_dens_tau"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.chi_dens_tau</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../documentation.html#edipack2triqs.solver.EDIpackSolver.chi_dens_w"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.chi_dens_w</span></code></a></li>
@@ -83,8 +84,8 @@
 <li class="toctree-l4"><a class="reference internal" href="../../documentation.html#edipack2triqs.solver.EDIpackSolver.chi_spin_iw"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.chi_spin_iw</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../documentation.html#edipack2triqs.solver.EDIpackSolver.chi_spin_tau"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.chi_spin_tau</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../documentation.html#edipack2triqs.solver.EDIpackSolver.chi_spin_w"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.chi_spin_w</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../documentation.html#edipack2triqs.solver.EDIpackSolver.superconductive_phi_arg"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.superconductive_phi_arg</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../documentation.html#edipack2triqs.solver.EDIpackSolver.magnetization"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.magnetization</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../documentation.html#edipack2triqs.solver.EDIpackSolver.denmat"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.denmat</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../documentation.html#edipack2triqs.solver.EDIpackSolver.rdm"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.rdm</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../documentation.html#edipack2triqs.solver.EDIpackSolver.g_iw"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.g_iw</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../documentation.html#edipack2triqs.solver.EDIpackSolver.g_an_iw"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.g_an_iw</span></code></a></li>
@@ -224,6 +225,7 @@
 <span class="sd">TRIQS interface to **EDIpack** exact diagonalization solver.</span>
 <span class="sd">&quot;&quot;&quot;</span>
 
+<span class="kn">from</span><span class="w"> </span><span class="nn">itertools</span><span class="w"> </span><span class="kn">import</span> <span class="n">product</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">tempfile</span><span class="w"> </span><span class="kn">import</span> <span class="n">TemporaryDirectory</span>
@@ -1017,6 +1019,36 @@
 <span class="sd">        one row per orbital.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">ed</span><span class="o">.</span><span class="n">get_mag</span><span class="p">()</span><span class="o">.</span><span class="n">T</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">denmat</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        1-body density matrix of electrons.</span>
+
+<span class="sd">        The density matrix is returned as a 4-dimensional array</span>
+<span class="sd">        :math:`\hat\rho_{\sigma, \sigma&#39;, i, j}`, where :math:`\sigma,\sigma&#39;`</span>
+<span class="sd">        are either spin indices or Nambu indices (in the superconducting</span>
+<span class="sd">        exact diagonalization mode). Each of the indices :math:`i, j` runs</span>
+<span class="sd">        over the combined range ``fops_imp_up + fops_bath_up`` or</span>
+<span class="sd">        ``fops_imp_dn + fops_bath_dn``, depending on the value of the respective</span>
+<span class="sd">        spin index.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">state_map</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">norb</span><span class="p">))</span> <span class="o">+</span> \
+            <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">norb</span> <span class="o">+</span> <span class="n">st</span> <span class="k">for</span> <span class="n">st</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">h_params</span><span class="o">.</span><span class="n">fops_bath_order</span><span class="p">]</span>
+
+        <span class="n">denmat_edipack</span> <span class="o">=</span> <span class="n">ed</span><span class="o">.</span><span class="n">get_denmat</span><span class="p">(</span><span class="n">ishape</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+        <span class="n">denmat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="o">*</span><span class="n">denmat_edipack</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">:]),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">complex</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="p">(</span><span class="n">b1</span><span class="p">,</span> <span class="n">fb1</span><span class="p">),</span> <span class="p">(</span><span class="n">b2</span><span class="p">,</span> <span class="n">fb2</span><span class="p">)</span> <span class="ow">in</span> <span class="n">product</span><span class="p">(</span><span class="nb">enumerate</span><span class="p">(</span><span class="n">state_map</span><span class="p">),</span> <span class="n">repeat</span><span class="o">=</span><span class="mi">2</span><span class="p">):</span>
+            <span class="c1"># Use the nspin=1 data to fill both spin-up and spin-down elements</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">ed</span><span class="o">.</span><span class="n">get_ed_mode</span><span class="p">()</span> <span class="o">==</span> <span class="nb">int</span><span class="p">(</span><span class="n">EDMode</span><span class="o">.</span><span class="n">NORMAL</span><span class="p">))</span> <span class="ow">and</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nspin</span> <span class="o">==</span> <span class="mi">1</span><span class="p">):</span>
+                <span class="n">denmat</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">fb1</span><span class="p">,</span> <span class="n">fb2</span><span class="p">]</span> <span class="o">=</span> <span class="n">denmat_edipack</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">b1</span><span class="p">,</span> <span class="n">b2</span><span class="p">]</span>
+                <span class="n">denmat</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">fb1</span><span class="p">,</span> <span class="n">fb2</span><span class="p">]</span> <span class="o">=</span> <span class="n">denmat_edipack</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">b1</span><span class="p">,</span> <span class="n">b2</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">denmat</span><span class="p">[:,</span> <span class="p">:,</span> <span class="n">fb1</span><span class="p">,</span> <span class="n">fb2</span><span class="p">]</span> <span class="o">=</span> <span class="n">denmat_edipack</span><span class="p">[:,</span> <span class="p">:,</span> <span class="n">b1</span><span class="p">,</span> <span class="n">b2</span><span class="p">]</span>
+
+        <span class="k">return</span> <span class="n">denmat</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">rdm</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>

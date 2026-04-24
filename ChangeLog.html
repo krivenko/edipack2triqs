@@ -74,6 +74,7 @@
 <li class="toctree-l4"><a class="reference internal" href="documentation.html#edipack2triqs.solver.EDIpackSolver.densities"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.densities</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="documentation.html#edipack2triqs.solver.EDIpackSolver.double_occ"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.double_occ</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="documentation.html#edipack2triqs.solver.EDIpackSolver.superconductive_phi"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.superconductive_phi</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="documentation.html#edipack2triqs.solver.EDIpackSolver.superconductive_phi_arg"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.superconductive_phi_arg</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="documentation.html#edipack2triqs.solver.EDIpackSolver.chi_dens_iw"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.chi_dens_iw</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="documentation.html#edipack2triqs.solver.EDIpackSolver.chi_dens_tau"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.chi_dens_tau</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="documentation.html#edipack2triqs.solver.EDIpackSolver.chi_dens_w"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.chi_dens_w</span></code></a></li>
@@ -86,8 +87,8 @@
 <li class="toctree-l4"><a class="reference internal" href="documentation.html#edipack2triqs.solver.EDIpackSolver.chi_spin_iw"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.chi_spin_iw</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="documentation.html#edipack2triqs.solver.EDIpackSolver.chi_spin_tau"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.chi_spin_tau</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="documentation.html#edipack2triqs.solver.EDIpackSolver.chi_spin_w"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.chi_spin_w</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="documentation.html#edipack2triqs.solver.EDIpackSolver.superconductive_phi_arg"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.superconductive_phi_arg</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="documentation.html#edipack2triqs.solver.EDIpackSolver.magnetization"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.magnetization</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="documentation.html#edipack2triqs.solver.EDIpackSolver.denmat"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.denmat</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="documentation.html#edipack2triqs.solver.EDIpackSolver.rdm"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.rdm</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="documentation.html#edipack2triqs.solver.EDIpackSolver.g_iw"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.g_iw</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="documentation.html#edipack2triqs.solver.EDIpackSolver.g_an_iw"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.g_an_iw</span></code></a></li>
@@ -226,6 +227,8 @@
 <section id="version-1-0-0">
 <h2>Version 1.0.0<a class="headerlink" href="#version-1-0-0" title="Link to this heading"></a></h2>
 <ul class="simple">
+<li><p>Expose single-particle density matrix of the full system (impurity + bath)
+via read-only property <code class="docutils literal notranslate"><span class="pre">EDIpackSolver.denmat</span></code>.</p></li>
 <li><p>Expose impurity reduced density matrix via read-only property
 <code class="docutils literal notranslate"><span class="pre">EDIpackSolver.rdm</span></code>. Calculation of the reduced density matrix is enabled
 by passing <code class="docutils literal notranslate"><span class="pre">rdm=True</span></code> to <code class="docutils literal notranslate"><span class="pre">EDIpackSolver.solve()</span></code>.</p></li>

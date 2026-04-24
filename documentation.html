@@ -76,6 +76,7 @@
 <li class="toctree-l4"><a class="reference internal" href="#edipack2triqs.solver.EDIpackSolver.densities"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.densities</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#edipack2triqs.solver.EDIpackSolver.double_occ"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.double_occ</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#edipack2triqs.solver.EDIpackSolver.superconductive_phi"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.superconductive_phi</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#edipack2triqs.solver.EDIpackSolver.superconductive_phi_arg"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.superconductive_phi_arg</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#edipack2triqs.solver.EDIpackSolver.chi_dens_iw"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.chi_dens_iw</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#edipack2triqs.solver.EDIpackSolver.chi_dens_tau"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.chi_dens_tau</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#edipack2triqs.solver.EDIpackSolver.chi_dens_w"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.chi_dens_w</span></code></a></li>
@@ -88,8 +89,8 @@
 <li class="toctree-l4"><a class="reference internal" href="#edipack2triqs.solver.EDIpackSolver.chi_spin_iw"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.chi_spin_iw</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#edipack2triqs.solver.EDIpackSolver.chi_spin_tau"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.chi_spin_tau</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#edipack2triqs.solver.EDIpackSolver.chi_spin_w"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.chi_spin_w</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#edipack2triqs.solver.EDIpackSolver.superconductive_phi_arg"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.superconductive_phi_arg</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#edipack2triqs.solver.EDIpackSolver.magnetization"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.magnetization</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#edipack2triqs.solver.EDIpackSolver.denmat"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.denmat</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#edipack2triqs.solver.EDIpackSolver.rdm"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.rdm</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#edipack2triqs.solver.EDIpackSolver.g_iw"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.g_iw</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#edipack2triqs.solver.EDIpackSolver.g_an_iw"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.g_an_iw</span></code></a></li>
@@ -462,6 +463,14 @@ impurity response functions.</p></li>
 </dd></dl>
 
 <dl class="py property">
+<dt class="sig sig-object py" id="edipack2triqs.solver.EDIpackSolver.superconductive_phi_arg">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">superconductive_phi_arg</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" rel="noopener noreferrer" target="_blank" title="(in NumPy v2.4)"><span class="pre">ndarray</span></a></em><a class="headerlink" href="#edipack2triqs.solver.EDIpackSolver.superconductive_phi_arg" title="Link to this definition"></a></dt>
+<dd><p>Complex argument of the impurity superconductive order parameter
+<span class="math notranslate nohighlight">\(\phi = \langle c_{o_1,\uparrow} c_{o_2,\downarrow} \rangle\)</span>
+(matrix in the orbital space).</p>
+</dd></dl>
+
+<dl class="py property">
 <dt class="sig sig-object py" id="edipack2triqs.solver.EDIpackSolver.chi_dens_iw">
 <em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">chi_dens_iw</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://triqs.github.io/triqs/latest/documentation/python_api/triqs.gf.gf.Gf.html#triqs.gf.gf.Gf" rel="noopener noreferrer" target="_blank" title="(in TRIQS v3.3.2)"><span class="pre">Gf</span></a></em><a class="headerlink" href="#edipack2triqs.solver.EDIpackSolver.chi_dens_iw" title="Link to this definition"></a></dt>
 <dd><p>Matsubara density response function</p>
@@ -534,18 +543,23 @@ impurity response functions.</p></li>
 </dd></dl>
 
 <dl class="py property">
-<dt class="sig sig-object py" id="edipack2triqs.solver.EDIpackSolver.superconductive_phi_arg">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">superconductive_phi_arg</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" rel="noopener noreferrer" target="_blank" title="(in NumPy v2.4)"><span class="pre">ndarray</span></a></em><a class="headerlink" href="#edipack2triqs.solver.EDIpackSolver.superconductive_phi_arg" title="Link to this definition"></a></dt>
-<dd><p>Complex argument of the impurity superconductive order parameter
-<span class="math notranslate nohighlight">\(\phi = \langle c_{o_1,\uparrow} c_{o_2,\downarrow} \rangle\)</span>
-(matrix in the orbital space).</p>
-</dd></dl>
-
-<dl class="py property">
 <dt class="sig sig-object py" id="edipack2triqs.solver.EDIpackSolver.magnetization">
 <em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">magnetization</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" rel="noopener noreferrer" target="_blank" title="(in NumPy v2.4)"><span class="pre">ndarray</span></a></em><a class="headerlink" href="#edipack2triqs.solver.EDIpackSolver.magnetization" title="Link to this definition"></a></dt>
 <dd><p>Cartesian components of impurity magnetization vectors,
 one row per orbital.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="edipack2triqs.solver.EDIpackSolver.denmat">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">denmat</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" rel="noopener noreferrer" target="_blank" title="(in NumPy v2.4)"><span class="pre">ndarray</span></a></em><a class="headerlink" href="#edipack2triqs.solver.EDIpackSolver.denmat" title="Link to this definition"></a></dt>
+<dd><p>1-body density matrix of electrons.</p>
+<p>The density matrix is returned as a 4-dimensional array
+<span class="math notranslate nohighlight">\(\hat\rho_{\sigma, \sigma', i, j}\)</span>, where <span class="math notranslate nohighlight">\(\sigma,\sigma'\)</span>
+are either spin indices or Nambu indices (in the superconducting
+exact diagonalization mode). Each of the indices <span class="math notranslate nohighlight">\(i, j\)</span> runs
+over the combined range <code class="docutils literal notranslate"><span class="pre">fops_imp_up</span> <span class="pre">+</span> <span class="pre">fops_bath_up</span></code> or
+<code class="docutils literal notranslate"><span class="pre">fops_imp_dn</span> <span class="pre">+</span> <span class="pre">fops_bath_dn</span></code>, depending on the value of the respective
+spin index.</p>
 </dd></dl>
 
 <dl class="py property">
