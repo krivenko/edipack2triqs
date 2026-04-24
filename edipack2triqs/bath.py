@@ -9,10 +9,12 @@ from typing import Optional
 import numpy as np
 import networkx as nx
 
+import triqs.operators as op
+
 from h5.formats import register_class
 
 from . import EDMode
-from .util import is_diagonal, is_spin_diagonal, make_nambu
+from .util import is_diagonal, is_spin_diagonal, make_nambu, IndicesType
 
 
 BasisMatNAn = tuple[np.ndarray, np.ndarray]
@@ -222,6 +224,70 @@ class BathNormal(Bath):
         else:
             return EDMode.NORMAL
 
+    def as_operator(self,
+                    fops_imp_up: list[IndicesType],
+                    fops_imp_dn: list[IndicesType],
+                    fops_bath_up: list[IndicesType],
+                    fops_bath_dn: list[IndicesType],
+                    fops_bath_order: list[int]) -> op.Operator:
+        """
+        Return the bath Hamiltonian as a :class:`triqs.operators.Operator`.
+
+        The operator includes bath energy levels, impurity-bath hopping
+        amplitudes, and (in ``EDMode.SUPERC`` mode) on-site pairing terms.
+
+        Parameters
+        ----------
+        fops_imp_up : list[IndicesType]
+            Fundamental operator indices for spin-up impurity orbitals.
+        fops_imp_dn : list[IndicesType]
+            Fundamental operator indices for spin-down impurity orbitals.
+        fops_bath_up : list[IndicesType]
+            Fundamental operator indices for spin-up bath states.
+        fops_bath_dn : list[IndicesType]
+            Fundamental operator indices for spin-down bath states.
+        fops_bath_order: list[int]
+            List of positions within fops_bath_up/fops_bath_dn in the order
+            corresponding to EDIpack's bath state enumeration.
+
+        Returns
+        -------
+        op.Operator
+        """
+        nspin, norb, nbath = self.V.shape
+
+        d = [[op.c(*ind) for ind in fops_imp_up],
+             [op.c(*ind) for ind in fops_imp_dn]]
+        c = [[op.c(*fops_bath_up[ind]) for ind in fops_bath_order],
+             [op.c(*fops_bath_dn[ind]) for ind in fops_bath_order]]
+
+        h = op.Operator()
+
+        for b, (orb, nu) in enumerate(np.ndindex(norb, nbath)):
+            for spin in range(2):
+                s = 0 if (nspin == 1) else spin
+                # Energy level
+                h += self.eps[s, orb, nu] * op.dagger(c[spin][b]) * c[spin][b]
+                # Same-spin hopping amplitude
+                h += self.V[s, orb, nu] * op.dagger(d[spin][orb]) * c[spin][b]
+                h += np.conj(self.V[s, orb, nu]) * \
+                    op.dagger(c[spin][b]) * d[spin][orb]
+
+                # Spin-flip hopping amplitude
+                if self.ed_mode == EDMode.NONSU2:
+                    h += self.U[spin, orb, nu] * \
+                        op.dagger(d[spin][orb]) * c[1 - spin][b]
+                    h += np.conj(self.U[spin, orb, nu]) * \
+                        op.dagger(c[1 - spin][b]) * d[spin][orb]
+
+            # On-site bath pairing
+            if self.ed_mode == EDMode.SUPERC:
+                h += self.Delta[0, orb, nu] * \
+                    op.dagger(c[0][b]) * op.dagger(c[1][b])
+                h += np.conj(self.Delta[0, orb, nu]) * c[1][b] * c[0][b]
+
+        return h
+
     def __deepcopy__(self, memo):
         nspin, norb, nbath = self.V.shape
         return BathNormal(self.ed_mode, nspin, norb, nbath, self.data.copy())
@@ -428,6 +494,74 @@ class BathHybrid(Bath):
         else:
             return EDMode.NORMAL
 
+    def as_operator(self,
+                    fops_imp_up: list[IndicesType],
+                    fops_imp_dn: list[IndicesType],
+                    fops_bath_up: list[IndicesType],
+                    fops_bath_dn: list[IndicesType],
+                    fops_bath_order: list[int]) -> op.Operator:
+        """
+        Return the bath Hamiltonian as a :class:`triqs.operators.Operator`.
+
+        The operator includes bath energy levels, impurity-bath hopping
+        amplitudes, and (in ``EDMode.SUPERC`` mode) on-site pairing terms.
+
+        Parameters
+        ----------
+        fops_imp_up : list[IndicesType]
+            Fundamental operator indices for spin-up impurity orbitals.
+        fops_imp_dn : list[IndicesType]
+            Fundamental operator indices for spin-down impurity orbitals.
+        fops_bath_up : list[IndicesType]
+            Fundamental operator indices for spin-up bath states.
+        fops_bath_dn : list[IndicesType]
+            Fundamental operator indices for spin-down bath states.
+        fops_bath_order: list[int]
+            List of positions within fops_bath_up/fops_bath_dn in the order
+            corresponding to EDIpack's bath state enumeration.
+
+        Returns
+        -------
+        op.Operator
+        """
+        nspin, norb, nbath = self.V.shape
+
+        d = [[op.c(*ind) for ind in fops_imp_up],
+             [op.c(*ind) for ind in fops_imp_dn]]
+        c = [[op.c(*fops_bath_up[ind]) for ind in fops_bath_order],
+             [op.c(*fops_bath_dn[ind]) for ind in fops_bath_order]]
+
+        h = op.Operator()
+
+        for nu in range(nbath):
+            for spin in range(2):
+                s = 0 if (nspin == 1) else spin
+                # Energy level
+                h += self.eps[s, nu] * op.dagger(c[spin][nu]) * c[spin][nu]
+
+            # On-site bath pairing
+            if self.ed_mode == EDMode.SUPERC:
+                h += self.Delta[0, nu] * \
+                    op.dagger(c[0][nu]) * op.dagger(c[1][nu])
+                h += np.conj(self.Delta[0, nu]) * c[1][nu] * c[0][nu]
+
+        for orb, nu in np.ndindex(norb, nbath):
+            for spin in range(2):
+                s = 0 if (nspin == 1) else spin
+                # Same-spin hopping amplitude
+                h += self.V[s, orb, nu] * op.dagger(d[spin][orb]) * c[spin][nu]
+                h += np.conj(self.V[s, orb, nu]) * \
+                    op.dagger(c[spin][nu]) * d[spin][orb]
+
+                # Spin-flip hopping amplitude
+                if self.ed_mode == EDMode.NONSU2:
+                    h += self.U[spin, orb, nu] * \
+                        op.dagger(d[spin][orb]) * c[1 - spin][nu]
+                    h += np.conj(self.U[spin, orb, nu]) * \
+                        op.dagger(c[1 - spin][nu]) * d[spin][orb]
+
+        return h
+
     def __deepcopy__(self, memo):
         nspin, norb, nbath = self.V.shape
         return BathHybrid(self.ed_mode, nspin, norb, nbath, self.data.copy())
@@ -511,6 +645,8 @@ class BathGeneral(Bath):
     Basis matrices :math:`\hat O_i` as an array of the shape
     (nspin, nspin, norb, norb, nsym).
     """
+    is_nambu: bool
+    r"Are replica basis matrices written in the Nambu basis?"
     l: list[np.ndarray]
     r"""
     Coefficients of linear combinations :math:`\lambda^\nu_i`. Each of the
@@ -529,9 +665,11 @@ class BathGeneral(Bath):
                  norb: int,
                  nbath: int,
                  hvec: np.ndarray,
+                 is_nambu: bool,
                  data: Optional[np.ndarray] = None):
         self.nbath = nbath
         self.hvec = hvec
+        self.is_nambu = is_nambu
         self.nsym = hvec.shape[-1]
 
         V_size = nspin * norb
@@ -563,10 +701,86 @@ class BathGeneral(Bath):
                   for nu in range(self.nbath)]
         assert all(l_nu.base is self.data for l_nu in self.l)
 
+    def as_operator(self,
+                    fops_imp_up: list[IndicesType],
+                    fops_imp_dn: list[IndicesType],
+                    fops_bath_up: list[IndicesType],
+                    fops_bath_dn: list[IndicesType],
+                    fops_bath_order: list[int]) -> op.Operator:
+        """
+        Return the bath Hamiltonian as a :class:`triqs.operators.Operator`.
+
+        The operator includes bath energy levels, impurity-bath hopping
+        amplitudes, and (when ``self.is_nambu = True``) on-site pairing terms.
+
+        Parameters
+        ----------
+        fops_imp_up : list[IndicesType]
+            Fundamental operator indices for spin-up impurity orbitals.
+        fops_imp_dn : list[IndicesType]
+            Fundamental operator indices for spin-down impurity orbitals.
+        fops_bath_up : list[IndicesType]
+            Fundamental operator indices for spin-up bath states.
+        fops_bath_dn : list[IndicesType]
+            Fundamental operator indices for spin-down bath states.
+        fops_bath_order: list[int]
+            List of positions within fops_bath_up/fops_bath_dn in the order
+            corresponding to EDIpack's bath state enumeration.
+
+        Returns
+        -------
+        op.Operator
+        """
+        nspin, norb = self.V[0].shape
+        nsym = self.hvec.shape[-1]
+
+        d = [[op.c(*ind) for ind in fops_imp_up],
+             [op.c(*ind) for ind in fops_imp_dn]]
+
+        h = op.Operator()
+
+        # Iterate over contributions from individual replicas
+        for nu, (l, V) in enumerate(zip(self.l, self.V)):
+            fbo_nu = fops_bath_order[nu * norb: (nu + 1) * norb]
+            c = [[op.c(*fops_bath_up[ind]) for ind in fbo_nu],
+                 [op.c(*fops_bath_dn[ind]) for ind in fbo_nu]]
+
+            # Matrix of replica Hamiltonian
+            h_nu_mat = sum(l[isym] * self.hvec[:, :, :, :, isym]
+                           for isym in range(nsym))
+
+            if self.is_nambu:
+                # h_nu_mat is written in Nambu basis
+                for orb1, orb2 in np.ndindex(norb, norb):
+                    h += h_nu_mat[0, 0, orb1, orb2] * \
+                        op.dagger(c[0][orb1]) * c[0][orb2]
+                    h += h_nu_mat[0, 1, orb1, orb2] * \
+                        op.dagger(c[0][orb1]) * op.dagger(c[1][orb2])
+                    h += h_nu_mat[1, 0, orb1, orb2] * c[1][orb1] * c[0][orb2]
+                    h += -h_nu_mat[1, 1, orb1, orb2] * \
+                        op.dagger(c[1][orb1]) * c[1][orb2]
+            else:
+                # h_nu_mat is written in spin basis
+                for spin1, spin2, orb1, orb2 in np.ndindex(2, 2, norb, norb):
+                    if nspin == 1:
+                        e = h_nu_mat[0, 0, orb1, orb2] if spin1 == spin2 else 0
+                    else:
+                        e = h_nu_mat[spin1, spin2, orb1, orb2]
+                    h += e * op.dagger(c[spin1][orb1]) * c[spin2][orb2]
+
+            # Hopping amplitudes
+            for spin, orb in np.ndindex(2, norb):
+                v = V[0, orb] if nspin == 1 else V[spin, orb]
+                h += v * op.dagger(d[spin][orb]) * c[spin][orb]
+                h += np.conj(v) * op.dagger(c[spin][orb]) * d[spin][orb]
+
+        return h
+
     def __deepcopy__(self, memo):
         nspin, norb = self.V[0].shape
         return BathGeneral(nspin, norb, self.nbath,
                            deepcopy(self.hvec, memo),
+                           self.is_nambu,
                            self.data.copy())
 
     def __reduce_to_dict__(self):
@@ -575,6 +789,7 @@ class BathGeneral(Bath):
                 "norb": self.V[0].shape[1],
                 "nbath": self.nbath,
                 "hvec": self.hvec,
+                "is_nambu": self.is_nambu,
                 "data": self.data}
 
     @classmethod
@@ -582,7 +797,7 @@ class BathGeneral(Bath):
         "HDFArchive deserialization"
         return BathGeneral(
             d["nspin"], d["norb"], d["nbath"],
-            d["hvec"], d["data"]
+            d["hvec"], d["is_nambu"], d["data"]
         )
 
     def assert_compatible(self, other):
@@ -591,6 +806,8 @@ class BathGeneral(Bath):
             "Incompatible bath topologies"
         assert (self.hvec == other.hvec).all(), \
             "Incompatible general bath objects (different basis matrices)"
+        assert self.is_nambu == other.is_nambu, \
+            "Incompatible general bath objects (Nambu vs non-Nambu basis)"
 
     # Multiply all bath parameters by a constant
     def __imul__(self, x):
@@ -973,7 +1190,7 @@ class BathGeneral(Bath):
         hvec, lambdavec = \
             cls._build_linear_combination(replicas, nnambu * nspin, h, is_nambu)
 
-        bath = cls(nspin, norb, nbath, hvec)
+        bath = cls(nspin, norb, nbath, hvec, is_nambu)
 
         # Fill l
         for nu in range(bath.nbath):
@@ -1033,7 +1250,7 @@ class BathGeneral(Bath):
                                          basis_mats,
                                          is_nambu)
 
-        bath = cls(nspin, norb, nbath, hvec)
+        bath = cls(nspin, norb, nbath, hvec, is_nambu)
 
         # Fill l
         for coeff, (nu, isym) in zip(coeffs, classification):

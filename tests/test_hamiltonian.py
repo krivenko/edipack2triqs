@@ -226,6 +226,13 @@ class TestHamiltonianBathNormal(TestHamiltonian):
             self.assertEqual(e, self.eps[orb, nu])
             self.assertEqual(v, self.V[orb, nu])
 
+        self.assertEqual(
+            params.bath.as_operator(self.fops_imp_up, self.fops_imp_dn,
+                                    self.fops_bath_up, self.fops_bath_dn,
+                                    params.fops_bath_order),
+            h_bath
+        )
+
         # Check interaction
         self.check_int_params(params)
 
@@ -280,6 +287,13 @@ class TestHamiltonianBathNormal(TestHamiltonian):
                 self.assertEqual(e, eps_s[orb, nu])
                 self.assertEqual(v, V_s[orb, nu])
 
+        self.assertEqual(
+            params.bath.as_operator(self.fops_imp_up, self.fops_imp_dn,
+                                    self.fops_bath_up, self.fops_bath_dn,
+                                    params.fops_bath_order),
+            h_bath
+        )
+
         # Check interaction
         self.check_int_params(params)
 
@@ -331,6 +345,13 @@ class TestHamiltonianBathNormal(TestHamiltonian):
                 nu, orb = self.fops_bath_to_nu_orb(fbo)
                 self.assertEqual(e, self.eps[orb, nu])
                 self.assertEqual(v, self.V[orb, nu])
+
+        self.assertEqual(
+            params.bath.as_operator(self.fops_imp_up, self.fops_imp_dn,
+                                    self.fops_bath_up, self.fops_bath_dn,
+                                    params.fops_bath_order),
+            h_bath
+        )
 
         # Check interaction
         self.check_int_params(params)
@@ -390,6 +411,13 @@ class TestHamiltonianBathNormal(TestHamiltonian):
                 self.assertEqual(v, V_s[orb, nu])
                 self.assertEqual(u, 0.2 * self.V[orb, nu])
 
+        self.assertEqual(
+            params.bath.as_operator(self.fops_imp_up, self.fops_imp_dn,
+                                    self.fops_bath_up, self.fops_bath_dn,
+                                    params.fops_bath_order),
+            h_bath
+        )
+
         # Check interaction
         self.check_int_params(params)
 
@@ -447,6 +475,13 @@ class TestHamiltonianBathNormal(TestHamiltonian):
             nu, orb = self.fops_bath_to_nu_orb(fbo)
             self.assertEqual(e, self.eps[orb, nu])
             self.assertEqual(v, self.V[orb, nu])
+
+        self.assertEqual(
+            params.bath.as_operator(self.fops_imp_up, self.fops_imp_dn,
+                                    self.fops_bath_up, self.fops_bath_dn,
+                                    params.fops_bath_order),
+            h_bath
+        )
 
         # Check interaction
         self.check_int_params(params)
@@ -513,6 +548,13 @@ class TestHamiltonianBathNormal(TestHamiltonian):
             self.assertEqual(e, self.eps[orb, nu])
             self.assertEqual(d, Delta[orb, nu])
             self.assertEqual(v, self.V[orb, nu])
+
+        self.assertEqual(
+            params.bath.as_operator(self.fops_imp_up, self.fops_imp_dn,
+                                    self.fops_bath_up, self.fops_bath_dn,
+                                    params.fops_bath_order),
+            h_bath + h_sc
+        )
 
         # Check interaction
         self.check_int_params(params)
@@ -615,6 +657,13 @@ class TestHamiltonianBathHybrid(TestHamiltonian):
         self.assertFalse(hasattr(params.bath, 'U'))
         self.assertEqual(params.fops_bath_order, list(range(self.nbath)))
 
+        self.assertEqual(
+            params.bath.as_operator(self.fops_imp_up, self.fops_imp_dn,
+                                    self.fops_bath_up, self.fops_bath_dn,
+                                    params.fops_bath_order),
+            h_bath
+        )
+
         # Check interaction
         self.check_int_params(params)
 
@@ -661,6 +710,13 @@ class TestHamiltonianBathHybrid(TestHamiltonian):
         self.assertFalse(hasattr(params.bath, 'U'))
         self.assertEqual(params.fops_bath_order, list(range(self.nbath)))
 
+        self.assertEqual(
+            params.bath.as_operator(self.fops_imp_up, self.fops_imp_dn,
+                                    self.fops_bath_up, self.fops_bath_dn,
+                                    params.fops_bath_order),
+            h_bath
+        )
+
         # Check interaction
         self.check_int_params(params)
 
@@ -702,6 +758,13 @@ class TestHamiltonianBathHybrid(TestHamiltonian):
         assert_allclose(params.bath.V, mul.outer([1, 1], self.V))
         assert_allclose(params.bath.U, np.zeros((2, self.norb, self.nbath)))
         self.assertEqual(params.fops_bath_order, list(range(self.nbath)))
+
+        self.assertEqual(
+            params.bath.as_operator(self.fops_imp_up, self.fops_imp_dn,
+                                    self.fops_bath_up, self.fops_bath_dn,
+                                    params.fops_bath_order),
+            h_bath
+        )
 
         # Check interaction
         self.check_int_params(params)
@@ -746,6 +809,13 @@ class TestHamiltonianBathHybrid(TestHamiltonian):
         assert_allclose(params.bath.V, mul.outer([1, -1], self.V))
         assert_allclose(params.bath.U, mul.outer([0.2, 0.2], self.V))
         self.assertEqual(params.fops_bath_order, list(range(self.nbath)))
+
+        self.assertEqual(
+            params.bath.as_operator(self.fops_imp_up, self.fops_imp_dn,
+                                    self.fops_bath_up, self.fops_bath_dn,
+                                    params.fops_bath_order),
+            h_bath
+        )
 
         # Check interaction
         self.check_int_params(params)
@@ -798,6 +868,13 @@ class TestHamiltonianBathHybrid(TestHamiltonian):
         self.assertFalse(hasattr(params.bath, 'U'))
         self.assertEqual(params.fops_bath_order, list(range(self.nbath)))
 
+        self.assertEqual(
+            params.bath.as_operator(self.fops_imp_up, self.fops_imp_dn,
+                                    self.fops_bath_up, self.fops_bath_dn,
+                                    params.fops_bath_order),
+            h_bath
+        )
+
         # Check interaction
         self.check_int_params(params)
 
@@ -847,6 +924,13 @@ class TestHamiltonianBathHybrid(TestHamiltonian):
         assert_allclose(params.bath.V, self.V.reshape(1, self.norb, self.nbath))
         self.assertFalse(hasattr(params.bath, 'U'))
         self.assertEqual(params.fops_bath_order, list(range(self.nbath)))
+
+        self.assertEqual(
+            params.bath.as_operator(self.fops_imp_up, self.fops_imp_dn,
+                                    self.fops_bath_up, self.fops_bath_dn,
+                                    params.fops_bath_order),
+            h_bath + h_sc
+        )
 
         # Check interaction
         self.check_int_params(params)
@@ -1013,14 +1097,21 @@ class TestHamiltonianBathGeneral(TestHamiltonian):
         self.assertEqual(params.bath.nsym, 6)
         self.assertEqual(params.bath.hvec.shape,
                          (1, 1, self.norb, self.norb, 6))
+        self.assertFalse(params.bath.is_nambu)
         self.assertEqual(len(params.bath.l), self.nbath)
-        self.assertEqual(len(params.bath.V), self.nbath)
         self.assertEqual(len(params.bath.V), self.nbath)
         self.check_bath(params.fops_bath_order,
                         params.bath.hvec, params.bath.l, params.bath.V,
                         self.h.reshape(1, 1, self.norb, self.norb, self.nbath),
                         self.V.reshape(1, self.norb, self.nbath))
         self.assertFalse(hasattr(params.bath, 'U'))
+
+        self.assertEqual(
+            params.bath.as_operator(self.fops_imp_up, self.fops_imp_dn,
+                                    self.fops_bath_up, self.fops_bath_dn,
+                                    params.fops_bath_order),
+            h_bath
+        )
 
         # Check interaction
         self.check_int_params(params)
@@ -1064,12 +1155,20 @@ class TestHamiltonianBathGeneral(TestHamiltonian):
         self.assertEqual(params.bath.nsym, 12)
         self.assertEqual(params.bath.hvec.shape,
                          (2, 2, self.norb, self.norb, 12))
+        self.assertFalse(params.bath.is_nambu)
         self.assertEqual(len(params.bath.l), self.nbath)
         self.assertEqual(len(params.bath.V), self.nbath)
         self.check_bath(params.fops_bath_order,
                         params.bath.hvec, params.bath.l, params.bath.V,
                         mul.outer(sz, self.h), mul.outer([1, -1], self.V))
         self.assertFalse(hasattr(params.bath, 'U'))
+
+        self.assertEqual(
+            params.bath.as_operator(self.fops_imp_up, self.fops_imp_dn,
+                                    self.fops_bath_up, self.fops_bath_dn,
+                                    params.fops_bath_order),
+            h_bath
+        )
 
         # Check interaction
         self.check_int_params(params)
@@ -1113,12 +1212,20 @@ class TestHamiltonianBathGeneral(TestHamiltonian):
         self.assertEqual(params.bath.nsym, 12)
         self.assertEqual(params.bath.hvec.shape,
                          (2, 2, self.norb, self.norb, 12))
+        self.assertFalse(params.bath.is_nambu)
         self.assertEqual(len(params.bath.l), self.nbath)
         self.assertEqual(len(params.bath.V), self.nbath)
         self.check_bath(params.fops_bath_order,
                         params.bath.hvec, params.bath.l, params.bath.V,
                         mul.outer(s0, self.h), mul.outer([1, 1], self.V))
         self.assertFalse(hasattr(params.bath, 'U'))
+
+        self.assertEqual(
+            params.bath.as_operator(self.fops_imp_up, self.fops_imp_dn,
+                                    self.fops_bath_up, self.fops_bath_dn,
+                                    params.fops_bath_order),
+            h_bath
+        )
 
         # Check interaction
         self.check_int_params(params)
@@ -1162,6 +1269,7 @@ class TestHamiltonianBathGeneral(TestHamiltonian):
         self.assertEqual(params.bath.nsym, 21)
         self.assertEqual(params.bath.hvec.shape,
                          (2, 2, self.norb, self.norb, 21))
+        self.assertFalse(params.bath.is_nambu)
         self.assertEqual(len(params.bath.l), self.nbath)
         self.assertEqual(len(params.bath.V), self.nbath)
         self.check_bath(params.fops_bath_order,
@@ -1169,6 +1277,13 @@ class TestHamiltonianBathGeneral(TestHamiltonian):
                         mul.outer(sz + 0.2 * sx, self.h),
                         mul.outer([1, -1], self.V))
         self.assertFalse(hasattr(params.bath, 'U'))
+
+        self.assertEqual(
+            params.bath.as_operator(self.fops_imp_up, self.fops_imp_dn,
+                                    self.fops_bath_up, self.fops_bath_dn,
+                                    params.fops_bath_order),
+            h_bath
+        )
 
         # Check interaction
         self.check_int_params(params)
@@ -1218,6 +1333,7 @@ class TestHamiltonianBathGeneral(TestHamiltonian):
         self.assertEqual(params.bath.nsym, 6)
         self.assertEqual(params.bath.hvec.shape,
                          (2, 2, self.norb, self.norb, 6))
+        self.assertTrue(params.bath.is_nambu)
         self.assertEqual(len(params.bath.l), self.nbath)
         self.assertEqual(len(params.bath.V), self.nbath)
 
@@ -1231,6 +1347,13 @@ class TestHamiltonianBathGeneral(TestHamiltonian):
                         params.bath.hvec, params.bath.l, params.bath.V,
                         h_ref, self.V.reshape(1, self.norb, self.nbath))
         self.assertFalse(hasattr(params.bath, 'U'))
+
+        self.assertEqual(
+            params.bath.as_operator(self.fops_imp_up, self.fops_imp_dn,
+                                    self.fops_bath_up, self.fops_bath_dn,
+                                    params.fops_bath_order),
+            h_bath
+        )
 
         # Check interaction
         self.check_int_params(params)
@@ -1280,6 +1403,7 @@ class TestHamiltonianBathGeneral(TestHamiltonian):
         self.assertEqual(params.bath.nsym, 15)
         self.assertEqual(params.bath.hvec.shape,
                          (2, 2, self.norb, self.norb, 15))
+        self.assertTrue(params.bath.is_nambu)
         self.assertEqual(len(params.bath.l), self.nbath)
         self.assertEqual(len(params.bath.V), self.nbath)
 
@@ -1295,6 +1419,13 @@ class TestHamiltonianBathGeneral(TestHamiltonian):
                         params.bath.hvec, params.bath.l, params.bath.V,
                         h_ref, self.V.reshape(1, self.norb, self.nbath))
         self.assertFalse(hasattr(params.bath, 'U'))
+
+        self.assertEqual(
+            params.bath.as_operator(self.fops_imp_up, self.fops_imp_dn,
+                                    self.fops_bath_up, self.fops_bath_dn,
+                                    params.fops_bath_order),
+            h_bath + h_sc
+        )
 
         # Check interaction
         self.check_int_params(params)
