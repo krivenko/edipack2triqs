@@ -11,6 +11,11 @@
   `EDIpackSolver.rdm`. Calculation of the reduced density matrix is enabled
   by passing `rdm=True` to `EDIpackSolver.solve()`.
 
+* Added a read-only property `EDIpackSolver.bath_op` that returns the current
+  bath stored in the solver in the form of a TRIQS operator.
+  The returned object contains contributions from both the bath Hamiltonian and
+  the impurity-bath hybridization Hamiltonian.
+
 ## Version 0.11.0
 
 * A matrix basis for the bath Hamiltonian in the general bath topology mode can

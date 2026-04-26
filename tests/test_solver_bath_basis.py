@@ -123,6 +123,7 @@ class TestEDIpackSolverBathBasis(TestSolver):
         assert_equal(solver.hloc_an_mat, np.zeros((1, 1, self.norb, self.norb)))
         self.assertEqual(solver.bath.name, "general")
         self.assertEqual(solver.bath.nbath, self.nbath)
+        self.assertEqual(solver.bath_op, h_bath)
 
         # Check constructed bath
         hvec_ref = np.zeros((1, 1, self.norb, self.norb, len(basis_mats)),
@@ -197,6 +198,7 @@ class TestEDIpackSolverBathBasis(TestSolver):
         assert_equal(solver.hloc_an_mat, np.zeros((1, 1, self.norb, self.norb)))
         self.assertEqual(solver.bath.name, "general")
         self.assertEqual(solver.bath.nbath, self.nbath)
+        self.assertEqual(solver.bath_op, h_bath)
 
         # Check constructed bath
         hvec_ref = np.zeros((2, 2, self.norb, self.norb, len(basis_mats)),
@@ -274,6 +276,7 @@ class TestEDIpackSolverBathBasis(TestSolver):
         assert_equal(solver.hloc_an_mat, np.zeros((1, 1, self.norb, self.norb)))
         self.assertEqual(solver.bath.name, "general")
         self.assertEqual(solver.bath.nbath, self.nbath)
+        self.assertEqual(solver.bath_op, h_bath)
 
         # Check constructed bath
         hvec_ref = np.zeros((2, 2, 2, 2, len(basis_mats)), dtype=complex)
@@ -348,6 +351,7 @@ class TestEDIpackSolverBathBasis(TestSolver):
         assert_equal(solver.hloc_an_mat, np.zeros((1, 1, self.norb, self.norb)))
         self.assertEqual(solver.bath.name, "general")
         self.assertEqual(solver.bath.nbath, self.nbath)
+        self.assertEqual(solver.bath_op, h_bath)
 
         # Check constructed bath
         hvec_ref = np.zeros((2, 2, self.norb, self.norb, len(basis_mats)),
@@ -420,6 +424,7 @@ class TestEDIpackSolverBathBasis(TestSolver):
                      h_loc_an_mat.reshape((1, 1, self.norb, self.norb)))
         self.assertEqual(solver.bath.name, "general")
         self.assertEqual(solver.bath.nbath, self.nbath)
+        self.assertEqual(solver.bath_op, h_bath)
 
         # Check constructed bath
         hvec_ref = np.zeros((2, 2, self.norb, self.norb, len(basis_mats)),
@@ -497,6 +502,7 @@ class TestEDIpackSolverBathBasis(TestSolver):
         assert_equal(solver.hloc_an_mat, np.zeros((1, 1, self.norb, self.norb)))
         self.assertEqual(solver.bath.name, "general")
         self.assertEqual(solver.bath.nbath, self.nbath)
+        self.assertEqual(solver.bath_op, h_bath + h_sc)
 
         # Check constructed bath
         hvec_ref = np.zeros((2, 2, self.norb, self.norb, len(basis_mats)),

@@ -2,6 +2,8 @@ import numpy as np
 from numpy import multiply as mul
 from numpy.testing import assert_equal
 
+import triqs.operators as op
+
 from edipack2triqs import EDMode
 from edipack2triqs.solver import EDIpackSolver, LanczosParams
 
@@ -48,6 +50,7 @@ class TestEDIpackSolverNoBath(TestSolver):
         assert_equal(solver.hloc_mat, h_loc_mat[:1, :1, ...])
         assert_equal(solver.hloc_an_mat, np.zeros((1, 1, self.norb, self.norb)))
         self.assertIsNone(solver.bath)
+        self.assertEqual(solver.bath_op, op.Operator())
 
         solve_params = {
             "n_iw": 10,
@@ -88,6 +91,7 @@ class TestEDIpackSolverNoBath(TestSolver):
         assert_equal(solver.hloc_mat, h_loc_mat[:1, :1, ...])
         assert_equal(solver.hloc_an_mat, np.zeros((1, 1, self.norb, self.norb)))
         self.assertIsNone(solver.bath)
+        self.assertEqual(solver.bath_op, op.Operator())
 
         # Part I: Initial solve()
         solve_params = {
@@ -157,6 +161,7 @@ class TestEDIpackSolverNoBath(TestSolver):
         assert_equal(solver.hloc_mat, h_loc_mat)
         assert_equal(solver.hloc_an_mat, np.zeros((1, 1, self.norb, self.norb)))
         self.assertIsNone(solver.bath)
+        self.assertEqual(solver.bath_op, op.Operator())
 
         # Part I: Initial solve()
         solve_params = {
@@ -228,6 +233,7 @@ class TestEDIpackSolverNoBath(TestSolver):
         assert_equal(solver.hloc_mat, h_loc_mat)
         assert_equal(solver.hloc_an_mat, np.zeros((1, 1, self.norb, self.norb)))
         self.assertIsNone(solver.bath)
+        self.assertEqual(solver.bath_op, op.Operator())
 
         # Part I: Initial solve()
         solve_params = {
@@ -301,6 +307,7 @@ class TestEDIpackSolverNoBath(TestSolver):
         assert_equal(solver.hloc_an_mat,
                      h_loc_an_mat.reshape((1, 1, self.norb, self.norb)))
         self.assertIsNone(solver.bath)
+        self.assertEqual(solver.bath_op, op.Operator())
 
         # Part I: Initial solve()
         solve_params = {

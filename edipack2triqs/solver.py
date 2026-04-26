@@ -576,6 +576,23 @@ class EDIpackSolver:
             self.h_params.bath = new_bath
 
     @property
+    def bath_op(self) -> op.Operator:
+        r"""
+        Retrieve the current bath stored in the solver in the form of a
+        :py:class:`TRIQS operator <triqs.operators.operators.Operator>`.
+        The returned object contains contributions from both the bath
+        Hamiltonian and the impurity-bath hybridization Hamiltonian.
+        """
+        if self.h_params.bath is None:
+            return op.Operator()
+        else:
+            return self.h_params.bath.as_operator(self.fops_imp_up,
+                                                  self.fops_imp_dn,
+                                                  self.fops_bath_up,
+                                                  self.fops_bath_dn,
+                                                  self.h_params.fops_bath_order)
+
+    @property
     def sectors(self) -> Union[list[int], list[tuple[int, int]], NoneType]:
         r"""
         The list of quantum numbers corresponding to the sectors selected for
