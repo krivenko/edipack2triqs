@@ -64,6 +64,7 @@
 <li class="toctree-l4"><a class="reference internal" href="../../documentation.html#edipack2triqs.solver.EDIpackSolver.hloc"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.hloc</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../documentation.html#edipack2triqs.solver.EDIpackSolver.U"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.U</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../documentation.html#edipack2triqs.solver.EDIpackSolver.bath"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.bath</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../documentation.html#edipack2triqs.solver.EDIpackSolver.bath_op"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.bath_op</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../documentation.html#edipack2triqs.solver.EDIpackSolver.sectors"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.sectors</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../documentation.html#edipack2triqs.solver.EDIpackSolver.solve"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.solve()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../documentation.html#edipack2triqs.solver.EDIpackSolver.e_pot"><code class="docutils literal notranslate"><span class="pre">EDIpackSolver.e_pot</span></code></a></li>
@@ -129,6 +130,7 @@
 <li class="toctree-l4"><a class="reference internal" href="../../documentation.html#edipack2triqs.bath.BathNormal.Delta"><code class="docutils literal notranslate"><span class="pre">BathNormal.Delta</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../documentation.html#edipack2triqs.bath.BathNormal.V"><code class="docutils literal notranslate"><span class="pre">BathNormal.V</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../documentation.html#edipack2triqs.bath.BathNormal.ed_mode"><code class="docutils literal notranslate"><span class="pre">BathNormal.ed_mode</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../documentation.html#edipack2triqs.bath.BathNormal.as_operator"><code class="docutils literal notranslate"><span class="pre">BathNormal.as_operator()</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="../../documentation.html#edipack2triqs.bath.BathHybrid"><code class="docutils literal notranslate"><span class="pre">BathHybrid</span></code></a><ul>
@@ -138,14 +140,17 @@
 <li class="toctree-l4"><a class="reference internal" href="../../documentation.html#edipack2triqs.bath.BathHybrid.Delta"><code class="docutils literal notranslate"><span class="pre">BathHybrid.Delta</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../documentation.html#edipack2triqs.bath.BathHybrid.V"><code class="docutils literal notranslate"><span class="pre">BathHybrid.V</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../documentation.html#edipack2triqs.bath.BathHybrid.ed_mode"><code class="docutils literal notranslate"><span class="pre">BathHybrid.ed_mode</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../documentation.html#edipack2triqs.bath.BathHybrid.as_operator"><code class="docutils literal notranslate"><span class="pre">BathHybrid.as_operator()</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="../../documentation.html#edipack2triqs.bath.BathGeneral"><code class="docutils literal notranslate"><span class="pre">BathGeneral</span></code></a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../documentation.html#edipack2triqs.bath.BathGeneral.nbath"><code class="docutils literal notranslate"><span class="pre">BathGeneral.nbath</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../documentation.html#edipack2triqs.bath.BathGeneral.hvec"><code class="docutils literal notranslate"><span class="pre">BathGeneral.hvec</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../documentation.html#edipack2triqs.bath.BathGeneral.is_nambu"><code class="docutils literal notranslate"><span class="pre">BathGeneral.is_nambu</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../documentation.html#edipack2triqs.bath.BathGeneral.nsym"><code class="docutils literal notranslate"><span class="pre">BathGeneral.nsym</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../documentation.html#edipack2triqs.bath.BathGeneral.V"><code class="docutils literal notranslate"><span class="pre">BathGeneral.V</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../documentation.html#edipack2triqs.bath.BathGeneral.l"><code class="docutils literal notranslate"><span class="pre">BathGeneral.l</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../documentation.html#edipack2triqs.bath.BathGeneral.as_operator"><code class="docutils literal notranslate"><span class="pre">BathGeneral.as_operator()</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -232,10 +237,12 @@
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">networkx</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">nx</span>
 
+<span class="kn">import</span><span class="w"> </span><span class="nn">triqs.operators</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">op</span>
+
 <span class="kn">from</span><span class="w"> </span><span class="nn">h5.formats</span><span class="w"> </span><span class="kn">import</span> <span class="n">register_class</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">.</span><span class="w"> </span><span class="kn">import</span> <span class="n">EDMode</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">.util</span><span class="w"> </span><span class="kn">import</span> <span class="n">is_diagonal</span><span class="p">,</span> <span class="n">is_spin_diagonal</span><span class="p">,</span> <span class="n">make_nambu</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.util</span><span class="w"> </span><span class="kn">import</span> <span class="n">is_diagonal</span><span class="p">,</span> <span class="n">is_spin_diagonal</span><span class="p">,</span> <span class="n">make_nambu</span><span class="p">,</span> <span class="n">IndicesType</span>
 
 
 <span class="n">BasisMatNAn</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]</span>
@@ -450,6 +457,76 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">EDMode</span><span class="o">.</span><span class="n">NORMAL</span>
 
+<div class="viewcode-block" id="BathNormal.as_operator">
+<a class="viewcode-back" href="../../documentation.html#edipack2triqs.bath.BathNormal.as_operator">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">as_operator</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                    <span class="n">fops_imp_up</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">IndicesType</span><span class="p">],</span>
+                    <span class="n">fops_imp_dn</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">IndicesType</span><span class="p">],</span>
+                    <span class="n">fops_bath_up</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">IndicesType</span><span class="p">],</span>
+                    <span class="n">fops_bath_dn</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">IndicesType</span><span class="p">],</span>
+                    <span class="n">fops_bath_order</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">op</span><span class="o">.</span><span class="n">Operator</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return the bath Hamiltonian as a</span>
+<span class="sd">        :py:class:`triqs.operators.operators.Operator`.</span>
+
+<span class="sd">        The operator includes bath energy levels, impurity-bath hopping</span>
+<span class="sd">        amplitudes, and (in ``EDMode.SUPERC`` mode) on-site pairing terms.</span>
+
+<span class="sd">        :param fops_imp_up: Fundamental operator set for spin-up impurity</span>
+<span class="sd">            degrees of freedom.</span>
+<span class="sd">        :type fops_imp_up: list[tuple[int | str, int | str]]</span>
+
+<span class="sd">        :param fops_imp_dn: Fundamental operator set for spin-down impurity</span>
+<span class="sd">            degrees of freedom.</span>
+<span class="sd">        :type fops_imp_dn: list[tuple[int | str, int | str]]</span>
+
+<span class="sd">        :param fops_bath_up: Fundamental operator set for spin-up bath</span>
+<span class="sd">            degrees of freedom.</span>
+<span class="sd">        :type fops_bath_up: list[tuple[int | str, int | str]]</span>
+
+<span class="sd">        :param fops_bath_dn: Fundamental operator set for spin-down bath</span>
+<span class="sd">            degrees of freedom.</span>
+<span class="sd">        :type fops_bath_dn: list[tuple[int | str, int | str]]</span>
+
+<span class="sd">        :param fops_bath_order: List of positions within fops_bath_* in</span>
+<span class="sd">            the order corresponding to EDIpack&#39;s bath state enumeration.</span>
+<span class="sd">        :type fops_bath_order: list[int]</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">nspin</span><span class="p">,</span> <span class="n">norb</span><span class="p">,</span> <span class="n">nbath</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">V</span><span class="o">.</span><span class="n">shape</span>
+
+        <span class="n">d</span> <span class="o">=</span> <span class="p">[[</span><span class="n">op</span><span class="o">.</span><span class="n">c</span><span class="p">(</span><span class="o">*</span><span class="n">ind</span><span class="p">)</span> <span class="k">for</span> <span class="n">ind</span> <span class="ow">in</span> <span class="n">fops_imp_up</span><span class="p">],</span>
+             <span class="p">[</span><span class="n">op</span><span class="o">.</span><span class="n">c</span><span class="p">(</span><span class="o">*</span><span class="n">ind</span><span class="p">)</span> <span class="k">for</span> <span class="n">ind</span> <span class="ow">in</span> <span class="n">fops_imp_dn</span><span class="p">]]</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="p">[[</span><span class="n">op</span><span class="o">.</span><span class="n">c</span><span class="p">(</span><span class="o">*</span><span class="n">fops_bath_up</span><span class="p">[</span><span class="n">ind</span><span class="p">])</span> <span class="k">for</span> <span class="n">ind</span> <span class="ow">in</span> <span class="n">fops_bath_order</span><span class="p">],</span>
+             <span class="p">[</span><span class="n">op</span><span class="o">.</span><span class="n">c</span><span class="p">(</span><span class="o">*</span><span class="n">fops_bath_dn</span><span class="p">[</span><span class="n">ind</span><span class="p">])</span> <span class="k">for</span> <span class="n">ind</span> <span class="ow">in</span> <span class="n">fops_bath_order</span><span class="p">]]</span>
+
+        <span class="n">h</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">Operator</span><span class="p">()</span>
+
+        <span class="k">for</span> <span class="n">b</span><span class="p">,</span> <span class="p">(</span><span class="n">orb</span><span class="p">,</span> <span class="n">nu</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ndindex</span><span class="p">(</span><span class="n">norb</span><span class="p">,</span> <span class="n">nbath</span><span class="p">)):</span>
+            <span class="k">for</span> <span class="n">spin</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">):</span>
+                <span class="n">s</span> <span class="o">=</span> <span class="mi">0</span> <span class="k">if</span> <span class="p">(</span><span class="n">nspin</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span> <span class="k">else</span> <span class="n">spin</span>
+                <span class="c1"># Energy level</span>
+                <span class="n">h</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">eps</span><span class="p">[</span><span class="n">s</span><span class="p">,</span> <span class="n">orb</span><span class="p">,</span> <span class="n">nu</span><span class="p">]</span> <span class="o">*</span> <span class="n">op</span><span class="o">.</span><span class="n">dagger</span><span class="p">(</span><span class="n">c</span><span class="p">[</span><span class="n">spin</span><span class="p">][</span><span class="n">b</span><span class="p">])</span> <span class="o">*</span> <span class="n">c</span><span class="p">[</span><span class="n">spin</span><span class="p">][</span><span class="n">b</span><span class="p">]</span>
+                <span class="c1"># Same-spin hopping amplitude</span>
+                <span class="n">h</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">V</span><span class="p">[</span><span class="n">s</span><span class="p">,</span> <span class="n">orb</span><span class="p">,</span> <span class="n">nu</span><span class="p">]</span> <span class="o">*</span> <span class="n">op</span><span class="o">.</span><span class="n">dagger</span><span class="p">(</span><span class="n">d</span><span class="p">[</span><span class="n">spin</span><span class="p">][</span><span class="n">orb</span><span class="p">])</span> <span class="o">*</span> <span class="n">c</span><span class="p">[</span><span class="n">spin</span><span class="p">][</span><span class="n">b</span><span class="p">]</span>
+                <span class="n">h</span> <span class="o">+=</span> <span class="n">np</span><span class="o">.</span><span class="n">conj</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">V</span><span class="p">[</span><span class="n">s</span><span class="p">,</span> <span class="n">orb</span><span class="p">,</span> <span class="n">nu</span><span class="p">])</span> <span class="o">*</span> \
+                    <span class="n">op</span><span class="o">.</span><span class="n">dagger</span><span class="p">(</span><span class="n">c</span><span class="p">[</span><span class="n">spin</span><span class="p">][</span><span class="n">b</span><span class="p">])</span> <span class="o">*</span> <span class="n">d</span><span class="p">[</span><span class="n">spin</span><span class="p">][</span><span class="n">orb</span><span class="p">]</span>
+
+                <span class="c1"># Spin-flip hopping amplitude</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">ed_mode</span> <span class="o">==</span> <span class="n">EDMode</span><span class="o">.</span><span class="n">NONSU2</span><span class="p">:</span>
+                    <span class="n">h</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">U</span><span class="p">[</span><span class="n">spin</span><span class="p">,</span> <span class="n">orb</span><span class="p">,</span> <span class="n">nu</span><span class="p">]</span> <span class="o">*</span> \
+                        <span class="n">op</span><span class="o">.</span><span class="n">dagger</span><span class="p">(</span><span class="n">d</span><span class="p">[</span><span class="n">spin</span><span class="p">][</span><span class="n">orb</span><span class="p">])</span> <span class="o">*</span> <span class="n">c</span><span class="p">[</span><span class="mi">1</span> <span class="o">-</span> <span class="n">spin</span><span class="p">][</span><span class="n">b</span><span class="p">]</span>
+                    <span class="n">h</span> <span class="o">+=</span> <span class="n">np</span><span class="o">.</span><span class="n">conj</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">U</span><span class="p">[</span><span class="n">spin</span><span class="p">,</span> <span class="n">orb</span><span class="p">,</span> <span class="n">nu</span><span class="p">])</span> <span class="o">*</span> \
+                        <span class="n">op</span><span class="o">.</span><span class="n">dagger</span><span class="p">(</span><span class="n">c</span><span class="p">[</span><span class="mi">1</span> <span class="o">-</span> <span class="n">spin</span><span class="p">][</span><span class="n">b</span><span class="p">])</span> <span class="o">*</span> <span class="n">d</span><span class="p">[</span><span class="n">spin</span><span class="p">][</span><span class="n">orb</span><span class="p">]</span>
+
+            <span class="c1"># On-site bath pairing</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">ed_mode</span> <span class="o">==</span> <span class="n">EDMode</span><span class="o">.</span><span class="n">SUPERC</span><span class="p">:</span>
+                <span class="n">h</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Delta</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">orb</span><span class="p">,</span> <span class="n">nu</span><span class="p">]</span> <span class="o">*</span> \
+                    <span class="n">op</span><span class="o">.</span><span class="n">dagger</span><span class="p">(</span><span class="n">c</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="n">b</span><span class="p">])</span> <span class="o">*</span> <span class="n">op</span><span class="o">.</span><span class="n">dagger</span><span class="p">(</span><span class="n">c</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="n">b</span><span class="p">])</span>
+                <span class="n">h</span> <span class="o">+=</span> <span class="n">np</span><span class="o">.</span><span class="n">conj</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Delta</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">orb</span><span class="p">,</span> <span class="n">nu</span><span class="p">])</span> <span class="o">*</span> <span class="n">c</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="n">b</span><span class="p">]</span> <span class="o">*</span> <span class="n">c</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="n">b</span><span class="p">]</span>
+
+        <span class="k">return</span> <span class="n">h</span></div>
+
+
     <span class="k">def</span><span class="w"> </span><span class="nf">__deepcopy__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">memo</span><span class="p">):</span>
         <span class="n">nspin</span><span class="p">,</span> <span class="n">norb</span><span class="p">,</span> <span class="n">nbath</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">V</span><span class="o">.</span><span class="n">shape</span>
         <span class="k">return</span> <span class="n">BathNormal</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ed_mode</span><span class="p">,</span> <span class="n">nspin</span><span class="p">,</span> <span class="n">norb</span><span class="p">,</span> <span class="n">nbath</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">copy</span><span class="p">())</span>
@@ -659,6 +736,80 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">EDMode</span><span class="o">.</span><span class="n">NORMAL</span>
 
+<div class="viewcode-block" id="BathHybrid.as_operator">
+<a class="viewcode-back" href="../../documentation.html#edipack2triqs.bath.BathHybrid.as_operator">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">as_operator</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                    <span class="n">fops_imp_up</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">IndicesType</span><span class="p">],</span>
+                    <span class="n">fops_imp_dn</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">IndicesType</span><span class="p">],</span>
+                    <span class="n">fops_bath_up</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">IndicesType</span><span class="p">],</span>
+                    <span class="n">fops_bath_dn</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">IndicesType</span><span class="p">],</span>
+                    <span class="n">fops_bath_order</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">op</span><span class="o">.</span><span class="n">Operator</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return the bath Hamiltonian as a</span>
+<span class="sd">        :py:class:`triqs.operators.operators.Operator`.</span>
+
+<span class="sd">        The operator includes bath energy levels, impurity-bath hopping</span>
+<span class="sd">        amplitudes, and (in ``EDMode.SUPERC`` mode) on-site pairing terms.</span>
+
+<span class="sd">        :param fops_imp_up: Fundamental operator set for spin-up impurity</span>
+<span class="sd">            degrees of freedom.</span>
+<span class="sd">        :type fops_imp_up: list[tuple[int | str, int | str]]</span>
+
+<span class="sd">        :param fops_imp_dn: Fundamental operator set for spin-down impurity</span>
+<span class="sd">            degrees of freedom.</span>
+<span class="sd">        :type fops_imp_dn: list[tuple[int | str, int | str]]</span>
+
+<span class="sd">        :param fops_bath_up: Fundamental operator set for spin-up bath</span>
+<span class="sd">            degrees of freedom.</span>
+<span class="sd">        :type fops_bath_up: list[tuple[int | str, int | str]]</span>
+
+<span class="sd">        :param fops_bath_dn: Fundamental operator set for spin-down bath</span>
+<span class="sd">            degrees of freedom.</span>
+<span class="sd">        :type fops_bath_dn: list[tuple[int | str, int | str]]</span>
+
+<span class="sd">        :param fops_bath_order: List of positions within fops_bath_* in</span>
+<span class="sd">            the order corresponding to EDIpack&#39;s bath state enumeration.</span>
+<span class="sd">        :type fops_bath_order: list[int]</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">nspin</span><span class="p">,</span> <span class="n">norb</span><span class="p">,</span> <span class="n">nbath</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">V</span><span class="o">.</span><span class="n">shape</span>
+
+        <span class="n">d</span> <span class="o">=</span> <span class="p">[[</span><span class="n">op</span><span class="o">.</span><span class="n">c</span><span class="p">(</span><span class="o">*</span><span class="n">ind</span><span class="p">)</span> <span class="k">for</span> <span class="n">ind</span> <span class="ow">in</span> <span class="n">fops_imp_up</span><span class="p">],</span>
+             <span class="p">[</span><span class="n">op</span><span class="o">.</span><span class="n">c</span><span class="p">(</span><span class="o">*</span><span class="n">ind</span><span class="p">)</span> <span class="k">for</span> <span class="n">ind</span> <span class="ow">in</span> <span class="n">fops_imp_dn</span><span class="p">]]</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="p">[[</span><span class="n">op</span><span class="o">.</span><span class="n">c</span><span class="p">(</span><span class="o">*</span><span class="n">fops_bath_up</span><span class="p">[</span><span class="n">ind</span><span class="p">])</span> <span class="k">for</span> <span class="n">ind</span> <span class="ow">in</span> <span class="n">fops_bath_order</span><span class="p">],</span>
+             <span class="p">[</span><span class="n">op</span><span class="o">.</span><span class="n">c</span><span class="p">(</span><span class="o">*</span><span class="n">fops_bath_dn</span><span class="p">[</span><span class="n">ind</span><span class="p">])</span> <span class="k">for</span> <span class="n">ind</span> <span class="ow">in</span> <span class="n">fops_bath_order</span><span class="p">]]</span>
+
+        <span class="n">h</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">Operator</span><span class="p">()</span>
+
+        <span class="k">for</span> <span class="n">nu</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nbath</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">spin</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">):</span>
+                <span class="n">s</span> <span class="o">=</span> <span class="mi">0</span> <span class="k">if</span> <span class="p">(</span><span class="n">nspin</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span> <span class="k">else</span> <span class="n">spin</span>
+                <span class="c1"># Energy level</span>
+                <span class="n">h</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">eps</span><span class="p">[</span><span class="n">s</span><span class="p">,</span> <span class="n">nu</span><span class="p">]</span> <span class="o">*</span> <span class="n">op</span><span class="o">.</span><span class="n">dagger</span><span class="p">(</span><span class="n">c</span><span class="p">[</span><span class="n">spin</span><span class="p">][</span><span class="n">nu</span><span class="p">])</span> <span class="o">*</span> <span class="n">c</span><span class="p">[</span><span class="n">spin</span><span class="p">][</span><span class="n">nu</span><span class="p">]</span>
+
+            <span class="c1"># On-site bath pairing</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">ed_mode</span> <span class="o">==</span> <span class="n">EDMode</span><span class="o">.</span><span class="n">SUPERC</span><span class="p">:</span>
+                <span class="n">h</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Delta</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">nu</span><span class="p">]</span> <span class="o">*</span> \
+                    <span class="n">op</span><span class="o">.</span><span class="n">dagger</span><span class="p">(</span><span class="n">c</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="n">nu</span><span class="p">])</span> <span class="o">*</span> <span class="n">op</span><span class="o">.</span><span class="n">dagger</span><span class="p">(</span><span class="n">c</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="n">nu</span><span class="p">])</span>
+                <span class="n">h</span> <span class="o">+=</span> <span class="n">np</span><span class="o">.</span><span class="n">conj</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Delta</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">nu</span><span class="p">])</span> <span class="o">*</span> <span class="n">c</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="n">nu</span><span class="p">]</span> <span class="o">*</span> <span class="n">c</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="n">nu</span><span class="p">]</span>
+
+        <span class="k">for</span> <span class="n">orb</span><span class="p">,</span> <span class="n">nu</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">ndindex</span><span class="p">(</span><span class="n">norb</span><span class="p">,</span> <span class="n">nbath</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">spin</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">):</span>
+                <span class="n">s</span> <span class="o">=</span> <span class="mi">0</span> <span class="k">if</span> <span class="p">(</span><span class="n">nspin</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span> <span class="k">else</span> <span class="n">spin</span>
+                <span class="c1"># Same-spin hopping amplitude</span>
+                <span class="n">h</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">V</span><span class="p">[</span><span class="n">s</span><span class="p">,</span> <span class="n">orb</span><span class="p">,</span> <span class="n">nu</span><span class="p">]</span> <span class="o">*</span> <span class="n">op</span><span class="o">.</span><span class="n">dagger</span><span class="p">(</span><span class="n">d</span><span class="p">[</span><span class="n">spin</span><span class="p">][</span><span class="n">orb</span><span class="p">])</span> <span class="o">*</span> <span class="n">c</span><span class="p">[</span><span class="n">spin</span><span class="p">][</span><span class="n">nu</span><span class="p">]</span>
+                <span class="n">h</span> <span class="o">+=</span> <span class="n">np</span><span class="o">.</span><span class="n">conj</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">V</span><span class="p">[</span><span class="n">s</span><span class="p">,</span> <span class="n">orb</span><span class="p">,</span> <span class="n">nu</span><span class="p">])</span> <span class="o">*</span> \
+                    <span class="n">op</span><span class="o">.</span><span class="n">dagger</span><span class="p">(</span><span class="n">c</span><span class="p">[</span><span class="n">spin</span><span class="p">][</span><span class="n">nu</span><span class="p">])</span> <span class="o">*</span> <span class="n">d</span><span class="p">[</span><span class="n">spin</span><span class="p">][</span><span class="n">orb</span><span class="p">]</span>
+
+                <span class="c1"># Spin-flip hopping amplitude</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">ed_mode</span> <span class="o">==</span> <span class="n">EDMode</span><span class="o">.</span><span class="n">NONSU2</span><span class="p">:</span>
+                    <span class="n">h</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">U</span><span class="p">[</span><span class="n">spin</span><span class="p">,</span> <span class="n">orb</span><span class="p">,</span> <span class="n">nu</span><span class="p">]</span> <span class="o">*</span> \
+                        <span class="n">op</span><span class="o">.</span><span class="n">dagger</span><span class="p">(</span><span class="n">d</span><span class="p">[</span><span class="n">spin</span><span class="p">][</span><span class="n">orb</span><span class="p">])</span> <span class="o">*</span> <span class="n">c</span><span class="p">[</span><span class="mi">1</span> <span class="o">-</span> <span class="n">spin</span><span class="p">][</span><span class="n">nu</span><span class="p">]</span>
+                    <span class="n">h</span> <span class="o">+=</span> <span class="n">np</span><span class="o">.</span><span class="n">conj</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">U</span><span class="p">[</span><span class="n">spin</span><span class="p">,</span> <span class="n">orb</span><span class="p">,</span> <span class="n">nu</span><span class="p">])</span> <span class="o">*</span> \
+                        <span class="n">op</span><span class="o">.</span><span class="n">dagger</span><span class="p">(</span><span class="n">c</span><span class="p">[</span><span class="mi">1</span> <span class="o">-</span> <span class="n">spin</span><span class="p">][</span><span class="n">nu</span><span class="p">])</span> <span class="o">*</span> <span class="n">d</span><span class="p">[</span><span class="n">spin</span><span class="p">][</span><span class="n">orb</span><span class="p">]</span>
+
+        <span class="k">return</span> <span class="n">h</span></div>
+
+
     <span class="k">def</span><span class="w"> </span><span class="nf">__deepcopy__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">memo</span><span class="p">):</span>
         <span class="n">nspin</span><span class="p">,</span> <span class="n">norb</span><span class="p">,</span> <span class="n">nbath</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">V</span><span class="o">.</span><span class="n">shape</span>
         <span class="k">return</span> <span class="n">BathHybrid</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ed_mode</span><span class="p">,</span> <span class="n">nspin</span><span class="p">,</span> <span class="n">norb</span><span class="p">,</span> <span class="n">nbath</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">copy</span><span class="p">())</span>
@@ -745,6 +896,8 @@
 <span class="sd">    Basis matrices :math:`\hat O_i` as an array of the shape</span>
 <span class="sd">    (nspin, nspin, norb, norb, nsym).</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">is_nambu</span><span class="p">:</span> <span class="nb">bool</span>
+    <span class="sa">r</span><span class="s2">&quot;Are replica basis matrices written in the Nambu basis?&quot;</span>
     <span class="n">l</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Coefficients of linear combinations :math:`\lambda^\nu_i`. Each of the</span>
@@ -763,9 +916,11 @@
                  <span class="n">norb</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
                  <span class="n">nbath</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
                  <span class="n">hvec</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+                 <span class="n">is_nambu</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
                  <span class="n">data</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">nbath</span> <span class="o">=</span> <span class="n">nbath</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">hvec</span> <span class="o">=</span> <span class="n">hvec</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">is_nambu</span> <span class="o">=</span> <span class="n">is_nambu</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">nsym</span> <span class="o">=</span> <span class="n">hvec</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
 
         <span class="n">V_size</span> <span class="o">=</span> <span class="n">nspin</span> <span class="o">*</span> <span class="n">norb</span>
@@ -797,10 +952,92 @@
                   <span class="k">for</span> <span class="n">nu</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nbath</span><span class="p">)]</span>
         <span class="k">assert</span> <span class="nb">all</span><span class="p">(</span><span class="n">l_nu</span><span class="o">.</span><span class="n">base</span> <span class="ow">is</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="k">for</span> <span class="n">l_nu</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">l</span><span class="p">)</span>
 
+<div class="viewcode-block" id="BathGeneral.as_operator">
+<a class="viewcode-back" href="../../documentation.html#edipack2triqs.bath.BathGeneral.as_operator">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">as_operator</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                    <span class="n">fops_imp_up</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">IndicesType</span><span class="p">],</span>
+                    <span class="n">fops_imp_dn</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">IndicesType</span><span class="p">],</span>
+                    <span class="n">fops_bath_up</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">IndicesType</span><span class="p">],</span>
+                    <span class="n">fops_bath_dn</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">IndicesType</span><span class="p">],</span>
+                    <span class="n">fops_bath_order</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">op</span><span class="o">.</span><span class="n">Operator</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return the bath Hamiltonian as a</span>
+<span class="sd">        :py:class:`triqs.operators.operators.Operator`.</span>
+
+<span class="sd">        The operator includes bath energy levels, impurity-bath hopping</span>
+<span class="sd">        amplitudes, and (when ``self.is_nambu = True``) on-site pairing terms.</span>
+
+<span class="sd">        :param fops_imp_up: Fundamental operator set for spin-up impurity</span>
+<span class="sd">            degrees of freedom.</span>
+<span class="sd">        :type fops_imp_up: list[tuple[int | str, int | str]]</span>
+
+<span class="sd">        :param fops_imp_dn: Fundamental operator set for spin-down impurity</span>
+<span class="sd">            degrees of freedom.</span>
+<span class="sd">        :type fops_imp_dn: list[tuple[int | str, int | str]]</span>
+
+<span class="sd">        :param fops_bath_up: Fundamental operator set for spin-up bath</span>
+<span class="sd">            degrees of freedom.</span>
+<span class="sd">        :type fops_bath_up: list[tuple[int | str, int | str]]</span>
+
+<span class="sd">        :param fops_bath_dn: Fundamental operator set for spin-down bath</span>
+<span class="sd">            degrees of freedom.</span>
+<span class="sd">        :type fops_bath_dn: list[tuple[int | str, int | str]]</span>
+
+<span class="sd">        :param fops_bath_order: List of positions within fops_bath_* in</span>
+<span class="sd">            the order corresponding to EDIpack&#39;s bath state enumeration.</span>
+<span class="sd">        :type fops_bath_order: list[int]</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">nspin</span><span class="p">,</span> <span class="n">norb</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">V</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span>
+        <span class="n">nsym</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">hvec</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+
+        <span class="n">d</span> <span class="o">=</span> <span class="p">[[</span><span class="n">op</span><span class="o">.</span><span class="n">c</span><span class="p">(</span><span class="o">*</span><span class="n">ind</span><span class="p">)</span> <span class="k">for</span> <span class="n">ind</span> <span class="ow">in</span> <span class="n">fops_imp_up</span><span class="p">],</span>
+             <span class="p">[</span><span class="n">op</span><span class="o">.</span><span class="n">c</span><span class="p">(</span><span class="o">*</span><span class="n">ind</span><span class="p">)</span> <span class="k">for</span> <span class="n">ind</span> <span class="ow">in</span> <span class="n">fops_imp_dn</span><span class="p">]]</span>
+
+        <span class="n">h</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">Operator</span><span class="p">()</span>
+
+        <span class="c1"># Iterate over contributions from individual replicas</span>
+        <span class="k">for</span> <span class="n">nu</span><span class="p">,</span> <span class="p">(</span><span class="n">l</span><span class="p">,</span> <span class="n">V</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">l</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">V</span><span class="p">)):</span>
+            <span class="n">fbo_nu</span> <span class="o">=</span> <span class="n">fops_bath_order</span><span class="p">[</span><span class="n">nu</span> <span class="o">*</span> <span class="n">norb</span><span class="p">:</span> <span class="p">(</span><span class="n">nu</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">norb</span><span class="p">]</span>
+            <span class="n">c</span> <span class="o">=</span> <span class="p">[[</span><span class="n">op</span><span class="o">.</span><span class="n">c</span><span class="p">(</span><span class="o">*</span><span class="n">fops_bath_up</span><span class="p">[</span><span class="n">ind</span><span class="p">])</span> <span class="k">for</span> <span class="n">ind</span> <span class="ow">in</span> <span class="n">fbo_nu</span><span class="p">],</span>
+                 <span class="p">[</span><span class="n">op</span><span class="o">.</span><span class="n">c</span><span class="p">(</span><span class="o">*</span><span class="n">fops_bath_dn</span><span class="p">[</span><span class="n">ind</span><span class="p">])</span> <span class="k">for</span> <span class="n">ind</span> <span class="ow">in</span> <span class="n">fbo_nu</span><span class="p">]]</span>
+
+            <span class="c1"># Matrix of replica Hamiltonian</span>
+            <span class="n">h_nu_mat</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">l</span><span class="p">[</span><span class="n">isym</span><span class="p">]</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">hvec</span><span class="p">[:,</span> <span class="p">:,</span> <span class="p">:,</span> <span class="p">:,</span> <span class="n">isym</span><span class="p">]</span>
+                           <span class="k">for</span> <span class="n">isym</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nsym</span><span class="p">))</span>
+
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_nambu</span><span class="p">:</span>
+                <span class="c1"># h_nu_mat is written in Nambu basis</span>
+                <span class="k">for</span> <span class="n">orb1</span><span class="p">,</span> <span class="n">orb2</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">ndindex</span><span class="p">(</span><span class="n">norb</span><span class="p">,</span> <span class="n">norb</span><span class="p">):</span>
+                    <span class="n">h</span> <span class="o">+=</span> <span class="n">h_nu_mat</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">orb1</span><span class="p">,</span> <span class="n">orb2</span><span class="p">]</span> <span class="o">*</span> \
+                        <span class="n">op</span><span class="o">.</span><span class="n">dagger</span><span class="p">(</span><span class="n">c</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="n">orb1</span><span class="p">])</span> <span class="o">*</span> <span class="n">c</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="n">orb2</span><span class="p">]</span>
+                    <span class="n">h</span> <span class="o">+=</span> <span class="n">h_nu_mat</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">orb1</span><span class="p">,</span> <span class="n">orb2</span><span class="p">]</span> <span class="o">*</span> \
+                        <span class="n">op</span><span class="o">.</span><span class="n">dagger</span><span class="p">(</span><span class="n">c</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="n">orb1</span><span class="p">])</span> <span class="o">*</span> <span class="n">op</span><span class="o">.</span><span class="n">dagger</span><span class="p">(</span><span class="n">c</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="n">orb2</span><span class="p">])</span>
+                    <span class="n">h</span> <span class="o">+=</span> <span class="n">h_nu_mat</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">orb1</span><span class="p">,</span> <span class="n">orb2</span><span class="p">]</span> <span class="o">*</span> <span class="n">c</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="n">orb1</span><span class="p">]</span> <span class="o">*</span> <span class="n">c</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="n">orb2</span><span class="p">]</span>
+                    <span class="n">h</span> <span class="o">+=</span> <span class="o">-</span><span class="n">h_nu_mat</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">orb1</span><span class="p">,</span> <span class="n">orb2</span><span class="p">]</span> <span class="o">*</span> \
+                        <span class="n">op</span><span class="o">.</span><span class="n">dagger</span><span class="p">(</span><span class="n">c</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="n">orb1</span><span class="p">])</span> <span class="o">*</span> <span class="n">c</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="n">orb2</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># h_nu_mat is written in spin basis</span>
+                <span class="k">for</span> <span class="n">spin1</span><span class="p">,</span> <span class="n">spin2</span><span class="p">,</span> <span class="n">orb1</span><span class="p">,</span> <span class="n">orb2</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">ndindex</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">norb</span><span class="p">,</span> <span class="n">norb</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="n">nspin</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                        <span class="n">e</span> <span class="o">=</span> <span class="n">h_nu_mat</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">orb1</span><span class="p">,</span> <span class="n">orb2</span><span class="p">]</span> <span class="k">if</span> <span class="n">spin1</span> <span class="o">==</span> <span class="n">spin2</span> <span class="k">else</span> <span class="mi">0</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">e</span> <span class="o">=</span> <span class="n">h_nu_mat</span><span class="p">[</span><span class="n">spin1</span><span class="p">,</span> <span class="n">spin2</span><span class="p">,</span> <span class="n">orb1</span><span class="p">,</span> <span class="n">orb2</span><span class="p">]</span>
+                    <span class="n">h</span> <span class="o">+=</span> <span class="n">e</span> <span class="o">*</span> <span class="n">op</span><span class="o">.</span><span class="n">dagger</span><span class="p">(</span><span class="n">c</span><span class="p">[</span><span class="n">spin1</span><span class="p">][</span><span class="n">orb1</span><span class="p">])</span> <span class="o">*</span> <span class="n">c</span><span class="p">[</span><span class="n">spin2</span><span class="p">][</span><span class="n">orb2</span><span class="p">]</span>
+
+            <span class="c1"># Hopping amplitudes</span>
+            <span class="k">for</span> <span class="n">spin</span><span class="p">,</span> <span class="n">orb</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">ndindex</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">norb</span><span class="p">):</span>
+                <span class="n">v</span> <span class="o">=</span> <span class="n">V</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">orb</span><span class="p">]</span> <span class="k">if</span> <span class="n">nspin</span> <span class="o">==</span> <span class="mi">1</span> <span class="k">else</span> <span class="n">V</span><span class="p">[</span><span class="n">spin</span><span class="p">,</span> <span class="n">orb</span><span class="p">]</span>
+                <span class="n">h</span> <span class="o">+=</span> <span class="n">v</span> <span class="o">*</span> <span class="n">op</span><span class="o">.</span><span class="n">dagger</span><span class="p">(</span><span class="n">d</span><span class="p">[</span><span class="n">spin</span><span class="p">][</span><span class="n">orb</span><span class="p">])</span> <span class="o">*</span> <span class="n">c</span><span class="p">[</span><span class="n">spin</span><span class="p">][</span><span class="n">orb</span><span class="p">]</span>
+                <span class="n">h</span> <span class="o">+=</span> <span class="n">np</span><span class="o">.</span><span class="n">conj</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="o">*</span> <span class="n">op</span><span class="o">.</span><span class="n">dagger</span><span class="p">(</span><span class="n">c</span><span class="p">[</span><span class="n">spin</span><span class="p">][</span><span class="n">orb</span><span class="p">])</span> <span class="o">*</span> <span class="n">d</span><span class="p">[</span><span class="n">spin</span><span class="p">][</span><span class="n">orb</span><span class="p">]</span>
+
+        <span class="k">return</span> <span class="n">h</span></div>
+
+
     <span class="k">def</span><span class="w"> </span><span class="nf">__deepcopy__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">memo</span><span class="p">):</span>
         <span class="n">nspin</span><span class="p">,</span> <span class="n">norb</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">V</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span>
         <span class="k">return</span> <span class="n">BathGeneral</span><span class="p">(</span><span class="n">nspin</span><span class="p">,</span> <span class="n">norb</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">nbath</span><span class="p">,</span>
                            <span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">hvec</span><span class="p">,</span> <span class="n">memo</span><span class="p">),</span>
+                           <span class="bp">self</span><span class="o">.</span><span class="n">is_nambu</span><span class="p">,</span>
                            <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">copy</span><span class="p">())</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">__reduce_to_dict__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -809,6 +1046,7 @@
                 <span class="s2">&quot;norb&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">V</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
                 <span class="s2">&quot;nbath&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">nbath</span><span class="p">,</span>
                 <span class="s2">&quot;hvec&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">hvec</span><span class="p">,</span>
+                <span class="s2">&quot;is_nambu&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_nambu</span><span class="p">,</span>
                 <span class="s2">&quot;data&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">}</span>
 
     <span class="nd">@classmethod</span>
@@ -816,7 +1054,7 @@
         <span class="s2">&quot;HDFArchive deserialization&quot;</span>
         <span class="k">return</span> <span class="n">BathGeneral</span><span class="p">(</span>
             <span class="n">d</span><span class="p">[</span><span class="s2">&quot;nspin&quot;</span><span class="p">],</span> <span class="n">d</span><span class="p">[</span><span class="s2">&quot;norb&quot;</span><span class="p">],</span> <span class="n">d</span><span class="p">[</span><span class="s2">&quot;nbath&quot;</span><span class="p">],</span>
-            <span class="n">d</span><span class="p">[</span><span class="s2">&quot;hvec&quot;</span><span class="p">],</span> <span class="n">d</span><span class="p">[</span><span class="s2">&quot;data&quot;</span><span class="p">]</span>
+            <span class="n">d</span><span class="p">[</span><span class="s2">&quot;hvec&quot;</span><span class="p">],</span> <span class="n">d</span><span class="p">[</span><span class="s2">&quot;is_nambu&quot;</span><span class="p">],</span> <span class="n">d</span><span class="p">[</span><span class="s2">&quot;data&quot;</span><span class="p">]</span>
         <span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">assert_compatible</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
@@ -825,6 +1063,8 @@
             <span class="s2">&quot;Incompatible bath topologies&quot;</span>
         <span class="k">assert</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">hvec</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">hvec</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">(),</span> \
             <span class="s2">&quot;Incompatible general bath objects (different basis matrices)&quot;</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_nambu</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">is_nambu</span><span class="p">,</span> \
+            <span class="s2">&quot;Incompatible general bath objects (Nambu vs non-Nambu basis)&quot;</span>
 
     <span class="c1"># Multiply all bath parameters by a constant</span>
     <span class="k">def</span><span class="w"> </span><span class="fm">__imul__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
@@ -1207,7 +1447,7 @@
         <span class="n">hvec</span><span class="p">,</span> <span class="n">lambdavec</span> <span class="o">=</span> \
             <span class="bp">cls</span><span class="o">.</span><span class="n">_build_linear_combination</span><span class="p">(</span><span class="n">replicas</span><span class="p">,</span> <span class="n">nnambu</span> <span class="o">*</span> <span class="n">nspin</span><span class="p">,</span> <span class="n">h</span><span class="p">,</span> <span class="n">is_nambu</span><span class="p">)</span>
 
-        <span class="n">bath</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">(</span><span class="n">nspin</span><span class="p">,</span> <span class="n">norb</span><span class="p">,</span> <span class="n">nbath</span><span class="p">,</span> <span class="n">hvec</span><span class="p">)</span>
+        <span class="n">bath</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">(</span><span class="n">nspin</span><span class="p">,</span> <span class="n">norb</span><span class="p">,</span> <span class="n">nbath</span><span class="p">,</span> <span class="n">hvec</span><span class="p">,</span> <span class="n">is_nambu</span><span class="p">)</span>
 
         <span class="c1"># Fill l</span>
         <span class="k">for</span> <span class="n">nu</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">bath</span><span class="o">.</span><span class="n">nbath</span><span class="p">):</span>
@@ -1267,7 +1507,7 @@
                                          <span class="n">basis_mats</span><span class="p">,</span>
                                          <span class="n">is_nambu</span><span class="p">)</span>
 
-        <span class="n">bath</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">(</span><span class="n">nspin</span><span class="p">,</span> <span class="n">norb</span><span class="p">,</span> <span class="n">nbath</span><span class="p">,</span> <span class="n">hvec</span><span class="p">)</span>
+        <span class="n">bath</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">(</span><span class="n">nspin</span><span class="p">,</span> <span class="n">norb</span><span class="p">,</span> <span class="n">nbath</span><span class="p">,</span> <span class="n">hvec</span><span class="p">,</span> <span class="n">is_nambu</span><span class="p">)</span>
 
         <span class="c1"># Fill l</span>
         <span class="k">for</span> <span class="n">coeff</span><span class="p">,</span> <span class="p">(</span><span class="n">nu</span><span class="p">,</span> <span class="n">isym</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">coeffs</span><span class="p">,</span> <span class="n">classification</span><span class="p">):</span>
