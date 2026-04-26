@@ -231,28 +231,31 @@ class BathNormal(Bath):
                     fops_bath_dn: list[IndicesType],
                     fops_bath_order: list[int]) -> op.Operator:
         """
-        Return the bath Hamiltonian as a :class:`triqs.operators.Operator`.
+        Return the bath Hamiltonian as a
+        :py:class:`triqs.operators.operators.Operator`.
 
         The operator includes bath energy levels, impurity-bath hopping
         amplitudes, and (in ``EDMode.SUPERC`` mode) on-site pairing terms.
 
-        Parameters
-        ----------
-        fops_imp_up : list[IndicesType]
-            Fundamental operator indices for spin-up impurity orbitals.
-        fops_imp_dn : list[IndicesType]
-            Fundamental operator indices for spin-down impurity orbitals.
-        fops_bath_up : list[IndicesType]
-            Fundamental operator indices for spin-up bath states.
-        fops_bath_dn : list[IndicesType]
-            Fundamental operator indices for spin-down bath states.
-        fops_bath_order: list[int]
-            List of positions within fops_bath_up/fops_bath_dn in the order
-            corresponding to EDIpack's bath state enumeration.
+        :param fops_imp_up: Fundamental operator set for spin-up impurity
+            degrees of freedom.
+        :type fops_imp_up: list[tuple[int | str, int | str]]
 
-        Returns
-        -------
-        op.Operator
+        :param fops_imp_dn: Fundamental operator set for spin-down impurity
+            degrees of freedom.
+        :type fops_imp_dn: list[tuple[int | str, int | str]]
+
+        :param fops_bath_up: Fundamental operator set for spin-up bath
+            degrees of freedom.
+        :type fops_bath_up: list[tuple[int | str, int | str]]
+
+        :param fops_bath_dn: Fundamental operator set for spin-down bath
+            degrees of freedom.
+        :type fops_bath_dn: list[tuple[int | str, int | str]]
+
+        :param fops_bath_order: List of positions within fops_bath_* in
+            the order corresponding to EDIpack's bath state enumeration.
+        :type fops_bath_order: list[int]
         """
         nspin, norb, nbath = self.V.shape
 
@@ -501,28 +504,31 @@ class BathHybrid(Bath):
                     fops_bath_dn: list[IndicesType],
                     fops_bath_order: list[int]) -> op.Operator:
         """
-        Return the bath Hamiltonian as a :class:`triqs.operators.Operator`.
+        Return the bath Hamiltonian as a
+        :py:class:`triqs.operators.operators.Operator`.
 
         The operator includes bath energy levels, impurity-bath hopping
         amplitudes, and (in ``EDMode.SUPERC`` mode) on-site pairing terms.
 
-        Parameters
-        ----------
-        fops_imp_up : list[IndicesType]
-            Fundamental operator indices for spin-up impurity orbitals.
-        fops_imp_dn : list[IndicesType]
-            Fundamental operator indices for spin-down impurity orbitals.
-        fops_bath_up : list[IndicesType]
-            Fundamental operator indices for spin-up bath states.
-        fops_bath_dn : list[IndicesType]
-            Fundamental operator indices for spin-down bath states.
-        fops_bath_order: list[int]
-            List of positions within fops_bath_up/fops_bath_dn in the order
-            corresponding to EDIpack's bath state enumeration.
+        :param fops_imp_up: Fundamental operator set for spin-up impurity
+            degrees of freedom.
+        :type fops_imp_up: list[tuple[int | str, int | str]]
 
-        Returns
-        -------
-        op.Operator
+        :param fops_imp_dn: Fundamental operator set for spin-down impurity
+            degrees of freedom.
+        :type fops_imp_dn: list[tuple[int | str, int | str]]
+
+        :param fops_bath_up: Fundamental operator set for spin-up bath
+            degrees of freedom.
+        :type fops_bath_up: list[tuple[int | str, int | str]]
+
+        :param fops_bath_dn: Fundamental operator set for spin-down bath
+            degrees of freedom.
+        :type fops_bath_dn: list[tuple[int | str, int | str]]
+
+        :param fops_bath_order: List of positions within fops_bath_* in
+            the order corresponding to EDIpack's bath state enumeration.
+        :type fops_bath_order: list[int]
         """
         nspin, norb, nbath = self.V.shape
 
@@ -708,28 +714,31 @@ class BathGeneral(Bath):
                     fops_bath_dn: list[IndicesType],
                     fops_bath_order: list[int]) -> op.Operator:
         """
-        Return the bath Hamiltonian as a :class:`triqs.operators.Operator`.
+        Return the bath Hamiltonian as a
+        :py:class:`triqs.operators.operators.Operator`.
 
         The operator includes bath energy levels, impurity-bath hopping
         amplitudes, and (when ``self.is_nambu = True``) on-site pairing terms.
 
-        Parameters
-        ----------
-        fops_imp_up : list[IndicesType]
-            Fundamental operator indices for spin-up impurity orbitals.
-        fops_imp_dn : list[IndicesType]
-            Fundamental operator indices for spin-down impurity orbitals.
-        fops_bath_up : list[IndicesType]
-            Fundamental operator indices for spin-up bath states.
-        fops_bath_dn : list[IndicesType]
-            Fundamental operator indices for spin-down bath states.
-        fops_bath_order: list[int]
-            List of positions within fops_bath_up/fops_bath_dn in the order
-            corresponding to EDIpack's bath state enumeration.
+        :param fops_imp_up: Fundamental operator set for spin-up impurity
+            degrees of freedom.
+        :type fops_imp_up: list[tuple[int | str, int | str]]
 
-        Returns
-        -------
-        op.Operator
+        :param fops_imp_dn: Fundamental operator set for spin-down impurity
+            degrees of freedom.
+        :type fops_imp_dn: list[tuple[int | str, int | str]]
+
+        :param fops_bath_up: Fundamental operator set for spin-up bath
+            degrees of freedom.
+        :type fops_bath_up: list[tuple[int | str, int | str]]
+
+        :param fops_bath_dn: Fundamental operator set for spin-down bath
+            degrees of freedom.
+        :type fops_bath_dn: list[tuple[int | str, int | str]]
+
+        :param fops_bath_order: List of positions within fops_bath_* in
+            the order corresponding to EDIpack's bath state enumeration.
+        :type fops_bath_order: list[int]
         """
         nspin, norb = self.V[0].shape
         nsym = self.hvec.shape[-1]
