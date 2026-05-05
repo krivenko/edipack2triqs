@@ -24,6 +24,7 @@ from edipack2py import global_env as ed
 from . import EDMode
 from .util import (IndicesType,
                    validate_fops_up_dn,
+                   is_diagonal,
                    is_spin_diagonal,
                    is_spin_degenerate,
                    write_config,
@@ -380,16 +381,31 @@ class EDIpackSolver:
                 c["NBATH"] = 0
                 c["BATH_TYPE"] = "hybrid"
 
+            # Phonons
+            self.phonon = kwargs.get("phonon", None)
+            if self.phonon is not None:
+                c["W0_PH"] = self.phonon.frequency
+                c["NPH"] = self.phonon.nphonons
+                self.g_ph, self.a_ph = parse_phonon_coupling(
+                    self.phonon.coupling,
+                    fops_imp_up,
+                    fops_imp_dn
+                )
+                phonon_diag = is_diagonal(self.g_ph)
+            else:
+                phonon_diag = True
+
             # ed_total_ud
-            ed_total_ud = kwargs.get("ed_total_ud", False)
+            self.ed_total_ud = kwargs.get("ed_total_ud", False)
             self.denden_int = _is_density_density(self.h_params.U)
-            if not ((not ed_total_ud)
+            if not ((not self.ed_total_ud)
                     and self.h_params.ed_mode == EDMode.NORMAL
                     and isinstance(self.h_params.bath, (NoneType, BathNormal))
                     and _is_density(self.h_params.Hloc)
-                    and self.denden_int):
-                ed_total_ud = True
-            c["ED_TOTAL_UD"] = ed_total_ud
+                    and self.denden_int
+                    and phonon_diag):
+                self.ed_total_ud = True
+            c["ED_TOTAL_UD"] = self.ed_total_ud
 
             # ed_sectors and ed_sectors_shift
             self.ed_sectors = kwargs.get("ed_sectors", False)
@@ -412,17 +428,6 @@ class EDIpackSolver:
             c["ED_FINITE_TEMP"] = not self.zerotemp
             if self.zerotemp:
                 c["LANC_NSTATES_TOTAL"] = 1
-
-            # Phonons
-            self.phonon = kwargs.get("phonon", None)
-            if self.phonon is not None:
-                c["W0_PH"] = self.phonon.frequency
-                c["NPH"] = self.phonon.nphonons
-                self.g_ph, self.a_ph = parse_phonon_coupling(
-                    self.phonon.coupling,
-                    fops_imp_up,
-                    fops_imp_dn
-                )
 
             # Bath fitting
             bfp = kwargs.get("bath_fitting_params", BathFittingParams())
@@ -793,11 +798,17 @@ class EDIpackSolver:
         ed.chipair_flag = chi_pair
         ed.chiexct_flag = chi_exct
 
-        if rdm and (self.phonon is not None):
-            raise RuntimeError(
-                "Impurity reduced density matrix is not available "
-                "in calculations with phonons"
-            )
+        if self.phonon is not None:
+            if rdm:
+                raise RuntimeError(
+                    "Impurity reduced density matrix is not available "
+                    "in calculations with phonons"
+                )
+            if (not self.ed_total_ud) and (not is_diagonal(self.g_ph)):
+                raise RuntimeError(
+                    "Cannot add orbital off-diagonal elements to "
+                    "the electron-phonon coupling"
+                )
 
         ed.rdm_flag = rdm
 
