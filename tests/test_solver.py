@@ -336,8 +336,12 @@ class TestSolver(unittest.TestCase):
         if cls.generate_ref_data:
             results = cls.make_reference_results(**params)
             with HDFArchive(filename, 'a') as ar:
-                ar.create_group(h5_group_name)
-                ar[h5_group_name] = results
+                gr = ar
+                for subgr_name in h5_group_name.split('/'):
+                    if subgr_name not in gr:
+                        gr.create_group(subgr_name)
+                    gr = gr[subgr_name]
+                gr.update(results)
                 return results
         else:
             with HDFArchive(filename, 'r') as ar:
