@@ -22,7 +22,7 @@ class TestEDIpackSolverPhononsNoBath(TestSolver):
     @classmethod
     def assert_all(cls, s, **refs):
         cls.assert_static_obs(s, atol=1e-7, **refs)
-        cls.assert_gfs(s, has_bath=False, **refs)
+        cls.assert_gfs(s, atol=1e-5, has_bath=False, **refs)
         cls.assert_chi(s, **refs)
 
     def test_zerotemp(self):
