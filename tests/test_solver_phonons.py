@@ -2,7 +2,7 @@ from itertools import product
 
 import numpy as np
 from numpy import multiply as mul
-from numpy.testing import assert_equal
+from numpy.testing import assert_equal, assert_allclose
 
 import triqs.operators as op
 
@@ -24,6 +24,9 @@ class TestEDIpackSolverPhononsNoBath(TestSolver):
         cls.assert_static_obs(s, atol=1e-7, **refs)
         cls.assert_gfs(s, atol=1e-5, has_bath=False, **refs)
         cls.assert_chi(s, **refs)
+        assert_allclose(s.phonon_occ, refs['phonon_occ'], atol=1e-7)
+        assert_allclose(s.phonon_x, refs['phonon_x'], atol=1e-7)
+        assert_allclose(s.phonon_x2, refs['phonon_x2'], atol=1e-7)
 
     def test_zerotemp(self):
         h_loc_mat = mul.outer(s0, np.diag([-0.5, -0.6]))
@@ -50,9 +53,8 @@ class TestEDIpackSolverPhononsNoBath(TestSolver):
             fops_imp_up, fops_imp_dn,
             zerotemp=True,
             phonon=phonon,
-            ed_total_ud=True,
             lanczos_params=LanczosParams(nstates_total=17),
-            verbose=0,
+            verbose=0
         )
 
         self.assertEqual(solver.h_params.ed_mode, EDMode.NORMAL)
@@ -282,7 +284,7 @@ class TestEDIpackSolverPhononsNoBath(TestSolver):
             fops_imp_up, fops_imp_dn,
             phonon=phonon,
             lanczos_params=LanczosParams(nstates_total=8),
-            verbose=0,
+            verbose=0
         )
 
         self.assertEqual(solver.h_params.ed_mode, EDMode.NONSU2)
@@ -472,6 +474,9 @@ class TestEDIpackSolverPhononsBathHybrid(TestSolver):
         cls.assert_static_obs(s, atol=1e-8, **refs)
         cls.assert_gfs(s, atol=1e-5, **refs)
         cls.assert_chi(s, atol=5e-5, **refs)
+        assert_allclose(s.phonon_occ, refs['phonon_occ'], atol=1e-7)
+        assert_allclose(s.phonon_x, refs['phonon_x'], atol=1e-7)
+        assert_allclose(s.phonon_x2, refs['phonon_x2'], atol=1e-7)
 
     def test_zerotemp(self):
         h_loc_mat = mul.outer(s0, np.diag([-0.5, -0.6]))

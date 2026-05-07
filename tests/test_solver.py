@@ -446,6 +446,10 @@ class TestSolver(unittest.TestCase):
                                  beta=beta,
                                  spin_blocks=spin_blocks)
 
+        # Phonons
+        if phonon is not None:
+            cls.make_phonon_results(results, ed, phonon, beta=beta)
+
         return results
 
     @classmethod
@@ -789,12 +793,11 @@ class TestSolver(unittest.TestCase):
                 results[f"chi_pair_{axis}"] = chi_pair
 
     @classmethod
-    def make_rdm_results(cls, results, ed, mki, *, beta, spin_blocks):
+    def _compute_ref_density_matrix(cls, ed, beta):
         """
-        Generate reference results for reduced impurity density matrix
-        using pomerol2triqs.
+        Compute density matrix of the full system using pomerol2triqs to obtain
+        energy levels and eigenbasis of the Hamiltonian.
         """
-
         # Find ground state energy
         e0 = np.min(list(map(np.min, ed.energies)))
 
@@ -806,6 +809,16 @@ class TestSolver(unittest.TestCase):
         # Normalize rho_diag and transform the density matrix into Fock basis
         rho = [U @ np.diag(w / Z) @ np.conj(U.T)
                for w, U in zip(rho_diag, ed.unitary_matrices)]
+
+        return rho
+
+    @classmethod
+    def make_rdm_results(cls, results, ed, mki, *, beta, spin_blocks):
+        """
+        Generate reference results for reduced impurity density matrix
+        using pomerol2triqs.
+        """
+        rho = cls._compute_ref_density_matrix(ed, beta)
 
         nbit = 2 * cls.norb
         if hasattr(cls, 'mkind_bath'):
@@ -873,3 +886,47 @@ class TestSolver(unittest.TestCase):
         np.isclose(np.trace(rdm), 1.0, atol=1e-12)
 
         results["rdm"] = rdm
+
+    @classmethod
+    def make_phonon_results(cls, results, ed, phonon, *, beta):
+        """
+        Generate reference results for phonon-related observables using
+        pomerol2triqs.
+        """
+        rho = cls._compute_ref_density_matrix(ed, beta)
+
+        nbit = 2 * cls.norb
+        if hasattr(cls, 'mkind_bath'):
+            nbit += len(cls.fops_bath_up) + len(cls.fops_bath_dn)
+
+        el_dim = 2 ** nbit
+        ph_dim = phonon.nphonons + 1
+        rho_ph = np.zeros((ph_dim, ph_dim), dtype=complex)
+
+        # Trace out electrons
+        for states_sp, rho_sp in zip(ed.fock_states, rho):
+            for (i1, st1), (i2, st2) in product(enumerate(states_sp), repeat=2):
+                st_ph1, st_el1 = divmod(st1, el_dim)
+                st_ph2, st_el2 = divmod(st2, el_dim)
+                if st_el1 == st_el2:
+                    rho_ph[st_ph1, st_ph2] += rho_sp[i1, i2]
+
+        # Basic sanity checks
+        np.allclose(rho_ph, np.conj(rho_ph.T), atol=1e-12)
+        np.isclose(np.trace(rho_ph), 1.0, atol=1e-12)
+
+        # Matrices of phonon creation/annihilation operators
+        b_mat = np.diag(np.sqrt(np.arange(1, ph_dim)), k=1)
+        b_dag_mat = b_mat.T
+
+        results["phonon_occ"] = np.trace(b_dag_mat @ b_mat @ rho_ph)
+
+        X_mat = (b_dag_mat + b_mat) / np.sqrt(2)
+        results["phonon_x"] = np.trace(X_mat @ rho_ph)
+
+        X2_mat = np.diag(0.5 + np.arange(ph_dim)) \
+            + 0.5 * np.diag(np.sqrt(np.arange(1, ph_dim - 1)
+                                    * np.arange(2, ph_dim)), k=2) \
+            + 0.5 * np.diag(np.sqrt(np.arange(1, ph_dim - 1)
+                                    * np.arange(2, ph_dim)), k=-2)
+        results["phonon_x2"] = np.trace(X2_mat @ rho_ph)

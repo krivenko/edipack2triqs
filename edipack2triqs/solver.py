@@ -931,6 +931,32 @@ class EDIpackSolver:
         """
         return ed.get_impurity_rdm()
 
+    @property
+    def phonon_occ(self) -> Union[float, NoneType]:
+        r"""
+        Phonon mode occupancy :math:`\langle b^\dagger b\rangle` or
+        :py:data:`None` if calculations with phonons have not been enabled.
+        """
+        return ed.get_phon(ikind=0) if (self.phonon is not None) else None
+
+    @property
+    def phonon_x(self) -> Union[float, NoneType]:
+        r"""
+        Expectation value of the phonon displacement operator,
+        :math:`\langle\hat X\rangle=\langle (b^\dagger + b) / \sqrt{2}\rangle`
+        or :py:data:`None` if calculations with phonons have not been enabled.
+        """
+        return ed.get_phon(ikind=1) if (self.phonon is not None) else None
+
+    @property
+    def phonon_x2(self) -> Union[float, NoneType]:
+        r"""
+        Expectation value of the squared phonon displacement operator,
+        :math:`\langle\hat X^2\rangle=\langle(b^\dagger + b)^2 / 2\rangle` or
+        :py:data:`None` if calculations with phonons have not been enabled.
+        """
+        return ed.get_phon(ikind=2) if (self.phonon is not None) else None
+
     def _make_gf(self, ed_func, real_freq, anomalous) -> BlockGf:
         if anomalous:
             if ed.get_ed_mode() != int(EDMode.SUPERC):

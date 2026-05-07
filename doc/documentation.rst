@@ -17,7 +17,7 @@ Solver class
    :members:
    :exclude-members: chi2_fit_bath
 
-.. autoclass:: PhononsParams
+.. autoclass:: PhononParams
    :members:
 
 .. autoclass:: LanczosParams
