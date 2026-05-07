@@ -40,7 +40,7 @@ class TestEDIpackSolverNoBath(TestSolver):
             fops_imp_up, fops_imp_dn,
             zerotemp=True,
             lanczos_params=LanczosParams(nstates_total=17),
-            verbose=0,
+            verbose=0
         )
 
         self.assertEqual(solver.h_params.ed_mode, EDMode.NORMAL)
@@ -223,7 +223,7 @@ class TestEDIpackSolverNoBath(TestSolver):
             h,
             fops_imp_up, fops_imp_dn,
             lanczos_params=LanczosParams(nstates_total=8),
-            verbose=0,
+            verbose=0
         )
 
         self.assertEqual(solver.h_params.ed_mode, EDMode.NONSU2)
