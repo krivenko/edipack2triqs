@@ -5,6 +5,7 @@ from numpy import multiply as mul
 from numpy.testing import assert_equal, assert_allclose
 
 import triqs.operators as op
+from triqs.utility.comparison_tests import assert_gfs_are_close
 
 from edipack2triqs import EDMode
 from edipack2triqs.solver import EDIpackSolver, PhononParams, LanczosParams
@@ -27,6 +28,10 @@ class TestEDIpackSolverPhononsNoBath(TestSolver):
         assert_allclose(s.phonon_occ, refs['phonon_occ'], atol=1e-7)
         assert_allclose(s.phonon_x, refs['phonon_x'], atol=1e-7)
         assert_allclose(s.phonon_x2, refs['phonon_x2'], atol=1e-7)
+        assert_gfs_are_close(s.phonon_D_w, refs["phonon_D_w"], precision=1e-6)
+        if 'phonon_D_iw' in refs:
+            assert_gfs_are_close(s.phonon_D_iw, refs["phonon_D_iw"],
+                                 precision=1e-6)
 
     def test_zerotemp(self):
         h_loc_mat = mul.outer(s0, np.diag([-0.5, -0.6]))
@@ -41,7 +46,7 @@ class TestEDIpackSolverPhononsNoBath(TestSolver):
         phonon = PhononParams(
             frequency=0.5,
             coupling=self.make_h_loc(mul.outer(s0, g_ph)) + a_ph,
-            nphonons=7
+            nphonons=31
         )
 
         fops_imp_up, fops_imp_dn = self.make_fops_imp()
@@ -96,7 +101,7 @@ class TestEDIpackSolverPhononsNoBath(TestSolver):
         phonon = PhononParams(
             frequency=0.5,
             coupling=self.make_h_loc(mul.outer(s0, g_ph)) + a_ph,
-            nphonons=7
+            nphonons=31
         )
 
         fops_imp_up, fops_imp_dn = self.make_fops_imp()
@@ -147,7 +152,7 @@ class TestEDIpackSolverPhononsNoBath(TestSolver):
         phonon = PhononParams(
             frequency=0.5,
             coupling=self.make_h_loc(mul.outer(s0, g_ph)) + a_ph,
-            nphonons=7
+            nphonons=31
         )
         solver.phonon_coupling = phonon.coupling
         self.assertEqual(solver.phonon_coupling, phonon.coupling)
@@ -182,7 +187,7 @@ class TestEDIpackSolverPhononsNoBath(TestSolver):
         phonon = PhononParams(
             frequency=0.5,
             coupling=self.make_h_loc(mul.outer(s0, g_ph)) + a_ph,
-            nphonons=7
+            nphonons=31
         )
 
         fops_imp_up, fops_imp_dn = self.make_fops_imp()
@@ -233,7 +238,7 @@ class TestEDIpackSolverPhononsNoBath(TestSolver):
         phonon = PhononParams(
             frequency=0.5,
             coupling=self.make_h_loc(mul.outer(s0, g_ph)) + a_ph,
-            nphonons=7
+            nphonons=31
         )
         solver.phonon_coupling = phonon.coupling
         self.assertEqual(solver.phonon_coupling, phonon.coupling)
@@ -272,7 +277,7 @@ class TestEDIpackSolverPhononsNoBath(TestSolver):
         phonon = PhononParams(
             frequency=0.5,
             coupling=phonon_coupling,
-            nphonons=7
+            nphonons=31
         )
 
         fops_imp_up, fops_imp_dn = self.make_fops_imp(False)
@@ -324,7 +329,7 @@ class TestEDIpackSolverPhononsNoBath(TestSolver):
         phonon = PhononParams(
             frequency=0.5,
             coupling=phonon_coupling,
-            nphonons=7
+            nphonons=31
         )
         solver.phonon_coupling = phonon.coupling
         self.assertEqual(solver.phonon_coupling, phonon.coupling)
@@ -359,7 +364,7 @@ class TestEDIpackSolverPhononsNoBath(TestSolver):
         phonon = PhononParams(
             frequency=0.5,
             coupling=self.make_h_loc(mul.outer(s0, g_ph)) + a_ph,
-            nphonons=7
+            nphonons=31
         )
 
         fops_imp_up, fops_imp_dn = self.make_fops_imp()
@@ -414,7 +419,7 @@ class TestEDIpackSolverPhononsNoBath(TestSolver):
         phonon = PhononParams(
             frequency=0.5,
             coupling=phonon_coupling,
-            nphonons=7
+            nphonons=31
         )
         solver.phonon_coupling = phonon.coupling
         self.assertEqual(solver.phonon_coupling, phonon.coupling)
@@ -477,6 +482,8 @@ class TestEDIpackSolverPhononsBathHybrid(TestSolver):
         assert_allclose(s.phonon_occ, refs['phonon_occ'], atol=1e-7)
         assert_allclose(s.phonon_x, refs['phonon_x'], atol=1e-7)
         assert_allclose(s.phonon_x2, refs['phonon_x2'], atol=1e-7)
+        # NB: Generating reference data for phonon_D_w and phonon_D_iw
+        # is way too expensive.
 
     def test_zerotemp(self):
         h_loc_mat = mul.outer(s0, np.diag([-0.5, -0.6]))

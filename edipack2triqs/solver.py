@@ -1152,6 +1152,50 @@ class EDIpackSolver:
         return chi
 
     #
+    # Green's functions of phonons
+    #
+
+    @property
+    def phonon_D_iw(self) -> Union[float, NoneType]:
+        r"""
+        Phononic Matsubara Green's function. :py:data:`None` is returned if
+        calculations with phonons have not been enabled.
+        """
+        if self.phonon is None:
+            return None
+
+        mesh = MeshImFreq(beta=ed.beta, S="Boson", n_iw=ed.Lmats)
+        z_vals = np.asarray([complex(z) for z in mesh])
+
+        with chdircontext(self.wdname):
+            data = ed.get_dimp(zeta=z_vals, axis="m")
+
+        D = Gf(mesh=mesh, target_shape=())
+        D.data[:] = data
+
+        return D
+
+    @property
+    def phonon_D_w(self) -> Union[float, NoneType]:
+        r"""
+        Phononic real-frequency Green's function. :py:data:`None` is returned if
+        calculations with phonons have not been enabled.
+        """
+        if self.phonon is None:
+            return None
+
+        mesh = MeshReFreq(window=(ed.wini, ed.wfin), n_w=ed.Lreal)
+        z_vals = np.asarray([complex(z) + ed.eps * 1j for z in mesh])
+
+        with chdircontext(self.wdname):
+            data = ed.get_dimp(zeta=z_vals, axis="r")
+
+        D = Gf(mesh=mesh, target_shape=())
+        D.data[:] = data
+
+        return D
+
+    #
     # Bath fitting
     #
 

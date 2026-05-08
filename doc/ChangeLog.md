@@ -10,7 +10,9 @@
   Computed expectation values of phonon-related observables are available via
   new properties of `EDIpackSolver`: `phonon_occ` for the phonon mode occupancy,
   `phonon_x` for the expectation value of the phonon displacement operator, and
-  `phonon_x2` for the expectation value of its square.
+  `phonon_x2` for the expectation value of its square. Matsubara and
+  real-frequency Green's functions of the phonon are available via properties
+  `EDIpackSolver.phonon_D_iw` and `EDIpackSolver.phonon_D_w`.
 
 * Expose single-particle density matrix of the full system (impurity + bath)
   via read-only property `EDIpackSolver.denmat`.

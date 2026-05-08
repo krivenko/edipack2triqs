@@ -21,7 +21,7 @@ from triqs.utility.comparison_tests import (assert_gfs_are_close,
 
 from h5 import HDFArchive
 
-from edipack2triqs.hamiltonian import extract_quadratic
+from edipack2triqs.hamiltonian import extract_quadratic, parse_phonon_coupling
 from edipack2triqs.util import monomial2op, non_int_part
 
 
@@ -448,7 +448,15 @@ class TestSolver(unittest.TestCase):
 
         # Phonons
         if phonon is not None:
-            cls.make_phonon_results(results, ed, phonon, beta=beta)
+            cls.make_phonon_results(results, ed, mki, phonon,
+                                    beta=beta,
+                                    n_iw=n_iw,
+                                    energy_window=energy_window,
+                                    n_w=n_w,
+                                    broadening=broadening,
+                                    spin_blocks=spin_blocks,
+                                    tols=tols,
+                                    zerotemp=zerotemp)
 
         return results
 
@@ -888,7 +896,13 @@ class TestSolver(unittest.TestCase):
         results["rdm"] = rdm
 
     @classmethod
-    def make_phonon_results(cls, results, ed, phonon, *, beta):
+    def make_phonon_results(cls, results, ed, mki, phonon, *,
+                            beta,
+                            n_iw,
+                            energy_window, n_w, broadening,
+                            spin_blocks,
+                            tols,
+                            zerotemp):
         """
         Generate reference results for phonon-related observables using
         pomerol2triqs.
@@ -930,3 +944,58 @@ class TestSolver(unittest.TestCase):
             + 0.5 * np.diag(np.sqrt(np.arange(1, ph_dim - 1)
                                     * np.arange(2, ph_dim)), k=-2)
         results["phonon_x2"] = np.trace(X2_mat @ rho_ph)
+
+        # Green's functions
+        fops_imp_up, fops_imp_dn = cls.make_fops_imp(spin_blocks)
+
+        w0 = phonon.frequency
+        g_ph, a_ph = parse_phonon_coupling(
+            phonon.coupling,
+            fops_imp_up,
+            fops_imp_dn
+        )
+
+        O_avg = 0.0
+        for spin in cls.spins:
+            for o1, o2 in product(cls.orbs, cls.orbs):
+                ind1, ind2 = mki(spin, o1), mki(spin, o2)
+                O_avg += g_ph[o1, o2] * ed.ensemble_average(ind1, ind2, beta)
+
+        # Real-frequency
+        D0_w = Gf(mesh=MeshReFreq(window=energy_window, n_w=n_w),
+                  target_shape=())
+
+        chi_w = D0_w.copy()
+        D0_w << inverse(Omega + 1j * broadening - w0) \
+            - inverse(Omega + 1j * broadening + w0)
+
+        for spin1, spin2 in product(cls.spins, repeat=2):
+            for o1, o2, o3, o4 in product(cls.orbs, repeat=4):
+                ind1, ind2 = mki(spin1, o1), mki(spin1, o2)
+                ind3, ind4 = mki(spin2, o3), mki(spin2, o4)
+                chi_w -= g_ph[o1, o2] * g_ph[o3, o4] \
+                    * ed.chi_w(ind1, ind2, ind3, ind4,
+                               beta, energy_window, n_w, broadening, **tols)
+
+        results["phonon_D_w"] = D0_w + D0_w * chi_w * D0_w
+
+        # Matsubara
+        if zerotemp:
+            return
+        D0_iw = Gf(mesh=MeshImFreq(beta=beta, S="Boson", n_iw=n_iw),
+                   target_shape=())
+
+        chi_iw = D0_iw.copy()
+        D0_iw << (2 * w0) * inverse(iOmega_n * iOmega_n - w0 ** 2)
+
+        for spin1, spin2 in product(cls.spins, repeat=2):
+            for o1, o2, o3, o4 in product(cls.orbs, repeat=4):
+                ind1, ind2 = mki(spin1, o1), mki(spin1, o2)
+                ind3, ind4 = mki(spin2, o3), mki(spin2, o4)
+                chi_iw -= g_ph[o1, o2] * g_ph[o3, o4] \
+                    * ed.chi_iw(ind1, ind2, ind3, ind4, beta, n_iw, **tols)
+
+        Omega0 = next(mp for mp in chi_iw.mesh if mp.index == 0)
+        chi_iw[Omega0] -= beta * (a_ph * a_ph + 2 * a_ph * O_avg)
+
+        results["phonon_D_iw"] = D0_iw + D0_iw * chi_iw * D0_iw
