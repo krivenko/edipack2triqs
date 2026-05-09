@@ -521,3 +521,40 @@ def parse_hamiltonian(  # noqa: C901
         params.Hloc[spin1, spin2, ...] = Hloc[spin1, spin2, ...]
 
     return params
+
+
+def parse_phonon_coupling(
+        coupling: op.Operator,
+        fops_imp_up: list[IndicesType],
+        fops_imp_dn: list[IndicesType]):
+    """
+    Parse a given phonon coupling operator into coupling constants and a
+    displacement field.
+    """
+
+    # Extract displacement fields
+    a_ph = 0.0
+    for mon, coeff in coupling:
+        if len(mon) == 0:
+            a_ph = coeff
+            break
+    if not np.isreal(a_ph):
+        raise RuntimeError("Phonon displacement constant must be real")
+
+    # Extract coupling constants
+    g_ph, g_ph_an = extract_quadratic(coupling - a_ph,
+                                      fops_imp_up,
+                                      fops_imp_dn,
+                                      ignore_unexpected=False)
+    if np.any(g_ph_an):
+        raise RuntimeError(
+            "Anomalous phonon coupling operators are not supported"
+        )
+    if not is_spin_degenerate(g_ph):
+        raise RuntimeError("Phonon coupling operators must be spin-degenerate")
+    if (g_ph[0, 0, :, :] != np.conj(g_ph[0, 0, :, :].T)).any():
+        raise RuntimeError(
+            "Phonon coupling constants must form a Hermitian matrix"
+        )
+
+    return g_ph[0, 0, :, :], a_ph

@@ -21,18 +21,27 @@ from triqs.utility.comparison_tests import (assert_gfs_are_close,
 
 from h5 import HDFArchive
 
-from edipack2triqs.hamiltonian import extract_quadratic
+from edipack2triqs.hamiltonian import extract_quadratic, parse_phonon_coupling
 from edipack2triqs.util import monomial2op, non_int_part
 
 
-def make_pomerol_ed(index_converter, h):
+def make_pomerol_ed(index_converter, h, phonon=None):
     "Construct a PomerolED object"
-    from pomerol2triqs import PomerolED
+    from pomerol2triqs import PomerolED, BosonParams
 
     ed = PomerolED(index_converter, verbose=False)
     ed.ops_melem_tol = 0
     ed.rho_threshold = 0
-    ed.diagonalize(h)
+
+    if phonon is not None:
+        bosons = [
+            BosonParams(frequency=phonon.frequency,
+                        coupling=phonon.coupling,
+                        n_bits=int(np.log2(phonon.nphonons + 1)))
+        ]
+        ed.diagonalize(h, bosons=bosons)
+    else:
+        ed.diagonalize(h)
     return ed
 
 
@@ -336,8 +345,12 @@ class TestSolver(unittest.TestCase):
         if cls.generate_ref_data:
             results = cls.make_reference_results(**params)
             with HDFArchive(filename, 'a') as ar:
-                ar.create_group(h5_group_name)
-                ar[h5_group_name] = results
+                gr = ar
+                for subgr_name in h5_group_name.split('/'):
+                    if subgr_name not in gr:
+                        gr.create_group(subgr_name)
+                    gr = gr[subgr_name]
+                gr.update(results)
                 return results
         else:
             with HDFArchive(filename, 'r') as ar:
@@ -346,6 +359,7 @@ class TestSolver(unittest.TestCase):
     @classmethod
     def make_reference_results(cls, *,
                                h,
+                               phonon=None,
                                fops,
                                beta, n_iw, energy_window, n_w, broadening,
                                n_tau=None,
@@ -362,7 +376,7 @@ class TestSolver(unittest.TestCase):
         mki = cls.make_mkind_imp(spin_blocks)
 
         index_converter = cls._make_index_converter(fops, spin_blocks)
-        ed = make_pomerol_ed(index_converter, h)
+        ed = make_pomerol_ed(index_converter, h, phonon)
 
         results = {}
 
@@ -381,7 +395,14 @@ class TestSolver(unittest.TestCase):
                 False
             )
             h_sb = cls._merge_spin_blocks_in_expr(h)
-            ed_sb = make_pomerol_ed(index_converter_sb, h_sb)
+            if phonon is not None:
+                phonon_sb = type(phonon)(
+                    frequency=phonon.frequency,
+                    coupling=cls._merge_spin_blocks_in_expr(phonon.coupling),
+                    nphonons=phonon.nphonons
+                )
+
+            ed_sb = make_pomerol_ed(index_converter_sb, h_sb, phonon_sb)
             ed0_sb = make_pomerol_ed(index_converter_sb, non_int_part(h_sb))
             cls.make_reference_gfs_superc_results(results, h_sb, ed_sb, ed0_sb,
                                                   beta=beta,
@@ -424,6 +445,18 @@ class TestSolver(unittest.TestCase):
             cls.make_rdm_results(results, ed, mki,
                                  beta=beta,
                                  spin_blocks=spin_blocks)
+
+        # Phonons
+        if phonon is not None:
+            cls.make_phonon_results(results, ed, mki, phonon,
+                                    beta=beta,
+                                    n_iw=n_iw,
+                                    energy_window=energy_window,
+                                    n_w=n_w,
+                                    broadening=broadening,
+                                    spin_blocks=spin_blocks,
+                                    tols=tols,
+                                    zerotemp=zerotemp)
 
         return results
 
@@ -768,12 +801,11 @@ class TestSolver(unittest.TestCase):
                 results[f"chi_pair_{axis}"] = chi_pair
 
     @classmethod
-    def make_rdm_results(cls, results, ed, mki, *, beta, spin_blocks):
+    def _compute_ref_density_matrix(cls, ed, beta):
         """
-        Generate reference results for reduced impurity density matrix
-        using pomerol2triqs.
+        Compute density matrix of the full system using pomerol2triqs to obtain
+        energy levels and eigenbasis of the Hamiltonian.
         """
-
         # Find ground state energy
         e0 = np.min(list(map(np.min, ed.energies)))
 
@@ -786,13 +818,23 @@ class TestSolver(unittest.TestCase):
         rho = [U @ np.diag(w / Z) @ np.conj(U.T)
                for w, U in zip(rho_diag, ed.unitary_matrices)]
 
+        return rho
+
+    @classmethod
+    def make_rdm_results(cls, results, ed, mki, *, beta, spin_blocks):
+        """
+        Generate reference results for reduced impurity density matrix
+        using pomerol2triqs.
+        """
+        rho = cls._compute_ref_density_matrix(ed, beta)
+
         nbit = 2 * cls.norb
         if hasattr(cls, 'mkind_bath'):
             nbit += len(cls.fops_bath_up) + len(cls.fops_bath_dn)
 
-        # Translate positions of bits in binary representation of Fock states
-        # from Pomerol to EDIpack. On the EDIpack side, the first 2 * norb bits
-        # represent the impurity states, and the rest is bath.
+        # Translate positions of bits in binary representation of fermionic
+        # Fock states from Pomerol to EDIpack. On the EDIpack side, the first
+        # 2 * norb bits represent the impurity states, and the rest is bath.
         fs_bit_map = [0 for _ in range(nbit)]
 
         fops_imp_up, fops_imp_dn = cls.make_fops_imp(spin_blocks)
@@ -809,18 +851,17 @@ class TestSolver(unittest.TestCase):
                     + len(cls.fops_bath_up)
 
         # Decompose a Pomerol Fock state into a direct product of
-        # an EDIpack impurity Fock state and an EDIpack bath Fock state.
-        # Also, compute the sign prefactor stemming from swapping occupied
-        # modes.
+        # an EDIpack impurity Fock state, an EDIpack bath Fock state and
+        # a phonon state. Also, compute the sign prefactor stemming from
+        # swapping occupied modes.
         def translate_state(st):
             # Collect positions of set bits in 'st' and translate them
-            pom_bit = 0
             edi_set_bits = []
-            while st != 0:
+            for pom_bit in range(nbit):
                 if st & 1:
                     edi_set_bits.append(fs_bit_map[pom_bit])
                 st = st >> 1
-                pom_bit += 1
+            st_ph = st
 
             # Compute sign of the permutation that brings edi_set_bits into
             # the ascending order
@@ -837,15 +878,15 @@ class TestSolver(unittest.TestCase):
                 else:
                     st_bath += 1 << (edi_bit - 2 * cls.norb)
 
-            return st_imp, st_bath, sign
+            return st_imp, st_bath, st_ph, sign
 
         rdm = np.zeros((4**cls.norb, 4**cls.norb), dtype=complex)
         # Trace out the bath, subspace by subspace
         for states_sp, rho_sp in zip(ed.fock_states, rho):
             for (i1, st1), (i2, st2) in product(enumerate(states_sp), repeat=2):
-                st_imp1, st_bath1, sign1 = translate_state(st1)
-                st_imp2, st_bath2, sign2 = translate_state(st2)
-                if st_bath1 == st_bath2:
+                st_imp1, st_bath1, st_ph1, sign1 = translate_state(st1)
+                st_imp2, st_bath2, st_ph2, sign2 = translate_state(st2)
+                if (st_bath1 == st_bath2) and (st_ph1 == st_ph2):
                     rdm[st_imp1, st_imp2] += rho_sp[i1, i2] * sign1 * sign2
 
         # Basic sanity checks
@@ -853,3 +894,108 @@ class TestSolver(unittest.TestCase):
         np.isclose(np.trace(rdm), 1.0, atol=1e-12)
 
         results["rdm"] = rdm
+
+    @classmethod
+    def make_phonon_results(cls, results, ed, mki, phonon, *,
+                            beta,
+                            n_iw,
+                            energy_window, n_w, broadening,
+                            spin_blocks,
+                            tols,
+                            zerotemp):
+        """
+        Generate reference results for phonon-related observables using
+        pomerol2triqs.
+        """
+        rho = cls._compute_ref_density_matrix(ed, beta)
+
+        nbit = 2 * cls.norb
+        if hasattr(cls, 'mkind_bath'):
+            nbit += len(cls.fops_bath_up) + len(cls.fops_bath_dn)
+
+        el_dim = 2 ** nbit
+        ph_dim = phonon.nphonons + 1
+        rho_ph = np.zeros((ph_dim, ph_dim), dtype=complex)
+
+        # Trace out electrons
+        for states_sp, rho_sp in zip(ed.fock_states, rho):
+            for (i1, st1), (i2, st2) in product(enumerate(states_sp), repeat=2):
+                st_ph1, st_el1 = divmod(st1, el_dim)
+                st_ph2, st_el2 = divmod(st2, el_dim)
+                if st_el1 == st_el2:
+                    rho_ph[st_ph1, st_ph2] += rho_sp[i1, i2]
+
+        # Basic sanity checks
+        np.allclose(rho_ph, np.conj(rho_ph.T), atol=1e-12)
+        np.isclose(np.trace(rho_ph), 1.0, atol=1e-12)
+
+        # Matrices of phonon creation/annihilation operators
+        b_mat = np.diag(np.sqrt(np.arange(1, ph_dim)), k=1)
+        b_dag_mat = b_mat.T
+
+        results["phonon_occ"] = np.trace(b_dag_mat @ b_mat @ rho_ph)
+
+        X_mat = (b_dag_mat + b_mat) / np.sqrt(2)
+        results["phonon_x"] = np.trace(X_mat @ rho_ph)
+
+        X2_mat = np.diag(0.5 + np.arange(ph_dim)) \
+            + 0.5 * np.diag(np.sqrt(np.arange(1, ph_dim - 1)
+                                    * np.arange(2, ph_dim)), k=2) \
+            + 0.5 * np.diag(np.sqrt(np.arange(1, ph_dim - 1)
+                                    * np.arange(2, ph_dim)), k=-2)
+        results["phonon_x2"] = np.trace(X2_mat @ rho_ph)
+
+        # Green's functions
+        fops_imp_up, fops_imp_dn = cls.make_fops_imp(spin_blocks)
+
+        w0 = phonon.frequency
+        g_ph, a_ph = parse_phonon_coupling(
+            phonon.coupling,
+            fops_imp_up,
+            fops_imp_dn
+        )
+
+        O_avg = 0.0
+        for spin in cls.spins:
+            for o1, o2 in product(cls.orbs, cls.orbs):
+                ind1, ind2 = mki(spin, o1), mki(spin, o2)
+                O_avg += g_ph[o1, o2] * ed.ensemble_average(ind1, ind2, beta)
+
+        # Real-frequency
+        D0_w = Gf(mesh=MeshReFreq(window=energy_window, n_w=n_w),
+                  target_shape=())
+
+        chi_w = D0_w.copy()
+        D0_w << inverse(Omega + 1j * broadening - w0) \
+            - inverse(Omega + 1j * broadening + w0)
+
+        for spin1, spin2 in product(cls.spins, repeat=2):
+            for o1, o2, o3, o4 in product(cls.orbs, repeat=4):
+                ind1, ind2 = mki(spin1, o1), mki(spin1, o2)
+                ind3, ind4 = mki(spin2, o3), mki(spin2, o4)
+                chi_w -= g_ph[o1, o2] * g_ph[o3, o4] \
+                    * ed.chi_w(ind1, ind2, ind3, ind4,
+                               beta, energy_window, n_w, broadening, **tols)
+
+        results["phonon_D_w"] = D0_w + D0_w * chi_w * D0_w
+
+        # Matsubara
+        if zerotemp:
+            return
+        D0_iw = Gf(mesh=MeshImFreq(beta=beta, S="Boson", n_iw=n_iw),
+                   target_shape=())
+
+        chi_iw = D0_iw.copy()
+        D0_iw << (2 * w0) * inverse(iOmega_n * iOmega_n - w0 ** 2)
+
+        for spin1, spin2 in product(cls.spins, repeat=2):
+            for o1, o2, o3, o4 in product(cls.orbs, repeat=4):
+                ind1, ind2 = mki(spin1, o1), mki(spin1, o2)
+                ind3, ind4 = mki(spin2, o3), mki(spin2, o4)
+                chi_iw -= g_ph[o1, o2] * g_ph[o3, o4] \
+                    * ed.chi_iw(ind1, ind2, ind3, ind4, beta, n_iw, **tols)
+
+        Omega0 = next(mp for mp in chi_iw.mesh if mp.index == 0)
+        chi_iw[Omega0] -= beta * (a_ph * a_ph + 2 * a_ph * O_avg)
+
+        results["phonon_D_iw"] = D0_iw + D0_iw * chi_iw * D0_iw
