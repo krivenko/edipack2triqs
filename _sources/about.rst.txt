@@ -14,6 +14,14 @@ version 3 <http://www.gnu.org/licenses/gpl.html>`_.
 
 Note that it *implies* that applications using edipack2triqs must also be GPL.
 
+Citing
+------
+
+Please, consider citing the `accompanying SciPost Phys. Codebases paper
+<https://scipost.org/10.21468/SciPostPhysCodeb.58>`_
+[`arXiv:2506.01363 <https://arxiv.org/abs/2506.01363>`_], if you find this
+package useful for your research (:download:`BibTeX file <edipack2.bib>`).
+
 Usage disclaimer
 ----------------
 
