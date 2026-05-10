@@ -46,6 +46,33 @@ Usage examples
 
 See https://krivenko.github.io/edipack2triqs/examples.html.
 
+Citing
+------
+
+Please, consider citing the [accompanying SciPost Phys. Codebases paper](
+https://scipost.org/10.21468/SciPostPhysCodeb.58)
+[[arXiv:2506.01363](https://arxiv.org/abs/2506.01363)], if you find this package
+useful for your research.
+
+```BibTeX
+@Article{10.21468/SciPostPhysCodeb.58,
+  title= {{Next-generation EDIpack: A Lanczos-based package for quantum
+           impurity models featuring general broken-symmetry phases,
+           flexible bath topologies and multi-platform interoperability}},
+  author = {Lorenzo Crippa and Igor Krivenko and Samuele Giuli and
+            Gabriele Bellomia and Alexander Kowalski and Francesco Petocchi and
+            Alberto Scazzola and Markus Wallerberger and Giacomo Mazza and
+            Luca de Medici and Giorgio Sangiovanni and Massimo Capone and
+            Adriano Amaricci},
+  journal = {SciPost Phys. Codebases},
+  pages = {58},
+  year = {2025},
+  publisher = {SciPost},
+  doi = {10.21468/SciPostPhysCodeb.58},
+  url = {https://scipost.org/10.21468/SciPostPhysCodeb.58}
+}
+```
+
 License
 -------
 
