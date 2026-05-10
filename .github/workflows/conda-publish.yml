@@ -35,10 +35,10 @@ jobs:
         shell: "bash -l {0}"
         run: |
              conda install -q -y conda-build
-             conda build .conda/ --output-folder "${HOME}/output"
+             conda-build .conda/ --output-folder "${HOME}/output"
 
              # Get the path to the built package from the output folder
-             BUILT_PKG=$(conda build  .conda/ --output-folder "${HOME}/output" --output)
+             BUILT_PKG=$(conda-build  .conda/ --output-folder "${HOME}/output" --output)
              echo "Built package: ${BUILT_PKG}"
              echo "BUILT_PKG=${BUILT_PKG}" >> $GITHUB_ENV
 
