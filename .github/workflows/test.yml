@@ -11,6 +11,10 @@ on:
   schedule:
     - cron:  '0 0 * * 2'
 
+# Allow pushes to gh-pages
+permissions:
+  contents: write
+
 jobs:
   test:
     runs-on: ubuntu-latest
