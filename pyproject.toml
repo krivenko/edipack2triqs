@@ -31,7 +31,7 @@ dependencies = ["edipack2py>=6.0.0",
                 "networkx"]
 
 [project.urls]
-"Source" = "https://github.com/krivenko/edipack2triqs/"
+"Source" = "https://github.com/EDIpack/edipack2triqs/"
 
 [project.optional-dependencies]
 test = [

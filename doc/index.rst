@@ -11,7 +11,7 @@ edipack2triqs
       .. image:: _static/logo_github.png
          :width: 75%
          :align: center
-         :target: https://github.com/krivenko/edipack2triqs
+         :target: https://github.com/EDIpack/edipack2triqs
 
 **edipack2triqs** is a thin compatibility layer between
 `EDIpack <https://github.com/EDIpack/EDIpack>`_ (A Massively Parallel Exact

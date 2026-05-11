@@ -3,18 +3,18 @@ package:
   version: {{ environ["EDIPACK2TRIQS_VERSION"] }}
 
 about:
-  home: https://github.com/krivenko/edipack2triqs
+  home: https://github.com/EDIpack/edipack2triqs
   license: GPL-3.0-or-later
   license_file: LICENSE.txt
   license_family: GPL
-  license_url: https://github.com/krivenko/edipack2triqs/blob/main/LICENSE.txt
+  license_url: https://github.com/EDIpack/edipack2triqs/blob/main/LICENSE.txt
   summary: "Compatibility layer between EDIpack and TRIQS"
   description: |
     edipack2triqs is a thin compatibility layer between EDIpack (A Massively
     Parallel Exact Diagonalization solver for generic Quantum Impurity problems)
     and TRIQS (Toolbox for Research on Interacting Quantum Systems).
-  dev_url: https://github.com/krivenko/edipack2triqs
-  doc_url: https://krivenko.github.io/edipack2triqs
+  dev_url: https://github.com/EDIpack/edipack2triqs
+  doc_url: https://EDIpack.github.io/edipack2triqs
 
 source:
   path: ..

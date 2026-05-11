@@ -1,9 +1,9 @@
 [![Documentation](https://img.shields.io/badge/docs-GitHub%20Pages-red)](
-https://krivenko.github.io/edipack2triqs)
+https://EDIpack.github.io/edipack2triqs)
 [![Anaconda-Server Badge](https://anaconda.org/edipack/edipack2triqs/badges/version.svg)](
 https://anaconda.org/edipack/edipack2triqs)
-[![Test](https://github.com/krivenko/edipack2triqs/actions/workflows/test.yml/badge.svg)](
-https://github.com/krivenko/edipack2triqs/actions/workflows/test.yml)
+[![Test](https://github.com/EDIpack/edipack2triqs/actions/workflows/test.yml/badge.svg)](
+https://github.com/EDIpack/edipack2triqs/actions/workflows/test.yml)
 
 edipack2triqs: Compatibility layer between EDIpack and TRIQS
 ============================================================
@@ -33,10 +33,10 @@ Installation
 conda install -c conda-forge -c edipack edipack2triqs
 ```
 
-**From the source code [repository on GitHub](https://github.com/krivenko/edipack2triqs)**
+**From the source code [repository on GitHub](https://github.com/EDIpack/edipack2triqs)**
 
 ```bash
-git clone https://github.com/krivenko/edipack2triqs
+git clone https://github.com/EDIpack/edipack2triqs
 cd edipack2triqs
 pip install .
 ```
@@ -44,7 +44,7 @@ pip install .
 Usage examples
 --------------
 
-See https://krivenko.github.io/edipack2triqs/examples.html.
+See https://EDIpack.github.io/edipack2triqs/examples.html.
 
 Citing
 ------

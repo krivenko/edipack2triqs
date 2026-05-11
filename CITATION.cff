@@ -13,8 +13,8 @@ authors:
 version: 1.0.0
 date-released: 2026-05-10
 license: GPL-3.0-or-later
-repository-code: "https://github.com/krivenko/edipack2triqs"
-url: "https://krivenko.github.io/edipack2triqs/"
+repository-code: "https://github.com/EDIpack/edipack2triqs"
+url: "https://EDIpack.github.io/edipack2triqs/"
 keywords:
   - EDIpack
   - TRIQS
