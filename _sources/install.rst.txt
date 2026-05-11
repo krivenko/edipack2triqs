@@ -32,6 +32,6 @@ Current development version from GitHub
 
 .. code::
 
-     $ git clone https://github.com/krivenko/edipack2triqs
+     $ git clone https://github.com/EDIpack/edipack2triqs
      $ cd edipack2triqs
      $ pip install .
