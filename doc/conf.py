@@ -46,7 +46,7 @@ myst_enable_extensions = [
 ]
 
 project = 'edipack2triqs'
-version = '0.11.0'
+version = '1.0.0'
 copyright = '2024-2026, Igor Krivenko, Lorenzo Crippa'
 
 source_suffix = '.rst'
