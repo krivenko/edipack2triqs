@@ -179,17 +179,20 @@ def _chi2_fit_bath(self, g: BlockGf, f: Optional[BlockGf] = None):
         if ed.get_ed_mode() == int(EDMode.NORMAL):  # Here nspin is important
             assert set(g.indices) == set(self.gf_block_names), \
                 "Unexpected block structure of 'g'"
-
-            func = np.zeros((ed.Nspin, ed.Nspin, ed.Norb, ed.Norb, ed.Lmats),
-                            dtype=complex)
+              
+            func = np.zeros((ed.Nspin, ed.Nspin, ed.Norb, ed.Norb, ed.Lmats),dtype=complex)
+            
             func[0, 0, ...] = extract_triqs_data(g[self.gf_block_names[0]].data)
-            bath_fit.data[:] = ed.chi2_fitgf(func, bath_fit.data, ispin=0)
-
+            
             if ed.Nspin != 1:
-                func[1, 1, ...] = extract_triqs_data(
-                    g[self.gf_block_names[1]].data
-                )
-                bath_fit.data[:] = ed.chi2_fitgf(func, bath_fit.data, ispin=1)
+                func[1, 1, ...] = extract_triqs_data(g[self.gf_block_names[1]].data)
+            
+            if ed.get_bath_type() > 2:
+                bath_fit.data[:] = ed.chi2_fitgf(func, bath_fit.data)
+            else:
+                bath_fit.data[:] = ed.chi2_fitgf(func, bath_fit.data, ispin=0)
+                if ed.Nspin != 1:
+                    bath_fit.data[:] = ed.chi2_fitgf(func, bath_fit.data, ispin=1)
 
         elif ed.get_ed_mode() == int(EDMode.SUPERC):  # Here nspin is 1
             assert set(f.indices) == set(self.gf_an_block_names), \
