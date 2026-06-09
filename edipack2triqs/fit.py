@@ -13,6 +13,7 @@ from triqs.gf import BlockGf, MeshImFreq
 from edipack2py import global_env as ed
 
 from . import EDMode
+from .bath import BathGeneral
 from .util import is_spin_diagonal, chdircontext
 
 
@@ -179,20 +180,21 @@ def _chi2_fit_bath(self, g: BlockGf, f: Optional[BlockGf] = None):
         if ed.get_ed_mode() == int(EDMode.NORMAL):  # Here nspin is important
             assert set(g.indices) == set(self.gf_block_names), \
                 "Unexpected block structure of 'g'"
-              
-            func = np.zeros((ed.Nspin, ed.Nspin, ed.Norb, ed.Norb, ed.Lmats),dtype=complex)
-            
-            func[0, 0, ...] = extract_triqs_data(g[self.gf_block_names[0]].data)
-            
-            if ed.Nspin != 1:
-                func[1, 1, ...] = extract_triqs_data(g[self.gf_block_names[1]].data)
-            
-            if ed.get_bath_type() > 2:
+
+            func = np.zeros((ed.Nspin, ed.Nspin, ed.Norb, ed.Norb, ed.Lmats),
+                            dtype=complex)
+
+            for ispin in range(ed.Nspin):
+                func[ispin, ispin, ...] = extract_triqs_data(
+                    g[self.gf_block_names[ispin]].data
+                )
+
+            if isinstance(self.h_params.bath, BathGeneral):
                 bath_fit.data[:] = ed.chi2_fitgf(func, bath_fit.data)
             else:
-                bath_fit.data[:] = ed.chi2_fitgf(func, bath_fit.data, ispin=0)
-                if ed.Nspin != 1:
-                    bath_fit.data[:] = ed.chi2_fitgf(func, bath_fit.data, ispin=1)
+                for ispin in range(ed.Nspin):
+                    bath_fit.data[:] = ed.chi2_fitgf(func, bath_fit.data,
+                                                     ispin=ispin)
 
         elif ed.get_ed_mode() == int(EDMode.SUPERC):  # Here nspin is 1
             assert set(f.indices) == set(self.gf_an_block_names), \
