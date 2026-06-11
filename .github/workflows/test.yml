@@ -79,7 +79,15 @@ jobs:
       run: |
            python -m pip install --upgrade pip
            pip install --user \
-               numpy scipy matplotlib mpi4py mako pytest networkx edipack2py
+               numpy scipy matplotlib mpi4py mako pytest networkx
+
+    - name: Install edipack2py
+      shell: "bash -l {0}"
+      run: |
+           git clone https://github.com/EDIpack/EDIpack2py EDIpack2py.git
+           pushd EDIpack2py.git
+           pip install --user .
+           popd
 
     - name: Build & install TRIQS
       shell: "bash -l {0}"
