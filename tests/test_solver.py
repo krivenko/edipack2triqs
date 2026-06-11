@@ -395,12 +395,11 @@ class TestSolver(unittest.TestCase):
                 False
             )
             h_sb = cls._merge_spin_blocks_in_expr(h)
-            if phonon is not None:
-                phonon_sb = type(phonon)(
-                    frequency=phonon.frequency,
-                    coupling=cls._merge_spin_blocks_in_expr(phonon.coupling),
-                    nphonons=phonon.nphonons
-                )
+            phonon_sb = type(phonon)(
+                frequency=phonon.frequency,
+                coupling=cls._merge_spin_blocks_in_expr(phonon.coupling),
+                nphonons=phonon.nphonons
+            ) if (phonon is not None) else None
 
             ed_sb = make_pomerol_ed(index_converter_sb, h_sb, phonon_sb)
             ed0_sb = make_pomerol_ed(index_converter_sb, non_int_part(h_sb))
