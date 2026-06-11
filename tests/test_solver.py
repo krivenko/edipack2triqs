@@ -2,6 +2,7 @@ import unittest
 import gc
 import inspect
 from itertools import product
+from warnings import warn
 
 import numpy as np
 from numpy.testing import assert_allclose
@@ -22,6 +23,7 @@ from triqs.utility.comparison_tests import (assert_gfs_are_close,
 from h5 import HDFArchive
 
 from edipack2triqs.hamiltonian import extract_quadratic, parse_phonon_coupling
+from edipack2triqs.solver import ed
 from edipack2triqs.util import monomial2op, non_int_part
 
 
@@ -94,6 +96,8 @@ class TestSolver(unittest.TestCase):
     def tearDown(self):
         "Make sure EDIpackSolver.__del__() is called"
         gc.collect()
+
+    normal_complex_enabled = ed.normal_complex_enabled
 
     #
     # Common parameters of the impurity
@@ -271,6 +275,11 @@ class TestSolver(unittest.TestCase):
     @classmethod
     def assert_chi(cls, solver, atol=1e-6, **refs):
         "Assert correctness of computed susceptibilities."
+        if cls.normal_complex_enabled:
+            warn("EDIpack is built with -DCMPLX_NORMAL=ON: "
+                 "Skipping checks of all response functions")
+            return
+
         for axis, chan in product(['iw', 'w', 'tau'],
                                   ['spin', 'dens', 'pair', 'exct']):
             chi = f"chi_{chan}_{axis}"

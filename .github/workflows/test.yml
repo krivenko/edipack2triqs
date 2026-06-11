@@ -64,7 +64,8 @@ jobs:
            export PKG_CONFIG_PATH="${HOME}/scifor/etc:${PKG_CONFIG_PATH}"
            cmake ../EDIpack.git                                                \
               -DCMAKE_BUILD_TYPE=Release                                       \
-              -DCMAKE_INSTALL_PREFIX=${HOME}/edipack
+              -DCMAKE_INSTALL_PREFIX=${HOME}/edipack                           \
+              -DCMPLX_NORMAL=ON
            make -j2
            make install
            popd

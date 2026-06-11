@@ -1,4 +1,5 @@
 from itertools import product
+import unittest
 
 import numpy as np
 from numpy import multiply as mul
@@ -8,7 +9,6 @@ import triqs.operators as op
 
 from edipack2triqs import EDMode
 from edipack2triqs.solver import EDIpackSolver, LanczosParams
-
 from .test_solver import TestSolver
 
 
@@ -116,7 +116,16 @@ class TestEDIpackSolverBathGeneral(TestSolver):
                                 beta=10000, zerotemp=True, **solve_params)
         self.assert_all(solver, **refs)
 
-    def test_nspin1(self):
+    @unittest.skipUnless(TestSolver.normal_complex_enabled,
+                         "requires EDIpack built with -DCMPLX_NORMAL=ON")
+    def test_nspin1_complex(self):
+        self._test_nspin1(True)
+
+    def test_nspin1_real(self):
+        self._test_nspin1(False)
+
+    def _test_nspin1(self, cmplx):
+        cmplx_suffix = "complex" if cmplx else "real"
         h_loc_mat = mul.outer(s0, np.diag([-0.5, -0.6]))
         h_loc = self.make_h_loc(h_loc_mat)
         h_int = self.make_h_int(
@@ -126,8 +135,9 @@ class TestEDIpackSolverBathGeneral(TestSolver):
         fops_imp_up, fops_imp_dn = self.make_fops_imp()
         fops = fops_imp_up + fops_imp_dn + self.fops_bath_up + self.fops_bath_dn
 
-        h = np.moveaxis(np.array([[[0.5, 0.1],
-                                   [0.1, 0.6]],
+        x = 1j if cmplx else 1
+        h = np.moveaxis(np.array([[[0.5, 0.1 * np.conj(x)],
+                                   [0.1 * x, 0.6]],
                                   [[-0.5, 0.0],
                                    [0.0, -0.6]]]), 0, 2)
         V = np.array([[0.2, -0.2],
@@ -167,7 +177,8 @@ class TestEDIpackSolverBathGeneral(TestSolver):
         solver.solve(**solve_params)
 
         ## Reference solution
-        refs = self.ref_results("nspin1_1", h=h, fops=fops, **solve_params)
+        refs = self.ref_results(f"nspin1_{cmplx_suffix}_1",
+                                h=h, fops=fops, **solve_params)
         self.assert_all(solver, **refs)
 
         # Part II: update interaction parameters
@@ -193,19 +204,24 @@ class TestEDIpackSolverBathGeneral(TestSolver):
         ## Reference solution
         h_int = self.make_h_int(**new_int_params)
         h = h_loc + h_int + h_bath
-        refs = self.ref_results("nspin1_2", h=h, fops=fops, **solve_params)
+        refs = self.ref_results(f"nspin1_{cmplx_suffix}_2",
+                                h=h, fops=fops, **solve_params)
         self.assert_all(solver, **refs)
 
         # Part III: Updated bath parameters
-        h = np.moveaxis(np.array([[[0.5, 0.2],
-                                   [0.2, 0.6]],
+        h = np.moveaxis(np.array([[[0.5, 0.2 * np.conj(x)],
+                                   [0.2 * x, 0.6]],
                                   [[-0.5, 0.0],
                                    [0.0, -0.6]]]), 0, 2)
         V = np.array([[0.1, 0.2],
                       [0.5, 0.4]])
 
         mat = np.zeros((1, 1, self.norb, self.norb), dtype=complex)
-        mat[0, 0, 0, 1] = mat[0, 0, 1, 0] = 1
+        if cmplx:
+            mat[0, 0, 0, 1] = -1j
+            mat[0, 0, 1, 0] = 1j
+        else:
+            mat[0, 0, 0, 1] = mat[0, 0, 1, 0] = 1
 
         bath = solver.bath
         bath.l[0][self.find_basis_mat(bath.hvec, mat)] = 0.2
@@ -227,10 +243,20 @@ class TestEDIpackSolverBathGeneral(TestSolver):
         ## Reference solution
         h_bath = self.make_h_bath(mul.outer(s0, h), mul.outer([1, 1], V))
         h = h_loc + h_int + h_bath
-        refs = self.ref_results("nspin1_3", h=h, fops=fops, **solve_params)
+        refs = self.ref_results(f"nspin1_{cmplx_suffix}_3",
+                                h=h, fops=fops, **solve_params)
         self.assert_all(solver, **refs)
 
-    def test_nspin2(self):
+    @unittest.skipUnless(TestSolver.normal_complex_enabled,
+                         "requires EDIpack built with -DCMPLX_NORMAL=ON")
+    def test_nspin2_complex(self):
+        self._test_nspin2(True)
+
+    def test_nspin2_real(self):
+        self._test_nspin2(False)
+
+    def _test_nspin2(self, cmplx):
+        cmplx_suffix = "complex" if cmplx else "real"
         h_loc_mat = mul.outer(np.diag([0.8, 1.2]),
                               np.diag([-0.5, -0.6]))
         h_loc = self.make_h_loc(h_loc_mat)
@@ -241,8 +267,9 @@ class TestEDIpackSolverBathGeneral(TestSolver):
         fops_imp_up, fops_imp_dn = self.make_fops_imp()
         fops = fops_imp_up + fops_imp_dn + self.fops_bath_up + self.fops_bath_dn
 
-        h = np.moveaxis(np.array([[[0.5, 0.1],
-                                   [0.1, 0.6]],
+        x = 1j if cmplx else 1
+        h = np.moveaxis(np.array([[[0.5, 0.1 * np.conj(x)],
+                                   [0.1 * x, 0.6]],
                                   [[-0.5, 0.0],
                                    [0.0, -0.6]]]), 0, 2)
         V = np.array([[0.2, -0.2],
@@ -283,7 +310,8 @@ class TestEDIpackSolverBathGeneral(TestSolver):
         solver.solve(**solve_params)
 
         ## Reference solution
-        refs = self.ref_results("nspin2_1", h=h, fops=fops, **solve_params)
+        refs = self.ref_results(f"nspin2_{cmplx_suffix}_1",
+                                h=h, fops=fops, **solve_params)
         self.assert_all(solver, **refs)
 
         # Part II: update interaction parameters
@@ -309,12 +337,13 @@ class TestEDIpackSolverBathGeneral(TestSolver):
         ## Reference solution
         h_int = self.make_h_int(**new_int_params)
         h = h_loc + h_int + h_bath
-        refs = self.ref_results("nspin2_2", h=h, fops=fops, **solve_params)
+        refs = self.ref_results(f"nspin2_{cmplx_suffix}_2",
+                                h=h, fops=fops, **solve_params)
         self.assert_all(solver, **refs)
 
         # Part III: Updated bath parameters
-        h = np.moveaxis(np.array([[[0.5, 0.2],
-                                   [0.2, 0.6]],
+        h = np.moveaxis(np.array([[[0.5, 0.2 * np.conj(x)],
+                                   [0.2 * x, 0.6]],
                                   [[-0.5, 0.0],
                                    [0.0, -0.6]]]), 0, 2)
         V = np.array([[0.1, 0.2],
@@ -322,8 +351,12 @@ class TestEDIpackSolverBathGeneral(TestSolver):
 
         mat_up = np.zeros((2, 2, self.norb, self.norb), dtype=complex)
         mat_dn = np.zeros((2, 2, self.norb, self.norb), dtype=complex)
-        mat_up[0, 0, 0, 1] = mat_up[0, 0, 1, 0] = 1
-        mat_dn[1, 1, 0, 1] = mat_dn[1, 1, 1, 0] = 1
+        if cmplx:
+            mat_up[0, 0, 0, 1] = mat_dn[1, 1, 0, 1] = -1j
+            mat_up[0, 0, 1, 0] = mat_dn[1, 1, 1, 0] = 1j
+        else:
+            mat_up[0, 0, 0, 1] = mat_up[0, 0, 1, 0] = 1
+            mat_dn[1, 1, 0, 1] = mat_dn[1, 1, 1, 0] = 1
 
         bath = solver.bath
         bath.l[0][self.find_basis_mat(bath.hvec, mat_up)] = 0.2
@@ -346,7 +379,8 @@ class TestEDIpackSolverBathGeneral(TestSolver):
         ## Reference solution
         h_bath = self.make_h_bath(mul.outer(sz, h), mul.outer([1, 0.9], V))
         h = h_loc + h_int + h_bath
-        refs = self.ref_results("nspin2_3", h=h, fops=fops, **solve_params)
+        refs = self.ref_results(f"nspin2_{cmplx_suffix}_3",
+                                h=h, fops=fops, **solve_params)
         self.assert_all(solver, **refs)
 
     def test_nonsu2_hloc(self):
