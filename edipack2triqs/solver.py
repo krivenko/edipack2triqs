@@ -525,6 +525,13 @@ class EDIpackSolver:
         except (AttributeError, TypeError):
             pass
 
+    normal_complex_enabled: bool = ed.normal_complex_enabled if \
+        hasattr(ed, "normal_complex_enabled") else False
+    r"""
+    This class attribute indicates whether EDIpack was built with
+    ``-DCMPLX_NORMAL=ON``.
+    """
+
     @property
     def hloc_mat(self) -> np.ndarray:
         r"""

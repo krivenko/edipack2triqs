@@ -2,6 +2,11 @@
 
 # Changelog
 
+## Version 1.1.0
+
+* Expose the value of EDIpack's compilation flag `CMPLX_NORMAL` via the class
+  attribute `EDIpackSolver.normal_complex_enabled`.
+
 ## Version 1.0.0
 
 * Enable calculations with local electron-phonon coupling on the impurity site.

@@ -116,7 +116,7 @@ class TestEDIpackSolverBathGeneral(TestSolver):
                                 beta=10000, zerotemp=True, **solve_params)
         self.assert_all(solver, **refs)
 
-    @unittest.skipUnless(TestSolver.normal_complex_enabled,
+    @unittest.skipUnless(EDIpackSolver.normal_complex_enabled,
                          "requires EDIpack built with -DCMPLX_NORMAL=ON")
     def test_nspin1_complex(self):
         self._test_nspin1(True)
@@ -247,7 +247,7 @@ class TestEDIpackSolverBathGeneral(TestSolver):
                                 h=h, fops=fops, **solve_params)
         self.assert_all(solver, **refs)
 
-    @unittest.skipUnless(TestSolver.normal_complex_enabled,
+    @unittest.skipUnless(EDIpackSolver.normal_complex_enabled,
                          "requires EDIpack built with -DCMPLX_NORMAL=ON")
     def test_nspin2_complex(self):
         self._test_nspin2(True)
