@@ -95,7 +95,7 @@ jobs:
       env:
         CXX: g++
       run: |
-           git clone https://github.com/TRIQS/triqs --branch 3.3.x triqs.git
+           git clone https://github.com/TRIQS/triqs --branch 4.0.x triqs.git
            mkdir triqs.build && pushd triqs.build
            cmake ../triqs.git                                                  \
              -DCMAKE_BUILD_TYPE=Release                                        \
