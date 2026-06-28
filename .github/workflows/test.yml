@@ -36,7 +36,7 @@ jobs:
       shell: "bash -l {0}"
       run: |
            sudo apt-get update -q
-           sudo apt-get install -y gfortran libopenmpi-dev libboost-dev        \
+           sudo apt-get install -y gfortran g++-14 libopenmpi-dev libboost-dev \
                libblas-dev liblapack-dev libfftw3-dev libgmp-dev libhdf5-dev   \
                libscalapack-mpi-dev
 
@@ -93,7 +93,7 @@ jobs:
     - name: Build & install TRIQS
       shell: "bash -l {0}"
       env:
-        CXX: g++
+        CXX: g++-14
       run: |
            git clone https://github.com/TRIQS/triqs --branch 4.0.x triqs.git
            mkdir triqs.build && pushd triqs.build
