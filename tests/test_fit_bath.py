@@ -6,9 +6,9 @@ import numpy as np
 from numpy import multiply as mul
 
 import triqs.operators as op
-from triqs.gf import Gf, BlockGf, MeshImFreq, conjugate, transpose
-from triqs.gf.descriptors import SemiCircular, iOmega_n
-from triqs.gf.tools import inverse
+from triqs.gfs import Gf, BlockGf, MeshImFreq, conjugate, transpose
+from triqs.gfs.descriptors import SemiCircular, iOmega_n
+from triqs.gfs.tools import inverse
 from triqs.utility.comparison_tests import assert_block_gfs_are_close
 
 from edipack2triqs import EDMode

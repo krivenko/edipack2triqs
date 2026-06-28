@@ -17,7 +17,7 @@ import numpy as np
 from mpi4py import MPI
 
 import triqs.operators as op
-from triqs.gf import BlockGf, Gf, MeshImFreq, MeshReFreq, MeshImTime
+from triqs.gfs import BlockGf, Gf, MeshImFreq, MeshReFreq, MeshImTime
 
 from edipack2py import global_env as ed
 
@@ -203,7 +203,7 @@ class EDIpackSolver:
         the many-body operator ``c_dag(b, i)``. ``b`` and ``i`` are a (string or
         integer) block index and an index within a block respectively, which
         are used to construct output :py:class:`Green's function
-        containers <triqs.gf.block_gf.BlockGf>`.
+        containers <triqs.gfs.block_gf.BlockGf>`.
 
         :param hamiltonian: Many-body electronic Hamiltonian to diagonalize.
             Symmetries of this Hamiltonian are automatically analyzed and

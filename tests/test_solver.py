@@ -7,15 +7,15 @@ import numpy as np
 from numpy.testing import assert_allclose
 
 import triqs.operators as op
-from triqs.gf import (BlockGf,
-                      Gf,
-                      MeshReFreq,
-                      MeshImFreq,
-                      MeshImTime,
-                      conjugate,
-                      transpose)
-from triqs.gf.descriptors import Omega, iOmega_n
-from triqs.gf.tools import inverse, dyson
+from triqs.gfs import (BlockGf,
+                       Gf,
+                       MeshReFreq,
+                       MeshImFreq,
+                       MeshImTime,
+                       conjugate,
+                       transpose)
+from triqs.gfs.descriptors import Omega, iOmega_n
+from triqs.gfs.tools import inverse, dyson
 from triqs.utility.comparison_tests import (assert_gfs_are_close,
                                             assert_block_gfs_are_close)
 
