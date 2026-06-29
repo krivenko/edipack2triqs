@@ -3,8 +3,10 @@
 About edipack2triqs
 ===================
 
-This package has been written by Igor Krivenko with contributions from Lorenzo
-Crippa.
+This package has been written by Igor Krivenko with contributions from
+
+- Lorenzo Crippa
+- Nils Wentzell
 
 License
 -------

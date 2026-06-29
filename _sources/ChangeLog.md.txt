@@ -4,6 +4,9 @@
 
 ## Version 1.1.0
 
+* Apply TRIQS 4.0 compatibility fixes. Starting from this version, TRIQS 3.x.y
+  is no longer supported.
+
 * Expose the value of EDIpack's compilation flag `CMPLX_NORMAL` via the class
   attribute `EDIpackSolver.normal_complex_enabled`.
 
