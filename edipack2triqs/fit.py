@@ -219,7 +219,7 @@ def _chi2_fit_bath(self, g: BlockGf, f: Optional[BlockGf] = None):
     # Create fitted G0 or \Delta
     #
 
-    mesh = MeshImFreq(beta=ed.beta, S="Fermion", n_iw=ed.Lmats)
+    mesh = MeshImFreq(beta=ed.beta, statistic="Fermion", n_iw=ed.Lmats)
     z_vals = np.array([complex(z) for z in mesh])
     get_method = ed.get_g0and if (self.config["CG_SCHEME"] == "weiss") \
         else ed.get_delta

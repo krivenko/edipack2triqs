@@ -981,7 +981,7 @@ class TestSolver(unittest.TestCase):
         # Matsubara
         if zerotemp:
             return
-        D0_iw = Gf(mesh=MeshImFreq(beta=beta, S="Boson", n_iw=n_iw),
+        D0_iw = Gf(mesh=MeshImFreq(beta=beta, statistic="Boson", n_iw=n_iw),
                    target_shape=())
 
         chi_iw = D0_iw.copy()
