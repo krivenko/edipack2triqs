@@ -6,9 +6,9 @@ import numpy as np
 from numpy import multiply as mul
 
 import triqs.operators as op
-from triqs.gf import Gf, BlockGf, MeshImFreq, conjugate, transpose
-from triqs.gf.descriptors import SemiCircular, iOmega_n
-from triqs.gf.tools import inverse
+from triqs.gfs import Gf, BlockGf, MeshImFreq, conjugate, transpose
+from triqs.gfs.descriptors import SemiCircular, iOmega_n
+from triqs.gfs.tools import inverse
 from triqs.utility.comparison_tests import assert_block_gfs_are_close
 
 from edipack2triqs import EDMode
@@ -112,7 +112,7 @@ class TestFitBath(unittest.TestCase):
         self.assertEqual(solver.h_params.ed_mode, EDMode.NORMAL)
         self.assertEqual(solver.nspin, 1)
 
-        mesh = MeshImFreq(beta=50.0, S="Fermion", n_iw=200)
+        mesh = MeshImFreq(beta=50.0, statistic="Fermion", n_iw=200)
         Delta = BlockGf(gf_struct=[("up", self.norb), ("dn", self.norb)],
                         mesh=mesh)
         G0 = BlockGf(gf_struct=[("up", self.norb), ("dn", self.norb)],
@@ -150,7 +150,7 @@ class TestFitBath(unittest.TestCase):
         self.assertEqual(solver.h_params.ed_mode, EDMode.NORMAL)
         self.assertEqual(solver.nspin, 2)
 
-        mesh = MeshImFreq(beta=50.0, S="Fermion", n_iw=200)
+        mesh = MeshImFreq(beta=50.0, statistic="Fermion", n_iw=200)
         Delta = BlockGf(gf_struct=[("up", self.norb), ("dn", self.norb)],
                         mesh=mesh)
         G0 = BlockGf(gf_struct=[("up", self.norb), ("dn", self.norb)],
@@ -188,7 +188,7 @@ class TestFitBath(unittest.TestCase):
                                verbose=3)
         self.assertEqual(solver.h_params.ed_mode, EDMode.NONSU2)
 
-        mesh = MeshImFreq(beta=50.0, S="Fermion", n_iw=200)
+        mesh = MeshImFreq(beta=50.0, statistic="Fermion", n_iw=200)
         Delta = BlockGf(gf_struct=[("up_dn", 2 * self.norb)], mesh=mesh)
         G0 = BlockGf(gf_struct=[("up_dn", 2 * self.norb)], mesh=mesh)
         d1 = inverse(iOmega_n + 0.4) + inverse(iOmega_n - 1.4)
@@ -236,7 +236,7 @@ class TestFitBath(unittest.TestCase):
                                verbose=0)
         self.assertEqual(solver.h_params.ed_mode, EDMode.SUPERC)
 
-        mesh = MeshImFreq(beta=50.0, S="Fermion", n_iw=200)
+        mesh = MeshImFreq(beta=50.0, statistic="Fermion", n_iw=200)
         Delta = BlockGf(gf_struct=[("up", norb), ("dn", norb)], mesh=mesh)
         Delta_an = BlockGf(gf_struct=[("up_dn", norb)], mesh=mesh)
 

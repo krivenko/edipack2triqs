@@ -8,9 +8,9 @@ from itertools import product
 import numpy as np
 
 # TRIQS modules
-from triqs.gf import (Gf, BlockGf, MeshImFreq, MeshProduct,
-                      iOmega_n, conjugate, inverse)
-from triqs.gf.tools import dyson
+from triqs.gfs import (Gf, BlockGf, MeshImFreq, MeshProduct,
+                       iOmega_n, conjugate, inverse)
+from triqs.gfs.tools import dyson
 from triqs.operators import c, c_dag, n, dagger
 from triqs.lattice.tight_binding import TBLattice
 from h5 import HDFArchive

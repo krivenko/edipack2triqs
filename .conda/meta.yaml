@@ -35,4 +35,4 @@ requirements:
     - mpi4py
     - networkx
     - edipack::edipack>=6.0.0
-    - conda-forge::triqs>=3.2.0
+    - conda-forge::triqs>=4.0.0

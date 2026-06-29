@@ -8,7 +8,7 @@ from typing import Optional
 
 import numpy as np
 
-from triqs.gf import BlockGf, MeshImFreq
+from triqs.gfs import BlockGf, MeshImFreq
 
 from edipack2py import global_env as ed
 
@@ -129,19 +129,19 @@ def _chi2_fit_bath(self, g: BlockGf, f: Optional[BlockGf] = None):
 
     :param g: Normal component of the function to fit (either the hybridization
               function or the Weiss field).
-    :type g: triqs.gf.block_gf.BlockGf
+    :type g: triqs.gfs.block_gf.BlockGf
 
     :param f: Anomalous component of the function to fit (either the
               hybridization function or the Weiss field). Required iff the bath
               is superconducting.
-    :type g: triqs.gf.block_gf.BlockGf
+    :type g: triqs.gfs.block_gf.BlockGf
 
     :return: - A bath object that contains resulting parameters of the fit.
              - The normal component of the fitted function.
              - (*optional*) The anomalous component of the fitted function.
 
-    :rtype: tuple[Bath, triqs.gf.block_gf.BlockGf] or
-            tuple[Bath, triqs.gf.block_gf.BlockGf, triqs.gf.block_gf.BlockGf]
+    :rtype: tuple[Bath, triqs.gfs.block_gf.BlockGf] or
+            tuple[Bath, triqs.gfs.block_gf.BlockGf, triqs.gfs.block_gf.BlockGf]
     """
 
     if self.h_params.bath is None:
@@ -219,7 +219,7 @@ def _chi2_fit_bath(self, g: BlockGf, f: Optional[BlockGf] = None):
     # Create fitted G0 or \Delta
     #
 
-    mesh = MeshImFreq(beta=ed.beta, S="Fermion", n_iw=ed.Lmats)
+    mesh = MeshImFreq(beta=ed.beta, statistic="Fermion", n_iw=ed.Lmats)
     z_vals = np.array([complex(z) for z in mesh])
     get_method = ed.get_g0and if (self.config["CG_SCHEME"] == "weiss") \
         else ed.get_delta
