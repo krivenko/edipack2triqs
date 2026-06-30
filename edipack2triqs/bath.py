@@ -134,8 +134,7 @@ class BathNormal(Bath):
     connected to ``nbath`` independent bath levels. There are, therefore,
     ``norb * nbath`` bath levels in total.
 
-    Instances of this class are compatible with TRIQS'
-    :ref:`HDF5 </documentation/manual/hdf5/ref.rst>` interface.
+    Instances of this class are compatible with TRIQS' HDF5 interface.
     """
 
     # EDIpack bath type
@@ -403,8 +402,7 @@ class BathHybrid(Bath):
     these levels is connected to each impurity orbital via hopping amplitudes
     ``V``.
 
-    Instances of this class are compatible with TRIQS'
-    :ref:`HDF5 </documentation/manual/hdf5/ref.rst>` interface.
+    Instances of this class are compatible with TRIQS' HDF5 interface.
     """
 
     # EDIpack bath type
@@ -635,8 +633,7 @@ class BathGeneral(Bath):
     orbital is coupled to the corresponding orbital of each replica via hopping
     amplitudes ``V``.
 
-    Instances of this class are compatible with TRIQS'
-    :ref:`HDF5 </documentation/manual/hdf5/ref.rst>` interface.
+    Instances of this class are compatible with TRIQS' HDF5 interface.
     """
 
     # EDIpack bath type
