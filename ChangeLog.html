@@ -251,6 +251,8 @@
 is no longer supported.</p></li>
 <li><p>Expose the value of EDIpack’s compilation flag <code class="docutils literal notranslate"><span class="pre">CMPLX_NORMAL</span></code> via the class
 attribute <code class="docutils literal notranslate"><span class="pre">EDIpackSolver.normal_complex_enabled</span></code>.</p></li>
+<li><p>Fix an issue in <code class="docutils literal notranslate"><span class="pre">EDIpackSolver.chi2_fit_bath()</span></code>, which unnecessarily called
+the fitting routine twice for <code class="docutils literal notranslate"><span class="pre">EDMode.NORMAL</span></code> and the general bath topology.</p></li>
 </ul>
 </section>
 <section id="version-1-0-0">
