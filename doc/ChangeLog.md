@@ -9,6 +9,9 @@
 
 * Expose the value of EDIpack's compilation flag `CMPLX_NORMAL` via the class
   attribute `EDIpackSolver.normal_complex_enabled`.
+  
+* Fix an issue in `EDIpackSolver.chi2_fit_bath()`, which unnecessarily called
+  the fitting routine twice for `EDMode.NORMAL` and the general bath topology.
 
 ## Version 1.0.0
 
