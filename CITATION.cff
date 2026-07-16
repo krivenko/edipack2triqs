@@ -10,8 +10,8 @@ authors:
   - given-names: Lorenzo
     family-names: Crippa
     orcid: https://orcid.org/0000-0002-2526-8906
-version: 1.0.0
-date-released: 2026-05-10
+version: 1.1.0
+date-released: 2026-07-16
 license: GPL-3.0-or-later
 repository-code: "https://github.com/EDIpack/edipack2triqs"
 url: "https://EDIpack.github.io/edipack2triqs/"
