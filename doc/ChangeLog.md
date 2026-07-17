@@ -2,7 +2,7 @@
 
 # Changelog
 
-## Version 1.1.0
+## Version 1.1.0 - 2026-07-16
 
 * Apply TRIQS 4.0 compatibility fixes. Starting from this version, TRIQS 3.x.y
   is no longer supported.
@@ -13,7 +13,7 @@
 * Fix an issue in `EDIpackSolver.chi2_fit_bath()`, which unnecessarily called
   the fitting routine twice for `EDMode.NORMAL` and the general bath topology.
 
-## Version 1.0.0
+## Version 1.0.0 - 2026-05-10
 
 * Enable calculations with local electron-phonon coupling on the impurity site.
   Parameters of the local phonon can be passed to `EDIpackSolver.__init__()`
@@ -37,7 +37,7 @@
   The returned object contains contributions from both the bath Hamiltonian and
   the impurity-bath hybridization Hamiltonian.
 
-## Version 0.11.0
+## Version 0.11.0 - 2026-02-05
 
 * A matrix basis for the bath Hamiltonian in the general bath topology mode can
   now be explicitly specified. The basis is passed via the `bath_basis` keyword
@@ -63,7 +63,7 @@
   `EDIpackSolver.__init__()`, those of them related to the Lanczos algorithm
   (name prefix `lanc_`) have been grouped into a dataclass `LanczosParams`.
 
-## Version 0.10.0
+## Version 0.10.0 - 2026-01-09
 
 * Added an enumeration type `EDMode` that represents EDIpack's exact
   diagonalization mode.
@@ -80,7 +80,7 @@
   pairing fields are now read-write accessible via new attributes
   `EDIpackSolver.hloc_mat` and `EDIpackSolver.hloc_an_mat`.
 
-## Version 0.9.0
+## Version 0.9.0 - 2025-09-05
 
 * Expose non-interacting impurity Green's functions and hybridization functions
   via attributes of `EDIpackSolver`.
@@ -89,7 +89,7 @@
   channel, `chi_dens_{iw,w,tau}` for the charge channel, `chi_pair_{iw,w,tau}`
   for the pair channel, and `chi_exct_{iw,w,tau}` for the exciton channel.
 
-## Version 0.8.0
+## Version 0.8.0 - 2025-07-06
 
 * Add support for calculations without bath.
 * Allow for read-write access to `EDIpackSolver.hloc`.
@@ -105,16 +105,16 @@
   unusable without first calling `EDIpackSolver.solve()`. There is now a unit
   test that covers the bath fitting functionality.
 
-## Version 0.7.0
+## Version 0.7.0 - 2025-05-30
 
 * Add support for general two-particle interactions.
 * Add support for zero temperature calculations.
 
-## Version 0.6.0
+## Version 0.6.0 - 2025-05-22
 
 Updated codebase following the naming change of EDIpack2 and EDIpy2.
 C.f. https://github.com/EDIpack/EDIpack/issues/16.
 
-## Version 0.5.0
+## Version 0.5.0 - 2025-03-07
 
 This is the initial public release for this project.
