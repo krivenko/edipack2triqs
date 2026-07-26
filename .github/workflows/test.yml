@@ -11,6 +11,11 @@ on:
   schedule:
     - cron:  '0 0 * * 2'
 
+# A new push to the same branch makes the running build obsolete
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 # Allow pushes to gh-pages
 permissions:
   contents: write
