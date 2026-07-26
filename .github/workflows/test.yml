@@ -19,6 +19,7 @@ jobs:
   test:
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
         python-version:
           - "3.10"
@@ -30,6 +31,9 @@ jobs:
     env:
       DEPLOY_DOCS: ${{ github.ref == 'refs/heads/main' &&
                        matrix.python-version == '3.14' }}
+      # Bump this to invalidate all dependency caches, e.g. after changing
+      # build options of one of the dependencies below.
+      CACHE_VERSION: 1
 
     steps:
     - name: Install dependencies
@@ -40,12 +44,39 @@ jobs:
                libblas-dev liblapack-dev libfftw3-dev libgmp-dev libhdf5-dev   \
                libscalapack-mpi-dev
 
+    # Commit hashes of the dependencies are used as parts of cache keys.
+    - name: Resolve revisions of dependencies
+      id: revs
+      shell: "bash -l {0}"
+      run: |
+           set -euo pipefail
+           rev() { git ls-remote "$1" "${2:-HEAD}" | cut -f1; }
+           GH=https://github.com
+           {
+             echo "scifor=$(rev $GH/SciFortran/SciFortran)"
+             echo "edipack=$(rev $GH/edipack/EDIpack)"
+             echo "edipack2py=$(rev $GH/EDIpack/EDIpack2py)"
+             echo "triqs=$(rev $GH/TRIQS/triqs refs/heads/4.0.x)"
+             # Runner image, e.g. 'ubuntu24'
+             echo "image=${ImageOS:-unknown}"
+           } >> "${GITHUB_OUTPUT}"
+
+    - name: Cache SciFortran installation
+      id: cache-scifor
+      uses: actions/cache@v4
+      with:
+        path: ~/scifor
+        key: scifor-${{ steps.revs.outputs.image }}-${{
+             steps.revs.outputs.scifor }}-v${{ env.CACHE_VERSION }}
+
     - name: Build & install SciFortran
+      if: steps.cache-scifor.outputs.cache-hit != 'true'
       shell: "bash -l {0}"
       env:
         FC: mpifort
       run: |
-           git clone https://github.com/SciFortran/SciFortran.git scifor.git
+           git clone --depth 1 https://github.com/SciFortran/SciFortran.git    \
+                               scifor.git
            mkdir scifor.build && pushd scifor.build
            cmake ../scifor.git                                                 \
              -DCMAKE_BUILD_TYPE=Release                                        \
@@ -54,12 +85,23 @@ jobs:
            make install
            popd
 
+    # EDIpack is built against SciFortran, hence both revisions in the key.
+    - name: Cache EDIpack installation
+      id: cache-edipack
+      uses: actions/cache@v4
+      with:
+        path: ~/edipack
+        key: edipack-${{ steps.revs.outputs.image }}-${{
+             steps.revs.outputs.scifor }}-${{
+             steps.revs.outputs.edipack }}-v${{ env.CACHE_VERSION }}
+
     - name: Build & install EDIpack
+      if: steps.cache-edipack.outputs.cache-hit != 'true'
       shell: "bash -l {0}"
       env:
         FC: mpifort
       run: |
-           git clone https://github.com/edipack/EDIpack EDIpack.git
+           git clone --depth 1 https://github.com/edipack/EDIpack EDIpack.git
            mkdir EDIpack.build && pushd EDIpack.build
            export PKG_CONFIG_PATH="${HOME}/scifor/etc:${PKG_CONFIG_PATH}"
            cmake ../EDIpack.git                                                \
@@ -82,20 +124,46 @@ jobs:
            pip install --user \
                numpy scipy matplotlib mpi4py mako pytest networkx
 
-    - name: Install edipack2py
+    - name: Cache edipack2py wheel
+      id: cache-edipack2py
+      uses: actions/cache@v4
+      with:
+        path: ~/edipack2py.wheel
+        key: edipack2py-${{ steps.revs.outputs.image }}-py${{
+             matrix.python-version }}-${{
+             steps.revs.outputs.edipack2py }}-v${{ env.CACHE_VERSION }}
+
+    - name: Build edipack2py wheel
+      if: steps.cache-edipack2py.outputs.cache-hit != 'true'
       shell: "bash -l {0}"
       run: |
-           git clone https://github.com/EDIpack/EDIpack2py EDIpack2py.git
-           pushd EDIpack2py.git
-           pip install --user .
-           popd
+           git clone --depth 1 https://github.com/EDIpack/EDIpack2py           \
+                               EDIpack2py.git
+           pip wheel --no-deps --wheel-dir ${HOME}/edipack2py.wheel            \
+                     ./EDIpack2py.git
+
+    - name: Install edipack2py
+      shell: "bash -l {0}"
+      run: pip install --user ${HOME}/edipack2py.wheel/*.whl
+
+    # TRIQS installs Python modules, hence the Python version in the key.
+    - name: Cache TRIQS installation
+      id: cache-triqs
+      uses: actions/cache@v4
+      with:
+        path: ~/triqs
+        key: triqs-${{ steps.revs.outputs.image }}-py${{
+             matrix.python-version }}-${{
+             steps.revs.outputs.triqs }}-v${{ env.CACHE_VERSION }}
 
     - name: Build & install TRIQS
+      if: steps.cache-triqs.outputs.cache-hit != 'true'
       shell: "bash -l {0}"
       env:
         CXX: g++-14
       run: |
-           git clone https://github.com/TRIQS/triqs --branch 4.0.x triqs.git
+           git clone --depth 1 --branch 4.0.x https://github.com/TRIQS/triqs   \
+                                              triqs.git
            mkdir triqs.build && pushd triqs.build
            cmake ../triqs.git                                                  \
              -DCMAKE_BUILD_TYPE=Release                                        \
