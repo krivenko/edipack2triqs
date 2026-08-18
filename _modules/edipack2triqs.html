@@ -246,22 +246,22 @@
 <div class="viewcode-block" id="EDMode">
 <a class="viewcode-back" href="../documentation.html#edipack2triqs.EDMode">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">EDMode</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
-    <span class="s2">&quot;EDIpack&#39;s :f:var:`exact diagonalization mode &lt;f/ed_input_vars/ed_mode&gt;`.&quot;</span>
-    <span class="n">NORMAL</span> <span class="o">=</span> <span class="s2">&quot;normal&quot;</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+    <span class="s2">"EDIpack's :f:var:`exact diagonalization mode &lt;f/ed_input_vars/ed_mode&gt;`."</span>
+    <span class="n">NORMAL</span> <span class="o">=</span> <span class="s2">"normal"</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Normal</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">SUPERC</span> <span class="o">=</span> <span class="s2">&quot;superc&quot;</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    """</span>
+    <span class="n">SUPERC</span> <span class="o">=</span> <span class="s2">"superc"</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    s-wave superconductive</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">NONSU2</span> <span class="o">=</span> <span class="s2">&quot;nonsu2&quot;</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    """</span>
+    <span class="n">NONSU2</span> <span class="o">=</span> <span class="s2">"nonsu2"</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Broken SU(2) symmetry</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__int__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="s2">&quot;Integer IDs used by EDIpack&quot;</span>
+        <span class="s2">"Integer IDs used by EDIpack"</span>
         <span class="k">return</span> <span class="p">{</span><span class="bp">self</span><span class="o">.</span><span class="n">NORMAL</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">SUPERC</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">NONSU2</span><span class="p">:</span> <span class="mi">3</span><span class="p">}[</span><span class="bp">self</span><span class="p">]</span></div>
 
 </pre></div>

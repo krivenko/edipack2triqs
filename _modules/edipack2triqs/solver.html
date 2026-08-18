@@ -241,9 +241,9 @@
            <div itemprop="articleBody">
              
   <h1>Source code for edipack2triqs.solver</h1><div class="highlight"><pre>
-<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span></span><span class="sd">"""</span>
 <span class="sd">TRIQS interface to **EDIpack** exact diagonalization solver.</span>
-<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">"""</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">itertools</span><span class="w"> </span><span class="kn">import</span> <span class="n">product</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span>
@@ -285,20 +285,20 @@
 <a class="viewcode-back" href="../../documentation.html#edipack2triqs.solver.PhononParams">[docs]</a>
 <span class="nd">@dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">kw_only</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">PhononParams</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Parameters of local phonon mode.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Parameters of local phonon mode."""</span>
 
     <span class="n">frequency</span><span class="p">:</span> <span class="nb">float</span>
-    <span class="s2">&quot;Frequency of the phonon mode.&quot;</span>
+    <span class="s2">"Frequency of the phonon mode."</span>
 
     <span class="n">coupling</span><span class="p">:</span> <span class="n">op</span><span class="o">.</span><span class="n">Operator</span>
-    <span class="s2">&quot;Bilinear fermionic operator coupled to the phonon mode.&quot;</span>
+    <span class="s2">"Bilinear fermionic operator coupled to the phonon mode."</span>
 
     <span class="n">nphonons</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span>
-    <span class="s2">&quot;Maximal number of phonons allowed in the phonon mode (cutoff).&quot;</span>
+    <span class="s2">"Maximal number of phonons allowed in the phonon mode (cutoff)."</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="s2">&quot;Validate &#39;nphonons&#39;.&quot;</span>
-        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">nphonons</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;&#39;nphonons&#39; cannot be negative&quot;</span></div>
+        <span class="s2">"Validate 'nphonons'."</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">nphonons</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">"'nphonons' cannot be negative"</span></div>
 
 
 
@@ -306,78 +306,78 @@
 <a class="viewcode-back" href="../../documentation.html#edipack2triqs.solver.LanczosParams">[docs]</a>
 <span class="nd">@dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">kw_only</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">LanczosParams</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Parameters of Lanczos algorithm.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Parameters of Lanczos algorithm."""</span>
 
-    <span class="n">method</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;arpack&quot;</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+    <span class="n">method</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"arpack"</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Select the method to be used in the determination of the spectrum,</span>
-<span class="sd">    one of *&quot;arpack&quot;*, *&quot;lanczos&quot;* (simple Lanczos method, only works at zero</span>
+<span class="sd">    one of *"arpack"*, *"lanczos"* (simple Lanczos method, only works at zero</span>
 <span class="sd">    temperature, can be useful in some rare cases, when ARPACK fails) and</span>
-<span class="sd">    *&quot;dvdson&quot;* (no-MPI mode only).</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    *"dvdson"* (no-MPI mode only).</span>
+<span class="sd">    """</span>
 
     <span class="n">nstates_sector</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">2</span>
-    <span class="s2">&quot;Initial number of states per sector to be determined.&quot;</span>
+    <span class="s2">"Initial number of states per sector to be determined."</span>
 
     <span class="n">nstates_total</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">2</span>
-    <span class="s2">&quot;Initial total number of states to be determined.&quot;</span>
+    <span class="s2">"Initial total number of states to be determined."</span>
 
     <span class="n">nstates_step</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">2</span>
-    <span class="s2">&quot;Number of states added to the spectrum at each step.&quot;</span>
+    <span class="s2">"Number of states added to the spectrum at each step."</span>
 
     <span class="n">ncv_factor</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">10</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Set the size of the block used in Lanczos-ARPACK by multiplying the</span>
 <span class="sd">    required ``Neigen`` (``NCV = ncv_factor * Neigen + ncv_add``).</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="n">ncv_add</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Adds up to the size of the block to prevent it from becoming too small</span>
 <span class="sd">    (``NCV = ncv_factor * Neigen + ncv_add``).</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="n">niter</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">512</span>
-    <span class="s2">&quot;Number of Lanczos iterations in spectrum determination.&quot;</span>
+    <span class="s2">"Number of Lanczos iterations in spectrum determination."</span>
 
     <span class="n">ngfiter</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">200</span>
-    <span class="s2">&quot;Number of Lanczos iterations in GF determination (number of momenta).&quot;</span>
+    <span class="s2">"Number of Lanczos iterations in GF determination (number of momenta)."</span>
 
     <span class="n">tolerance</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1e-18</span>
-    <span class="s2">&quot;Tolerance for the Lanczos iterations as used in ARPACK.&quot;</span>
+    <span class="s2">"Tolerance for the Lanczos iterations as used in ARPACK."</span>
 
     <span class="n">dim_threshold</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1024</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Minimal dimension threshold to use Lanczos determination of the spectrum</span>
 <span class="sd">    rather than LAPACK-based exact diagonalization.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="s2">&quot;Validate parameters.&quot;</span>
-        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">method</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;arpack&quot;</span><span class="p">,</span> <span class="s2">&quot;lanczos&quot;</span><span class="p">,</span> <span class="s2">&quot;dvdson&quot;</span><span class="p">),</span> \
-            <span class="s2">&quot;Invalid value of &#39;method&#39;&quot;</span>
-        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">nstates_sector</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;&#39;nstates_sector&#39; must be positive&quot;</span>
-        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">nstates_total</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;&#39;nstates_total&#39; must be positive&quot;</span>
-        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">nstates_step</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;&#39;nstates_step&#39; must be positive&quot;</span>
-        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">ncv_factor</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;&#39;ncv_factor&#39; must be positive&quot;</span>
-        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">ncv_add</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;&#39;ncv_add&#39; cannot be negative&quot;</span>
-        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">niter</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;&#39;niter&#39; must be positive&quot;</span>
-        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">ngfiter</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;&#39;ngfiter&#39; must be positive&quot;</span>
-        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">tolerance</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;&#39;tolerance&#39; cannot be negative&quot;</span>
-        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">dim_threshold</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;&#39;dim_threshold&#39; must be positive&quot;</span>
+        <span class="s2">"Validate parameters."</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">method</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">"arpack"</span><span class="p">,</span> <span class="s2">"lanczos"</span><span class="p">,</span> <span class="s2">"dvdson"</span><span class="p">),</span> \
+            <span class="s2">"Invalid value of 'method'"</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">nstates_sector</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">"'nstates_sector' must be positive"</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">nstates_total</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">"'nstates_total' must be positive"</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">nstates_step</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">"'nstates_step' must be positive"</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">ncv_factor</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">"'ncv_factor' must be positive"</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">ncv_add</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">"'ncv_add' cannot be negative"</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">niter</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">"'niter' must be positive"</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">ngfiter</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">"'ngfiter' must be positive"</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">tolerance</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">"'tolerance' cannot be negative"</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">dim_threshold</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">"'dim_threshold' must be positive"</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">__dict__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="p">{</span>
-            <span class="s2">&quot;LANC_METHOD&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">method</span><span class="p">,</span>
-            <span class="s2">&quot;LANC_NSTATES_SECTOR&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">nstates_sector</span><span class="p">,</span>
-            <span class="s2">&quot;LANC_NSTATES_TOTAL&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">nstates_total</span><span class="p">,</span>
-            <span class="s2">&quot;LANC_NSTATES_STEP&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">nstates_step</span><span class="p">,</span>
-            <span class="s2">&quot;LANC_NCV_FACTOR&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">ncv_factor</span><span class="p">,</span>
-            <span class="s2">&quot;LANC_NCV_ADD&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">ncv_add</span><span class="p">,</span>
-            <span class="s2">&quot;LANC_NITER&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">niter</span><span class="p">,</span>
-            <span class="s2">&quot;LANC_NGFITER&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">ngfiter</span><span class="p">,</span>
-            <span class="s2">&quot;LANC_TOLERANCE&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">tolerance</span><span class="p">,</span>
-            <span class="s2">&quot;LANC_DIM_THRESHOLD&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">dim_threshold</span>
+            <span class="s2">"LANC_METHOD"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">method</span><span class="p">,</span>
+            <span class="s2">"LANC_NSTATES_SECTOR"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">nstates_sector</span><span class="p">,</span>
+            <span class="s2">"LANC_NSTATES_TOTAL"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">nstates_total</span><span class="p">,</span>
+            <span class="s2">"LANC_NSTATES_STEP"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">nstates_step</span><span class="p">,</span>
+            <span class="s2">"LANC_NCV_FACTOR"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">ncv_factor</span><span class="p">,</span>
+            <span class="s2">"LANC_NCV_ADD"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">ncv_add</span><span class="p">,</span>
+            <span class="s2">"LANC_NITER"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">niter</span><span class="p">,</span>
+            <span class="s2">"LANC_NGFITER"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">ngfiter</span><span class="p">,</span>
+            <span class="s2">"LANC_TOLERANCE"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">tolerance</span><span class="p">,</span>
+            <span class="s2">"LANC_DIM_THRESHOLD"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">dim_threshold</span>
         <span class="p">}</span></div>
 
 
@@ -385,7 +385,7 @@
 <div class="viewcode-block" id="EDIpackSolver">
 <a class="viewcode-back" href="../../documentation.html#edipack2triqs.solver.EDIpackSolver">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">EDIpackSolver</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    This class represents the **EDIpack** exact diagonalization library and</span>
 <span class="sd">    incapsulates its internal state. Its methods and attributes allow to perform</span>
 <span class="sd">    ED calculations and to access their results.</span>
@@ -394,7 +394,7 @@
 
 <span class="sd">        At most one instance of this type can exists at any time. An attempt to</span>
 <span class="sd">        create more such objects will raise an :py:class:`AssertionError`.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="c1"># EDIpack maintains the state of a simulation as a set of global variables.</span>
     <span class="c1"># Therefore, this state must be controlled by at most one EDIpackSolver</span>
@@ -404,36 +404,36 @@
     <span class="c1"># Default configuration</span>
     <span class="n">default_config</span> <span class="o">=</span> <span class="p">{</span>
         <span class="c1"># DMFT</span>
-        <span class="s2">&quot;NLOOP&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
-        <span class="s2">&quot;DMFT_ERROR&quot;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>
-        <span class="s2">&quot;NSUCCESS&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+        <span class="s2">"NLOOP"</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+        <span class="s2">"DMFT_ERROR"</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>
+        <span class="s2">"NSUCCESS"</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
         <span class="c1"># Hartree-Fock</span>
-        <span class="s2">&quot;HFMODE&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
-        <span class="s2">&quot;XMU&quot;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>
+        <span class="s2">"HFMODE"</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="s2">"XMU"</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>
         <span class="c1"># Phonons</span>
-        <span class="s2">&quot;PH_TYPE&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
-        <span class="s2">&quot;NPH&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+        <span class="s2">"PH_TYPE"</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+        <span class="s2">"NPH"</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
         <span class="c1"># Fixed density calculations</span>
-        <span class="s2">&quot;NREAD&quot;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>
-        <span class="s2">&quot;NERR&quot;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>
-        <span class="s2">&quot;NDELTA&quot;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>
-        <span class="s2">&quot;NCOEFF&quot;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>
+        <span class="s2">"NREAD"</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>
+        <span class="s2">"NERR"</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>
+        <span class="s2">"NDELTA"</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>
+        <span class="s2">"NCOEFF"</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>
         <span class="c1"># ED</span>
-        <span class="s2">&quot;ED_USE_KANAMORI&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
-        <span class="s2">&quot;ED_READ_UMATRIX&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
-        <span class="s2">&quot;PRINT_SECTOR_EIGENVALUES&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
-        <span class="s2">&quot;ED_PRINT_SIGMA&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
-        <span class="s2">&quot;ED_PRINT_G&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
-        <span class="s2">&quot;ED_PRINT_G0&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
-        <span class="s2">&quot;ED_TWIN&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
-        <span class="s2">&quot;ED_SOLVE_OFFDIAG_GF&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>   <span class="c1"># TODO</span>
-        <span class="s2">&quot;ED_ALL_G&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
-        <span class="s2">&quot;ED_OFFSET_BATH&quot;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>
-        <span class="s2">&quot;LTAU&quot;</span><span class="p">:</span> <span class="mi">1000</span><span class="p">,</span>
-        <span class="s2">&quot;CHISPIN_FLAG&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
-        <span class="s2">&quot;CHIDENS_FLAG&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
-        <span class="s2">&quot;CHIPAIR_FLAG&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
-        <span class="s2">&quot;CHIEXCT_FLAG&quot;</span><span class="p">:</span> <span class="kc">False</span>
+        <span class="s2">"ED_USE_KANAMORI"</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="s2">"ED_READ_UMATRIX"</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="s2">"PRINT_SECTOR_EIGENVALUES"</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="s2">"ED_PRINT_SIGMA"</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="s2">"ED_PRINT_G"</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="s2">"ED_PRINT_G0"</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="s2">"ED_TWIN"</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="s2">"ED_SOLVE_OFFDIAG_GF"</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>   <span class="c1"># TODO</span>
+        <span class="s2">"ED_ALL_G"</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="s2">"ED_OFFSET_BATH"</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>
+        <span class="s2">"LTAU"</span><span class="p">:</span> <span class="mi">1000</span><span class="p">,</span>
+        <span class="s2">"CHISPIN_FLAG"</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="s2">"CHIDENS_FLAG"</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="s2">"CHIPAIR_FLAG"</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="s2">"CHIEXCT_FLAG"</span><span class="p">:</span> <span class="kc">False</span>
     <span class="p">}</span>
 
 <div class="viewcode-block" id="EDIpackSolver.__init__">
@@ -446,7 +446,7 @@
                  <span class="n">fops_bath_dn</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">IndicesType</span><span class="p">]</span> <span class="o">=</span> <span class="p">[],</span>
                  <span class="o">**</span><span class="n">kwargs</span>
                  <span class="p">):</span>
-<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""</span>
 <span class="sd">        Initialize internal state of the underlying **EDIpack** solver.</span>
 
 <span class="sd">        The fundamental operator sets (**fops** for short) define sizes of</span>
@@ -455,15 +455,15 @@
 <span class="sd">        corresponds to a single fermionic degree of freedom created by</span>
 <span class="sd">        the many-body operator ``c_dag(b, i)``. ``b`` and ``i`` are a (string or</span>
 <span class="sd">        integer) block index and an index within a block respectively, which</span>
-<span class="sd">        are used to construct output :py:class:`Green&#39;s function</span>
+<span class="sd">        are used to construct output :py:class:`Green's function</span>
 <span class="sd">        containers &lt;triqs.gfs.block_gf.BlockGf&gt;`.</span>
 
 <span class="sd">        :param hamiltonian: Many-body electronic Hamiltonian to diagonalize.</span>
 <span class="sd">            Symmetries of this Hamiltonian are automatically analyzed and</span>
-<span class="sd">            dictate the choice of **EDIpacks**&#39;s</span>
+<span class="sd">            dictate the choice of **EDIpacks**'s</span>
 <span class="sd">            :f:var:`ED mode &lt;f/ed_input_vars/ed_mode&gt;` and</span>
 <span class="sd">            :f:mod:`bath geometry &lt;f/ed_bath&gt;`. This choice</span>
-<span class="sd">            remains unchangeable throughout object&#39;s lifetime.</span>
+<span class="sd">            remains unchangeable throughout object's lifetime.</span>
 <span class="sd">        :type hamiltonian: triqs.operators.operators.Operator</span>
 
 <span class="sd">        :param fops_imp_up: Fundamental operator set for spin-up impurity</span>
@@ -485,7 +485,7 @@
 <span class="sd">            default=[]</span>
 
 <span class="sd">        :param input_file: Path to a custom input file compatible with</span>
-<span class="sd">            **EDIpack**&#39;s :f:func:`f/ed_input_vars/ed_read_input`.</span>
+<span class="sd">            **EDIpack**'s :f:func:`f/ed_input_vars/ed_read_input`.</span>
 <span class="sd">            When specified, it is used to initialize **EDIpack**.</span>
 <span class="sd">            This option is mutually exclusive with all other keyword arguments.</span>
 <span class="sd">        :type input_file: str, optional</span>
@@ -498,7 +498,7 @@
 <span class="sd">            variables and their values on the console.</span>
 <span class="sd">        :type print_input_vars: bool, default=False</span>
 
-<span class="sd">        :param keep_dir: Do not remove **EDIpack**&#39;s temporary directory upon</span>
+<span class="sd">        :param keep_dir: Do not remove **EDIpack**'s temporary directory upon</span>
 <span class="sd">                         destruction of this :py:class:`EDIpackSolver` object.</span>
 <span class="sd">        :type keep_dir: bool, default=False</span>
 
@@ -554,17 +554,17 @@
 
 <span class="sd">        :param bath_fitting_params: Parameters used to perform bath fitting.</span>
 <span class="sd">        :type bath_fitting_params: BathFittingParams, optional</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
 
         <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance_count</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">,</span> \
-            <span class="s2">&quot;Only one instance of EDIpackSolver can exist at any time&quot;</span>
+            <span class="s2">"Only one instance of EDIpackSolver can exist at any time"</span>
 
-        <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">fops_imp_up</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;fops_imp_up must not be empty&quot;</span>
-        <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">fops_imp_dn</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;fops_imp_dn must not be empty&quot;</span>
+        <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">fops_imp_up</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">"fops_imp_up must not be empty"</span>
+        <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">fops_imp_dn</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">"fops_imp_dn must not be empty"</span>
         <span class="n">validate_fops_up_dn</span><span class="p">(</span><span class="n">fops_imp_up</span><span class="p">,</span> <span class="n">fops_imp_dn</span><span class="p">,</span>
-                            <span class="s2">&quot;fops_imp_up&quot;</span><span class="p">,</span> <span class="s2">&quot;fops_imp_dn&quot;</span><span class="p">)</span>
+                            <span class="s2">"fops_imp_up"</span><span class="p">,</span> <span class="s2">"fops_imp_dn"</span><span class="p">)</span>
         <span class="n">validate_fops_up_dn</span><span class="p">(</span><span class="n">fops_bath_up</span><span class="p">,</span> <span class="n">fops_bath_dn</span><span class="p">,</span>
-                            <span class="s2">&quot;fops_bath_up&quot;</span><span class="p">,</span> <span class="s2">&quot;fops_bath_dn&quot;</span><span class="p">)</span>
+                            <span class="s2">"fops_bath_up"</span><span class="p">,</span> <span class="s2">"fops_bath_dn"</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">norb</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">fops_imp_up</span><span class="p">)</span>
 
@@ -577,68 +577,68 @@
         <span class="n">block_names_up</span> <span class="o">=</span> <span class="p">[</span><span class="n">ind</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">ind</span> <span class="ow">in</span> <span class="n">fops_imp_up</span><span class="p">]</span>
         <span class="n">block_names_dn</span> <span class="o">=</span> <span class="p">[</span><span class="n">ind</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">ind</span> <span class="ow">in</span> <span class="n">fops_imp_dn</span><span class="p">]</span>
         <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">bn</span> <span class="o">!=</span> <span class="n">block_names_up</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">bn</span> <span class="ow">in</span> <span class="n">block_names_up</span><span class="p">):</span>
-            <span class="n">warn</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Inconsistent block names in </span><span class="si">{</span><span class="n">block_names_up</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">warn</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Inconsistent block names in </span><span class="si">{</span><span class="n">block_names_up</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">bn</span> <span class="o">!=</span> <span class="n">block_names_dn</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">bn</span> <span class="ow">in</span> <span class="n">block_names_dn</span><span class="p">):</span>
-            <span class="n">warn</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Inconsistent block names in </span><span class="si">{</span><span class="n">block_names_dn</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">warn</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Inconsistent block names in </span><span class="si">{</span><span class="n">block_names_dn</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 
-        <span class="n">bath_basis</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;bath_basis&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="n">bath_basis</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">"bath_basis"</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="p">(</span><span class="n">bath_basis</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fops_bath_up</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="n">bath_basis</span> <span class="o">=</span> <span class="kc">None</span>
-            <span class="n">warn</span><span class="p">(</span><span class="s2">&quot;User-supplied bath_basis is ignored &quot;</span>
-                 <span class="s2">&quot;as there are no bath degrees of freedom&quot;</span><span class="p">)</span>
+            <span class="n">warn</span><span class="p">(</span><span class="s2">"User-supplied bath_basis is ignored "</span>
+                 <span class="s2">"as there are no bath degrees of freedom"</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">h_params</span> <span class="o">=</span> <span class="n">parse_hamiltonian</span><span class="p">(</span>
             <span class="n">hamiltonian</span><span class="p">,</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">fops_imp_up</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">fops_imp_dn</span><span class="p">,</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">fops_bath_up</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">fops_bath_dn</span><span class="p">,</span>
-            <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;ed_mode&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
+            <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"ed_mode"</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
             <span class="n">bath_basis</span><span class="o">=</span><span class="n">bath_basis</span><span class="p">,</span>
         <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">nspin</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">h_params</span><span class="o">.</span><span class="n">Hloc</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 
         <span class="c1"># Keep temporary directory?</span>
-        <span class="n">keep_dir</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;keep_dir&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+        <span class="n">keep_dir</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"keep_dir"</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">keep_dir</span> <span class="ow">and</span> <span class="n">sys</span><span class="o">.</span><span class="n">version_info</span> <span class="o">&lt;</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">12</span><span class="p">,</span> <span class="mi">0</span><span class="p">):</span>
             <span class="n">keep_dir</span> <span class="o">=</span> <span class="kc">False</span>
-            <span class="n">warn</span><span class="p">(</span><span class="s2">&quot;keep_dir=True is ignored on Python versions prior to 3.12&quot;</span><span class="p">)</span>
+            <span class="n">warn</span><span class="p">(</span><span class="s2">"keep_dir=True is ignored on Python versions prior to 3.12"</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="s2">&quot;input_file&quot;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">input_file</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;input_file&quot;</span><span class="p">))</span>
+        <span class="k">if</span> <span class="s2">"input_file"</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">input_file</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">"input_file"</span><span class="p">))</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">input_file</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">input_file</span><span class="o">.</span><span class="n">resolve</span><span class="p">(</span><span class="n">strict</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
             <span class="k">if</span> <span class="n">kwargs</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                    <span class="s2">&quot;&#39;input_file&#39; is mutually exclusive with other parameters&quot;</span>
+                    <span class="s2">"'input_file' is mutually exclusive with other parameters"</span>
                 <span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">input_file</span> <span class="o">=</span> <span class="kc">None</span>
 
             <span class="n">c</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">default_config</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-            <span class="n">c</span><span class="p">[</span><span class="s2">&quot;ED_VERBOSE&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;verbose&quot;</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
-            <span class="n">c</span><span class="p">[</span><span class="s2">&quot;PRINT_INPUT_VARS&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;print_input_vars&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
-            <span class="n">c</span><span class="p">[</span><span class="s2">&quot;CUTOFF&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;cutoff&quot;</span><span class="p">,</span> <span class="mf">1e-9</span><span class="p">)</span>
-            <span class="n">c</span><span class="p">[</span><span class="s2">&quot;GS_THRESHOLD&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;gs_threshold&quot;</span><span class="p">,</span> <span class="mf">1e-9</span><span class="p">)</span>
-            <span class="n">c</span><span class="p">[</span><span class="s2">&quot;ED_SPARSE_H&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;ed_sparse_h&quot;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+            <span class="n">c</span><span class="p">[</span><span class="s2">"ED_VERBOSE"</span><span class="p">]</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"verbose"</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+            <span class="n">c</span><span class="p">[</span><span class="s2">"PRINT_INPUT_VARS"</span><span class="p">]</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"print_input_vars"</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+            <span class="n">c</span><span class="p">[</span><span class="s2">"CUTOFF"</span><span class="p">]</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"cutoff"</span><span class="p">,</span> <span class="mf">1e-9</span><span class="p">)</span>
+            <span class="n">c</span><span class="p">[</span><span class="s2">"GS_THRESHOLD"</span><span class="p">]</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"gs_threshold"</span><span class="p">,</span> <span class="mf">1e-9</span><span class="p">)</span>
+            <span class="n">c</span><span class="p">[</span><span class="s2">"ED_SPARSE_H"</span><span class="p">]</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"ed_sparse_h"</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
 
             <span class="c1"># Impurity structure</span>
-            <span class="n">c</span><span class="p">[</span><span class="s2">&quot;ED_MODE&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">h_params</span><span class="o">.</span><span class="n">ed_mode</span><span class="o">.</span><span class="n">value</span>
-            <span class="n">c</span><span class="p">[</span><span class="s2">&quot;NSPIN&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">nspin</span>
-            <span class="n">c</span><span class="p">[</span><span class="s2">&quot;NORB&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">norb</span>
+            <span class="n">c</span><span class="p">[</span><span class="s2">"ED_MODE"</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">h_params</span><span class="o">.</span><span class="n">ed_mode</span><span class="o">.</span><span class="n">value</span>
+            <span class="n">c</span><span class="p">[</span><span class="s2">"NSPIN"</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">nspin</span>
+            <span class="n">c</span><span class="p">[</span><span class="s2">"NORB"</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">norb</span>
 
             <span class="c1"># Bath geometry</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">h_params</span><span class="o">.</span><span class="n">bath</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="n">c</span><span class="p">[</span><span class="s2">&quot;BATH_TYPE&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">h_params</span><span class="o">.</span><span class="n">bath</span><span class="o">.</span><span class="n">name</span>
-                <span class="n">c</span><span class="p">[</span><span class="s2">&quot;NBATH&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">h_params</span><span class="o">.</span><span class="n">bath</span><span class="o">.</span><span class="n">nbath</span>
+                <span class="n">c</span><span class="p">[</span><span class="s2">"BATH_TYPE"</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">h_params</span><span class="o">.</span><span class="n">bath</span><span class="o">.</span><span class="n">name</span>
+                <span class="n">c</span><span class="p">[</span><span class="s2">"NBATH"</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">h_params</span><span class="o">.</span><span class="n">bath</span><span class="o">.</span><span class="n">nbath</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="n">c</span><span class="p">[</span><span class="s2">&quot;NBATH&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
-                <span class="n">c</span><span class="p">[</span><span class="s2">&quot;BATH_TYPE&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;hybrid&quot;</span>
+                <span class="n">c</span><span class="p">[</span><span class="s2">"NBATH"</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+                <span class="n">c</span><span class="p">[</span><span class="s2">"BATH_TYPE"</span><span class="p">]</span> <span class="o">=</span> <span class="s2">"hybrid"</span>
 
             <span class="c1"># Phonons</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">phonon</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;phonon&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">phonon</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"phonon"</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">phonon</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="n">c</span><span class="p">[</span><span class="s2">&quot;W0_PH&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">phonon</span><span class="o">.</span><span class="n">frequency</span>
-                <span class="n">c</span><span class="p">[</span><span class="s2">&quot;NPH&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">phonon</span><span class="o">.</span><span class="n">nphonons</span>
+                <span class="n">c</span><span class="p">[</span><span class="s2">"W0_PH"</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">phonon</span><span class="o">.</span><span class="n">frequency</span>
+                <span class="n">c</span><span class="p">[</span><span class="s2">"NPH"</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">phonon</span><span class="o">.</span><span class="n">nphonons</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">g_ph</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">a_ph</span> <span class="o">=</span> <span class="n">parse_phonon_coupling</span><span class="p">(</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">phonon</span><span class="o">.</span><span class="n">coupling</span><span class="p">,</span>
                     <span class="n">fops_imp_up</span><span class="p">,</span>
@@ -649,7 +649,7 @@
                 <span class="n">phonon_diag</span> <span class="o">=</span> <span class="kc">True</span>
 
             <span class="c1"># ed_total_ud</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">ed_total_ud</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;ed_total_ud&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ed_total_ud</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"ed_total_ud"</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">denden_int</span> <span class="o">=</span> <span class="n">_is_density_density</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">h_params</span><span class="o">.</span><span class="n">U</span><span class="p">)</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="p">((</span><span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">ed_total_ud</span><span class="p">)</span>
                     <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">h_params</span><span class="o">.</span><span class="n">ed_mode</span> <span class="o">==</span> <span class="n">EDMode</span><span class="o">.</span><span class="n">NORMAL</span>
@@ -658,40 +658,40 @@
                     <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">denden_int</span>
                     <span class="ow">and</span> <span class="n">phonon_diag</span><span class="p">):</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">ed_total_ud</span> <span class="o">=</span> <span class="kc">True</span>
-            <span class="n">c</span><span class="p">[</span><span class="s2">&quot;ED_TOTAL_UD&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ed_total_ud</span>
+            <span class="n">c</span><span class="p">[</span><span class="s2">"ED_TOTAL_UD"</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ed_total_ud</span>
 
             <span class="c1"># ed_sectors and ed_sectors_shift</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">ed_sectors</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;ed_sectors&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ed_sectors</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"ed_sectors"</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">ed_sectors</span><span class="p">:</span>
-                <span class="n">c</span><span class="p">[</span><span class="s2">&quot;ED_SECTORS&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
-                <span class="n">c</span><span class="p">[</span><span class="s2">&quot;ED_SECTORS_SHIFT&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;ed_sectors_shift&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+                <span class="n">c</span><span class="p">[</span><span class="s2">"ED_SECTORS"</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="n">c</span><span class="p">[</span><span class="s2">"ED_SECTORS_SHIFT"</span><span class="p">]</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"ed_sectors_shift"</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="n">c</span><span class="p">[</span><span class="s2">&quot;ED_SECTORS&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
-                <span class="k">if</span> <span class="s2">&quot;ed_sectors_shift&quot;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
+                <span class="n">c</span><span class="p">[</span><span class="s2">"ED_SECTORS"</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
+                <span class="k">if</span> <span class="s2">"ed_sectors_shift"</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
                     <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
-                        <span class="s2">&quot;&#39;ed_sectors_shift&#39; is only valid for &#39;ed_sectors=True&#39;&quot;</span>
+                        <span class="s2">"'ed_sectors_shift' is only valid for 'ed_sectors=True'"</span>
                     <span class="p">)</span>
 
             <span class="c1"># Lanczos parameters</span>
-            <span class="n">lp</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;lanczos_params&quot;</span><span class="p">,</span> <span class="n">LanczosParams</span><span class="p">())</span>
+            <span class="n">lp</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"lanczos_params"</span><span class="p">,</span> <span class="n">LanczosParams</span><span class="p">())</span>
             <span class="n">c</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">lp</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">())</span>
 
             <span class="c1"># Zero temperature calculations</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">zerotemp</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;zerotemp&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
-            <span class="n">c</span><span class="p">[</span><span class="s2">&quot;ED_FINITE_TEMP&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">zerotemp</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">zerotemp</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"zerotemp"</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+            <span class="n">c</span><span class="p">[</span><span class="s2">"ED_FINITE_TEMP"</span><span class="p">]</span> <span class="o">=</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">zerotemp</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">zerotemp</span><span class="p">:</span>
-                <span class="n">c</span><span class="p">[</span><span class="s2">&quot;LANC_NSTATES_TOTAL&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+                <span class="n">c</span><span class="p">[</span><span class="s2">"LANC_NSTATES_TOTAL"</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
 
             <span class="c1"># Bath fitting</span>
-            <span class="n">bfp</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;bath_fitting_params&quot;</span><span class="p">,</span> <span class="n">BathFittingParams</span><span class="p">())</span>
+            <span class="n">bfp</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"bath_fitting_params"</span><span class="p">,</span> <span class="n">BathFittingParams</span><span class="p">())</span>
             <span class="n">c</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">bfp</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">())</span>
 
             <span class="c1"># Save G, G0 and \Sigma if the temporary directory is to be kept</span>
             <span class="k">if</span> <span class="n">keep_dir</span><span class="p">:</span>
-                <span class="n">c</span><span class="p">[</span><span class="s2">&quot;PRINT_SECTOR_EIGENVALUES&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
-                <span class="n">c</span><span class="p">[</span><span class="s2">&quot;ED_PRINT_G&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
-                <span class="n">c</span><span class="p">[</span><span class="s2">&quot;ED_PRINT_G0&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
-                <span class="n">c</span><span class="p">[</span><span class="s2">&quot;ED_PRINT_SIGMA&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="n">c</span><span class="p">[</span><span class="s2">"PRINT_SECTOR_EIGENVALUES"</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="n">c</span><span class="p">[</span><span class="s2">"ED_PRINT_G"</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="n">c</span><span class="p">[</span><span class="s2">"ED_PRINT_G0"</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="n">c</span><span class="p">[</span><span class="s2">"ED_PRINT_SIGMA"</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
 
             <span class="bp">self</span><span class="o">.</span><span class="n">config</span> <span class="o">=</span> <span class="n">c</span>
 
@@ -701,11 +701,11 @@
         <span class="c1"># process with rank 0. The directory is assumed to be accessible to all</span>
         <span class="c1"># other MPI processes under the same name via a common file system.</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">comm</span><span class="o">.</span><span class="n">Get_rank</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="n">tdargs</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;prefix&quot;</span><span class="p">:</span> <span class="s2">&quot;edipack-&quot;</span><span class="p">,</span>
-                      <span class="s2">&quot;suffix&quot;</span><span class="p">:</span> <span class="s2">&quot;.tmp&quot;</span><span class="p">,</span>
-                      <span class="s2">&quot;dir&quot;</span><span class="p">:</span> <span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">()}</span>
+            <span class="n">tdargs</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"prefix"</span><span class="p">:</span> <span class="s2">"edipack-"</span><span class="p">,</span>
+                      <span class="s2">"suffix"</span><span class="p">:</span> <span class="s2">".tmp"</span><span class="p">,</span>
+                      <span class="s2">"dir"</span><span class="p">:</span> <span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">()}</span>
             <span class="k">if</span> <span class="n">keep_dir</span><span class="p">:</span>
-                <span class="n">tdargs</span><span class="p">[</span><span class="s2">&quot;delete&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
+                <span class="n">tdargs</span><span class="p">[</span><span class="s2">"delete"</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
 
             <span class="bp">self</span><span class="o">.</span><span class="n">workdir</span> <span class="o">=</span> <span class="n">TemporaryDirectory</span><span class="p">(</span><span class="o">**</span><span class="n">tdargs</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">wdname</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">workdir</span><span class="o">.</span><span class="n">name</span>
@@ -716,27 +716,27 @@
         <span class="k">with</span> <span class="n">chdircontext</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">wdname</span><span class="p">):</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">comm</span><span class="o">.</span><span class="n">Get_rank</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
                 <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">input_file</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">input_file</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s1">&#39;input.conf&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">resolve</span><span class="p">()</span>
-                    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">input_file</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">config_file</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">input_file</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s1">'input.conf'</span><span class="p">)</span><span class="o">.</span><span class="n">resolve</span><span class="p">()</span>
+                    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">input_file</span><span class="p">,</span> <span class="s1">'w'</span><span class="p">)</span> <span class="k">as</span> <span class="n">config_file</span><span class="p">:</span>
                         <span class="n">write_config</span><span class="p">(</span><span class="n">config_file</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">)</span>
 
                 <span class="k">else</span><span class="p">:</span>
-                    <span class="n">Path</span><span class="p">(</span><span class="s1">&#39;input.conf&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">symlink_to</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">input_file</span><span class="p">)</span>
+                    <span class="n">Path</span><span class="p">(</span><span class="s1">'input.conf'</span><span class="p">)</span><span class="o">.</span><span class="n">symlink_to</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">input_file</span><span class="p">)</span>
 
             <span class="bp">self</span><span class="o">.</span><span class="n">comm</span><span class="o">.</span><span class="n">barrier</span><span class="p">()</span>
-            <span class="n">ed</span><span class="o">.</span><span class="n">read_input</span><span class="p">(</span><span class="s1">&#39;input.conf&#39;</span><span class="p">)</span>
+            <span class="n">ed</span><span class="o">.</span><span class="n">read_input</span><span class="p">(</span><span class="s1">'input.conf'</span><span class="p">)</span>
 
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">comm</span><span class="o">.</span><span class="n">Get_rank</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">scifor_version</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span>
-                    <span class="sa">r</span><span class="s2">&quot;^(.*): (.*)&quot;</span><span class="p">,</span>
-                    <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;scifor_version.inc&quot;</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">readline</span><span class="p">())[</span><span class="mi">2</span><span class="p">]</span>
+                    <span class="sa">r</span><span class="s2">"^(.*): (.*)"</span><span class="p">,</span>
+                    <span class="nb">open</span><span class="p">(</span><span class="s2">"scifor_version.inc"</span><span class="p">,</span> <span class="s1">'r'</span><span class="p">)</span><span class="o">.</span><span class="n">readline</span><span class="p">())[</span><span class="mi">2</span><span class="p">]</span>
 
                 <span class="bp">self</span><span class="o">.</span><span class="n">edipack_version</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span>
-                    <span class="sa">r</span><span class="s2">&quot;^(.*): (.*)&quot;</span><span class="p">,</span>
-                    <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;EDIpack_version.inc&quot;</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">readline</span><span class="p">())[</span><span class="mi">2</span><span class="p">]</span>
+                    <span class="sa">r</span><span class="s2">"^(.*): (.*)"</span><span class="p">,</span>
+                    <span class="nb">open</span><span class="p">(</span><span class="s2">"EDIpack_version.inc"</span><span class="p">,</span> <span class="s1">'r'</span><span class="p">)</span><span class="o">.</span><span class="n">readline</span><span class="p">())[</span><span class="mi">2</span><span class="p">]</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">scifor_version</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">edipack_version</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">scifor_version</span> <span class="o">=</span> <span class="s2">""</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">edipack_version</span> <span class="o">=</span> <span class="s2">""</span>
 
             <span class="bp">self</span><span class="o">.</span><span class="n">scifor_version</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">comm</span><span class="o">.</span><span class="n">bcast</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">scifor_version</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">edipack_version</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">comm</span><span class="o">.</span><span class="n">bcast</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">edipack_version</span><span class="p">)</span>
@@ -763,7 +763,7 @@
 
         <span class="k">if</span> <span class="n">ed</span><span class="o">.</span><span class="n">get_ed_mode</span><span class="p">()</span> <span class="o">==</span> <span class="nb">int</span><span class="p">(</span><span class="n">EDMode</span><span class="o">.</span><span class="n">SUPERC</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">gf_an_block_names</span> <span class="o">=</span> <span class="p">(</span><span class="n">block_names_up</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-                                      <span class="o">+</span> <span class="s2">&quot;_&quot;</span> <span class="o">+</span> <span class="n">block_names_dn</span><span class="p">[</span><span class="mi">0</span><span class="p">],)</span>
+                                      <span class="o">+</span> <span class="s2">"_"</span> <span class="o">+</span> <span class="n">block_names_dn</span><span class="p">[</span><span class="mi">0</span><span class="p">],)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">instance_count</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">comm</span><span class="o">.</span><span class="n">barrier</span><span class="p">()</span></div>
@@ -780,35 +780,35 @@
             <span class="k">pass</span>
 
     <span class="n">normal_complex_enabled</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="n">ed</span><span class="o">.</span><span class="n">normal_complex_enabled</span> <span class="k">if</span> \
-        <span class="nb">hasattr</span><span class="p">(</span><span class="n">ed</span><span class="p">,</span> <span class="s2">&quot;normal_complex_enabled&quot;</span><span class="p">)</span> <span class="k">else</span> <span class="kc">False</span>
-<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+        <span class="nb">hasattr</span><span class="p">(</span><span class="n">ed</span><span class="p">,</span> <span class="s2">"normal_complex_enabled"</span><span class="p">)</span> <span class="k">else</span> <span class="kc">False</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">"""</span>
 <span class="sd">    This class attribute indicates whether EDIpack was built with</span>
 <span class="sd">    ``-DCMPLX_NORMAL=ON``.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">hloc_mat</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
-<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""</span>
 <span class="sd">        Access to the matrix of the local impurity Hamiltonian</span>
 <span class="sd">        :math:`\hat H_\text{loc}`.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">h_params</span><span class="o">.</span><span class="n">Hloc</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">hloc_an_mat</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
-<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""</span>
 <span class="sd">        Access to the matrix of the anomalous local impurity Hamiltonian</span>
 <span class="sd">        :math:`\hat H_\text{loc, an}`.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">h_params</span><span class="o">.</span><span class="n">Hloc_an</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">hloc</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">op</span><span class="o">.</span><span class="n">Operator</span><span class="p">:</span>
-<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""</span>
 <span class="sd">        Access to the local impurity Hamiltonian :math:`\hat H_\text{loc}`</span>
 <span class="sd">        in the form of a TRIQS many-body operator. The operator object contains</span>
 <span class="sd">        both normal and anomalous contributions.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">h_params</span><span class="o">.</span><span class="n">ed_mode</span> <span class="o">==</span> <span class="n">EDMode</span><span class="o">.</span><span class="n">SUPERC</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">h_params</span><span class="o">.</span><span class="n">Hloc_op</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fops_imp_up</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">fops_imp_dn</span><span class="p">)</span> <span class="o">+</span> \
                 <span class="bp">self</span><span class="o">.</span><span class="n">h_params</span><span class="o">.</span><span class="n">Hloc_an_op</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fops_imp_up</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">fops_imp_dn</span><span class="p">)</span>
@@ -817,10 +817,10 @@
 
     <span class="nd">@hloc</span><span class="o">.</span><span class="n">setter</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">hloc</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">h</span><span class="p">:</span> <span class="n">op</span><span class="o">.</span><span class="n">Operator</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Set the local impurity Hamiltonian given in the form of a TRIQS</span>
 <span class="sd">        many-body operator containing both normal and anomalous contributions.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="n">new_hloc</span><span class="p">,</span> <span class="n">new_hloc_an</span> <span class="o">=</span> <span class="n">extract_quadratic</span><span class="p">(</span><span class="n">h</span><span class="p">,</span>
                                                   <span class="bp">self</span><span class="o">.</span><span class="n">fops_imp_up</span><span class="p">,</span>
                                                   <span class="bp">self</span><span class="o">.</span><span class="n">fops_imp_dn</span><span class="p">,</span>
@@ -828,7 +828,7 @@
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">nspin</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">is_spin_degenerate</span><span class="p">(</span><span class="n">new_hloc</span><span class="p">):</span>
                 <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
-                    <span class="s2">&quot;Local Hamiltonian must remain spin-degenerate&quot;</span>
+                    <span class="s2">"Local Hamiltonian must remain spin-degenerate"</span>
                 <span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">h_params</span><span class="o">.</span><span class="n">Hloc</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">new_hloc</span><span class="p">[:</span><span class="mi">1</span><span class="p">,</span> <span class="p">:</span><span class="mi">1</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:]</span>
         <span class="k">else</span><span class="p">:</span>
@@ -837,7 +837,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">U</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
-<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""</span>
 <span class="sd">        Access to the two-particle interaction tensor</span>
 <span class="sd">        :math:`U_{o_1 \sigma_1 o_2 \sigma_2 o_3 \sigma_3 o_4 \sigma_4}`.</span>
 <span class="sd">        Contributions to the impurity interaction Hamiltonian are defined</span>
@@ -851,37 +851,37 @@
 <span class="sd">                    c^\dagger_{\sigma_1 o_1} c^\dagger_{\sigma_2 o_2}</span>
 <span class="sd">                    c_{\sigma_4 o_4} c_{\sigma_3 o_3}.</span>
 
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">h_params</span><span class="o">.</span><span class="n">U</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">bath</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">Bath</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]:</span>
-<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""</span>
 <span class="sd">        Access to the current :py:class:`bath &lt;edipack2triqs.bath.Bath&gt;` object</span>
 <span class="sd">        stored in the solver. It is possible to assign a new bath object as long</span>
 <span class="sd">        as it has the matching type and describes a bath of the same geometry.</span>
 <span class="sd">        In the no-bath mode this attribute is set to :py:data:`None`.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">h_params</span><span class="o">.</span><span class="n">bath</span>
 
     <span class="nd">@bath</span><span class="o">.</span><span class="n">setter</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">bath</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_bath</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Bath</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]):</span>
-        <span class="s2">&quot;Set the bath object&quot;</span>
+        <span class="s2">"Set the bath object"</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">h_params</span><span class="o">.</span><span class="n">bath</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">assert</span> <span class="n">new_bath</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">,</span> \
-                <span class="s2">&quot;Cannot set a new bath object in a no-bath calculation&quot;</span>
+                <span class="s2">"Cannot set a new bath object in a no-bath calculation"</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">h_params</span><span class="o">.</span><span class="n">bath</span><span class="o">.</span><span class="n">assert_compatible</span><span class="p">(</span><span class="n">new_bath</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">h_params</span><span class="o">.</span><span class="n">bath</span> <span class="o">=</span> <span class="n">new_bath</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">bath_op</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">op</span><span class="o">.</span><span class="n">Operator</span><span class="p">:</span>
-<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""</span>
 <span class="sd">        Retrieve the current bath stored in the solver in the form of a</span>
 <span class="sd">        :py:class:`TRIQS operator &lt;triqs.operators.operators.Operator&gt;`.</span>
 <span class="sd">        The returned object contains contributions from both the bath</span>
 <span class="sd">        Hamiltonian and the impurity-bath hybridization Hamiltonian.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">h_params</span><span class="o">.</span><span class="n">bath</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">op</span><span class="o">.</span><span class="n">Operator</span><span class="p">()</span>
         <span class="k">else</span><span class="p">:</span>
@@ -893,14 +893,14 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">phonon_coupling</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">op</span><span class="o">.</span><span class="n">Operator</span><span class="p">:</span>
-        <span class="s2">&quot;Access the fermionic operator coupled to the phonon mode&quot;</span>
+        <span class="s2">"Access the fermionic operator coupled to the phonon mode"</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">phonon</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
-                <span class="s2">&quot;This solver object has not been constructed with phonon &quot;</span>
-                <span class="s2">&quot;support enabled&quot;</span>
+                <span class="s2">"This solver object has not been constructed with phonon "</span>
+                <span class="s2">"support enabled"</span>
             <span class="p">)</span>
         <span class="n">coupling</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">Operator</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">a_ph</span><span class="p">)</span>
-        <span class="n">coupling_it</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nditer</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">g_ph</span><span class="p">,</span> <span class="n">flags</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;multi_index&#39;</span><span class="p">])</span>
+        <span class="n">coupling_it</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nditer</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">g_ph</span><span class="p">,</span> <span class="n">flags</span><span class="o">=</span><span class="p">[</span><span class="s1">'multi_index'</span><span class="p">])</span>
         <span class="k">for</span> <span class="n">coeff</span> <span class="ow">in</span> <span class="n">coupling_it</span><span class="p">:</span>
             <span class="n">orb1</span><span class="p">,</span> <span class="n">orb2</span> <span class="o">=</span> <span class="n">coupling_it</span><span class="o">.</span><span class="n">multi_index</span>
             <span class="n">coupling</span> <span class="o">+=</span> <span class="n">coeff</span> <span class="o">*</span> <span class="n">op</span><span class="o">.</span><span class="n">c_dag</span><span class="p">(</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">fops_imp_up</span><span class="p">[</span><span class="n">orb1</span><span class="p">])</span> \
@@ -913,8 +913,8 @@
     <span class="k">def</span><span class="w"> </span><span class="nf">phonon_coupling</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_coupling</span><span class="p">:</span> <span class="n">op</span><span class="o">.</span><span class="n">Operator</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">phonon</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
-                <span class="s2">&quot;This solver object has not been constructed with phonon &quot;</span>
-                <span class="s2">&quot;support enabled&quot;</span>
+                <span class="s2">"This solver object has not been constructed with phonon "</span>
+                <span class="s2">"support enabled"</span>
             <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">g_ph</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">a_ph</span> <span class="o">=</span> <span class="n">parse_phonon_coupling</span><span class="p">(</span>
             <span class="n">new_coupling</span><span class="p">,</span>
@@ -924,7 +924,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">sectors</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="nb">list</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]],</span> <span class="n">NoneType</span><span class="p">]:</span>
-<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""</span>
 <span class="sd">        The list of quantum numbers corresponding to the sectors selected for</span>
 <span class="sd">        diagonalization. Depending on ``ed_mode``, each element of the list is</span>
 
@@ -936,11 +936,11 @@
 
 <span class="sd">        By default, this attribute equals :py:data:`None` and all sectors of the</span>
 <span class="sd">        Hamiltonian are considered for diagonalization.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">with</span> <span class="n">chdircontext</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">wdname</span><span class="p">):</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;sectors.restart&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">is_file</span><span class="p">():</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">Path</span><span class="p">(</span><span class="s2">"sectors.restart"</span><span class="p">)</span><span class="o">.</span><span class="n">is_file</span><span class="p">():</span>
                 <span class="k">return</span> <span class="kc">None</span>
-            <span class="n">sectors</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">loadtxt</span><span class="p">(</span><span class="s2">&quot;sectors.restart&quot;</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
+            <span class="n">sectors</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">loadtxt</span><span class="p">(</span><span class="s2">"sectors.restart"</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">h_params</span><span class="o">.</span><span class="n">ed_mode</span> <span class="o">==</span> <span class="n">EDMode</span><span class="o">.</span><span class="n">NORMAL</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">sectors</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
                 <span class="n">sectors</span> <span class="o">=</span> <span class="n">sectors</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="n">sectors</span><span class="o">.</span><span class="n">size</span><span class="p">))</span>
@@ -956,19 +956,19 @@
                            <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">nn</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="nb">int</span><span class="p">)</span> <span class="ow">and</span> <span class="n">nn</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="mi">0</span>
                            <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">nn</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="nb">int</span><span class="p">)</span> <span class="ow">and</span> <span class="n">nn</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="mi">0</span>
                            <span class="k">for</span> <span class="n">nn</span> <span class="ow">in</span> <span class="n">sectors</span><span class="p">),</span> \
-                       <span class="s2">&quot;&#39;sectors&#39; must be a list of pairs of non-negative &quot;</span> \
-                       <span class="s2">&quot;integer occupation numbers (N_</span><span class="si">{up}</span><span class="s2">, N_</span><span class="si">{dn}</span><span class="s2">)&quot;</span>
+                       <span class="s2">"'sectors' must be a list of pairs of non-negative "</span> \
+                       <span class="s2">"integer occupation numbers (N_</span><span class="si">{up}</span><span class="s2">, N_</span><span class="si">{dn}</span><span class="s2">)"</span>
             <span class="k">case</span> <span class="n">EDMode</span><span class="o">.</span><span class="n">NONSU2</span><span class="p">:</span>
                 <span class="k">assert</span> <span class="nb">all</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span> <span class="ow">and</span> <span class="n">n</span> <span class="o">&gt;=</span> <span class="mi">0</span> <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">sectors</span><span class="p">),</span> \
-                       <span class="s2">&quot;&#39;sectors&#39; must be a list of non-negative integer &quot;</span> \
-                       <span class="s2">&quot;occupation numbers N_</span><span class="si">{tot}</span><span class="s2">&quot;</span>
+                       <span class="s2">"'sectors' must be a list of non-negative integer "</span> \
+                       <span class="s2">"occupation numbers N_</span><span class="si">{tot}</span><span class="s2">"</span>
             <span class="k">case</span> <span class="n">EDMode</span><span class="o">.</span><span class="n">SUPERC</span><span class="p">:</span>
                 <span class="k">assert</span> <span class="nb">all</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">Sz</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span> <span class="k">for</span> <span class="n">Sz</span> <span class="ow">in</span> <span class="n">sectors</span><span class="p">),</span> \
-                       <span class="s2">&quot;&#39;sectors&#39; must be a list of integer total &quot;</span> \
-                       <span class="s2">&quot;spin projections S_z&quot;</span>
+                       <span class="s2">"'sectors' must be a list of integer total "</span> \
+                       <span class="s2">"spin projections S_z"</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">comm</span><span class="o">.</span><span class="n">Get_rank</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">with</span> <span class="n">chdircontext</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">wdname</span><span class="p">):</span>
-                <span class="n">np</span><span class="o">.</span><span class="n">savetxt</span><span class="p">(</span><span class="s2">&quot;sectors.restart&quot;</span><span class="p">,</span> <span class="n">sectors</span><span class="p">,</span> <span class="n">fmt</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">%i</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="n">np</span><span class="o">.</span><span class="n">savetxt</span><span class="p">(</span><span class="s2">"sectors.restart"</span><span class="p">,</span> <span class="n">sectors</span><span class="p">,</span> <span class="n">fmt</span><span class="o">=</span><span class="s2">"</span><span class="si">%i</span><span class="s2">"</span><span class="p">)</span>
 
 <div class="viewcode-block" id="EDIpackSolver.solve">
 <a class="viewcode-back" href="../../documentation.html#edipack2triqs.solver.EDIpackSolver.solve">[docs]</a>
@@ -985,15 +985,15 @@
               <span class="n">chi_exct</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
               <span class="n">chi_pair</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
               <span class="n">rdm</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
-<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Solve the impurity problem and calculate the observables, Green&#39;s</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""</span>
+<span class="sd">        Solve the impurity problem and calculate the observables, Green's</span>
 <span class="sd">        function and self-energy.</span>
 
 <span class="sd">        :param beta:</span>
 <span class="sd">            Inverse temperature :math:`\beta = 1 / (k_B T)` for observable and</span>
-<span class="sd">            Green&#39;s function calculations. In the zero temperature mode, this</span>
+<span class="sd">            Green's function calculations. In the zero temperature mode, this</span>
 <span class="sd">            parameter determines spacing between fictitious Matsubara</span>
-<span class="sd">            frequencies used as a mesh for the Green&#39;s functions.</span>
+<span class="sd">            frequencies used as a mesh for the Green's functions.</span>
 <span class="sd">        :type beta: float, default=1000</span>
 
 <span class="sd">        :param n_iw: Number of Matsubara frequencies for impurity GF and</span>
@@ -1031,7 +1031,7 @@
 
 <span class="sd">        :param rdm: Compute impurity reduced density matrix.</span>
 <span class="sd">        :type rdm: bool, default=False</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
 
         <span class="n">ed</span><span class="o">.</span><span class="n">beta</span> <span class="o">=</span> <span class="n">beta</span>
         <span class="n">ed</span><span class="o">.</span><span class="n">Lmats</span> <span class="o">=</span> <span class="n">n_iw</span>
@@ -1042,19 +1042,19 @@
 
         <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nspin</span> <span class="o">==</span> <span class="mi">2</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">h_params</span><span class="o">.</span><span class="n">ed_mode</span> <span class="o">==</span> <span class="n">EDMode</span><span class="o">.</span><span class="n">NORMAL</span><span class="p">)</span> <span class="ow">and</span> \
                 <span class="p">(</span><span class="ow">not</span> <span class="n">is_spin_diagonal</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">h_params</span><span class="o">.</span><span class="n">Hloc</span><span class="p">)):</span>
-            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Local Hamiltonian must remain spin-diagonal&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">"Local Hamiltonian must remain spin-diagonal"</span><span class="p">)</span>
 
         <span class="c1"># The interactions must remain of the density-density type, if this is</span>
         <span class="c1"># how they were at the construction time.</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">denden_int</span> <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="n">_is_density_density</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">h_params</span><span class="o">.</span><span class="n">U</span><span class="p">)):</span>
             <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
-                <span class="s2">&quot;Cannot add non-density-density terms to the interaction&quot;</span>
+                <span class="s2">"Cannot add non-density-density terms to the interaction"</span>
             <span class="p">)</span>
 
         <span class="k">if</span> <span class="nb">any</span><span class="p">((</span><span class="n">chi_spin</span><span class="p">,</span> <span class="n">chi_dens</span><span class="p">,</span> <span class="n">chi_exct</span><span class="p">,</span> <span class="n">chi_pair</span><span class="p">))</span> <span class="ow">and</span> \
                 <span class="n">ed</span><span class="o">.</span><span class="n">get_ed_mode</span><span class="p">()</span> <span class="o">!=</span> <span class="nb">int</span><span class="p">(</span><span class="n">EDMode</span><span class="o">.</span><span class="n">NORMAL</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
-                <span class="s2">&quot;Response functions are only available in the normal ED mode&quot;</span>
+                <span class="s2">"Response functions are only available in the normal ED mode"</span>
             <span class="p">)</span>
         <span class="n">ed</span><span class="o">.</span><span class="n">chispin_flag</span> <span class="o">=</span> <span class="n">chi_spin</span>
         <span class="n">ed</span><span class="o">.</span><span class="n">chidens_flag</span> <span class="o">=</span> <span class="n">chi_dens</span>
@@ -1064,13 +1064,13 @@
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">phonon</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">rdm</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
-                    <span class="s2">&quot;Impurity reduced density matrix is not available &quot;</span>
-                    <span class="s2">&quot;in calculations with phonons&quot;</span>
+                    <span class="s2">"Impurity reduced density matrix is not available "</span>
+                    <span class="s2">"in calculations with phonons"</span>
                 <span class="p">)</span>
             <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">ed_total_ud</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="n">is_diagonal</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">g_ph</span><span class="p">)):</span>
                 <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
-                    <span class="s2">&quot;Cannot add orbital off-diagonal elements to &quot;</span>
-                    <span class="s2">&quot;the electron-phonon coupling&quot;</span>
+                    <span class="s2">"Cannot add orbital off-diagonal elements to "</span>
+                    <span class="s2">"the electron-phonon coupling"</span>
                 <span class="p">)</span>
 
         <span class="n">ed</span><span class="o">.</span><span class="n">rdm_flag</span> <span class="o">=</span> <span class="n">rdm</span>
@@ -1091,7 +1091,7 @@
                 <span class="k">if</span> <span class="n">val</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
                     <span class="k">continue</span>
                 <span class="n">o1</span><span class="p">,</span> <span class="n">o2</span><span class="p">,</span> <span class="n">o3</span><span class="p">,</span> <span class="n">o4</span> <span class="o">=</span> <span class="n">ind</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">8</span><span class="p">:</span><span class="mi">2</span><span class="p">]</span>
-                <span class="n">s1</span><span class="p">,</span> <span class="n">s2</span><span class="p">,</span> <span class="n">s3</span><span class="p">,</span> <span class="n">s4</span> <span class="o">=</span> <span class="p">((</span><span class="s1">&#39;u&#39;</span> <span class="k">if</span> <span class="n">s</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">else</span> <span class="s1">&#39;d&#39;</span><span class="p">)</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">ind</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="mi">8</span><span class="p">:</span><span class="mi">2</span><span class="p">])</span>
+                <span class="n">s1</span><span class="p">,</span> <span class="n">s2</span><span class="p">,</span> <span class="n">s3</span><span class="p">,</span> <span class="n">s4</span> <span class="o">=</span> <span class="p">((</span><span class="s1">'u'</span> <span class="k">if</span> <span class="n">s</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">else</span> <span class="s1">'d'</span><span class="p">)</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">ind</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="mi">8</span><span class="p">:</span><span class="mi">2</span><span class="p">])</span>
                 <span class="n">ed</span><span class="o">.</span><span class="n">add_twobody_operator</span><span class="p">(</span><span class="n">o1</span><span class="p">,</span> <span class="n">s1</span><span class="p">,</span> <span class="n">o2</span><span class="p">,</span> <span class="n">s2</span><span class="p">,</span> <span class="n">o3</span><span class="p">,</span> <span class="n">s3</span><span class="p">,</span> <span class="n">o4</span><span class="p">,</span> <span class="n">s4</span><span class="p">,</span> <span class="n">val</span><span class="p">)</span>
 
             <span class="c1"># Set phonon parameters, if any</span>
@@ -1109,63 +1109,63 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">e_pot</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-        <span class="s2">&quot;Potential energy from interaction.&quot;</span>
+        <span class="s2">"Potential energy from interaction."</span>
         <span class="k">return</span> <span class="n">ed</span><span class="o">.</span><span class="n">get_eimp</span><span class="p">(</span><span class="n">ikind</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">e_kin</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-        <span class="s2">&quot;Kinetic energy.&quot;</span>
+        <span class="s2">"Kinetic energy."</span>
         <span class="k">return</span> <span class="n">ed</span><span class="o">.</span><span class="n">get_eimp</span><span class="p">(</span><span class="n">ikind</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">densities</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
-        <span class="s2">&quot;Impurity occupations, one element per orbital.&quot;</span>
+        <span class="s2">"Impurity occupations, one element per orbital."</span>
         <span class="k">return</span> <span class="n">ed</span><span class="o">.</span><span class="n">get_dens</span><span class="p">()</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">double_occ</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
-        <span class="s2">&quot;Impurity double occupancy, one element per orbital.&quot;</span>
+        <span class="s2">"Impurity double occupancy, one element per orbital."</span>
         <span class="k">return</span> <span class="n">ed</span><span class="o">.</span><span class="n">get_docc</span><span class="p">()</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">superconductive_phi</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
-<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""</span>
 <span class="sd">        Modulus of the impurity superconductive order parameter</span>
 <span class="sd">        :math:`\phi = \langle c_{o_1,\uparrow} c_{o_2,\downarrow} \rangle`</span>
 <span class="sd">        (matrix in the orbital space).</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">ed</span><span class="o">.</span><span class="n">get_phi</span><span class="p">(</span><span class="n">component</span><span class="o">=</span><span class="s1">&#39;mod&#39;</span><span class="p">)</span>
+<span class="sd">        """</span>
+        <span class="k">return</span> <span class="n">ed</span><span class="o">.</span><span class="n">get_phi</span><span class="p">(</span><span class="n">component</span><span class="o">=</span><span class="s1">'mod'</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">superconductive_phi_arg</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
-<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""</span>
 <span class="sd">        Complex argument of the impurity superconductive order parameter</span>
 <span class="sd">        :math:`\phi = \langle c_{o_1,\uparrow} c_{o_2,\downarrow} \rangle`</span>
 <span class="sd">        (matrix in the orbital space).</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">ed</span><span class="o">.</span><span class="n">get_phi</span><span class="p">(</span><span class="n">component</span><span class="o">=</span><span class="s1">&#39;arg&#39;</span><span class="p">)</span>
+<span class="sd">        """</span>
+        <span class="k">return</span> <span class="n">ed</span><span class="o">.</span><span class="n">get_phi</span><span class="p">(</span><span class="n">component</span><span class="o">=</span><span class="s1">'arg'</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">magnetization</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Cartesian components of impurity magnetization vectors,</span>
 <span class="sd">        one row per orbital.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">return</span> <span class="n">ed</span><span class="o">.</span><span class="n">get_mag</span><span class="p">()</span><span class="o">.</span><span class="n">T</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">denmat</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
-<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""</span>
 <span class="sd">        1-body density matrix of electrons.</span>
 
 <span class="sd">        The density matrix is returned as a 4-dimensional array</span>
-<span class="sd">        :math:`\hat\rho_{\sigma, \sigma&#39;, i, j}`, where :math:`\sigma,\sigma&#39;`</span>
+<span class="sd">        :math:`\hat\rho_{\sigma, \sigma', i, j}`, where :math:`\sigma,\sigma'`</span>
 <span class="sd">        are either spin indices or Nambu indices (in the superconducting</span>
 <span class="sd">        exact diagonalization mode). Each of the indices :math:`i, j` runs</span>
 <span class="sd">        over the combined range ``fops_imp_up + fops_bath_up`` or</span>
 <span class="sd">        ``fops_imp_dn + fops_bath_dn``, depending on the value of the respective</span>
 <span class="sd">        spin index.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
 
         <span class="n">state_map</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">norb</span><span class="p">))</span> <span class="o">+</span> \
             <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">norb</span> <span class="o">+</span> <span class="n">st</span> <span class="k">for</span> <span class="n">st</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">h_params</span><span class="o">.</span><span class="n">fops_bath_order</span><span class="p">]</span>
@@ -1185,57 +1185,57 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">rdm</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
-<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""</span>
 <span class="sd">        Reduced impurity density matrix, a complex matrix of size</span>
 <span class="sd">        :math:`4^{N_{orb}}\times 4^{N_{orb}}`.</span>
 
 <span class="sd">        The impurity Fock states forming the basis for this matrix are</span>
 <span class="sd">        :math:`|n_{1,\uparrow}, \ldots, n_{N_{orb},\uparrow}</span>
 <span class="sd">        n_{1,\downarrow}, \ldots, n_{N_{orb},\downarrow}\rangle`.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">return</span> <span class="n">ed</span><span class="o">.</span><span class="n">get_impurity_rdm</span><span class="p">()</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">phonon_occ</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]:</span>
-<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""</span>
 <span class="sd">        Phonon mode occupancy :math:`\langle b^\dagger b\rangle` or</span>
 <span class="sd">        :py:data:`None` if calculations with phonons have not been enabled.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">return</span> <span class="n">ed</span><span class="o">.</span><span class="n">get_phon</span><span class="p">(</span><span class="n">ikind</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span> <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">phonon</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="k">else</span> <span class="kc">None</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">phonon_x</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]:</span>
-<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""</span>
 <span class="sd">        Expectation value of the phonon displacement operator,</span>
 <span class="sd">        :math:`\langle\hat X\rangle=\langle (b^\dagger + b) / \sqrt{2}\rangle`</span>
 <span class="sd">        or :py:data:`None` if calculations with phonons have not been enabled.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">return</span> <span class="n">ed</span><span class="o">.</span><span class="n">get_phon</span><span class="p">(</span><span class="n">ikind</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">phonon</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="k">else</span> <span class="kc">None</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">phonon_x2</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]:</span>
-<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""</span>
 <span class="sd">        Expectation value of the squared phonon displacement operator,</span>
 <span class="sd">        :math:`\langle\hat X^2\rangle=\langle(b^\dagger + b)^2 / 2\rangle` or</span>
 <span class="sd">        :py:data:`None` if calculations with phonons have not been enabled.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">return</span> <span class="n">ed</span><span class="o">.</span><span class="n">get_phon</span><span class="p">(</span><span class="n">ikind</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span> <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">phonon</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="k">else</span> <span class="kc">None</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_make_gf</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ed_func</span><span class="p">,</span> <span class="n">real_freq</span><span class="p">,</span> <span class="n">anomalous</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">BlockGf</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">anomalous</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">ed</span><span class="o">.</span><span class="n">get_ed_mode</span><span class="p">()</span> <span class="o">!=</span> <span class="nb">int</span><span class="p">(</span><span class="n">EDMode</span><span class="o">.</span><span class="n">SUPERC</span><span class="p">):</span>
-                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;anomalous = True is only supported for &quot;</span>
-                                   <span class="s2">&quot;superconducting bath&quot;</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">"anomalous = True is only supported for "</span>
+                                   <span class="s2">"superconducting bath"</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">real_freq</span><span class="p">:</span>
             <span class="n">mesh</span> <span class="o">=</span> <span class="n">MeshReFreq</span><span class="p">(</span><span class="n">window</span><span class="o">=</span><span class="p">(</span><span class="n">ed</span><span class="o">.</span><span class="n">wini</span><span class="p">,</span> <span class="n">ed</span><span class="o">.</span><span class="n">wfin</span><span class="p">),</span> <span class="n">n_w</span><span class="o">=</span><span class="n">ed</span><span class="o">.</span><span class="n">Lreal</span><span class="p">)</span>
             <span class="n">z_vals</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">([</span><span class="nb">complex</span><span class="p">(</span><span class="n">z</span><span class="p">)</span> <span class="o">+</span> <span class="n">ed</span><span class="o">.</span><span class="n">eps</span> <span class="o">*</span> <span class="mi">1</span><span class="n">j</span> <span class="k">for</span> <span class="n">z</span> <span class="ow">in</span> <span class="n">mesh</span><span class="p">])</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">mesh</span> <span class="o">=</span> <span class="n">MeshImFreq</span><span class="p">(</span><span class="n">beta</span><span class="o">=</span><span class="n">ed</span><span class="o">.</span><span class="n">beta</span><span class="p">,</span> <span class="n">statistic</span><span class="o">=</span><span class="s2">&quot;Fermion&quot;</span><span class="p">,</span> <span class="n">n_iw</span><span class="o">=</span><span class="n">ed</span><span class="o">.</span><span class="n">Lmats</span><span class="p">)</span>
+            <span class="n">mesh</span> <span class="o">=</span> <span class="n">MeshImFreq</span><span class="p">(</span><span class="n">beta</span><span class="o">=</span><span class="n">ed</span><span class="o">.</span><span class="n">beta</span><span class="p">,</span> <span class="n">statistic</span><span class="o">=</span><span class="s2">"Fermion"</span><span class="p">,</span> <span class="n">n_iw</span><span class="o">=</span><span class="n">ed</span><span class="o">.</span><span class="n">Lmats</span><span class="p">)</span>
             <span class="n">z_vals</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">([</span><span class="nb">complex</span><span class="p">(</span><span class="n">z</span><span class="p">)</span> <span class="k">for</span> <span class="n">z</span> <span class="ow">in</span> <span class="n">mesh</span><span class="p">])</span>
 
         <span class="k">with</span> <span class="n">chdircontext</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">wdname</span><span class="p">):</span>
-            <span class="n">data</span> <span class="o">=</span> <span class="n">ed_func</span><span class="p">(</span><span class="n">z_vals</span><span class="p">,</span> <span class="n">typ</span><span class="o">=</span><span class="s1">&#39;a&#39;</span> <span class="k">if</span> <span class="n">anomalous</span> <span class="k">else</span> <span class="s1">&#39;n&#39;</span><span class="p">)</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="n">ed_func</span><span class="p">(</span><span class="n">z_vals</span><span class="p">,</span> <span class="n">typ</span><span class="o">=</span><span class="s1">'a'</span> <span class="k">if</span> <span class="n">anomalous</span> <span class="k">else</span> <span class="s1">'n'</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">anomalous</span><span class="p">:</span>
             <span class="n">F</span> <span class="o">=</span> <span class="n">Gf</span><span class="p">(</span><span class="n">mesh</span><span class="o">=</span><span class="n">mesh</span><span class="p">,</span> <span class="n">target_shape</span><span class="o">=</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">norb</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">norb</span><span class="p">))</span>
@@ -1270,57 +1270,57 @@
                        <span class="n">make_copies</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 
     <span class="c1">#</span>
-    <span class="c1"># Green&#39;s functions</span>
+    <span class="c1"># Green's functions</span>
     <span class="c1">#</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">g_iw</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">BlockGf</span><span class="p">:</span>
-        <span class="s2">&quot;Matsubara impurity Green&#39;s function.&quot;</span>
+        <span class="s2">"Matsubara impurity Green's function."</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_make_gf</span><span class="p">(</span><span class="n">ed</span><span class="o">.</span><span class="n">build_gimp</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">g_an_iw</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">BlockGf</span><span class="p">:</span>
-        <span class="s2">&quot;Anomalous Matsubara impurity Green&#39;s function.&quot;</span>
+        <span class="s2">"Anomalous Matsubara impurity Green's function."</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_make_gf</span><span class="p">(</span><span class="n">ed</span><span class="o">.</span><span class="n">build_gimp</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">g_w</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">BlockGf</span><span class="p">:</span>
-        <span class="s2">&quot;Real-frequency impurity Green&#39;s function.&quot;</span>
+        <span class="s2">"Real-frequency impurity Green's function."</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_make_gf</span><span class="p">(</span><span class="n">ed</span><span class="o">.</span><span class="n">build_gimp</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">g_an_w</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">BlockGf</span><span class="p">:</span>
-        <span class="s2">&quot;Anomalous real-frequency impurity Green&#39;s function.&quot;</span>
+        <span class="s2">"Anomalous real-frequency impurity Green's function."</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_make_gf</span><span class="p">(</span><span class="n">ed</span><span class="o">.</span><span class="n">build_gimp</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
 
     <span class="c1">#</span>
-    <span class="c1"># Non-interacting Green&#39;s functions</span>
+    <span class="c1"># Non-interacting Green's functions</span>
     <span class="c1">#</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">g0_iw</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">BlockGf</span><span class="p">:</span>
-        <span class="s2">&quot;Matsubara non-interacting impurity Green&#39;s function&quot;</span>
+        <span class="s2">"Matsubara non-interacting impurity Green's function"</span>
         <span class="k">def</span><span class="w"> </span><span class="nf">ed_func</span><span class="p">(</span><span class="n">z_vals</span><span class="p">,</span> <span class="n">typ</span><span class="p">):</span>
             <span class="k">return</span> <span class="n">ed</span><span class="o">.</span><span class="n">get_g0and</span><span class="p">(</span><span class="n">z_vals</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">bath</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">typ</span><span class="o">=</span><span class="n">typ</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_make_gf</span><span class="p">(</span><span class="n">ed_func</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">g0_an_iw</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">BlockGf</span><span class="p">:</span>
-        <span class="s2">&quot;Anomalous Matsubara non-interacting impurity Green&#39;s function&quot;</span>
+        <span class="s2">"Anomalous Matsubara non-interacting impurity Green's function"</span>
         <span class="k">def</span><span class="w"> </span><span class="nf">ed_func</span><span class="p">(</span><span class="n">z_vals</span><span class="p">,</span> <span class="n">typ</span><span class="p">):</span>
             <span class="k">return</span> <span class="n">ed</span><span class="o">.</span><span class="n">get_g0and</span><span class="p">(</span><span class="n">z_vals</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">bath</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">typ</span><span class="o">=</span><span class="n">typ</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_make_gf</span><span class="p">(</span><span class="n">ed_func</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">g0_w</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">BlockGf</span><span class="p">:</span>
-        <span class="s2">&quot;Real-frequency non-interacting impurity Green&#39;s function&quot;</span>
+        <span class="s2">"Real-frequency non-interacting impurity Green's function"</span>
         <span class="k">def</span><span class="w"> </span><span class="nf">ed_func</span><span class="p">(</span><span class="n">z_vals</span><span class="p">,</span> <span class="n">typ</span><span class="p">):</span>
             <span class="k">return</span> <span class="n">ed</span><span class="o">.</span><span class="n">get_g0and</span><span class="p">(</span><span class="n">z_vals</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">bath</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">typ</span><span class="o">=</span><span class="n">typ</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_make_gf</span><span class="p">(</span><span class="n">ed_func</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">g0_an_w</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">BlockGf</span><span class="p">:</span>
-        <span class="s2">&quot;Anomalous real-frequency non-interacting impurity Green&#39;s function&quot;</span>
+        <span class="s2">"Anomalous real-frequency non-interacting impurity Green's function"</span>
         <span class="k">def</span><span class="w"> </span><span class="nf">ed_func</span><span class="p">(</span><span class="n">z_vals</span><span class="p">,</span> <span class="n">typ</span><span class="p">):</span>
             <span class="k">return</span> <span class="n">ed</span><span class="o">.</span><span class="n">get_g0and</span><span class="p">(</span><span class="n">z_vals</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">bath</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">typ</span><span class="o">=</span><span class="n">typ</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_make_gf</span><span class="p">(</span><span class="n">ed_func</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
@@ -1331,22 +1331,22 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">Sigma_iw</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">BlockGf</span><span class="p">:</span>
-        <span class="s2">&quot;Matsubara impurity self-energy.&quot;</span>
+        <span class="s2">"Matsubara impurity self-energy."</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_make_gf</span><span class="p">(</span><span class="n">ed</span><span class="o">.</span><span class="n">build_sigma</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">Sigma_an_iw</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">BlockGf</span><span class="p">:</span>
-        <span class="s2">&quot;Anomalous Matsubara impurity self-energy.&quot;</span>
+        <span class="s2">"Anomalous Matsubara impurity self-energy."</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_make_gf</span><span class="p">(</span><span class="n">ed</span><span class="o">.</span><span class="n">build_sigma</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">Sigma_w</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">BlockGf</span><span class="p">:</span>
-        <span class="s2">&quot;Real-frequency impurity self-energy.&quot;</span>
+        <span class="s2">"Real-frequency impurity self-energy."</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_make_gf</span><span class="p">(</span><span class="n">ed</span><span class="o">.</span><span class="n">build_sigma</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">Sigma_an_w</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">BlockGf</span><span class="p">:</span>
-        <span class="s2">&quot;Anomalous real-frequency impurity self-energy.&quot;</span>
+        <span class="s2">"Anomalous real-frequency impurity self-energy."</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_make_gf</span><span class="p">(</span><span class="n">ed</span><span class="o">.</span><span class="n">build_sigma</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
 
     <span class="c1">#</span>
@@ -1355,28 +1355,28 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">Delta_iw</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">BlockGf</span><span class="p">:</span>
-        <span class="s2">&quot;Matsubara hybridization function&quot;</span>
+        <span class="s2">"Matsubara hybridization function"</span>
         <span class="k">def</span><span class="w"> </span><span class="nf">ed_func</span><span class="p">(</span><span class="n">z_vals</span><span class="p">,</span> <span class="n">typ</span><span class="p">):</span>
             <span class="k">return</span> <span class="n">ed</span><span class="o">.</span><span class="n">get_delta</span><span class="p">(</span><span class="n">z_vals</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">bath</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">typ</span><span class="o">=</span><span class="n">typ</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_make_gf</span><span class="p">(</span><span class="n">ed_func</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">Delta_an_iw</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">BlockGf</span><span class="p">:</span>
-        <span class="s2">&quot;Anomalous Matsubara hybridization function&quot;</span>
+        <span class="s2">"Anomalous Matsubara hybridization function"</span>
         <span class="k">def</span><span class="w"> </span><span class="nf">ed_func</span><span class="p">(</span><span class="n">z_vals</span><span class="p">,</span> <span class="n">typ</span><span class="p">):</span>
             <span class="k">return</span> <span class="n">ed</span><span class="o">.</span><span class="n">get_delta</span><span class="p">(</span><span class="n">z_vals</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">bath</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">typ</span><span class="o">=</span><span class="n">typ</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_make_gf</span><span class="p">(</span><span class="n">ed_func</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">Delta_w</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">BlockGf</span><span class="p">:</span>
-        <span class="s2">&quot;Real-frequency hybridization function&quot;</span>
+        <span class="s2">"Real-frequency hybridization function"</span>
         <span class="k">def</span><span class="w"> </span><span class="nf">ed_func</span><span class="p">(</span><span class="n">z_vals</span><span class="p">,</span> <span class="n">typ</span><span class="p">):</span>
             <span class="k">return</span> <span class="n">ed</span><span class="o">.</span><span class="n">get_delta</span><span class="p">(</span><span class="n">z_vals</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">bath</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">typ</span><span class="o">=</span><span class="n">typ</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_make_gf</span><span class="p">(</span><span class="n">ed_func</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">Delta_an_w</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">BlockGf</span><span class="p">:</span>
-        <span class="s2">&quot;Anomalous real-frequency hybridization function&quot;</span>
+        <span class="s2">"Anomalous real-frequency hybridization function"</span>
         <span class="k">def</span><span class="w"> </span><span class="nf">ed_func</span><span class="p">(</span><span class="n">z_vals</span><span class="p">,</span> <span class="n">typ</span><span class="p">):</span>
             <span class="k">return</span> <span class="n">ed</span><span class="o">.</span><span class="n">get_delta</span><span class="p">(</span><span class="n">z_vals</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">bath</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">typ</span><span class="o">=</span><span class="n">typ</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_make_gf</span><span class="p">(</span><span class="n">ed_func</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
@@ -1388,27 +1388,27 @@
     <span class="k">def</span><span class="w"> </span><span class="nf">_make_chi</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">chan</span><span class="p">,</span> <span class="n">axis</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Gf</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">ed</span><span class="o">.</span><span class="n">get_ed_mode</span><span class="p">()</span> <span class="o">!=</span> <span class="nb">int</span><span class="p">(</span><span class="n">EDMode</span><span class="o">.</span><span class="n">NORMAL</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
-                <span class="s2">&quot;Response functions are only available in the normal ED mode&quot;</span>
+                <span class="s2">"Response functions are only available in the normal ED mode"</span>
             <span class="p">)</span>
 
         <span class="k">match</span> <span class="n">axis</span><span class="p">:</span>
-            <span class="k">case</span> <span class="s2">&quot;m&quot;</span><span class="p">:</span>
+            <span class="k">case</span> <span class="s2">"m"</span><span class="p">:</span>
                 <span class="n">mesh</span> <span class="o">=</span> <span class="n">MeshImFreq</span><span class="p">(</span><span class="n">beta</span><span class="o">=</span><span class="n">ed</span><span class="o">.</span><span class="n">beta</span><span class="p">,</span>
-                                  <span class="n">statistic</span><span class="o">=</span><span class="s2">&quot;Boson&quot;</span><span class="p">,</span>
+                                  <span class="n">statistic</span><span class="o">=</span><span class="s2">"Boson"</span><span class="p">,</span>
                                   <span class="n">n_iw</span><span class="o">=</span><span class="n">ed</span><span class="o">.</span><span class="n">Lmats</span><span class="p">)</span>
                 <span class="n">z_vals</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">([</span><span class="nb">complex</span><span class="p">(</span><span class="n">z</span><span class="p">)</span> <span class="k">for</span> <span class="n">z</span> <span class="ow">in</span> <span class="n">mesh</span><span class="p">])</span>
-            <span class="k">case</span> <span class="s2">&quot;r&quot;</span><span class="p">:</span>
+            <span class="k">case</span> <span class="s2">"r"</span><span class="p">:</span>
                 <span class="n">mesh</span> <span class="o">=</span> <span class="n">MeshReFreq</span><span class="p">(</span><span class="n">window</span><span class="o">=</span><span class="p">(</span><span class="n">ed</span><span class="o">.</span><span class="n">wini</span><span class="p">,</span> <span class="n">ed</span><span class="o">.</span><span class="n">wfin</span><span class="p">),</span> <span class="n">n_w</span><span class="o">=</span><span class="n">ed</span><span class="o">.</span><span class="n">Lreal</span><span class="p">)</span>
                 <span class="n">z_vals</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">([</span><span class="nb">complex</span><span class="p">(</span><span class="n">z</span><span class="p">)</span> <span class="o">+</span> <span class="n">ed</span><span class="o">.</span><span class="n">eps</span> <span class="o">*</span> <span class="mi">1</span><span class="n">j</span> <span class="k">for</span> <span class="n">z</span> <span class="ow">in</span> <span class="n">mesh</span><span class="p">])</span>
-            <span class="k">case</span> <span class="s2">&quot;t&quot;</span><span class="p">:</span>
+            <span class="k">case</span> <span class="s2">"t"</span><span class="p">:</span>
                 <span class="n">mesh</span> <span class="o">=</span> <span class="n">MeshImTime</span><span class="p">(</span><span class="n">beta</span><span class="o">=</span><span class="n">ed</span><span class="o">.</span><span class="n">beta</span><span class="p">,</span>
-                                  <span class="n">statistic</span><span class="o">=</span><span class="s2">&quot;Boson&quot;</span><span class="p">,</span>
+                                  <span class="n">statistic</span><span class="o">=</span><span class="s2">"Boson"</span><span class="p">,</span>
                                   <span class="n">n_tau</span><span class="o">=</span><span class="n">ed</span><span class="o">.</span><span class="n">Ltau</span><span class="p">)</span>
                 <span class="n">z_vals</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">([</span><span class="nb">complex</span><span class="p">(</span><span class="n">z</span><span class="p">)</span> <span class="k">for</span> <span class="n">z</span> <span class="ow">in</span> <span class="n">mesh</span><span class="p">])</span>
             <span class="k">case</span><span class="w"> </span><span class="k">_</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">AssertionError</span><span class="p">(</span><span class="s2">&quot;Unexpected axis&quot;</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="ne">AssertionError</span><span class="p">(</span><span class="s2">"Unexpected axis"</span><span class="p">)</span>
 
-        <span class="n">target_shape</span> <span class="o">=</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">norb</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">norb</span><span class="p">)</span> <span class="k">if</span> <span class="n">chan</span> <span class="o">==</span> <span class="s2">&quot;exct&quot;</span> <span class="k">else</span> \
+        <span class="n">target_shape</span> <span class="o">=</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">norb</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">norb</span><span class="p">)</span> <span class="k">if</span> <span class="n">chan</span> <span class="o">==</span> <span class="s2">"exct"</span> <span class="k">else</span> \
                        <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">norb</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">norb</span><span class="p">)</span>
 
         <span class="k">with</span> <span class="n">chdircontext</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">wdname</span><span class="p">):</span>
@@ -1420,23 +1420,23 @@
         <span class="k">return</span> <span class="n">chi</span>
 
     <span class="c1">#</span>
-    <span class="c1"># Green&#39;s functions of phonons</span>
+    <span class="c1"># Green's functions of phonons</span>
     <span class="c1">#</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">phonon_D_iw</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]:</span>
-<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Phononic Matsubara Green&#39;s function. :py:data:`None` is returned if</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""</span>
+<span class="sd">        Phononic Matsubara Green's function. :py:data:`None` is returned if</span>
 <span class="sd">        calculations with phonons have not been enabled.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">phonon</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">None</span>
 
-        <span class="n">mesh</span> <span class="o">=</span> <span class="n">MeshImFreq</span><span class="p">(</span><span class="n">beta</span><span class="o">=</span><span class="n">ed</span><span class="o">.</span><span class="n">beta</span><span class="p">,</span> <span class="n">statistic</span><span class="o">=</span><span class="s2">&quot;Boson&quot;</span><span class="p">,</span> <span class="n">n_iw</span><span class="o">=</span><span class="n">ed</span><span class="o">.</span><span class="n">Lmats</span><span class="p">)</span>
+        <span class="n">mesh</span> <span class="o">=</span> <span class="n">MeshImFreq</span><span class="p">(</span><span class="n">beta</span><span class="o">=</span><span class="n">ed</span><span class="o">.</span><span class="n">beta</span><span class="p">,</span> <span class="n">statistic</span><span class="o">=</span><span class="s2">"Boson"</span><span class="p">,</span> <span class="n">n_iw</span><span class="o">=</span><span class="n">ed</span><span class="o">.</span><span class="n">Lmats</span><span class="p">)</span>
         <span class="n">z_vals</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">([</span><span class="nb">complex</span><span class="p">(</span><span class="n">z</span><span class="p">)</span> <span class="k">for</span> <span class="n">z</span> <span class="ow">in</span> <span class="n">mesh</span><span class="p">])</span>
 
         <span class="k">with</span> <span class="n">chdircontext</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">wdname</span><span class="p">):</span>
-            <span class="n">data</span> <span class="o">=</span> <span class="n">ed</span><span class="o">.</span><span class="n">get_dimp</span><span class="p">(</span><span class="n">zeta</span><span class="o">=</span><span class="n">z_vals</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="s2">&quot;m&quot;</span><span class="p">)</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="n">ed</span><span class="o">.</span><span class="n">get_dimp</span><span class="p">(</span><span class="n">zeta</span><span class="o">=</span><span class="n">z_vals</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="s2">"m"</span><span class="p">)</span>
 
         <span class="n">D</span> <span class="o">=</span> <span class="n">Gf</span><span class="p">(</span><span class="n">mesh</span><span class="o">=</span><span class="n">mesh</span><span class="p">,</span> <span class="n">target_shape</span><span class="o">=</span><span class="p">())</span>
         <span class="n">D</span><span class="o">.</span><span class="n">data</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">data</span>
@@ -1445,10 +1445,10 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">phonon_D_w</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">]:</span>
-<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Phononic real-frequency Green&#39;s function. :py:data:`None` is returned if</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""</span>
+<span class="sd">        Phononic real-frequency Green's function. :py:data:`None` is returned if</span>
 <span class="sd">        calculations with phonons have not been enabled.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">phonon</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">None</span>
 
@@ -1456,7 +1456,7 @@
         <span class="n">z_vals</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">([</span><span class="nb">complex</span><span class="p">(</span><span class="n">z</span><span class="p">)</span> <span class="o">+</span> <span class="n">ed</span><span class="o">.</span><span class="n">eps</span> <span class="o">*</span> <span class="mi">1</span><span class="n">j</span> <span class="k">for</span> <span class="n">z</span> <span class="ow">in</span> <span class="n">mesh</span><span class="p">])</span>
 
         <span class="k">with</span> <span class="n">chdircontext</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">wdname</span><span class="p">):</span>
-            <span class="n">data</span> <span class="o">=</span> <span class="n">ed</span><span class="o">.</span><span class="n">get_dimp</span><span class="p">(</span><span class="n">zeta</span><span class="o">=</span><span class="n">z_vals</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="s2">&quot;r&quot;</span><span class="p">)</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="n">ed</span><span class="o">.</span><span class="n">get_dimp</span><span class="p">(</span><span class="n">zeta</span><span class="o">=</span><span class="n">z_vals</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="s2">"r"</span><span class="p">)</span>
 
         <span class="n">D</span> <span class="o">=</span> <span class="n">Gf</span><span class="p">(</span><span class="n">mesh</span><span class="o">=</span><span class="n">mesh</span><span class="p">,</span> <span class="n">target_shape</span><span class="o">=</span><span class="p">())</span>
         <span class="n">D</span><span class="o">.</span><span class="n">data</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">data</span>
@@ -1475,18 +1475,18 @@
 <span class="k">def</span><span class="w"> </span><span class="nf">_make_chi_property</span><span class="p">(</span><span class="n">chan</span><span class="p">,</span> <span class="n">chan_name</span><span class="p">,</span> <span class="n">axis</span><span class="p">,</span> <span class="n">axis_name</span><span class="p">):</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">getter</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Gf</span><span class="p">:</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_make_chi</span><span class="p">(</span><span class="n">chan</span><span class="p">,</span> <span class="n">axis</span><span class="p">)</span>
-    <span class="n">docstring</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">axis_name</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">chan_name</span><span class="si">}</span><span class="s2"> response function&quot;</span>
+    <span class="n">docstring</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">axis_name</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">chan_name</span><span class="si">}</span><span class="s2"> response function"</span>
     <span class="k">return</span> <span class="nb">property</span><span class="p">(</span><span class="n">fget</span><span class="o">=</span><span class="n">getter</span><span class="p">,</span> <span class="n">doc</span><span class="o">=</span><span class="n">docstring</span><span class="p">)</span>
 
 
-<span class="k">for</span> <span class="n">chan</span><span class="p">,</span> <span class="n">chan_name</span> <span class="ow">in</span> <span class="p">[(</span><span class="s2">&quot;spin&quot;</span><span class="p">,</span> <span class="s2">&quot;spin&quot;</span><span class="p">),</span>
-                        <span class="p">(</span><span class="s2">&quot;dens&quot;</span><span class="p">,</span> <span class="s2">&quot;density&quot;</span><span class="p">),</span>
-                        <span class="p">(</span><span class="s2">&quot;pair&quot;</span><span class="p">,</span> <span class="s2">&quot;pairing&quot;</span><span class="p">),</span>
-                        <span class="p">(</span><span class="s2">&quot;exct&quot;</span><span class="p">,</span> <span class="s2">&quot;exciton&quot;</span><span class="p">)]:</span>
-    <span class="k">for</span> <span class="n">axis</span><span class="p">,</span> <span class="n">axis_name</span><span class="p">,</span> <span class="n">axis_suffix</span> <span class="ow">in</span> <span class="p">[(</span><span class="s2">&quot;m&quot;</span><span class="p">,</span> <span class="s2">&quot;Matsubara&quot;</span><span class="p">,</span> <span class="s2">&quot;iw&quot;</span><span class="p">),</span>
-                                         <span class="p">(</span><span class="s2">&quot;r&quot;</span><span class="p">,</span> <span class="s2">&quot;Real-frequency&quot;</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">),</span>
-                                         <span class="p">(</span><span class="s2">&quot;t&quot;</span><span class="p">,</span> <span class="s2">&quot;Imaginary time&quot;</span><span class="p">,</span> <span class="s2">&quot;tau&quot;</span><span class="p">)]:</span>
-        <span class="nb">setattr</span><span class="p">(</span><span class="n">EDIpackSolver</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;chi_</span><span class="si">{</span><span class="n">chan</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">axis_suffix</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+<span class="k">for</span> <span class="n">chan</span><span class="p">,</span> <span class="n">chan_name</span> <span class="ow">in</span> <span class="p">[(</span><span class="s2">"spin"</span><span class="p">,</span> <span class="s2">"spin"</span><span class="p">),</span>
+                        <span class="p">(</span><span class="s2">"dens"</span><span class="p">,</span> <span class="s2">"density"</span><span class="p">),</span>
+                        <span class="p">(</span><span class="s2">"pair"</span><span class="p">,</span> <span class="s2">"pairing"</span><span class="p">),</span>
+                        <span class="p">(</span><span class="s2">"exct"</span><span class="p">,</span> <span class="s2">"exciton"</span><span class="p">)]:</span>
+    <span class="k">for</span> <span class="n">axis</span><span class="p">,</span> <span class="n">axis_name</span><span class="p">,</span> <span class="n">axis_suffix</span> <span class="ow">in</span> <span class="p">[(</span><span class="s2">"m"</span><span class="p">,</span> <span class="s2">"Matsubara"</span><span class="p">,</span> <span class="s2">"iw"</span><span class="p">),</span>
+                                         <span class="p">(</span><span class="s2">"r"</span><span class="p">,</span> <span class="s2">"Real-frequency"</span><span class="p">,</span> <span class="s2">"w"</span><span class="p">),</span>
+                                         <span class="p">(</span><span class="s2">"t"</span><span class="p">,</span> <span class="s2">"Imaginary time"</span><span class="p">,</span> <span class="s2">"tau"</span><span class="p">)]:</span>
+        <span class="nb">setattr</span><span class="p">(</span><span class="n">EDIpackSolver</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"chi_</span><span class="si">{</span><span class="n">chan</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">axis_suffix</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
                 <span class="n">_make_chi_property</span><span class="p">(</span><span class="n">chan</span><span class="p">,</span> <span class="n">chan_name</span><span class="p">,</span> <span class="n">axis</span><span class="p">,</span> <span class="n">axis_name</span><span class="p">))</span>
 </pre></div>
 
